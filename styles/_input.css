@@ -1,0 +1,21 @@
+.inputRow {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.inputRow input {
+  flex: 1;
+  padding: 10px;
+  font-size: 1rem;
+}
+
+.inputRow button {
+  padding: 10px 16px;
+  font-size: 1rem;
+  background: black;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+}
