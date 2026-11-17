@@ -10,9 +10,29 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 ## Nu — ett aktivt spår åt gången
 | # | Spår | Klart när |
 |---|---|---|
-| 0.1 | **Städa dokumenten** → tre levande dokument (Produkt, Design, Plan) | Rätt filer ligger i projektet, gamla är arkiverade |
-| 0.2 | **Färsk repo-inventering** (Claude Code) | Vi vet vad som är byggt, och tabellen "specat/designat/byggt" är ifylld |
-| 0.3 | **Designgrund** (tokens + komponenter, tvåskiktsmodell) | Grundtokens + semantiska tokens skrivna, "öppet" markerat där inget är satt |
+| 0.1 | **Städa dokumenten** → tre levande dokument (Produkt, Design, Plan) | ✅ Skrivna och i repot. Kvar: arkivera gamla projektfiler, rätta minnet |
+| 0.2 | **Färsk repo-inventering** | ✅ Klar 2026-11-17, se "Kodläge" nedan |
+| 0.3 | **Designgrund** (tokens + komponenter, tvåskiktsmodell) | ✅ `design.md` skriven. Kvar: Claude Design-rebuild mot den |
+
+## Kodläge (inventerat 2026-11-17, commit `2ce6ed6`)
+
+| Yta | Specat | Designat | Byggt |
+|---|---|---|---|
+| Hem | ✅ | 🚧 | 🟡 Gammal stil: tio sektioner, filter utan logik. Ingen hälsningshero eller glas. |
+| Flöde | ✅ | ⬜ | 🟡 Grundversion (`feed.tsx`, ProductGrid) |
+| Hitta | ✅ | ⬜ | ✅ Fungerande chatt mot Claude API. Saknar länk till Produktdetalj, arkiv/ny chatt och tal. |
+| Sparat | ✅ | ⬜ | 🟡 Platt "gilla"-lista. Inga egna samlingar. |
+| Produktdetalj, Samling, Partner, Profil | ✅ | ⬜ | ⬜ Inga routes finns |
+| Onboarding | parkerad | — | — |
+
+**Fynd**
+1. **Datamodellen är den gamla.** `Product` är ett erbjudande (pris och nytt/begagnat ligger på produkten). Retailer och Offer saknas. 56 produkter finns.
+2. **Bara mörkt tema.** Ingen tema-provider, `userInterfaceStyle: dark`.
+3. **Bra utgångsläge för tokens:** bara 4 hex och 13 rgba utanför `constants/`. 20 av filerna använder redan `Colors`/`Spacing`, så migreringen till `theme/` blir liten.
+4. **Beroenden som saknas för designen:** `expo-blur` (glas), Familjen Grotesk (finns som Google Fonts-paket) och General Sans (finns inte där, filerna måste in i den tomma `assets/fonts`). Animation (Reanimated/gestures) och `expo-image` är ej installerade.
+5. **TypeScript:** inga fel (`tsc --noEmit`).
+6. **API-nyckeln ligger i klienten** (känd skuld). Modellnamnet i `claudeProxy.ts` (`claude-sonnet-5`) bör verifieras.
+7. **Skräp att städa:** `CardShowcase.tsx` är oanvänd, `ClusterCard` är omonterad, `test.json` i roten, och splash har vit bakgrund i en mörk app.
 
 ## Näst — i den här ordningen
 1. **Byggbas i koden:** tokens och basskomponenter (Glas, Pill, Kort, TopBar) enligt designgrunden
