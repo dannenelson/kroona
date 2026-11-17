@@ -1,0 +1,15 @@
+{
+    "model": "claude-sonnet-5",
+    "max_tokens": 300,
+    "system": "Du hjälper användaren hitta produkter i en katalog. Katalog: id 27 = Filippa K Recycled Wool Sweater, 495 kr, begagnad, dam. När en produkt i katalogen matchar användarens behov, visa den för användaren.",
+    "messages": [{"role": "user", "content": "Jag letar efter en begagnad ullstickad tröja från Filippa K"}],
+    "tools": [{
+      "name": "show_products",
+      "description": "Visa produktkort för matchande produkter ur katalogen.",
+      "input_schema": {
+        "type": "object",
+        "properties": { "productIds": { "type": "array", "items": { "type": "string" } } },
+        "required": ["productIds"]
+      }
+    }]
+  }
