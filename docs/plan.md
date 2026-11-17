@@ -29,13 +29,14 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 1. **Datamodellen är den gamla.** `Product` är ett erbjudande (pris och nytt/begagnat ligger på produkten). Retailer och Offer saknas. 56 produkter finns.
 2. **Bara mörkt tema.** Ingen tema-provider, `userInterfaceStyle: dark`.
 3. **Bra utgångsläge för tokens:** bara 4 hex och 13 rgba utanför `constants/`. 20 av filerna använder redan `Colors`/`Spacing`, så migreringen till `theme/` blir liten.
-4. **Beroenden som saknas för designen:** `expo-blur` (glas), Familjen Grotesk (finns som Google Fonts-paket) och General Sans (finns inte där, filerna måste in i den tomma `assets/fonts`). Animation (Reanimated/gestures) och `expo-image` är ej installerade.
+4. **Beroenden som saknas för designen:** `expo-blur` (glas) och Familjen Grotesk (Google Fonts-paket). UI-typsnitt blir Google Sans Flex (redan installerat, tillfällig grund). Animation (Reanimated/gestures) och `expo-image` är ej installerade och väntar tills en skärm behöver dem.
 5. **TypeScript:** inga fel (`tsc --noEmit`).
 6. **API-nyckeln ligger i klienten** (känd skuld). Modellnamnet i `claudeProxy.ts` (`claude-sonnet-5`) bör verifieras.
 7. **Skräp att städa:** `CardShowcase.tsx` är oanvänd, `ClusterCard` är omonterad, `test.json` i roten, och splash har vit bakgrund i en mörk app.
 
 ## Näst — i den här ordningen
-1. **Byggbas i koden:** tokens och basskomponenter (Glas, Pill, Kort, TopBar) enligt designgrunden
+1a. **Tema** (`theme/`, typsnitt, migrering) — brief: `docs/briefs/01-theme.md`
+1b. **Basskomponenter** (Glas, Pill, Kort, TopBar) på temat
 2. **Datamodell i koden:** Produkt / Återförsäljare / Erbjudande (koden speglar troligen den gamla modellen)
 3. **Produktdetalj** (mest efterfrågade luckan), sedan **Samlingsdetalj**
 4. **Sparat** med egna samlingar (AsyncStorage)

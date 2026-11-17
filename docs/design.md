@@ -52,20 +52,20 @@ Följer temat: mörkt glas i mörkt tema, ljust i ljust.
 Glaset måste hålla både över foto och över ren yta.
 
 ## 4. Typografi
-Familjen Grotesk (display) + General Sans (UI) ✅. Statiska vikter, ett fontfamilj-namn per vikt (inga variabla axlar i RN).
+Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex är en tillfällig grund (beslut 2026-11-17) och kan bytas senare genom att ändra typografitokens, utan att komponenter berörs. Statiska vikter, ett fontfamilj-namn per vikt (inga variabla axlar i RN).
 
-**Regel:** Familjen Grotesk används för rubriker, hero, samlingsnamn och logotyp. Allt annat är General Sans.
+**Regel:** Familjen Grotesk används för rubriker, hero, samlingsnamn och logotyp. Allt annat är Google Sans Flex.
 
 | Stil | Typsnitt | Vikt | Storlek / radhöjd | Status |
 |---|---|---|---|---|
 | `display` | Familjen Grotesk | 700 | 34 / 38 | 🔵 |
 | `title1` | Familjen Grotesk | 600 | 26 / 30 | 🔵 |
 | `title2` | Familjen Grotesk | 600 | 20 / 24 | 🔵 |
-| `headline` | General Sans | 600 | 17 / 22 | 🔵 |
-| `body` | General Sans | 400 | 15 / 22 | 🔵 |
-| `label` | General Sans | 500 | 13 / 18 | 🔵 |
-| `caption` | General Sans | 400 | 12 / 16 | 🔵 |
-| `price` | General Sans | 600 | enligt kontext | ✅ format |
+| `headline` | Google Sans Flex | 600 | 17 / 22 | 🔵 |
+| `body` | Google Sans Flex | 400 | 15 / 22 | 🔵 |
+| `label` | Google Sans Flex | 500 | 13 / 18 | 🔵 |
+| `caption` | Google Sans Flex | 400 | 12 / 16 | 🔵 |
+| `price` | Google Sans Flex | 600 | enligt kontext | ✅ format |
 
 **Prisformat** ✅: `1 490 kr`, "kr" direkt efter siffran på samma rad och cirka 70 % av prisets storlek. **Betyg** ✅: ikon före värde, `★ 4,8 (312)` och `🍃 4,2`.
 Textstorlek skalas med systemets inställning för text, och layouten måste tåla det. 🔵
@@ -119,10 +119,11 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 - **En** ingång: `theme/` (ersätter `constants/colors.ts` och `constants/spacing.ts`, inget andra system bredvid).
 - Filer: `colors.ts` (mörk + ljus, semantiska roller), `typography.ts`, `spacing.ts`, `radius.ts`, `shadows.ts`, `motion.ts`, `glass.ts`, `index.ts`.
 - `useTheme()` ger aktivt tema. Färger används bara inuti komponenter vid render.
-- Typsnitt laddas med `expo-font`, en fil per vikt.
-- **Migrering:** nuvarande kod har `#0f0f0e` och Google Sans Flex. Det byts när byggbasen börjar (Plan, "Näst" steg 1), och inte i förväg.
+- Typsnitt laddas med `expo-font` via `@expo-google-fonts`-paketen (Familjen Grotesk 600/700, Google Sans Flex 400/500/600).
+- **Migrering:** nuvarande kod har `#0f0f0e` och bara Google Sans Flex (400/500/700). Färgerna migreras i steg 1a och Familjen Grotesk läggs till för rubriker.
 
 ## 🟡 Öppet
+0. UI-typsnitt: Google Sans Flex är tillfälligt, byt vid behov
 1. `danger`-färg (först när fel/radera behövs)
 2. Glasets exakta alfa
 3. Ikonbibliotek och ikonvikt (nuvarande SVG-pipeline eller en samlad ikonuppsättning)
