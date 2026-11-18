@@ -7,17 +7,17 @@
 **Status på varje rad:**
 ✅ **Låst** = beslutat i designarbetet · 🔵 **Grund** = best-practice-värde så att ingenting är tomt, justeras fritt · 🟡 **Öppet** = behöver beslut
 
-Komponenternas former (korttaxonomi, SectionHeader, TopBar, FilterPills) ligger kvar i `designsystem.md` tills de flyttas hit. Det dokumentets färg-, typsnitts- och spacingavsnitt är ersatta av detta.
+Komponenternas former (korttaxonomi, SectionHeader, TopBar, TextTabs) ligger kvar i `designsystem.md` tills de flyttas hit. Det dokumentets färg-, typsnitts- och spacingavsnitt är ersatta av detta.
 
 ---
 
 ## 0. Riktning: Apple-ren ✅ (godkänd 2026-11-18)
-Källa: Claude Design "Kroona Looken A" (hela setet, mörkt och ljust). Detta **ersätter** guld som accent och justerar färg-, glas- och radietabellerna nedan. Tabellerna i §2–§6 uppdateras till dessa värden när brief 04 körs.
+Källa: Claude Design "Kroona Looken A" (hela setet, mörkt och ljust). Implementerat i brief 04; tabellerna i §2–§8 nedan matchar koden.
 
 - **Ingen accentfärg.** Neutral gråskala, fotot är enda färgen. Guld `#B8965A` utgår.
 - **Vald** = inverterad text/yta (mörk pill på ljust, ljus pill på mörkt). **Nedtryckt** = djupare yta + lätt nedskalning. **Inaktiv** = 35 % opacitet.
 - **Hörn:** squircle (`borderCurve: 'continuous'` i RN) på alla rundningar utom cirklar och pillar.
-- **Kanter:** kort toning + gradvis blur överst (bakom statusfält/Dynamic Island, något högre än den) och underst (bakom navigationen). Nav-ikoner låga, nära hemindikatorn. Komponent "kantblur", byggs i brief 04.
+- **Kanter:** kort toning + gradvis blur överst (bakom statusfält/Dynamic Island, något högre än den) och underst (bakom navigationen). Nav-ikoner låga, nära hemindikatorn. Komponent `EdgeFade`.
 - **Spara:** bokmärke, via långt tryck-meny (Spara · Följ varumärke · Dela · Visa liknande) plus en Spara-knapp på Produktdetalj.
 - **Typsnitt:** Familjen Grotesk (rubriker) + Google Sans Flex (UI) ✅ (Daniel, 2026-11-18).
 
@@ -39,37 +39,39 @@ Källa: Claude Design "Kroona Looken A" (hela setet, mörkt och ljust). Detta **
 
 Radier: bildkort/lista/meny 14 · samlingskort 16–18 · jämförelse 18 · pill 17 (34 hög) · knapp/glasknapp 22 (44) · sökfält 25 (50) · bubbla 20 (6 nere höger) · varumärke cirkel. Kantblur: 8 px max, tre lager (20 / 50 / 100 %) med mask.
 
-**Hållbarhet visas neutralt** (ingen grön/röd). `success`/`warning` i §2 gäller därför inte hållbarhetsvisning och ska tas bort eller användas bara för system-states.
+**Hållbarhet visas neutralt** (ingen grön/röd). `success`/`warning`/`successSubtle` finns kvar i temat bara för att Hitta (`warning`), CardShowcase och ClusterCard använder dem. Städas när de filerna tas bort.
 
 **Kvar att avgöra:** ljust glas över ren yta (syns knappt), solid scrim i botten i ljust, Spara-knappens storlek på små kort, ikonstil, om översta toningen i Expo Go är iOS 26 native scroll-edge.
 
 ## 1. Princip: två lager
 1. **Grundtokens** är råa värden (`#15171B`, `16`). De används bara inuti temat.
-2. **Semantiska tokens** är roller (`bg`, `textPrimary`, `accent`). Komponenter använder bara dessa.
+2. **Semantiska tokens** är roller (`bg`, `textPrimary`, `pressed`). Komponenter använder bara dessa.
 
 Då byts tema, märkesfärg eller typsnitt på ett ställe. Ingen hex, fontstorlek eller spacing-siffra skrivs i komponenter eller skärmar (undantag: lokala optiska justeringar, med kommentar).
 
-## 2. Färg
+## 2. Färg ✅ (Apple-ren, §0)
+Kodens rollnamn behölls i brief 04. Kolumnen "§0" visar vilket §0-namn rollen motsvarar.
 
-| Roll | Mörkt | Ljust | Status |
+| Roll i koden | §0 | Mörkt | Ljust |
 |---|---|---|---|
-| `bg` | `#15171B` | `#F5F6F8` | ✅ |
-| `surface` | `#1B1E23` | `#FFFFFF` | 🔵 |
-| `surfaceRaised` | `#22262C` | `#FFFFFF` + skugga | 🔵 |
-| `border` | `rgba(255,255,255,.08)` | `rgba(20,24,29,.10)` | 🔵 |
-| `textPrimary` | `#FFFFFF` | `#14181D` | ✅ |
-| `textSecondary` | `#C4C4C4` | `#4B525C` | 🔵 |
-| `textTertiary` | `#A0A4AB` | `#5F6672` | 🔵 |
-| `accent` (fyllning, ikon) | `#B8965A` | `#B8965A` | ✅ |
-| `accentText` (guld som text) | `#B8965A` | `#80602A` | 🔵 |
-| `onAccent` | `#15171B` | `#15171B` | 🔵 |
-| `cta` / `onCta` | `#F5F6F8` / `#15171B` | `#15171B` / `#F5F6F8` | ✅ |
-| `success` (hållbarhet hög) | `#4A9E5C` | `#2F7D43` | 🔵 |
-| `warning` (hållbarhet medel) | `#C08A4A` | `#8A5A1C` | 🔵 |
-| `successSubtle` (tonad yta bakom hållbarhet/kluster) | `#0C1A0E` | `#E4F1E7` | 🔵 |
-| `danger` | — | — | 🟡 behövs först vid fel- och raderingsstate |
+| `bg` | `bg` | `#15171B` | `#F5F6F8` |
+| `surface` | `surface` | `#1F2227` | `#FFFFFF` |
+| `surfaceRaised` | `surface2` | `#2A2D33` | `#E9EBEE` |
+| `pressed` | `pressed` | `#353840` | `#DCDFE3` |
+| `textPrimary` | `text` (även yta för vald) | `#F5F6F8` | `#15171B` |
+| `textSecondary` | `mute` | `#9298A2` | `#686E78` |
+| `textTertiary` | `mute` (§0 har två textnivåer) | `#9298A2` | `#686E78` |
+| `border` | `line` | `rgba(255,255,255,.10)` | `rgba(21,23,27,.10)` |
+| `sep` | `sep` | `rgba(255,255,255,.07)` | `rgba(21,23,27,.07)` |
+| `placeholder` | `placeholder` | `#24272D` | `#E2E5E9` |
+| `menu` | `menu` | `rgba(44,46,52,.80)` | `rgba(255,255,255,.82)` |
+| `scrim` | `scrim` (bakom lyft meny) | `rgba(8,9,11,.40)` | `rgba(21,23,27,.12)` |
+| `success` / `warning` / `successSubtle` | — | `#4A9E5C` / `#C08A4A` / `#0C1A0E` | `#2F7D43` / `#8A5A1C` / `#E4F1E7` |
+| `danger` | — | — | — 🟡 först vid fel/radera |
 
-**Kontrast kontrollerad (WCAG AA ≥ 4,5 för text):** alla textroller ovan klarar AA (lägst 4,63). Guld `#B8965A` på ljus bakgrund ger bara 2,57, så det får **aldrig** användas som text i ljust tema. Där gäller `accentText`.
+**Ingen accent.** `accent`, `accentText`, `onAccent` och `cta`/`onCta` är borttagna. Vald = `textPrimary` som yta och `bg` som text.
+
+**Kontrast:** `mute` på `bg` ger 6,2 (mörkt) och 4,75 (ljust), båda AA.
 
 **Foto-overlayer är fasta och identiska i båda teman** ✅: scrim enligt `scrimStops` nedan, mjuk och lång utfasning. Hero-rubriker på foto är det enda medvetna AA-undantaget. Knappar, pillar och priser ska alltid klara AA.
 
@@ -78,19 +80,23 @@ Då byts tema, märkesfärg eller typsnitt på ett ställe. Ingen hex, fontstorl
 | `scrimStops` (hero- och partnerkort, toning till solid botten) | `rgba(14,16,20)` med alfa 0 / .56 / .75 / 1 vid 0 / .4 / .65 / 1 | 🔵 |
 | `scrimSoft` (knapp/badge på foto) | `rgba(14,16,20,.6)` | 🔵 |
 | `onPhoto` / `onPhotoSecondary` (text på scrim) | `#FFFFFF` / `#C4C4C4` | 🔵 |
+| `photoFade` (kantblur över foto, topp) | `rgba(0,0,0,.4)` → 0 | ✅ |
 
-## 3. Glas (chrome på foto och på ren yta) ✅
-Följer temat: mörkt glas i mörkt tema, ljust i ljust.
+## 3. Glas ✅ (Apple-ren, §0)
+Följer temat. Tre toner i `components/Glass.tsx`: `theme` (över innehåll), `photo` (direkt på foto, lika i båda teman), `plain` (över ren yta).
 
-| Egenskap | Mörkt | Ljust | Status |
+| Egenskap | Mörkt (`glass`) | Ljust (`glass`) | Foto (`photoGlass`) |
 |---|---|---|---|
-| Fyllning | `rgba(14,16,20,.24)` | `rgba(255,255,255,.28)` | 🟡 alfa 0,20–0,30, justeras mot kod |
-| Blur | 10 | 10 | ✅ (8–12) |
-| Saturate | 180 % | 180 % | ✅ |
-| Kant | 1 px, `rgba(255,255,255,.10)` | 1 px, `rgba(255,255,255,.40)` | 🔵 en linje, aldrig dubbel |
-| Innehåll | vit | `#14181D` | ✅ |
+| Fyllning | `rgba(42,45,51,.72)` | `rgba(255,255,255,.72)` | `rgba(20,22,26,.34)` |
+| Kant (1 px, en linje) | `rgba(255,255,255,.14)` | `rgba(21,23,27,.10)` | `rgba(255,255,255,.24)` |
+| Innehåll | `#F5F6F8` | `#15171B` | `#FFFFFF` |
+| Blur / saturate | 20 / 160 % | 20 / 160 % | 20 / 160 % |
 
-Glaset måste hålla både över foto och över ren yta.
+`expo-blur` tar intensitet, inte radie: blur 20 ≈ intensity 50. Saturate saknas (närmast är BlurViews tint). 🟡 Ljust glas över ren yta (`plain` i ljust tema) använder `surface` + `line` utan blur tills frågan är avgjord.
+
+**Kantblur (`EdgeFade`):** max 8 px i tre lager (20 / 50 / 100 %), vart och ett med gradientmask (maskstopp 0–20→55 %, 0–40→80 %, 0–60→100 %), plus toning mot `bg`: topp alfa .80 / .50 / 0, botten .96 / .80 / 0. Höjd topp = safe area + 14 (≈ 68), botten 128. Kräver `@react-native-masked-view/masked-view`.
+
+**Kontextmeny (långt tryck):** bakgrund blur 18 (intensity 60) + `scrim`, lyft kort skala 1,04 med radie 16 och skugga `lift`, meny 250 bred, rader 46, `menu`-yta med blur 40 (intensity 90) och `glassLine`-kant.
 
 ## 4. Typografi
 Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex är en tillfällig grund (beslut 2026-11-17) och kan bytas senare genom att ändra typografitokens, utan att komponenter berörs. Statiska vikter, ett fontfamilj-namn per vikt (inga variabla axlar i RN).
@@ -112,6 +118,8 @@ Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex ä
 **Prisformat** ✅: `1 490 kr`, "kr" direkt efter siffran på samma rad och cirka 70 % av prisets storlek. **Betyg** ✅: ikon före värde, `★ 4,8 (312)` och `🍃 4,2`.
 Textstorlek skalas med systemets inställning för text, och layouten måste tåla det. 🔵
 
+Referensen "Kroona Looken A" använder några storlekar utan egen stil (pill 14/500, flik och knapp 15/500, kortetikett 13/400, navigation 10,5/500). Koden använder närmaste stil (`label`, `caption`, `micro`) tills de eventuellt läggs till. 🟡
+
 ## 5. Spacing (4-punktsskala)
 Alla nuvarande värden i appen passar in.
 
@@ -127,18 +135,21 @@ Alla nuvarande värden i appen passar in.
 
 Layout sker med `gap`, aldrig `marginRight` eller `marginBottom` på enskilda kort ✅. Minsta tryckyta 44 × 44 🔵. Ikonstorlekar 20 och 24 🔵.
 
-## 6. Radie
-| Token | px | Status |
+## 6. Radie ✅ (Apple-ren, §0)
+| Token | px | Används till |
 |---|---|---|
-| `tile` | 10 | ✅ täta flerbildsgrid |
-| `card` | 20 | ✅ bildcontainrar på kort |
-| `control` | 12 | 🔵 knappar, fält |
-| `full` | 999 | 🔵 pillar och cirkelknappar (löser den gamla öppna frågan) |
+| `tile` | 10 | täta flerbildsgrid (ProductCard S) |
+| `control` | 12 | raka knappar och fält |
+| `card` | 14 | bildkort, grupperad lista, meny |
+| `lifted` | 16 | lyft kort i kontextmeny, flödesbilder |
+| `collection` | 18 | samlingskort, jämförelse |
+| `bubble` | 20 | chattbubbla (6 nere höger) |
+| `full` | 999 | pillar (34 hög) och cirklar (glasknapp 44, sökfält 50, varumärke) |
 
-Alla icke-runda radier kombineras med `borderCurve: 'continuous'`. 🔵
+**Squircle:** alla rundningar utom cirklar och pillar har `borderCurve: 'continuous'`.
 
 ## 7. Elevation
-Mörkt tema: ingen skugga, djup uttrycks med `surface`-steg och `border`. 🔵
+Mörkt tema: ingen skugga, djup uttrycks med `surface`-steg och `border`. 🔵 Undantag i båda teman: `lift` (`0 30px 70px`, alfa .55 mörkt / .22 ljust) för lyft kort och `menu` (`0 20px 50px rgba(0,0,0,.25)`).
 Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` · `raised` `0 4px 12px rgba(20,24,29,.10)` · `overlay` `0 8px 24px rgba(20,24,29,.18)`.
 
 ## 8. Rörelse
@@ -149,7 +160,10 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 | `fast` / `base` / `slow` | 150 / 250 / 400 ms | 🔵 |
 | Easing | `cubic-bezier(0.2, 0, 0, 1)` | 🔵 |
 | Spring (gester, sheets) | damping 20, stiffness 220, mass 1 | 🔵 |
-| Tryck-feedback | opacity 0,8 på alla tryckbara | 🔵 |
+| Nedtryckt | `pressed`-yta + skala 0,96 (navigation 0,92). Text-flik: opacitet 0,55 | ✅ |
+| Inaktiv | opacitet 0,35 | ✅ |
+| Långt tryck | 450 ms, lyft skala 1,04 | ✅ |
+| Äldre komponenter | opacity 0,8 tills de görs om | 🔵 |
 | Reduce motion | respekteras alltid | ✅ krav |
 
 ## 9. Komponentkontrakt
@@ -171,6 +185,6 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 ## 🟡 Öppet
 0. ~~UI-typsnitt~~ ✅ Google Sans Flex vald 2026-11-18
 1. `danger`-färg (först när fel/radera behövs)
-2. Glasets exakta alfa
+2. ~~Glasets exakta alfa~~ ✅ .72 enligt §0 (foto .34)
 3. Ikonbibliotek och ikonvikt (nuvarande SVG-pipeline eller en samlad ikonuppsättning)
 4. Ljust temas foto-tonade ytor (hur färgtonad fotografi beter sig i ljust läge)

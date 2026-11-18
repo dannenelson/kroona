@@ -28,7 +28,6 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
       <ImageBackground
         source={{ uri: imageUrl }}
         style={styles.image}
-        imageStyle={styles.imageRadius}
       >
         <TouchableOpacity style={styles.followButton} onPress={() => toggleFollowed(id)}>
           <Text style={[styles.followIcon, followed && styles.followIconActive]}>
@@ -60,7 +59,7 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
 }
 
 // Allt innehåll ligger på foto + scrim, som är mörk i båda teman. Därför
-// används fasta overlay-färger (onPhoto). accent är samma i båda teman.
+// används fasta overlay-färger (onPhoto), identiska i båda teman.
 const useStyles = makeStyles((t) => ({
   card: {
     width: 150,
@@ -70,9 +69,6 @@ const useStyles = makeStyles((t) => ({
     overflow: 'hidden',
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: t.colors.border,
-  },
-  imageRadius: {
-    borderRadius: radius.card,
   },
   image: {
     width: '100%',
@@ -95,7 +91,7 @@ const useStyles = makeStyles((t) => ({
     color: overlay.onPhoto,
   },
   followIconActive: {
-    color: t.colors.accent,
+    color: overlay.onPhoto,
   },
   gradient: {
     position: 'absolute',
@@ -105,6 +101,7 @@ const useStyles = makeStyles((t) => ({
     height: '50%',
     borderBottomLeftRadius: radius.card,
     borderBottomRightRadius: radius.card,
+    borderCurve: 'continuous',
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingBottom: spacing.md,
@@ -112,7 +109,7 @@ const useStyles = makeStyles((t) => ({
   },
   tag: {
     ...typography.micro,
-    color: t.colors.accent,
+    color: overlay.onPhotoSecondary,
     letterSpacing: letterSpacing.caps,
     textTransform: 'uppercase',
     marginBottom: spacing.xs,

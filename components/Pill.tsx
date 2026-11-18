@@ -1,13 +1,13 @@
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import { useTheme, darkColors, darkGlass, typography, spacing, radius, motion, touchTarget } from '../theme';
+import { useTheme, darkColors, overlay, typography, spacing, radius, motion, touchTarget } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
 
 type Props = {
   children: string;
   onPress?: () => void;
-  /** 'glass' (standard) eller 'filled' (surfaceRaised). */
-  variant?: 'glass' | 'filled';
-  /** 'photo' ger fast mörkt glas och mörka temats cta, identiskt i båda teman. */
+  /** 'filled' (standard, surface2) eller 'glass' (på foto). */
+  variant?: 'filled' | 'glass';
+  /** Gäller glas-varianten: 'photo' ger fast mörkt glas i båda teman. */
   tone?: GlassTone;
   selected?: boolean;
   disabled?: boolean;
@@ -15,66 +15,29 @@ type Props = {
   style?: StyleProp<ViewStyle>;
 };
 
-// Höjden ges av innehållet: label-radhöjd + padding + kant (18 + 2×8 + 2×1 = 36).
+// Höjd 34 enligt referensen: label-radhöjd + padding (18 + 2×8).
 // hitSlop fyller ut till minsta tryckyta 44.
-// Samma kantbredd som glaset (lika i båda teman), så alla varianter blir lika höga.
-const BORDER = darkGlass.borderWidth;
-const PILL_HEIGHT = typography.label.lineHeight + spacing.sm * 2 + BORDER * 2;
+const PILL_HEIGHT = typography.label.lineHeight + spacing.sm * 2;
 const HIT = (touchTarget - PILL_HEIGHT) / 2;
 
 /**
  * Pill: byter innehåll överst på en skärm (design.md §11). Används INTE för
- * filtrering, det gör TextTabs. States: default, pressed (opacity 0,8),
- * selected (cta-stil, omvänd mot temat), disabled (tertiär text).
+ * filtrering, det gör TextTabs. States enligt design.md §0:
+ * pressed = pressed-yta + skala 0,96, selected = inverterad (text-färg som yta),
+ * disabled = 35 % opacitet. Form: pill (radie full, ingen squircle).
  */
 export default function Pill({
   children,
   onPress,
-  variant = 'glass',
-  tone = 'theme',
+  variant = 'filled',
+  tone = 'photo',
   selected = false,
   disabled = false,
   style,
 }: Props) {
   const { colors } = useTheme();
   const g = useGlass(tone);
-  const palette = tone === 'photo' ? darkColors : colors;
-
-  const textColor = disabled
-    ? palette.textTertiary
-    : selected
-      ? palette.onCta
-      : variant === 'glass'
-        ? g.content
-        : palette.textPrimary;
-
-  const label = <Text style={[styles.label, { color: textColor }]}>{children}</Text>;
-
-  let body;
-  if (selected) {
-    body = (
-      <View style={[styles.shape, { backgroundColor: palette.cta, borderColor: palette.cta }]}>
-        {label}
-      </View>
-    );
-  } else if (variant === 'glass') {
-    body = (
-      <Glass tone={tone} style={styles.shape}>
-        {label}
-      </Glass>
-    );
-  } else {
-    body = (
-      <View
-        style={[
-          styles.shape,
-          { backgroundColor: palette.surfaceRaised, borderColor: palette.surfaceRaised },
-        ]}
-      >
-        {label}
-      </View>
-    );
-  }
+  const onPhoto = variant === 'glass' && tone === 'photo';
 
   return (
     <Pressable
@@ -83,9 +46,39 @@ export default function Pill({
       disabled={disabled}
       onPress={onPress}
       hitSlop={{ top: HIT, bottom: HIT }}
-      style={({ pressed }) => [pressed && styles.pressed, style]}
+      style={({ pressed }) => [pressed && styles.pressed, disabled && styles.disabled, style]}
     >
-      {body}
+      {({ pressed }) => {
+        if (selected) {
+          const bg = onPhoto ? overlay.onPhoto : colors.textPrimary;
+          const fg = onPhoto ? darkColors.bg : colors.bg;
+          return (
+            <View style={[styles.shape, { backgroundColor: bg }]}>
+              <Text style={[styles.label, { color: fg }]}>{children}</Text>
+            </View>
+          );
+        }
+        if (variant === 'glass') {
+          return (
+            <Glass tone={tone} style={[styles.shape, styles.glassShape]}>
+              {pressed && (
+                <View style={[StyleSheet.absoluteFill, { backgroundColor: g.borderColor }]} />
+              )}
+              <Text style={[styles.label, { color: g.content }]}>{children}</Text>
+            </Glass>
+          );
+        }
+        return (
+          <View
+            style={[
+              styles.shape,
+              { backgroundColor: pressed ? colors.pressed : colors.surfaceRaised },
+            ]}
+          >
+            <Text style={[styles.label, { color: colors.textPrimary }]}>{children}</Text>
+          </View>
+        );
+      }}
     </Pressable>
   );
 }
@@ -95,14 +88,20 @@ const styles = StyleSheet.create({
     height: PILL_HEIGHT,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.full,
-    borderWidth: BORDER,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Glasets kant ligger innanför höjden, så glas-pillen blir lika hög.
+  glassShape: {
+    paddingHorizontal: spacing.lg,
   },
   label: {
     ...typography.label,
   },
   pressed: {
-    opacity: motion.pressedOpacity,
+    transform: [{ scale: motion.pressedScale }],
+  },
+  disabled: {
+    opacity: motion.disabledOpacity,
   },
 });

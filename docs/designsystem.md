@@ -54,7 +54,7 @@ För att länka till senaste chattar (Hitta) eller in till specifika kategorier.
 76×76 cirkel, guld-initial i mitten, namn under. Används i `DiscoverBrandsRow` ("Fler varumärken i din stil") — ersatte den ursprungliga PartnerCard-stilen där, eftersom destinationen är en varumärkes-*identitet* (profilsida) snarare än en produktförhandsvisning. **Ingen profilsida finns byggd än att länka till** — `onPress` är avsiktligt inte kopplad.
 
 ### AskBar — ✅ Implementerad, ej i taxonomin ursprungligen
-"Fråga Kroona"-textfält, ingen SectionHeader ovanför (medvetet diskret). Riktig navigation: skickar frågan till Hitta som en ny konversation (inte fejkad). Sitter direkt under FilterPills på Hem.
+"Fråga Kroona"-textfält, ingen SectionHeader ovanför (medvetet diskret). Riktig navigation: skickar frågan till Hitta som en ny konversation (inte fejkad). Sitter direkt under text-flikarna (TextTabs) på Hem.
 
 ### ContinueDialogRow — ✅ Implementerad (använder LinkCard Horizontal)
 "Fortsätt din dialog". Dummy-data idag — kräver riktig chatthistorik för äkta villkorad synlighet (dölj om ingen aktiv dialog finns). Se roadmap avsnitt 7/12.
@@ -114,15 +114,14 @@ Generalisering av `SectionTitle`. Ligger alltid UTANFÖR kort-wrappern, aldrig i
 
 Ersätter `DiscoveryPreviewCard`s egenbyggda rubrikrad (byggdes fristående innan `SectionTitle` hade ikon-stöd) — konsolideras till samma komponent.
 
-## 7. FilterPills / kategorifilter — ✅ Reviderat aug 2026 (ersätter tidigare flik-beslut)
+## 7. Filtrering = TextTabs — ✅ Uppdaterat 2026-11-18 (brief 04)
 
-**Historik, för att undvika förvirring:** under wireframe-genomgången (aug 2026) beslutades först att byta från pill-badges till text-flikar med understrykning (Pinterest-mönstret). Det beslutet är **överspelat** av det efterföljande Claude Design-arbetet med glassystemet (se avsnitt 9) — pillren är tillbaka, men nu som frostat glas snarare än solid bakgrundsfärg. Om äldre anteckningar nämner "text-flikar" för filter, är det inaktuellt.
+**Filtrering görs med text-flikar med understrykning** (`components/TextTabs.tsx`, Pinterest-mönstret, 44 px höga), se `design.md` §11. Komponenten FilterPills är borttagen. Beslutet om glaspillar för filter (aug 2026) är överspelat.
 
-**Nuvarande beslut:** pillar (`Allt`/`Textil`/`Keramik`/`Ljus` etc.), samma glasbehandling som övrigt chrome-på-foto (avsnitt 9):
-- Overksam (unselected) state: temats glas (mörkt glas i mörkt tema, ljust glas i ljust tema), textfärg = glasets motsatta innehållsfärg
-- **Aktiv/vald state:** samma behandling som primär CTA, INTE samma glas som overksam state — ljus bakgrund + mörk text i mörkt tema, mörk bakgrund + ljus text i ljust tema (omvänt mot glaset)
+- Ej vald: `textSecondary` (mute). Vald: `textPrimary` och understrykning i `textPrimary`. Ingen accentfärg.
+- **Pill** (`components/Pill.tsx`) byter innehåll överst på en skärm (t.ex. Allt · Mode · Heminredning), filtrerar inte. Vald pill är inverterad: textfärg som yta, bakgrundsfärg som text.
 
-Används på Hem och Flöde, samt som generisk facettering i CollectionCard-detalj (kan vara andra kategorier än kläder/möbler beroende på samlingstyp — se wireframes.md avsnitt 2).
+Används på Hem, Flöde och i samlingsdetalj (andra kategorier beroende på samlingstyp, se wireframes.md avsnitt 2).
 
 ## 8. TopBar — delad navigationskomponent (tillagt aug 2026)
 
@@ -134,7 +133,7 @@ Alla detaljvyer (Produktdetalj, CollectionCard-/PartnerCard-/ProfileCard-detalj)
 - **Höger slot:** alltid kontext-specifika åtgärder, 0–2 ikoner. Innehållet varierar per skärm men positionen och stilen gör det inte.
 
 **Exempel på höger-slot-innehåll per skärm:**
-- Produktdetalj: spara (hjärta)
+- Produktdetalj: spara (bokmärke). Spara finns också i menyn vid långt tryck på kort (Spara · Följ varumärke · Dela · Visa liknande); korten har ingen egen Spara-knapp.
 - Hitta: Arkiv + Ny chatt
 - Sparat (tab-rot, inget tillbaka-behov): Ny samling
 - CollectionCard-/PartnerCard-/ProfileCard-detalj: Följ/Avfölj (följda) ELLER Dela/redigera (egna samlingar, se wireframes.md avsnitt 2)
@@ -145,7 +144,9 @@ Alla detaljvyer (Produktdetalj, CollectionCard-/PartnerCard-/ProfileCard-detalj)
 
 ## 9. Glassystem — chrome ovanpå foto (tillagt aug 2026, framtaget i Claude Design)
 
-Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på temats bas-yta (TopBar-innehåll, FilterPills). Iterativt framtaget — värdena nedan är senast bekräftade, men **alfa-värdet för glasets bakgrundsfyllning är fortfarande inte helt låst** (senast diskuterat runt 0,20–0,30).
+> **Värdena nedan är ersatta** av `design.md` §0/§3 (Apple-ren, 2026-11-18). Avsnittet står kvar som historik för principerna (en kant, två kontexter, WCAG-undantaget).
+
+Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på temats bas-yta (TopBar-innehåll, pillar). Iterativt framtaget — värdena nedan är senast bekräftade, men **alfa-värdet för glasets bakgrundsfyllning är fortfarande inte helt låst** (senast diskuterat runt 0,20–0,30).
 
 **Grundregel:** mörkt tema → mörkt glas. Ljust tema → ljust glas. INTE ett fast glas oavsett tema (testat och förkastat under iterationen).
 

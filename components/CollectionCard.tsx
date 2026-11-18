@@ -44,7 +44,7 @@ const useStyles = makeStyles((t) => ({
     flexDirection: 'row',
     height: 160,
     gap: StyleSheet.hairlineWidth, // tunn bildskarv
-    borderRadius: radius.card,
+    borderRadius: radius.collection, // samlingskort (design.md §0)
     borderCurve: 'continuous',
     overflow: 'hidden',
     borderWidth: StyleSheet.hairlineWidth,
@@ -78,7 +78,7 @@ const useStyles = makeStyles((t) => ({
   },
   avatarText: {
     ...typography.label,
-    color: t.colors.accentText,
+    color: t.colors.textPrimary,
   },
   content: {
     paddingTop: spacing.md,

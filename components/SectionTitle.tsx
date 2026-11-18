@@ -46,7 +46,7 @@ const useStyles = makeStyles((t) => ({
   },
   preheader: {
     ...typography.micro,
-    color: t.colors.accentText,
+    color: t.colors.textSecondary,
     letterSpacing: letterSpacing.caps,
     textTransform: 'uppercase',
     marginBottom: spacing.xs,
@@ -72,6 +72,6 @@ const useStyles = makeStyles((t) => ({
   },
   ctaLabel: {
     ...typography.label,
-    color: t.colors.accentText,
+    color: t.colors.textPrimary,
   },
 }));

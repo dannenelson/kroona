@@ -196,7 +196,7 @@ export default function FindScreen() {
             if (item.id === LOADING_ID) {
               return (
                 <View style={[styles.bubble, styles.bubbleAssistant]}>
-                  <ActivityIndicator color={colors.accent} />
+                  <ActivityIndicator color={colors.textSecondary} />
                 </View>
               );
             }
@@ -327,7 +327,7 @@ const useStyles = makeStyles((t) => ({
   },
   bubbleUser: {
     backgroundColor: t.colors.surfaceRaised,
-    borderColor: t.colors.accent,
+    borderColor: t.colors.border,
     borderBottomRightRadius: 4, // lokal: bubblans "svans"-hörn
   },
   bubbleAssistant: {
@@ -372,7 +372,7 @@ const useStyles = makeStyles((t) => ({
     maxHeight: INPUT_MAX_HEIGHT,
   },
   sendButton: {
-    backgroundColor: t.colors.accent,
+    backgroundColor: t.colors.textPrimary, // vald/primär = inverterad (design.md §0)
     borderRadius: radius.card,
     borderCurve: 'continuous',
     paddingHorizontal: spacing.lg,
@@ -385,6 +385,6 @@ const useStyles = makeStyles((t) => ({
   },
   sendButtonText: {
     ...typography.label,
-    color: t.colors.onAccent,
+    color: t.colors.bg,
   },
 }));

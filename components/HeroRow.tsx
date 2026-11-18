@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { View, Text, ScrollView, ImageBackground, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { makeStyles, overlay, typography, letterSpacing, spacing, radius } from '../theme';
+import { makeStyles, darkColors, overlay, typography, letterSpacing, spacing, radius } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import { MixSignal, signalKey, getKnownSignals } from '../lib/personalizationSignals';
@@ -124,7 +124,6 @@ export default function HeroRow() {
             key={post.id}
             source={{ uri: post.imageUrl }}
             style={styles.card}
-            imageStyle={styles.cardImage}
           >
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{post.badge}</Text>
@@ -146,7 +145,7 @@ export default function HeroRow() {
 }
 
 // Innehållet ligger på foto + scrim, som är mörk i båda teman. Därför
-// används fasta overlay-färger (onPhoto). accent är samma i båda teman.
+// används fasta overlay-färger (onPhoto), identiska i båda teman.
 const useStyles = makeStyles((t) => ({
   section: {
     marginTop: spacing.xxl,
@@ -167,14 +166,11 @@ const useStyles = makeStyles((t) => ({
     borderWidth: StyleSheet.hairlineWidth,
     borderColor: t.colors.border,
   },
-  cardImage: {
-    borderRadius: radius.card,
-  },
   badge: {
     position: 'absolute',
     top: spacing.md,
     left: spacing.md,
-    backgroundColor: t.colors.accent,
+    backgroundColor: overlay.onPhoto, // inverterad badge på foto
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.xs,
     borderRadius: radius.full,
@@ -182,7 +178,7 @@ const useStyles = makeStyles((t) => ({
   },
   badgeText: {
     ...typography.micro,
-    color: t.colors.onAccent,
+    color: darkColors.bg,
     letterSpacing: 1, // lokal optisk spärrning
     textTransform: 'uppercase',
   },
@@ -198,7 +194,7 @@ const useStyles = makeStyles((t) => ({
   },
   eyebrow: {
     ...typography.micro,
-    color: t.colors.accent,
+    color: overlay.onPhotoSecondary,
     letterSpacing: letterSpacing.caps,
     textTransform: 'uppercase',
     marginBottom: spacing.xs,

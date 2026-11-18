@@ -3,29 +3,46 @@ import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { useTheme, photoGlass, type Glass as GlassToken } from '../theme';
 
-export type GlassTone = 'theme' | 'photo';
+/**
+ * 'theme': temats glas, över innehåll som scrollar under (t.ex. nedscrollad toppbar).
+ * 'photo': fast mörkt glas med vitt innehåll, för chrome direkt på foto.
+ * 'plain': över ren yta. I ljust tema blir det surface + line utan blur.
+ */
+export type GlassTone = 'theme' | 'photo' | 'plain';
 
 type Props = {
-  /** 'theme' följer temat, 'photo' är fast mörkt glas för chrome på foto. */
   tone?: GlassTone;
   style?: StyleProp<ViewStyle>;
   children?: ReactNode;
 };
 
+type ResolvedGlass = GlassToken & { blurred: boolean };
+
 /** Glastoken för en ton. Används också av komponenter som behöver innehållsfärgen. */
-export function useGlass(tone: GlassTone = 'theme'): GlassToken {
-  const { glass } = useTheme();
-  return tone === 'photo' ? photoGlass : glass;
+export function useGlass(tone: GlassTone = 'theme'): ResolvedGlass {
+  const { glass, colors, scheme } = useTheme();
+  if (tone === 'photo') return { ...photoGlass, blurred: true };
+  // TODO(design): ljust glas över ren ljus yta syns knappt (öppen designfråga).
+  // Tills vidare: surface + line, utan blur.
+  if (tone === 'plain' && scheme === 'light') {
+    return {
+      ...glass,
+      fill: colors.surface,
+      borderColor: colors.border,
+      content: colors.textPrimary,
+      blurred: false,
+    };
+  }
+  return { ...glass, blurred: true };
 }
 
 /**
- * Glasyta enligt docs/design.md §3: blur, fyllning och EN kant på 1 px.
- * Form (radie, storlek) kommer från `style`, som slås ihop sist.
+ * Glasyta enligt docs/design.md §0/§3: blur, fyllning och EN kant på 1 px.
+ * Form (radie, storlek) kommer från `style`, som slås ihop sist. Den som ger
+ * en icke-rund radie lägger själv till borderCurve: 'continuous'.
  *
- * Approximation: expo-blur saknar saturate (180 %). Närmast är BlurViews
- * tint-lager plus vår fyllning.
- * TODO(design): ljust glas över ren ljus yta (vit 28 % på ljust bg) syns
- * knappt mer än kanten. Öppen designfråga (a), implementerat enligt tokens.
+ * Approximation: expo-blur saknar saturate. Närmast är BlurViews tint-lager
+ * plus vår fyllning.
  */
 export default function Glass({ tone = 'theme', style, children }: Props) {
   const g = useGlass(tone);
@@ -37,12 +54,14 @@ export default function Glass({ tone = 'theme', style, children }: Props) {
         style,
       ]}
     >
-      <BlurView
-        tint={g.tint}
-        intensity={g.blurIntensity}
-        blurMethod="dimezisBlurViewSdk31Plus"
-        style={StyleSheet.absoluteFill}
-      />
+      {g.blurred && (
+        <BlurView
+          tint={g.tint}
+          intensity={g.blurIntensity}
+          blurMethod="dimezisBlurViewSdk31Plus"
+          style={StyleSheet.absoluteFill}
+        />
+      )}
       <View style={[StyleSheet.absoluteFill, { backgroundColor: g.fill }]} />
       {children}
     </View>
@@ -52,6 +71,5 @@ export default function Glass({ tone = 'theme', style, children }: Props) {
 const styles = StyleSheet.create({
   base: {
     overflow: 'hidden',
-    borderCurve: 'continuous',
   },
 });

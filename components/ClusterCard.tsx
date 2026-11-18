@@ -90,7 +90,7 @@ const useStyles = makeStyles((t) => ({
   },
   avatarInitial: {
     ...typography.headline,
-    color: t.colors.onAccent,
+    color: t.colors.bg,
   },
   content: {
     padding: spacing.lg,

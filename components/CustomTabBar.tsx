@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { BottomTabBarProps } from 'expo-router/js-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { makeStyles, useTheme, withAlpha, typography, fonts, spacing, motion } from '../theme';
+import { makeStyles, useTheme, typography, spacing, motion, touchTarget, iconSize } from '../theme';
+import EdgeFade from './EdgeFade';
 
 import HomeIcon from '../assets/icons/HomeIcon';
 import HomeIconFilled from '../assets/icons/HomeIcon_filled';
@@ -27,34 +27,28 @@ const LABELS: Record<string, string> = {
   saved: 'Sparat',
 };
 
-// Lokala mått för tab-baren (ikonens storlek och flikbredd är komponentmått,
-// inte spacing).
-const ICON_SIZE = 30;
+// Lokala mått för tab-baren (flikbredd och höjd är komponentmått, inte spacing).
+// Referensen "Kroona Looken A": flik 56 hög, ikon 25 (här iconSize.lg 24),
+// etikett 10,5/500 (här micro 10/14), ikonerna ligger lågt nära hemindikatorn.
 const TAB_WIDTH = 80;
-// Etikettens radhöjd följer typography.caption, så TAB_BAR_HEIGHT kan räknas
-// exakt i stället för att uppskattas.
-const LABEL_LINE_HEIGHT = typography.caption.lineHeight;
-
-const CONTAINER_PADDING_TOP = spacing.xxl;
-const CONTAINER_PADDING_BOTTOM = spacing.xs;
-const TAB_GAP = 6; // lokal optisk justering: ikon → etikett
+const TAB_ROW_HEIGHT = touchTarget + spacing.md; // 56
+const TAB_GAP = 3; // lokal optisk justering: ikon → etikett (referensen)
+// Hur långt in i hemindikatorns safe area flikarna sänks (referensen: 10 px
+// från skärmkanten på en iPhone med 34 px safe area).
+const NAV_LOWER = spacing.xl;
 
 export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useStyles();
+  // Flikarna sänks in i safe area, men aldrig närmare kanten än spacing.sm.
+  const bottomPad = Math.max(insets.bottom - NAV_LOWER, spacing.sm);
 
   return (
-    <View style={styles.container}>
-      {/* Gradient mot bakgrundstoken (bg med alfa), så att den möter
-          skärmens bakgrund utan söm i båda teman. */}
-      <LinearGradient
-        colors={[withAlpha(colors.bg, 0), withAlpha(colors.bg, 0.8), colors.bg]}
-        locations={[0, 0.5, 1]}
-        style={StyleSheet.absoluteFill}
-      />
+    <View style={[styles.container, { paddingBottom: bottomPad }]} pointerEvents="box-none">
+      {/* Kantblur ersätter den tidigare toningen (brief 04). */}
+      <EdgeFade position="bottom" />
 
-      {/* Meny-rad, se TAB_BAR_HEIGHT nedan — ej påverkad av insets */}
       <View style={styles.tabsRow}>
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
@@ -75,59 +69,58 @@ export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTa
             }
           };
 
+          const color = isFocused ? colors.textPrimary : colors.textSecondary;
+
           return (
-            <TouchableOpacity
+            <Pressable
               key={route.key}
-              style={styles.tab}
+              accessibilityRole="tab"
+              accessibilityLabel={label}
+              accessibilityState={{ selected: isFocused }}
+              style={({ pressed }) => [styles.tab, pressed && styles.pressed]}
               onPress={onPress}
-              activeOpacity={motion.pressedOpacity}
             >
-              <Icon color={colors.textPrimary} size={ICON_SIZE} />
-              <Text style={styles.label}>{label}</Text>
-            </TouchableOpacity>
+              <Icon color={color} size={iconSize.lg} />
+              <Text style={[styles.label, { color }]}>{label}</Text>
+            </Pressable>
           );
         })}
       </View>
-
-      {/* Safe area spacer under menyn */}
-      <View style={{ height: insets.bottom }} />
     </View>
   );
 }
 
-const useStyles = makeStyles((t) => ({
+const useStyles = makeStyles(() => ({
   container: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: spacing.screenMargin,
-    paddingTop: CONTAINER_PADDING_TOP,
-    paddingBottom: CONTAINER_PADDING_BOTTOM,
+    paddingHorizontal: spacing.sm,
   },
   tabsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center',
   },
   tab: {
     width: TAB_WIDTH,
+    height: TAB_ROW_HEIGHT,
     alignItems: 'center',
     justifyContent: 'center',
     gap: TAB_GAP,
   },
+  pressed: {
+    transform: [{ scale: motion.navPressedScale }],
+  },
   label: {
-    ...typography.caption,
-    fontFamily: fonts.ui500, // vikt 500 behålls, storlek från caption
-    color: t.colors.textPrimary,
+    ...typography.micro,
     includeFontPadding: false,
     textAlign: 'center',
   },
 }));
 
-// Summerar tab-barens egna kända mått från samma konstanter som stilen
-// använder, så en ändring av padding/gap/etikett slår igenom automatiskt.
-// insets.bottom ingår INTE här (det varierar per enhet/skärm) — varje
-// anropande skärm lägger till sin egen insets.bottom separat.
-export const TAB_BAR_HEIGHT =
-  CONTAINER_PADDING_TOP + ICON_SIZE + TAB_GAP + LABEL_LINE_HEIGHT + CONTAINER_PADDING_BOTTOM;
+// Utrymme som skärmarnas innehåll lämnar för tab-baren, utöver insets.bottom.
+// Flikraden plus luft. Flikarna sänks in i safe area på enheter med
+// hemindikator, så på dem blir det lite extra luft (ofarligt).
+export const TAB_BAR_HEIGHT = TAB_ROW_HEIGHT + spacing.sm;

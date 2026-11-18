@@ -39,7 +39,7 @@ function FontLoading() {
   const { colors } = useTheme();
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', alignItems: 'center' }}>
-      <ActivityIndicator color={colors.accent} />
+      <ActivityIndicator color={colors.textSecondary} />
     </View>
   );
 }

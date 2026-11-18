@@ -42,7 +42,7 @@ const useStyles = makeStyles((t) => ({
   },
   initial: {
     ...typography.headline,
-    color: t.colors.accentText,
+    color: t.colors.textPrimary,
   },
   name: {
     ...typography.caption,

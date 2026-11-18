@@ -78,6 +78,6 @@ const useStyles = makeStyles((t) => ({
   },
   arrow: {
     ...typography.body,
-    color: t.colors.accent, // pil-ikon: accent som fyllning/ikon
+    color: t.colors.textPrimary,
   },
 }));

@@ -40,7 +40,7 @@ const useStyles = makeStyles((t) => ({
   },
   avatarText: {
     ...typography.label,
-    color: t.colors.accentText,
+    color: t.colors.textPrimary,
   },
   logo: {
     ...typography.title2,

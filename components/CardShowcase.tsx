@@ -71,7 +71,7 @@ export default function CardShowcase() {
     { initial: string; color: string },
     { initial: string; color: string },
   ] = [
-    { initial: 'J', color: colors.accent },
+    { initial: 'J', color: colors.textPrimary },
     { initial: 'F', color: colors.success },
     { initial: 'H', color: colors.warning },
   ];

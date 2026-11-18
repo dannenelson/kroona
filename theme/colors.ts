@@ -1,19 +1,23 @@
-// Färgtokens enligt docs/design.md §2. Råa värden används bara här.
-// Komponenter läser semantiska roller via useTheme().colors.
+// Färgtokens enligt docs/design.md §0 och §2 (Apple-ren). Råa värden används
+// bara här. Komponenter läser semantiska roller via useTheme().colors.
+// Ingen märkesfärg: neutral gråskala, fotot är enda färgen.
 
 const raw = {
   ink900: '#15171B',
-  ink800: '#1B1E23',
-  ink700: '#22262C',
-  ink950: '#14181D',
+  ink850: '#1F2227',
+  ink800: '#24272D',
+  ink700: '#2A2D33',
+  ink600: '#353840',
+  grey500: '#9298A2',
+  slate500: '#686E78',
   paper50: '#F5F6F8',
+  paper100: '#E9EBEE',
+  paper150: '#E2E5E9',
+  paper200: '#DCDFE3',
   white: '#FFFFFF',
   grey300: '#C4C4C4',
-  grey400: '#A0A4AB',
-  slate600: '#4B525C',
-  slate500: '#5F6672',
-  gold: '#B8965A',
-  goldDeep: '#80602A',
+  // Används bara av system-states i Hitta och av CardShowcase/ClusterCard.
+  // Hållbarhet visas neutralt (design.md §0). Städas när de filerna tas bort.
   green: '#4A9E5C',
   greenDeep: '#2F7D43',
   greenNight: '#0C1A0E',
@@ -25,16 +29,26 @@ const raw = {
 export type ColorRoles = {
   bg: string;
   surface: string;
+  /** §0 `surface2`: pill, sekundär knapp, bubbla. */
   surfaceRaised: string;
+  /** Nedtryckt yta. */
+  pressed: string;
+  /** §0 `line`: hårlinjer och kanter. */
   border: string;
+  /** §0 `sep`: avdelare i grupperade listor och menyer. */
+  sep: string;
+  /** Bakgrund bakom bilder innan de laddat. */
+  placeholder: string;
+  /** §0 `text`. Används också som yta för vald (inverterad) state. */
   textPrimary: string;
+  /** §0 `mute`: sekundär text, ej vald flik. */
   textSecondary: string;
+  /** §0 har bara två textnivåer, tertiär = `mute`. */
   textTertiary: string;
-  accent: string;
-  accentText: string;
-  onAccent: string;
-  cta: string;
-  onCta: string;
+  /** Kontextmenyns yta (över blur). */
+  menu: string;
+  /** Dämpning bakom en lyft meny. */
+  scrim: string;
   success: string;
   successSubtle: string;
   warning: string;
@@ -42,17 +56,17 @@ export type ColorRoles = {
 
 export const darkColors: ColorRoles = {
   bg: raw.ink900,
-  surface: raw.ink800,
+  surface: raw.ink850,
   surfaceRaised: raw.ink700,
-  border: 'rgba(255,255,255,0.08)',
-  textPrimary: raw.white,
-  textSecondary: raw.grey300,
-  textTertiary: raw.grey400,
-  accent: raw.gold,
-  accentText: raw.gold,
-  onAccent: raw.ink900,
-  cta: raw.paper50,
-  onCta: raw.ink900,
+  pressed: raw.ink600,
+  border: 'rgba(255,255,255,0.10)',
+  sep: 'rgba(255,255,255,0.07)',
+  placeholder: raw.ink800,
+  textPrimary: raw.paper50,
+  textSecondary: raw.grey500,
+  textTertiary: raw.grey500,
+  menu: 'rgba(44,46,52,0.80)',
+  scrim: 'rgba(8,9,11,0.40)',
   success: raw.green,
   successSubtle: raw.greenNight,
   warning: raw.amber,
@@ -61,16 +75,16 @@ export const darkColors: ColorRoles = {
 export const lightColors: ColorRoles = {
   bg: raw.paper50,
   surface: raw.white,
-  surfaceRaised: raw.white,
-  border: 'rgba(20,24,29,0.10)',
-  textPrimary: raw.ink950,
-  textSecondary: raw.slate600,
+  surfaceRaised: raw.paper100,
+  pressed: raw.paper200,
+  border: 'rgba(21,23,27,0.10)',
+  sep: 'rgba(21,23,27,0.07)',
+  placeholder: raw.paper150,
+  textPrimary: raw.ink900,
+  textSecondary: raw.slate500,
   textTertiary: raw.slate500,
-  accent: raw.gold,
-  accentText: raw.goldDeep,
-  onAccent: raw.ink900,
-  cta: raw.ink950,
-  onCta: raw.paper50,
+  menu: 'rgba(255,255,255,0.82)',
+  scrim: 'rgba(21,23,27,0.12)',
   success: raw.greenDeep,
   successSubtle: raw.greenMist,
   warning: raw.amberDeep,
@@ -83,7 +97,7 @@ export const overlay = {
   onPhotoSecondary: raw.grey300,
   scrimSoft: 'rgba(14,16,20,0.6)',
   // TODO(design): scrimen slutar i solid rgba(14,16,20,1). I ljust tema
-  // möter den bg #F5F6F8 med en tydlig mörk kant (öppen designfråga b).
+  // möter den bg med en tydlig mörk kant (öppen designfråga).
   scrimStops: {
     colors: [
       'rgba(14,16,20,0)',
@@ -93,6 +107,14 @@ export const overlay = {
     ] as [string, string, ...string[]],
     locations: [0, 0.4, 0.65, 1] as [number, number, ...number[]],
   },
+  // Kantblurens toning över foto (överst på Produktdetalj).
+  photoFade: ['rgba(0,0,0,0.4)', 'rgba(0,0,0,0)'] as [string, string],
+} as const;
+
+// Kantblurens toning mot bakgrunden (EdgeFade). Alfa på bg vid stoppen.
+export const edgeFadeStops = {
+  top: { alphas: [0.8, 0.5, 0], locations: [0, 0.45, 1] },
+  bottom: { alphas: [0.96, 0.8, 0], locations: [0, 0.45, 1] },
 } as const;
 
 /** Lägger alfa på en #RRGGBB-färg, t.ex. för gradienter mot bakgrundstoken. */

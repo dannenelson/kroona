@@ -16,8 +16,8 @@ const UNDERLINE = 2; // lokal linjetjocklek för understrykningen
 /**
  * Text-flikar med understrykning (design.md §11), 44 px höga, scrollar
  * horisontellt vid många. Används för filtrering i stället för pillar.
- * States: default, pressed (opacity 0,8), selected (accentText + understrykning),
- * disabled (tertiär text).
+ * States enligt design.md §0: default (mute), pressed (text-färg, opacitet 0,55),
+ * selected (text-färg + understrykning i text-färg), disabled (35 % opacitet).
  */
 export default function TextTabs<T extends string>({
   items,
@@ -44,18 +44,22 @@ export default function TextTabs<T extends string>({
             accessibilityState={{ selected: isSelected, disabled: isDisabled }}
             disabled={isDisabled}
             onPress={() => onSelect(item)}
-            style={({ pressed }) => [styles.tab, pressed && styles.pressed]}
+            style={[styles.tab, isDisabled && styles.disabled]}
           >
-            <Text
-              style={[
-                styles.label,
-                isSelected && styles.labelSelected,
-                isDisabled && styles.labelDisabled,
-              ]}
-            >
-              {item}
-            </Text>
-            {isSelected && <View style={styles.underline} />}
+            {({ pressed }) => (
+              <>
+                <Text
+                  style={[
+                    styles.label,
+                    (isSelected || pressed) && styles.labelActive,
+                    pressed && !isSelected && styles.pressed,
+                  ]}
+                >
+                  {item}
+                </Text>
+                {isSelected && <View style={styles.underline} />}
+              </>
+            )}
           </Pressable>
         );
       })}
@@ -73,17 +77,17 @@ const useStyles = makeStyles((t) => ({
     justifyContent: 'center',
   },
   pressed: {
-    opacity: motion.pressedOpacity,
+    opacity: motion.pressedTextOpacity,
+  },
+  disabled: {
+    opacity: motion.disabledOpacity,
   },
   label: {
     ...typography.label,
     color: t.colors.textSecondary,
   },
-  labelSelected: {
-    color: t.colors.accentText,
-  },
-  labelDisabled: {
-    color: t.colors.textTertiary,
+  labelActive: {
+    color: t.colors.textPrimary,
   },
   underline: {
     position: 'absolute',
@@ -92,6 +96,6 @@ const useStyles = makeStyles((t) => ({
     bottom: 0,
     height: UNDERLINE,
     borderRadius: UNDERLINE / 2,
-    backgroundColor: t.colors.accent,
+    backgroundColor: t.colors.textPrimary,
   },
 }));
