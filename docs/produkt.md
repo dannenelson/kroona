@@ -15,6 +15,16 @@ En svensk upptäcktsplattform för mode och heminredning som äger hela köpresa
 ## Affärsmodell
 CPA, provision per genomförd försäljning och aldrig per klick. "Ni betalar bara när ni säljer." Server-side tracking, last-click, 30 dagars click_id. (Detaljer: spec avsnitt 9–10.)
 
+## Vision och UX-principer (Daniels formulering, 2026-11-18)
+Göra köpresan enklare och roligare för alla konsumenter, oavsett intresse eller kategori, från inspiration och utforskning till köp.
+
+1. **Hela resan täcks av fyra flikar** (Hem, Flöde, Hitta, Sparat). Användaren ska alltid kunna vända sig till Kroona för hjälp.
+2. **Hitta det som passar just mig:** specifikationer, pris, hållbarhet, plats och cirkularitet. Information om företagen man stöttar visas transparent.
+3. **Användaren har kontrollen:** följ personer och samlingar för att styra vad som syns i flödet.
+4. **Konsumenten betalar aldrig, och företag betalar inte för att vara med eller synas.** Provision tas bara när en försäljning gått genom tjänsten. Alla spelar efter samma regler.
+5. **Senare:** önskelistor (som GoWish) och följande av personer och samlingar.
+6. **Innehållet ska vara relevant, bra och snyggt.** Referenser: Spotify (personlig, igenkänning) och Pinterest (upptäckt).
+
 ## Produkten
 | Flik | Roll |
 |---|---|

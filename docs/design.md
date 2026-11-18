@@ -2,6 +2,8 @@
 
 *Grunden för hur Kroona ser ut och byggs visuellt. Levande dokument: justera värden här först, sedan i koden. Senast: 2026-11-18.*
 
+**Designprincip:** så modern och stilren som möjligt, och så Apple-nära som möjligt. Tydlig hierarki, generöst med luft, få färger, fotografin bär designen, native känsla och lugn rörelse. Referenser: Apple HIG, Spotify, Pinterest. I kod stödjer skillen `expo-native-ui` (Apple HIG-styling) detta. I granskning används en HIG-kontroll före demot.
+
 **Status på varje rad:**
 ✅ **Låst** = beslutat i designarbetet · 🔵 **Grund** = best-practice-värde så att ingenting är tomt, justeras fritt · 🟡 **Öppet** = behöver beslut
 
