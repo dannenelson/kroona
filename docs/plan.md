@@ -63,7 +63,7 @@ Supabase-projekt och schema (collections, collection_items, follows) · konton �
 - [x] Filterstil: text-flikar med understrykning (2026-11-18). Pillar behålls med annan funktion, se design.md avsnitt 11
 - [ ] Ljust glas över ren yta syns inte: använd surface + kant + skugga där, glas bara över foto?
 - [x] FilterPills 36 px: försvinner som problem när filter blir text-flikar (44 px höga)
-- [ ] Pillens funktion (annat än filter): avgörs före brief 03
+- [x] Pillens funktion: byter innehåll överst på Hem. Text-flikar filtrerar i listor (2026-11-18)
 - [ ] Hitta: hur ser dialog med urval och jämförelse ut? (designfråga när Hitta är på tur)
 - [ ] Ska ia-karta och wireframes justeras till de nya flikrollerna?
 

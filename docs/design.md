@@ -134,7 +134,7 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 
 ## 11. Filter och pillar ✅
 - **Filtrering** görs med **text-flikar med understrykning** (Pinterest-mönstret), 44 px höga. Gäller Hem, Flöde och Samlingsdetalj.
-- **Pillar** (glas och fylld) behålls som komponent men används **inte** för filtrering. Funktionen är 🟡 öppen (se nedan).
+- **Pillar** byter innehåll överst på en skärm (vad skärmen handlar om), som Spotify. Används tills vidare **bara överst på Hem** (t.ex. Allt · Mode · Heminredning). Text-flikar snävar in en lista inom ett innehåll. Känns gränsen otydlig när det är byggt slås de ihop. 🔵
 
 ## 🟡 Öppet
 0. UI-typsnitt: Google Sans Flex är tillfälligt, byt vid behov
@@ -142,4 +142,3 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 2. Glasets exakta alfa
 3. Ikonbibliotek och ikonvikt (nuvarande SVG-pipeline eller en samlad ikonuppsättning)
 4. Ljust temas foto-tonade ytor (hur färgtonad fotografi beter sig i ljust läge)
-5. Pillens funktion (annat än filter)
