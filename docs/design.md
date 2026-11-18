@@ -20,6 +20,8 @@ Källa: Claude Design "Kroona Looken A" (hela setet, mörkt och ljust). Implemen
 - **Kanter:** kort toning + gradvis blur överst (bakom statusfält/Dynamic Island, något högre än den) och underst (bakom navigationen). Nav-ikoner låga, nära hemindikatorn. Komponent `EdgeFade`.
 - **Spara:** bokmärke, via långt tryck-meny (Spara · Följ varumärke · Dela · Visa liknande) plus en Spara-knapp på Produktdetalj.
 - **Typsnitt:** Familjen Grotesk (rubriker) + Google Sans Flex (UI) ✅ (Daniel, 2026-11-18).
+- **Delight** ✅ (Daniel, 2026-11-18): appen ska kännas rolig, med små oväntade saker som händer (rörelse, haptik, överraskningar). Följer med genom hela bygget. Lugnt och sansat gäller fortfarande: inget blinkar, inget spelas av sig självt. Idéer samlas i idebanken tills de prioriteras.
+- **Glas över foto i ljust tema är ljust** (ändrat 2026-11-18, ersätter "fasta overlayer i båda teman" för glas; scrim är fortsatt fast).
 
 | Token | Mörkt | Ljust |
 |---|---|---|
