@@ -5,6 +5,6 @@ export { spacing, touchTarget, iconSize } from './spacing';
 export { radius } from './radius';
 export { darkShadows, lightShadows, type Shadows } from './shadows';
 export { motion } from './motion';
-export { darkGlass, lightGlass, photoGlass, edgeBlur, type Glass, type GlassTint } from './glass';
+export { darkGlass, lightGlass, darkPhotoGlass, lightPhotoGlass, edgeBlur, type Glass, type GlassTint } from './glass';
 export { ThemeProvider, useTheme, buildTheme, type Theme, type ColorScheme } from './ThemeProvider';
 export { makeStyles } from './makeStyles';

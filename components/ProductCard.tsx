@@ -1,8 +1,9 @@
-import { useRef, useState, type ComponentRef } from 'react';
+import { useRef, type ComponentRef } from 'react';
 import { View, Text, Pressable, Image, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
-import ProductContextMenu, { type AnchorRect, type ContextMenuItem } from './ProductContextMenu';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
+import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import BookmarkIcon from '../assets/icons/BookmarkIcon';
 import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
 import FollowIcon from '../assets/icons/FollowIcon';
@@ -84,14 +85,10 @@ export default function ProductCard({
   const { isSaved, toggleSaved } = useSavedProducts();
   const saved = isSaved(id);
   const imageRef = useRef<ComponentRef<typeof View>>(null);
-  const [anchor, setAnchor] = useState<AnchorRect | null>(null);
+  const contextMenu = useContextMenu();
 
   const isSmall = size === 'S';
   const isLarge = size === 'L';
-
-  const openMenu = () => {
-    imageRef.current?.measureInWindow((x, y, width, height) => setAnchor({ x, y, width, height }));
-  };
 
   // Spara använder befintlig SavedProductsContext. Följ varumärke, Dela och
   // Visa liknande har ingen logik i Fas 0-steget, de stänger bara menyn.
@@ -106,87 +103,97 @@ export default function ProductCard({
     { label: 'Visa liknande', icon: SimilarIcon },
   ];
 
+  const openMenu = () => {
+    imageRef.current?.measureInWindow((x, y, width, height) =>
+      contextMenu.open({ anchor: { x, y, width, height }, imageUrl, items: menuItems }),
+    );
+  };
+
+  // Långt tryck som övergår i drag (brief 05): gesten stannar på kortet så att
+  // fingret kan dras till en menyrad. När den aktiveras avbryts kortets
+  // Pressable (inget onPress), och listan bakom tar inte över touchen.
+  const longPress = usePanGesture({
+    activateAfterLongPress: motion.longPressMs,
+    enabled: menu && !disabled,
+    runOnJS: true,
+    disableReanimated: true,
+    onActivate: () => openMenu(),
+    onUpdate: (e) => contextMenu.move(e.absoluteX, e.absoluteY),
+    onDeactivate: () => contextMenu.release(),
+  });
+
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${brand} ${name}`}
-      accessibilityHint={menu ? 'Håll in för fler val' : undefined}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      onLongPress={menu ? openMenu : undefined}
-      delayLongPress={motion.longPressMs}
-      style={({ pressed }) => [
-        styles.card,
-        featured && styles.cardFeatured,
-        pressed && styles.pressed,
-        disabled && styles.disabled,
-        containerStyle,
-      ]}
-    >
-      <View
-        ref={imageRef}
-        collapsable={false}
-        style={[
-          styles.imageContainer,
-          isSmall && styles.imageContainerSmall,
-          fixedHeight ? { height: fixedHeight } : { aspectRatio: aspectRatio ?? 3 / 4 },
+    <GestureDetector gesture={longPress}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${brand} ${name}`}
+        accessibilityHint={menu ? 'Håll in för fler val' : undefined}
+        accessibilityState={{ disabled }}
+        disabled={disabled}
+        onPress={onPress}
+        style={({ pressed }) => [
+          styles.card,
+          featured && styles.cardFeatured,
+          pressed && styles.pressed,
+          disabled && styles.disabled,
+          containerStyle,
         ]}
       >
-        <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+        <View
+          ref={imageRef}
+          collapsable={false}
+          style={[
+            styles.imageContainer,
+            isSmall && styles.imageContainerSmall,
+            fixedHeight ? { height: fixedHeight } : { aspectRatio: aspectRatio ?? 3 / 4 },
+          ]}
+        >
+          <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
 
-        {!isSmall && (isNew || isUsed) && (
-          // Avvikelse från komponentsidan: badgen behålls (Daniels beslut).
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{isUsed ? 'Begagnad' : 'Nyhet'}</Text>
+          {!isSmall && (isNew || isUsed) && (
+            // Avvikelse från komponentsidan: badgen behålls (Daniels beslut).
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>{isUsed ? 'Begagnad' : 'Nyhet'}</Text>
+            </View>
+          )}
+
+        </View>
+
+        {!isSmall && (
+          <View style={styles.info}>
+            <Text style={styles.brand} numberOfLines={1}>
+              {brand}
+            </Text>
+            <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
+              {name}
+            </Text>
+            <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
+              {formatPrice(price)}
+              <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
+            </Text>
+            <View style={styles.ratings}>
+              {rating !== undefined && (
+                <View style={styles.rating}>
+                  <StarIcon color={colors.textSecondary} size={typography.caption.fontSize} />
+                  <Text style={styles.ratingText}>{formatScore(rating)}</Text>
+                  {reviewCount !== undefined && (
+                    <Text style={styles.ratingCount}>({reviewCount})</Text>
+                  )}
+                </View>
+              )}
+              {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
+              <View style={styles.rating}>
+                <LeafIcon color={colors.textSecondary} size={typography.caption.fontSize} />
+                <Text style={styles.ratingText}>
+                  {formatScore(sustainabilityScore)}
+                </Text>
+              </View>
+            </View>
           </View>
         )}
 
-      </View>
-
-      {!isSmall && (
-        <View style={styles.info}>
-          <Text style={styles.brand} numberOfLines={1}>
-            {brand}
-          </Text>
-          <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
-            {name}
-          </Text>
-          <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
-            {formatPrice(price)}
-            <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
-          </Text>
-          <View style={styles.ratings}>
-            {rating !== undefined && (
-              <View style={styles.rating}>
-                <StarIcon color={colors.textSecondary} size={typography.caption.fontSize} />
-                <Text style={styles.ratingText}>{formatScore(rating)}</Text>
-                {reviewCount !== undefined && (
-                  <Text style={styles.ratingCount}>({reviewCount})</Text>
-                )}
-              </View>
-            )}
-            {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
-            <View style={styles.rating}>
-              <LeafIcon color={colors.textSecondary} size={typography.caption.fontSize} />
-              <Text style={styles.ratingText}>
-                {formatScore(sustainabilityScore)}
-              </Text>
-            </View>
-          </View>
-        </View>
-      )}
-
-      {menu && (
-        <ProductContextMenu
-          visible={anchor !== null}
-          anchor={anchor}
-          imageUrl={imageUrl}
-          items={menuItems}
-          onClose={() => setAnchor(null)}
-        />
-      )}
-    </Pressable>
+      </Pressable>
+    </GestureDetector>
   );
 }
 

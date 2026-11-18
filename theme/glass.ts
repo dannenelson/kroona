@@ -39,9 +39,9 @@ export const lightGlass: Glass = {
   blurIntensity: 50,
 };
 
-// Glas på foto: mörkt och genomskinligt med vitt innehåll, identiskt i båda
-// teman. Värden från referensen "Kroona Looken A" (knappar på produktfoto).
-export const photoGlass: Glass = {
+// Glas på foto (design.md §0/§3, ändrat 2026-11-18): följer temat.
+// Mörkt: mörkt och genomskinligt med vitt innehåll (referensen "Kroona Looken A").
+export const darkPhotoGlass: Glass = {
   fill: 'rgba(20,22,26,0.34)',
   blur: 20,
   saturate: 1.6,
@@ -49,6 +49,18 @@ export const photoGlass: Glass = {
   borderColor: 'rgba(255,255,255,0.24)',
   content: '#FFFFFF',
   tint: 'dark',
+  blurIntensity: 50,
+};
+
+// Ljust: ljus fyllning, ljus kant och mörkt innehåll (brief 05).
+export const lightPhotoGlass: Glass = {
+  fill: 'rgba(255,255,255,0.62)',
+  blur: 20,
+  saturate: 1.6,
+  borderWidth: 1,
+  borderColor: 'rgba(255,255,255,0.60)',
+  content: '#15171B',
+  tint: 'light',
   blurIntensity: 50,
 };
 
@@ -69,8 +81,8 @@ export const edgeBlur = {
   /** Standardhöjder: topp ca 68 (något högre än statusfält/Dynamic Island), botten 128. */
   topExtra: 14,
   bottomHeight: 128,
-  /** Bakgrundsblur bakom kontextmenyn (blur 18). */
-  menuBackdropIntensity: 60,
+  /** Bakgrundsblur bakom kontextmenyn: lätt, ca hälften av referensens blur 18. */
+  menuBackdropIntensity: 30,
   /** Menyns egen blur (blur 40). */
   menuIntensity: 90,
 } as const;

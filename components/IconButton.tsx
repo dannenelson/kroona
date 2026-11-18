@@ -1,6 +1,6 @@
 import type { ComponentType } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { useTheme, darkColors, overlay, motion, radius, touchTarget, iconSize } from '../theme';
+import { useTheme, motion, radius, touchTarget, iconSize } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
 
 type IconProps = { color: string; size?: number };
@@ -41,11 +41,13 @@ export default function IconButton({
   const g = useGlass(tone);
   const ShownIcon = selected && selectedIcon ? selectedIcon : Icon;
 
-  // Inverterat: på foto vit yta med mörk ikon, annars text-färg som yta.
-  const invertedBg = tone === 'photo' ? overlay.onPhoto : colors.textPrimary;
-  const invertedFg = tone === 'photo' ? darkColors.bg : colors.bg;
+  // Inverterat: glasets innehållsfärg som yta och bakgrundsfärgen som ikon.
+  // Mörkt tema: ljus yta, mörk ikon. Ljust tema (även på foto): mörk yta, ljus ikon.
+  const invertedBg = g.content;
+  const invertedFg = colors.bg;
   // Djupare yta vid tryck: en hårlinjefärg ovanpå glaset (samma som menyrader).
   const pressedTint = tone === 'photo' ? g.borderColor : colors.border;
+  const isGlass = variant === 'glass';
 
   return (
     <Pressable
@@ -56,7 +58,8 @@ export default function IconButton({
       onPress={onPress}
       style={({ pressed }) => [
         pressed && styles.pressed,
-        disabled && styles.disabled,
+        // Glas tonas inuti Glass (dimmed): opacitet på blurrens förälder bryter effekten.
+        disabled && !isGlass && styles.disabled,
         style,
       ]}
     >
@@ -70,17 +73,17 @@ export default function IconButton({
           <View style={[StyleSheet.absoluteFill, { backgroundColor: pressedTint }]} />
         ) : null;
 
-        if (variant === 'glass') {
+        if (isGlass) {
           return (
-            <Glass tone={tone} style={styles.circle}>
+            <Glass tone={tone} dimmed={disabled} style={styles.circle}>
               {fill}
               {content}
             </Glass>
           );
         }
-        // I en glaskapsel: kapselns kant räknas in, så kapseln blir lika hög som en glasknapp.
+        // I en glaskapsel (kapselns kant är ett eget lager och tar ingen plats).
         return (
-          <View style={[styles.circle, styles.bare, { height: touchTarget - g.borderWidth * 2 }]}>
+          <View style={[styles.circle, styles.bare]}>
             {fill}
             {content}
           </View>

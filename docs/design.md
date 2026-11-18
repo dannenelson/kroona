@@ -75,7 +75,7 @@ Kodens rollnamn behölls i brief 04. Kolumnen "§0" visar vilket §0-namn rollen
 
 **Kontrast:** `mute` på `bg` ger 6,2 (mörkt) och 4,75 (ljust), båda AA.
 
-**Foto-overlayer är fasta och identiska i båda teman** ✅: scrim enligt `scrimStops` nedan, mjuk och lång utfasning. Hero-rubriker på foto är det enda medvetna AA-undantaget. Knappar, pillar och priser ska alltid klara AA.
+**Scrim på foto är fast och identisk i båda teman** ✅ (glas på foto följer däremot temat, se §3): scrim enligt `scrimStops` nedan, mjuk och lång utfasning. Hero-rubriker på foto är det enda medvetna AA-undantaget. Knappar, pillar och priser ska alltid klara AA.
 
 | Overlay-token | Värde (båda teman) | Status |
 |---|---|---|
@@ -85,20 +85,24 @@ Kodens rollnamn behölls i brief 04. Kolumnen "§0" visar vilket §0-namn rollen
 | `photoFade` (kantblur över foto, topp) | `rgba(0,0,0,.4)` → 0 | ✅ |
 
 ## 3. Glas ✅ (Apple-ren, §0)
-Följer temat. Tre toner i `components/Glass.tsx`: `theme` (över innehåll), `photo` (direkt på foto, lika i båda teman), `plain` (över ren yta).
+Följer temat. Tre toner i `components/Glass.tsx`: `theme` (över innehåll), `photo` (direkt på foto, följer temat sedan 2026-11-18), `plain` (över ren yta).
 
-| Egenskap | Mörkt (`glass`) | Ljust (`glass`) | Foto (`photoGlass`) |
-|---|---|---|---|
-| Fyllning | `rgba(42,45,51,.72)` | `rgba(255,255,255,.72)` | `rgba(20,22,26,.34)` |
-| Kant (1 px, en linje) | `rgba(255,255,255,.14)` | `rgba(21,23,27,.10)` | `rgba(255,255,255,.24)` |
-| Innehåll | `#F5F6F8` | `#15171B` | `#FFFFFF` |
-| Blur / saturate | 20 / 160 % | 20 / 160 % | 20 / 160 % |
+| Egenskap | Mörkt (`glass`) | Ljust (`glass`) | Foto mörkt (`darkPhotoGlass`) | Foto ljust (`lightPhotoGlass`) |
+|---|---|---|---|---|
+| Fyllning | `rgba(42,45,51,.72)` | `rgba(255,255,255,.72)` | `rgba(20,22,26,.34)` | `rgba(255,255,255,.62)` |
+| Kant (1 px, en linje) | `rgba(255,255,255,.14)` | `rgba(21,23,27,.10)` | `rgba(255,255,255,.24)` | `rgba(255,255,255,.60)` |
+| Innehåll | `#F5F6F8` | `#15171B` | `#FFFFFF` | `#15171B` |
+| Blur / saturate | 20 / 160 % | 20 / 160 % | 20 / 160 % | 20 / 160 % |
+
+Vald på glas är inverterad mot glaset: glasets innehållsfärg som yta, `bg` som ikon/text (mörkt tema ljus yta, ljust tema mörk yta, även på foto).
+
+**Rundning på glas:** blur-lagret, fyllningen och kanten får var sin radie, kanten är ett eget lager, och radien kläms till halva höjden. Annars klipps inte blurren av förälderns runda hörn på iOS (raka kanter). Inaktivt glas tonas inuti glaset, inte på blurrens förälder.
 
 `expo-blur` tar intensitet, inte radie: blur 20 ≈ intensity 50. Saturate saknas (närmast är BlurViews tint). 🟡 Ljust glas över ren yta (`plain` i ljust tema) använder `surface` + `line` utan blur tills frågan är avgjord.
 
 **Kantblur (`EdgeFade`):** max 8 px i tre lager (20 / 50 / 100 %), vart och ett med gradientmask (maskstopp 0–20→55 %, 0–40→80 %, 0–60→100 %), plus toning mot `bg`: topp alfa .80 / .50 / 0, botten .96 / .80 / 0. Höjd topp = safe area + 14 (≈ 68), botten 128. Kräver `@react-native-masked-view/masked-view`.
 
-**Kontextmeny (långt tryck):** bakgrund blur 18 (intensity 60) + `scrim`, lyft kort skala 1,04 med radie 16 och skugga `lift`, meny 250 bred, rader 46, `menu`-yta med blur 40 (intensity 90) och `glassLine`-kant.
+**Kontextmeny (långt tryck):** lager ovanför appen (ingen Modal), gest från kortet med dra-för-att-välja. Bakgrund lätt blur (intensity 30, ca hälften av referensens 18) + `scrim`, lyft kort skala 1,04 med radie 16 och skugga `lift`, meny 250 bred, rader 46, `menu`-yta med blur 40 (intensity 90) och `glassLine`-kant.
 
 ## 4. Typografi
 Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex är en tillfällig grund (beslut 2026-11-17) och kan bytas senare genom att ändra typografitokens, utan att komponenter berörs. Statiska vikter, ett fontfamilj-namn per vikt (inga variabla axlar i RN).
@@ -165,6 +169,8 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 | Nedtryckt | `pressed`-yta + skala 0,96 (navigation 0,92). Text-flik: opacitet 0,55 | ✅ |
 | Inaktiv | opacitet 0,35 | ✅ |
 | Långt tryck | 450 ms, lyft skala 1,04 | ✅ |
+| Kontextmeny | spring damping 18, stiffness 260, mass 1 (in och ut). Menyn växer från 0,6 och glider 12 px från kortet. Bakgrund tonar 150 / 180 ms. Reduce motion: bara toning | ✅ |
+| Haptik (meny) | lätt vid öppning, `selection` vid radbyte, `success` vid val | ✅ |
 | Äldre komponenter | opacity 0,8 tills de görs om | 🔵 |
 | Reduce motion | respekteras alltid | ✅ krav |
 

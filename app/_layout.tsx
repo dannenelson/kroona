@@ -10,10 +10,12 @@ import {
   GoogleSansFlex_500Medium,
   GoogleSansFlex_600SemiBold,
 } from '@expo-google-fonts/google-sans-flex';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme, type ColorScheme } from '../theme';
 import { SavedProductsProvider } from '../context/SavedProductsContext';
 import { FollowedCollectionsProvider } from '../context/FollowedCollectionsContext';
+import { ContextMenuProvider } from '../components/ProductContextMenu';
 
 // Aktivt tema. Byt till 'light' här för att testa ljust tema (ingen UI för
 // det än).
@@ -29,9 +31,12 @@ export default function RootLayout() {
   });
 
   return (
-    <ThemeProvider initialScheme={INITIAL_SCHEME}>
-      {fontsLoaded ? <AppShell /> : <FontLoading />}
-    </ThemeProvider>
+    // GestureHandlerRootView krävs av react-native-gesture-handler (långt tryck-menyn).
+    <GestureHandlerRootView style={StyleSheet.absoluteFill}>
+      <ThemeProvider initialScheme={INITIAL_SCHEME}>
+        {fontsLoaded ? <AppShell /> : <FontLoading />}
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }
 
@@ -50,7 +55,10 @@ function AppShell() {
     <SavedProductsProvider>
       <FollowedCollectionsProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+        {/* Kontextmenyn ritas ovanför alla skärmar (ingen Modal, se ProductContextMenu). */}
+        <ContextMenuProvider>
+          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+        </ContextMenuProvider>
       </FollowedCollectionsProvider>
     </SavedProductsProvider>
   );

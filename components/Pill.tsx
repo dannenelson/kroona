@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
-import { useTheme, darkColors, overlay, typography, spacing, radius, motion, touchTarget } from '../theme';
+import { useTheme, typography, spacing, radius, motion, touchTarget } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
   onPress?: () => void;
   /** 'filled' (standard, surface2) eller 'glass' (på foto). */
   variant?: 'filled' | 'glass';
-  /** Gäller glas-varianten: 'photo' ger fast mörkt glas i båda teman. */
+  /** Gäller glas-varianten: 'photo' ger glas på foto som följer temat. */
   tone?: GlassTone;
   selected?: boolean;
   disabled?: boolean;
@@ -37,7 +37,7 @@ export default function Pill({
 }: Props) {
   const { colors } = useTheme();
   const g = useGlass(tone);
-  const onPhoto = variant === 'glass' && tone === 'photo';
+  const isGlass = variant === 'glass';
 
   return (
     <Pressable
@@ -46,21 +46,27 @@ export default function Pill({
       disabled={disabled}
       onPress={onPress}
       hitSlop={{ top: HIT, bottom: HIT }}
-      style={({ pressed }) => [pressed && styles.pressed, disabled && styles.disabled, style]}
+      style={({ pressed }) => [
+        pressed && styles.pressed,
+        // Glas tonas inuti Glass (dimmed): opacitet på blurrens förälder bryter effekten.
+        disabled && !(isGlass && !selected) && styles.disabled,
+        style,
+      ]}
     >
       {({ pressed }) => {
         if (selected) {
-          const bg = onPhoto ? overlay.onPhoto : colors.textPrimary;
-          const fg = onPhoto ? darkColors.bg : colors.bg;
+          // Inverterad: glasets innehållsfärg (glas) eller textfärg (fylld) som yta.
+          const bg = isGlass ? g.content : colors.textPrimary;
+          const fg = colors.bg;
           return (
             <View style={[styles.shape, { backgroundColor: bg }]}>
               <Text style={[styles.label, { color: fg }]}>{children}</Text>
             </View>
           );
         }
-        if (variant === 'glass') {
+        if (isGlass) {
           return (
-            <Glass tone={tone} style={[styles.shape, styles.glassShape]}>
+            <Glass tone={tone} dimmed={disabled} style={styles.shape}>
               {pressed && (
                 <View style={[StyleSheet.absoluteFill, { backgroundColor: g.borderColor }]} />
               )}
@@ -90,10 +96,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  // Glasets kant ligger innanför höjden, så glas-pillen blir lika hög.
-  glassShape: {
-    paddingHorizontal: spacing.lg,
   },
   label: {
     ...typography.label,

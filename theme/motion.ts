@@ -17,4 +17,11 @@ export const motion = {
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */
   longPressMs: 450,
+  /** Kontextmenyn: lyft kort och meny fjädrar in, stängning samma väg tillbaka. */
+  menuSpring: { damping: 18, stiffness: 260, mass: 1 },
+  /** Menyn växer från kortet: startskala och glidavstånd (px) mot kortet. */
+  menuEnterScale: 0.6,
+  menuOffset: 12,
+  /** Stängning utan fjäder (reduce motion, och bakgrundens toning). */
+  menuFadeDuration: 180,
 } as const;

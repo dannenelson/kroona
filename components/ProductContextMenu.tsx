@@ -1,9 +1,18 @@
-import { useEffect, useRef, type ComponentType } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ComponentType,
+  type ReactNode,
+} from 'react';
 import {
   AccessibilityInfo,
   Animated,
   Image,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -11,7 +20,8 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import * as Haptics from 'expo-haptics';
+import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, edgeBlur, typography, spacing, radius, motion, iconSize } from '../theme';
 
 type IconProps = { color: string; size?: number };
@@ -25,12 +35,20 @@ export type ContextMenuItem = {
 /** Bildens läge i fönstret när det långa trycket började. */
 export type AnchorRect = { x: number; y: number; width: number; height: number };
 
-type Props = {
-  visible: boolean;
-  anchor: AnchorRect | null;
+export type ContextMenuRequest = {
+  anchor: AnchorRect;
   imageUrl: string;
   items: readonly ContextMenuItem[];
-  onClose: () => void;
+};
+
+type ContextMenuApi = {
+  /** Öppnar menyn (anropas när det långa trycket aktiveras). */
+  open: (request: ContextMenuRequest) => void;
+  /** Fingret rör sig under samma gest: markerar raden under fingret. */
+  move: (x: number, y: number) => void;
+  /** Fingret släpps: väljer markerad rad, stänger eller låter menyn stå kvar. */
+  release: () => void;
+  close: () => void;
 };
 
 // Lokala mått från referensen "Kroona Looken A": menybredd 250, rad 46.
@@ -38,68 +56,282 @@ const MENU_WIDTH = 250;
 const ROW_HEIGHT = 46;
 // Lyft kort får högst denna höjd så att menyn ryms under.
 const MAX_LIFT_HEIGHT = 250;
+// Så långt fingret måste röra sig innan det räknas som drag (iOS: ca 10 pt).
+const DRAG_SLOP = spacing.sm;
+
+type MenuLayout = {
+  lift: { x: number; y: number; width: number; height: number };
+  menu: { x: number; y: number; width: number; height: number };
+  /** Menyn ligger under kortet (annars ovanför). */
+  below: boolean;
+};
 
 /**
- * Meny vid långt tryck på kort (iOS-kontextmeny-känsla): kortets bild lyfts
- * (skala 1,04, skugga), bakgrunden blurras och dämpas, menyn ligger under.
- * Egen lösning med Modal: expo-routers Link.Menu är iOS-only, kräver href
- * och tar bara SF Symbols.
+ * Placering: bilden står kvar där den var om allt ryms, annars flyttas den in
+ * på skärmen. Menyn läggs under bilden, eller ovanför om den inte ryms.
  */
-export default function ProductContextMenu({ visible, anchor, imageUrl, items, onClose }: Props) {
-  const { scheme, shadows } = useTheme();
-  const styles = useStyles();
+function layoutMenu(
+  anchor: AnchorRect,
+  itemCount: number,
+  win: { width: number; height: number },
+  insets: EdgeInsets,
+): MenuLayout {
+  const menuHeight = itemCount * ROW_HEIGHT;
+  const scale = Math.min(1, MAX_LIFT_HEIGHT / anchor.height);
+  const width = anchor.width * scale;
+  const height = anchor.height * scale;
+  const top = insets.top + spacing.lg;
+  const bottom = win.height - insets.bottom - spacing.lg;
+  const needed = height + spacing.xl + menuHeight;
+
+  const x = Math.min(
+    Math.max(anchor.x + (anchor.width - width) / 2, spacing.screenMargin),
+    win.width - spacing.screenMargin - width,
+  );
+  const menuX = Math.min(
+    Math.max(x + width / 2 - MENU_WIDTH / 2, spacing.screenMargin),
+    win.width - spacing.screenMargin - MENU_WIDTH,
+  );
+
+  // Ryms menyn under kortet på dess nuvarande plats?
+  const below = anchor.y + needed <= bottom || anchor.y - spacing.xl - menuHeight < top;
+  if (below) {
+    const y = Math.min(Math.max(anchor.y, top), bottom - needed);
+    return {
+      lift: { x, y, width, height },
+      menu: { x: menuX, y: y + height + spacing.xl, width: MENU_WIDTH, height: menuHeight },
+      below: true,
+    };
+  }
+  const y = Math.max(anchor.y, top + menuHeight + spacing.xl);
+  return {
+    lift: { x, y, width, height },
+    menu: { x: menuX, y: y - spacing.xl - menuHeight, width: MENU_WIDTH, height: menuHeight },
+    below: false,
+  };
+}
+
+function rowAt(layout: MenuLayout | null, count: number, x: number, y: number): number | null {
+  if (!layout) return null;
+  const m = layout.menu;
+  if (x < m.x || x > m.x + m.width || y < m.y || y > m.y + m.height) return null;
+  return Math.min(count - 1, Math.floor((y - m.y) / ROW_HEIGHT));
+}
+
+const ContextMenuContext = createContext<ContextMenuApi | null>(null);
+
+export function useContextMenu(): ContextMenuApi {
+  const ctx = useContext(ContextMenuContext);
+  if (!ctx) throw new Error('useContextMenu måste användas inuti <ContextMenuProvider>');
+  return ctx;
+}
+
+/**
+ * Meny vid långt tryck på kort (iOS-kontextmeny-känsla), brief 05.
+ *
+ * Ligger som ett lager ovanför hela appen (i app/_layout) i stället för en
+ * Modal: en Modal avbryter den pågående touchen, och då går det inte att dra
+ * fingret vidare till en rad. Gesten ägs av kortet (gesture-handler) och
+ * rapporterar fingrets läge hit via move/release.
+ *
+ * Släpp utan att ha dragit: menyn står kvar, tryck på rad väljer, tryck
+ * utanför stänger. Har man dragit och släpper utanför raderna: menyn stängs.
+ */
+export function ContextMenuProvider({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
-  const { width: winW, height: winH } = useWindowDimensions();
+  const win = useWindowDimensions();
+  const [request, setRequest] = useState<ContextMenuRequest | null>(null);
+  const [highlighted, setHighlighted] = useState<number | null>(null);
+  const [reduceMotion, setReduceMotion] = useState(false);
+
   const progress = useRef(new Animated.Value(0)).current;
+  const backdrop = useRef(new Animated.Value(0)).current;
+
+  // Senaste värden för gest-callbacks, som inte ska behöva skapas om.
+  const state = useRef({
+    request: null as ContextMenuRequest | null,
+    layout: null as MenuLayout | null,
+    highlighted: null as number | null,
+    start: null as { x: number; y: number } | null,
+    dragged: false,
+    closing: false,
+  }).current;
+
+  const layout = useMemo(
+    () => (request ? layoutMenu(request.anchor, request.items.length, win, insets) : null),
+    [request, win, insets],
+  );
+  state.request = request;
+  state.layout = layout;
 
   useEffect(() => {
-    if (!visible) return;
-    let cancelled = false;
-    progress.setValue(0);
-    AccessibilityInfo.isReduceMotionEnabled().then((reduce) => {
-      if (cancelled) return;
-      if (reduce) {
-        progress.setValue(1);
-      } else {
+    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
+    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
+    return () => sub.remove();
+  }, []);
+
+  const setHighlight = useCallback(
+    (i: number | null) => {
+      if (state.highlighted === i) return;
+      state.highlighted = i;
+      setHighlighted(i);
+      if (i !== null) Haptics.selectionAsync();
+    },
+    [state],
+  );
+
+  const close = useCallback(() => {
+    if (!state.request || state.closing) return;
+    state.closing = true;
+    const done = () => {
+      state.closing = false;
+      state.highlighted = null;
+      setHighlighted(null);
+      setRequest(null);
+    };
+    Animated.timing(backdrop, {
+      toValue: 0,
+      duration: motion.menuFadeDuration,
+      useNativeDriver: true,
+    }).start();
+    if (reduceMotion) {
+      Animated.timing(progress, {
+        toValue: 0,
+        duration: motion.menuFadeDuration,
+        useNativeDriver: true,
+      }).start(done);
+    } else {
+      Animated.spring(progress, { toValue: 0, ...motion.menuSpring, useNativeDriver: true }).start(done);
+    }
+  }, [state, backdrop, progress, reduceMotion]);
+
+  const select = useCallback(
+    (i: number) => {
+      const item = state.request?.items[i];
+      if (!item) return;
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      item.onPress?.();
+      close();
+    },
+    [state, close],
+  );
+
+  const open = useCallback(
+    (req: ContextMenuRequest) => {
+      if (state.request) return;
+      state.start = null;
+      state.dragged = false;
+      state.highlighted = null;
+      setHighlighted(null);
+      setRequest(req);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      progress.setValue(0);
+      backdrop.setValue(0);
+      Animated.timing(backdrop, {
+        toValue: 1,
+        duration: motion.duration.fast,
+        useNativeDriver: true,
+      }).start();
+      if (reduceMotion) {
         Animated.timing(progress, {
           toValue: 1,
           duration: motion.duration.fast,
           useNativeDriver: true,
         }).start();
+      } else {
+        Animated.spring(progress, { toValue: 1, ...motion.menuSpring, useNativeDriver: true }).start();
       }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [visible, progress]);
-
-  if (!anchor) return null;
-
-  // Placering: bilden står kvar där den var om allt ryms, annars flyttas den
-  // in på skärmen. Menyn läggs under bilden, eller ovanför om den inte ryms.
-  const menuHeight = items.length * ROW_HEIGHT;
-  const scale = Math.min(1, MAX_LIFT_HEIGHT / anchor.height);
-  const liftW = anchor.width * scale;
-  const liftH = anchor.height * scale;
-  const top = insets.top + spacing.lg;
-  const bottom = winH - insets.bottom - spacing.lg;
-  const needed = liftH + spacing.xl + menuHeight;
-  const liftY = Math.min(Math.max(anchor.y, top), bottom - needed);
-  const liftX = Math.min(
-    Math.max(anchor.x + (anchor.width - liftW) / 2, spacing.screenMargin),
-    winW - spacing.screenMargin - liftW,
-  );
-  const menuY = liftY + liftH + spacing.xl;
-  const menuX = Math.min(
-    Math.max(liftX + liftW / 2 - MENU_WIDTH / 2, spacing.screenMargin),
-    winW - spacing.screenMargin - MENU_WIDTH,
+    },
+    [state, progress, backdrop, reduceMotion],
   );
 
-  const liftScale = progress.interpolate({ inputRange: [0, 1], outputRange: [1, motion.liftScale] });
+  const move = useCallback(
+    (x: number, y: number) => {
+      if (!state.request || state.closing) return;
+      if (!state.start) state.start = { x, y };
+      if (!state.dragged && Math.hypot(x - state.start.x, y - state.start.y) > DRAG_SLOP) {
+        state.dragged = true;
+      }
+      setHighlight(rowAt(state.layout, state.request.items.length, x, y));
+    },
+    [state, setHighlight],
+  );
+
+  const release = useCallback(() => {
+    if (!state.request || state.closing) return;
+    if (state.highlighted !== null) {
+      select(state.highlighted);
+    } else if (state.dragged) {
+      close();
+    }
+    // Annars: släppt där man höll in, menyn står kvar för tryck.
+  }, [state, select, close]);
+
+  const api = useMemo(() => ({ open, move, release, close }), [open, move, release, close]);
 
   return (
-    <Modal visible={visible} transparent animationType="none" onRequestClose={onClose} statusBarTranslucent>
-      <Animated.View style={[StyleSheet.absoluteFill, { opacity: progress }]}>
+    <ContextMenuContext.Provider value={api}>
+      {children}
+      {request && layout && (
+        <MenuOverlay
+          request={request}
+          layout={layout}
+          highlighted={highlighted}
+          progress={progress}
+          backdrop={backdrop}
+          reduceMotion={reduceMotion}
+          onSelect={select}
+          onClose={close}
+        />
+      )}
+    </ContextMenuContext.Provider>
+  );
+}
+
+type OverlayProps = {
+  request: ContextMenuRequest;
+  layout: MenuLayout;
+  highlighted: number | null;
+  progress: Animated.Value;
+  backdrop: Animated.Value;
+  reduceMotion: boolean;
+  onSelect: (i: number) => void;
+  onClose: () => void;
+};
+
+function MenuOverlay({
+  request,
+  layout,
+  highlighted,
+  progress,
+  backdrop,
+  reduceMotion,
+  onSelect,
+  onClose,
+}: OverlayProps) {
+  const { scheme, shadows } = useTheme();
+  const styles = useStyles();
+
+  const liftScale = reduceMotion
+    ? 1
+    : progress.interpolate({ inputRange: [0, 1], outputRange: [1, motion.liftScale] });
+  const menuScale = reduceMotion
+    ? 1
+    : progress.interpolate({ inputRange: [0, 1], outputRange: [motion.menuEnterScale, 1] });
+  // Menyn glider in från kortets håll.
+  const direction = layout.below ? -1 : 1;
+  const menuShift = reduceMotion
+    ? 0
+    : progress.interpolate({ inputRange: [0, 1], outputRange: [direction * motion.menuOffset, 0] });
+  const menuOpacity = progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  return (
+    <View style={StyleSheet.absoluteFill}>
+      <Animated.View style={[StyleSheet.absoluteFill, { opacity: backdrop }]}>
         <Pressable accessibilityLabel="Stäng meny" style={StyleSheet.absoluteFill} onPress={onClose}>
           <BlurView
             tint={scheme}
@@ -116,51 +348,78 @@ export default function ProductContextMenu({ visible, anchor, imageUrl, items, o
         style={[
           styles.lift,
           {
-            left: liftX,
-            top: liftY,
-            width: liftW,
-            height: liftH,
+            left: layout.lift.x,
+            top: layout.lift.y,
+            width: layout.lift.width,
+            height: layout.lift.height,
             boxShadow: shadows.lift,
             transform: [{ scale: liftScale }],
           },
         ]}
       >
-        <Image source={{ uri: imageUrl }} style={styles.liftImage} resizeMode="cover" />
+        <Image source={{ uri: request.imageUrl }} style={styles.liftImage} resizeMode="cover" />
       </Animated.View>
 
       <Animated.View
+        accessibilityRole="menu"
         style={[
           styles.menu,
-          { left: menuX, top: menuY, width: MENU_WIDTH, boxShadow: shadows.menu, opacity: progress },
+          {
+            left: layout.menu.x,
+            top: layout.menu.y,
+            width: layout.menu.width,
+            boxShadow: shadows.menu,
+            opacity: menuOpacity,
+            transformOrigin: layout.below ? 'top' : 'bottom',
+            transform: [{ translateY: menuShift }, { scale: menuScale }],
+          },
         ]}
       >
         <BlurView
           tint={scheme}
           intensity={edgeBlur.menuIntensity}
           blurMethod="dimezisBlurViewSdk31Plus"
-          style={StyleSheet.absoluteFill}
+          // Egen radie på blur-lagret, se Glass.tsx (hårda kanter).
+          style={[StyleSheet.absoluteFill, styles.menuShape]}
         />
         <View style={[StyleSheet.absoluteFill, styles.menuFill]} />
-        {items.map((item, i) => (
-          <MenuRow key={item.label} item={item} first={i === 0} onClose={onClose} />
+        {request.items.map((item, i) => (
+          <MenuRow
+            key={item.label}
+            item={item}
+            first={i === 0}
+            highlighted={highlighted === i}
+            onPress={() => onSelect(i)}
+          />
         ))}
       </Animated.View>
-    </Modal>
+    </View>
   );
 }
 
-function MenuRow({ item, first, onClose }: { item: ContextMenuItem; first: boolean; onClose: () => void }) {
+function MenuRow({
+  item,
+  first,
+  highlighted,
+  onPress,
+}: {
+  item: ContextMenuItem;
+  first: boolean;
+  highlighted: boolean;
+  onPress: () => void;
+}) {
   const styles = useStyles();
   const { colors } = useTheme();
   const Icon = item.icon;
   return (
     <Pressable
       accessibilityRole="menuitem"
-      onPress={() => {
-        item.onPress?.();
-        onClose();
-      }}
-      style={({ pressed }) => [styles.row, !first && styles.rowDivider, pressed && styles.rowPressed]}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.row,
+        !first && styles.rowDivider,
+        (pressed || highlighted) && styles.rowPressed,
+      ]}
     >
       <Text style={styles.rowLabel}>{item.label}</Text>
       <Icon color={colors.textPrimary} size={iconSize.md} />
@@ -191,6 +450,11 @@ const useStyles = makeStyles((t) => ({
     borderWidth: t.glass.borderWidth,
     borderColor: t.glass.borderColor,
   },
+  menuShape: {
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    overflow: 'hidden',
+  },
   menuFill: {
     backgroundColor: t.colors.menu,
   },
@@ -206,7 +470,7 @@ const useStyles = makeStyles((t) => ({
     borderTopColor: t.colors.border,
   },
   rowPressed: {
-    backgroundColor: t.colors.border,
+    backgroundColor: t.colors.pressed,
   },
   rowLabel: {
     ...typography.body,

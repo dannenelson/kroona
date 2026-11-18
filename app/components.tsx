@@ -21,7 +21,12 @@ import BookmarkIcon from '../assets/icons/BookmarkIcon';
 import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
 
 const [P1, P2, P3] = PRODUCTS;
-const PHOTO = { uri: P3.imageUrl };
+// Ljusaste och mörkaste produktfotot (uppmätt medelluminans 0,69 resp. 0,45),
+// för att pröva läsbarheten hos glas på foto i båda teman.
+const PHOTOS = [
+  { label: 'ljust foto', source: { uri: P3.imageUrl } },
+  { label: 'mörkare foto', source: { uri: P1.imageUrl } },
+] as const;
 const DEMO_RATING = { rating: 4.8, reviewCount: 312 };
 // Höjd på kantblur-demons fönster (lokalt demomått).
 const FADE_DEMO_HEIGHT = 360;
@@ -59,27 +64,31 @@ export default function ComponentsScreen() {
           </Pill>
         </View>
         <Text style={styles.hint}>
-          Nedtryckt visas genom att hålla in. Långt tryck på ett produktkort öppnar menyn.
+          Nedtryckt visas genom att hålla in. Växla tema uppe till höger: glas på foto följer temat.
         </Text>
 
         <Section title="1 · IconButton (glas)">
-          <Caption>Över foto (identiskt i båda teman)</Caption>
-          <ImageBackground source={PHOTO} style={styles.photo}>
-            <StateRow
-              onPhoto
-              render={(s) => (
-                <IconButton
-                  tone="photo"
-                  icon={BookmarkIcon}
-                  selectedIcon={BookmarkIconFilled}
-                  accessibilityLabel={`Spara, ${s.label}`}
-                  selected={'selected' in s}
-                  disabled={'disabled' in s}
-                  onPress={() => {}}
+          {PHOTOS.map((photo) => (
+            <View key={photo.label} style={styles.photoBlock}>
+              <Caption>Över {photo.label}</Caption>
+              <ImageBackground source={photo.source} style={styles.photo}>
+                <StateRow
+                  onPhoto
+                  render={(s) => (
+                    <IconButton
+                      tone="photo"
+                      icon={BookmarkIcon}
+                      selectedIcon={BookmarkIconFilled}
+                      accessibilityLabel={`Spara, ${s.label}`}
+                      selected={'selected' in s}
+                      disabled={'disabled' in s}
+                      onPress={() => {}}
+                    />
+                  )}
                 />
-              )}
-            />
-          </ImageBackground>
+              </ImageBackground>
+            </View>
+          ))}
           <Caption>Över ren yta (ljust: surface + line, TODO(design))</Caption>
           <StateRow
             render={(s) => (
@@ -105,17 +114,21 @@ export default function ComponentsScreen() {
               </Pill>
             )}
           />
-          <Caption>Glas över foto</Caption>
-          <ImageBackground source={PHOTO} style={styles.photo}>
-            <StateRow
-              onPhoto
-              render={(s) => (
-                <Pill variant="glass" selected={'selected' in s} disabled={'disabled' in s} onPress={() => {}}>
-                  Mode
-                </Pill>
-              )}
-            />
-          </ImageBackground>
+          {PHOTOS.map((photo) => (
+            <View key={photo.label} style={styles.photoBlock}>
+              <Caption>Glas över {photo.label}</Caption>
+              <ImageBackground source={photo.source} style={styles.photo}>
+                <StateRow
+                  onPhoto
+                  render={(s) => (
+                    <Pill variant="glass" selected={'selected' in s} disabled={'disabled' in s} onPress={() => {}}>
+                      Mode
+                    </Pill>
+                  )}
+                />
+              </ImageBackground>
+            </View>
+          ))}
         </Section>
 
         <Section title="3 · TextTabs" bleed>
@@ -130,7 +143,9 @@ export default function ComponentsScreen() {
               <ProductCard key={p.id} {...p} size="S" />
             ))}
           </View>
-          <Caption>Medium · håll in för menyn · höger: inaktiv</Caption>
+          <Caption>
+            Medium · håll in för menyn, dra fingret till en rad och släpp (haptik: känn efter) · höger: inaktiv
+          </Caption>
           <View style={styles.row}>
             <ProductCard {...P1} {...DEMO_RATING} />
             <ProductCard {...P2} {...DEMO_RATING} disabled />
@@ -140,8 +155,8 @@ export default function ComponentsScreen() {
         </Section>
 
         <Section title="5 · TopBar" bleed>
-          <Caption inset>Produktdetalj · tillbaka + spara, över foto</Caption>
-          <ImageBackground source={{ uri: P2.imageUrl }} style={styles.topBarPhoto}>
+          <Caption inset>Produktdetalj · tillbaka + spara, över ljust foto</Caption>
+          <ImageBackground source={PHOTOS[0].source} style={styles.topBarPhoto}>
             <TopBar
               tone="photo"
               left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: () => {} }}
@@ -267,6 +282,9 @@ const useStyles = makeStyles((t) => ({
   },
   captionOnPhoto: {
     color: overlay.onPhoto, // på foto: fast vit i båda teman
+  },
+  photoBlock: {
+    gap: spacing.sm,
   },
   photo: {
     padding: spacing.lg,
