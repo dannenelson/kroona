@@ -9,10 +9,11 @@ Kroona är en svensk e-handelsupptäcktsapp (mode + heminredning). Vi bygger **F
 - `docs/plan.md` — vad som är aktivt nu, näst och senare. Bygg bara det som står under **Nu/Näst**.
 - `docs/produkt.md` — vad Kroona är och vilka beslut som är låsta.
 - `docs/design.md` — tokens (färg, typ, spacing, radie, glas, rörelse) och komponentkontrakt. **Alla visuella värden kommer härifrån.**
+- `docs/process.md` — hur vi arbetar (flöde, granskning, briefmall).
 - `docs/designsystem.md` — komponentkatalog (korttaxonomi, SectionHeader, TopBar, FilterPills). Dess färg-, typsnitts- och spacingavsnitt är ersatta av `design.md`.
 
 ## Tech-stack
-- React Native + Expo (~54), Expo Router, TypeScript. Test via Expo Go (`npx expo start`).
+- React Native + Expo (SDK 58), Expo Router, TypeScript. Node 24 (`.nvmrc`, kör `nvm use` först). Test via Expo Go (`npx expo start`).
 - Expo-paket: `npx expo install <paket>`. Övrigt: `npm install <paket> --legacy-peer-deps`.
 - Använd skills för Expo, React Native och Supabase när de finns installerade.
 

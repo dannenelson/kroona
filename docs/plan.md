@@ -36,7 +36,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 
 ## Näst — i den här ordningen
 1a. ✅ **Tema** (`theme/`, typsnitt, migrering) — klart 2026-11-18, commit `d048031`. Besiktigas i Expo Go (mörkt och ljust).
-1a.5 **SDK-uppgradering 54 → 58** — brief: `docs/briefs/02-sdk-upgrade.md`. Krävs för att köra appen i Expo Go på telefonen.
+1a.5 ✅ **SDK-uppgradering 54 → 58** — klart 2026-11-18, commit `dcc94fb`. Besiktigas i Expo Go (kör `nvm use` först).
 1b. **Basskomponenter** (Glas, Pill, Kort, TopBar) på temat. Ta med två fynd från 1a:
     - Guld som ikon på ljus yta ger 2,57:1 (ikoner kräver 3:1). Använd `accentText` för ikoner i ljust tema.
     - Hero- och Partner-toningen slutar i solid mörk botten, vilket kan se ut som ett mörkt block i ljust läge. Avgörs visuellt.
@@ -45,6 +45,12 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 4. **Sparat** med egna samlingar (AsyncStorage)
 5. **Hem** i ny design, sedan **Flöde** och **Hitta**
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning
+
+## Teknisk skuld (ingen brådska, men inte glömd)
+- `npm audit`: 54 sårbarheter (1 kritisk). Kolla om den kritiska gäller något som hamnar i appen. Kör inte `audit fix --force`.
+- `@react-navigation/native` och `bottom-tabs` ligger kvar i `package.json` men används inte. Kan tas bort.
+- `react-native-svg-transformer` hittar Metro-konfigen bara på ett visst ställe i `node_modules`. Kraschar Metro efter en framtida installation behövs en egen transformer.
+- API-nyckeln i klienten, `claude-sonnet-5` i `claudeProxy.ts` ska verifieras, `test.json`, oanvända `CardShowcase` och `ClusterCard`.
 
 ## Senare — Fas 1 och framåt (byggs inte i Fas 0)
 Supabase-projekt och schema (collections, collection_items, follows) · konton · tracking och provision · första riktiga återförsäljaren · admin för handlare · DPP
