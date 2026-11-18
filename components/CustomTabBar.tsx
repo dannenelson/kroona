@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Spacing } from '../constants/spacing';
+import { makeStyles, useTheme, withAlpha, typography, fonts, spacing, motion } from '../theme';
 
 import HomeIcon from '../assets/icons/HomeIcon';
 import HomeIconFilled from '../assets/icons/HomeIcon_filled';
@@ -27,18 +27,29 @@ const LABELS: Record<string, string> = {
   saved: 'Sparat',
 };
 
+// Lokala mått för tab-baren (ikonens storlek och flikbredd är komponentmått,
+// inte spacing).
+const ICON_SIZE = 30;
+const TAB_WIDTH = 80;
+// Etikettens radhöjd följer typography.caption, så TAB_BAR_HEIGHT kan räknas
+// exakt i stället för att uppskattas.
+const LABEL_LINE_HEIGHT = typography.caption.lineHeight;
+
+const CONTAINER_PADDING_TOP = spacing.xxl;
+const CONTAINER_PADDING_BOTTOM = spacing.xs;
+const TAB_GAP = 6; // lokal optisk justering: ikon → etikett
+
 export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useStyles();
 
   return (
     <View style={styles.container}>
-      {/* Gradient bakgrund */}
+      {/* Gradient mot bakgrundstoken (bg med alfa), så att den möter
+          skärmens bakgrund utan söm i båda teman. */}
       <LinearGradient
-        colors={[
-          'rgba(15,15,14,0.0)',
-          'rgba(15,15,14,0.8)',
-          'rgba(15,15,14,1.0)',
-        ]}
+        colors={[withAlpha(colors.bg, 0), withAlpha(colors.bg, 0.8), colors.bg]}
         locations={[0, 0.5, 1]}
         style={StyleSheet.absoluteFillObject}
       />
@@ -67,9 +78,9 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
               key={route.key}
               style={styles.tab}
               onPress={onPress}
-              activeOpacity={0.7}
+              activeOpacity={motion.pressedOpacity}
             >
-              <Icon color="#ffffff" size={30} />
+              <Icon color={colors.textPrimary} size={ICON_SIZE} />
               <Text style={styles.label}>{label}</Text>
             </TouchableOpacity>
           );
@@ -82,15 +93,15 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   container: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: Spacing.screenMargin,
-    paddingTop: 36,
-    paddingBottom: 4,
+    paddingHorizontal: spacing.screenMargin,
+    paddingTop: CONTAINER_PADDING_TOP,
+    paddingBottom: CONTAINER_PADDING_BOTTOM,
   },
   tabsRow: {
     flexDirection: 'row',
@@ -98,28 +109,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   tab: {
-    width: 80,
+    width: TAB_WIDTH,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: TAB_GAP,
   },
   label: {
-    fontSize: 12,
-    fontFamily: 'GoogleSansFlex_500Medium',
-    color: '#ffffff',
+    ...typography.caption,
+    fontFamily: fonts.ui500, // vikt 500 behålls, storlek från caption
+    color: t.colors.textPrimary,
     includeFontPadding: false,
     textAlign: 'center',
   },
-});
+}));
 
-// Beräknad, inte gissad — summerar tab-barens egna kända mått, så en
-// framtida ändring av paddingTop/gap/paddingBottom automatiskt uppdaterar
-// den här konstanten istället för att bli ännu en manuellt underhållen
-// gissning. insets.bottom ingår INTE här (det varierar per enhet/skärm) —
-// varje anropande skärm lägger till sin egen insets.bottom separat.
+// Summerar tab-barens egna kända mått från samma konstanter som stilen
+// använder, så en ändring av padding/gap/etikett slår igenom automatiskt.
+// insets.bottom ingår INTE här (det varierar per enhet/skärm) — varje
+// anropande skärm lägger till sin egen insets.bottom separat.
 export const TAB_BAR_HEIGHT =
-  styles.container.paddingTop! +
-  30 + // ikonstorlek, se <Icon size={30}> ovan
-  styles.tab.gap! +
-  16 + // uppskattad radhöjd för label (fontSize 12) — går ej läsa statiskt
-  styles.container.paddingBottom!;
+  CONTAINER_PADDING_TOP + ICON_SIZE + TAB_GAP + LABEL_LINE_HEIGHT + CONTAINER_PADDING_BOTTOM;

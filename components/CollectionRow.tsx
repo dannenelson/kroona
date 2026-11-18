@@ -1,7 +1,7 @@
 import { View, ScrollView, StyleSheet } from 'react-native';
 import PartnerCard from './PartnerCard';
 import SectionTitle from './SectionTitle';
-import { Spacing } from '../constants/spacing';
+import { spacing } from '../theme';
 import { COLLECTIONS, getCollectionProducts, getCollectionNewCount } from '../data/collections';
 
 // Ingen samlings-detaljvy finns eller byggs här — korten navigerar
@@ -41,13 +41,13 @@ export default function CollectionsRow() {
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 24,
+    marginTop: spacing.xl,
   },
   title: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: Spacing.gutter,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.gutter,
   },
 });

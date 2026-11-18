@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import { Spacing } from '../constants/spacing';
+import { spacing } from '../theme';
 import { COLLECTIONS } from '../data/collections';
 import { PRODUCTS } from '../data/products';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
@@ -80,13 +80,13 @@ export default function DiscoverBrandsRow() {
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   title: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: 16,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.lg,
   },
 });

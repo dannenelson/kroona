@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image, StyleProp, ViewStyle } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Radius } from '../constants/spacing';
+import { makeStyles, typography, fonts, spacing, radius } from '../theme';
+
+const THUMB_SIZE = 56;
 
 type Props = {
   title: string;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function LinkCard({ title, subtitle, imageUrl, variant, style, onPress }: Props) {
+  const styles = useStyles();
   if (variant === 'vertical') {
     return (
       <TouchableOpacity style={[styles.verticalWrapper, style]} onPress={onPress}>
@@ -35,45 +37,46 @@ export default function LinkCard({ title, subtitle, imageUrl, variant, style, on
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   // Horizontal (Spotify-mönster): tumnagel vänster, text vertikalt centrerad höger.
   horizontalCard: {
     width: 220,
     height: 80,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.cardBg,
-    borderRadius: Radius.card,
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
-    padding: 12,
-    gap: 12,
+    backgroundColor: t.colors.surface,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
+    padding: spacing.md,
+    gap: spacing.md,
   },
   thumbnailHorizontal: {
-    width: 56,
-    height: 56,
-    // Radius.card (20) på en 56px yta blir nästan cirkulär — ett dedikerat
-    // mindre värde används här istället. Kandidat för en framtida
-    // Radius.thumbnail-token.
-    borderRadius: 12,
-    backgroundColor: Colors.cardBgAlt,
+    width: THUMB_SIZE,
+    height: THUMB_SIZE,
+    // radius.card (20) på en 56px yta blir nästan cirkulär — control (12)
+    // har samma värde som tidigare.
+    borderRadius: radius.control,
+    borderCurve: 'continuous',
+    backgroundColor: t.colors.surfaceRaised,
   },
   textContainerHorizontal: {
     flex: 1,
     justifyContent: 'center',
   },
   titleHorizontal: {
-    color: Colors.textPrimary,
-    fontFamily: 'GoogleSansFlex_500Medium',
-    fontSize: 14,
-    letterSpacing: 0.2,
+    ...typography.body,
+    fontFamily: fonts.ui500, // vikt 500 behålls
+    color: t.colors.textPrimary,
+    letterSpacing: 0.2, // lokal optisk spärrning
   },
   subtitleHorizontal: {
-    color: Colors.textSecondary,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    fontSize: 11,
-    marginTop: 4,
-    letterSpacing: 0.3,
+    ...typography.micro,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: t.colors.textSecondary,
+    marginTop: spacing.xs,
+    letterSpacing: 0.3, // lokal optisk spärrning
   },
 
   // Vertical: tumnagel överst (samma bildyta-behandling som MixCard), text under.
@@ -85,24 +88,24 @@ const styles = StyleSheet.create({
   thumbnailVertical: {
     width: '100%',
     height: 160,
-    borderRadius: Radius.card,
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   contentVertical: {
-    paddingTop: 12,
+    paddingTop: spacing.md,
   },
   titleVertical: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    letterSpacing: 0.3,
-    marginBottom: 4,
+    ...typography.body,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    marginBottom: spacing.xs,
   },
   subtitleVertical: {
-    color: Colors.textSecondary,
-    fontSize: 11,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    letterSpacing: 0.3,
+    ...typography.micro,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: t.colors.textSecondary,
+    letterSpacing: 0.3, // lokal optisk spärrning
   },
-});
+}));

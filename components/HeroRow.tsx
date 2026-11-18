@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { View, Text, ScrollView, ImageBackground, StyleSheet, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors } from '../constants/colors';
-import { Spacing, Radius } from '../constants/spacing';
+import { makeStyles, overlay, typography, letterSpacing, spacing, radius } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import { MixSignal, signalKey, getKnownSignals } from '../lib/personalizationSignals';
@@ -88,6 +87,7 @@ const EDITORIAL_POSTS: EditorialPost[] = [
 export default function HeroRow() {
   const { savedProducts } = useSavedProducts();
   const { followedCollectionIds } = useFollowedCollections();
+  const styles = useStyles();
 
   const knownSignals = useMemo(
     () => getKnownSignals(followedCollectionIds, savedProducts),
@@ -115,7 +115,7 @@ export default function HeroRow() {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH + Spacing.gutter}
+        snapToInterval={CARD_WIDTH + spacing.gutter}
         decelerationRate="fast"
         contentContainerStyle={styles.scroll}
       >
@@ -130,13 +130,8 @@ export default function HeroRow() {
               <Text style={styles.badgeText}>{post.badge}</Text>
             </View>
             <LinearGradient
-              colors={[
-                'rgba(26,28,33,0.0)',
-                'rgba(26,28,33,0.56)',
-                'rgba(26,28,33,0.75)',
-                'rgba(26,28,33,1.0)',
-              ]}
-              locations={[0, 0.4, 0.65, 1]}
+              colors={overlay.scrimStops.colors}
+              locations={overlay.scrimStops.locations}
               style={styles.gradient}
             >
               <Text style={styles.eyebrow}>{post.eyebrow}</Text>
@@ -150,44 +145,46 @@ export default function HeroRow() {
   );
 }
 
-const styles = StyleSheet.create({
+// Innehållet ligger på foto + scrim, som är mörk i båda teman. Därför
+// används fasta overlay-färger (onPhoto). accent är samma i båda teman.
+const useStyles = makeStyles((t) => ({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   sectionTitleWrapper: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: Spacing.gutter,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.gutter,
   },
   card: {
     width: CARD_WIDTH,
     height: CARD_HEIGHT,
-    borderRadius: Radius.card,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   cardImage: {
-    borderRadius: Radius.card,
+    borderRadius: radius.card,
   },
   badge: {
     position: 'absolute',
-    top: 12,
-    left: 12,
-    backgroundColor: Colors.gold,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    top: spacing.md,
+    left: spacing.md,
+    backgroundColor: t.colors.accent,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.full,
     zIndex: 1,
   },
   badgeText: {
-    color: Colors.background,
-    fontSize: 10,
-    letterSpacing: 1,
+    ...typography.micro,
+    color: t.colors.onAccent,
+    letterSpacing: 1, // lokal optisk spärrning
     textTransform: 'uppercase',
-    fontFamily: 'GoogleSansFlex_500Medium',
   },
   gradient: {
     position: 'absolute',
@@ -196,27 +193,24 @@ const styles = StyleSheet.create({
     right: 0,
     height: '60%',
     justifyContent: 'flex-end',
-    paddingBottom: 16,
-    paddingHorizontal: 16,
+    paddingBottom: spacing.lg,
+    paddingHorizontal: spacing.lg,
   },
   eyebrow: {
-    color: Colors.gold,
-    fontSize: 10,
-    letterSpacing: 1.5,
+    ...typography.micro,
+    color: t.colors.accent,
+    letterSpacing: letterSpacing.caps,
     textTransform: 'uppercase',
-    fontFamily: 'GoogleSansFlex_500Medium',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   title: {
-    color: Colors.textPrimary,
-    fontFamily: 'GoogleSansFlex_700Bold',
-    fontSize: 27,
-    letterSpacing: 0.3,
-    marginBottom: 4,
+    ...typography.title1,
+    color: overlay.onPhoto,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    marginBottom: spacing.xs,
   },
   meta: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-    fontFamily: 'GoogleSansFlex_400Regular',
+    ...typography.caption,
+    color: overlay.onPhotoSecondary,
   },
-});
+}));

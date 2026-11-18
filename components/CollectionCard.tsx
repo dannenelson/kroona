@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Radius } from '../constants/spacing';
+import { makeStyles, typography, fonts, spacing, radius } from '../theme';
+
+const AVATAR_SIZE = 32;
 
 type Props = {
   id: string;
@@ -12,6 +13,7 @@ type Props = {
 };
 
 export default function CollectionCard({ title, curatorInitial, itemCount, updatedLabel, images }: Props) {
+  const styles = useStyles();
   return (
     <TouchableOpacity style={styles.wrapper}>
       <View style={styles.imagesContainer}>
@@ -34,18 +36,19 @@ export default function CollectionCard({ title, curatorInitial, itemCount, updat
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   wrapper: {
     width: 220,
   },
   imagesContainer: {
     flexDirection: 'row',
     height: 160,
-    gap: 1,
-    borderRadius: Radius.card,
+    gap: StyleSheet.hairlineWidth, // tunn bildskarv
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   imageLarge: {
     flex: 2,
@@ -53,7 +56,7 @@ const styles = StyleSheet.create({
   },
   imagesSmall: {
     flex: 1,
-    gap: 1,
+    gap: StyleSheet.hairlineWidth, // tunn bildskarv
   },
   imageSmall: {
     flex: 1,
@@ -61,37 +64,35 @@ const styles = StyleSheet.create({
   },
   avatar: {
     position: 'absolute',
-    bottom: 8,
-    left: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: Colors.cardBg,
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    bottom: spacing.sm,
+    left: spacing.sm,
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: radius.full,
+    backgroundColor: t.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
   },
   avatarText: {
-    color: Colors.gold,
-    fontSize: 13,
-    fontWeight: '500',
+    ...typography.label,
+    color: t.colors.accentText,
   },
   content: {
-    paddingTop: 12,
+    paddingTop: spacing.md,
   },
   title: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    letterSpacing: 0.3,
-    marginBottom: 4,
+    ...typography.body,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    marginBottom: spacing.xs,
   },
   meta: {
-    color: Colors.textSecondary,
-    fontSize: 11,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    letterSpacing: 0.3,
+    ...typography.micro,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: t.colors.textSecondary,
+    letterSpacing: 0.3, // lokal optisk spärrning
   },
-});
+}));

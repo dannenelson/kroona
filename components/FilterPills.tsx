@@ -5,14 +5,14 @@
 // separat, framtida arbete.
 import { useState } from 'react';
 import { ScrollView, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Spacing } from '../constants/spacing';
+import { makeStyles, typography, spacing, radius } from '../theme';
 
 const FILTERS = ['Allt', 'Kläder', 'Möbler', 'Begagnat'] as const;
 type Filter = (typeof FILTERS)[number];
 
 export default function FilterPills() {
   const [active, setActive] = useState<Filter>('Allt');
+  const styles = useStyles();
 
   return (
     <ScrollView
@@ -36,30 +36,29 @@ export default function FilterPills() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    paddingBottom: 4,
-    gap: 8,
+    paddingHorizontal: spacing.screenMargin,
+    paddingBottom: spacing.xs,
+    gap: spacing.sm,
   },
   pill: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    backgroundColor: Colors.cardBg,
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    borderRadius: radius.full,
+    backgroundColor: t.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   pillActive: {
-    backgroundColor: Colors.gold,
+    backgroundColor: t.colors.accent,
     borderWidth: 0,
   },
   label: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontFamily: 'GoogleSansFlex_500Medium',
+    ...typography.label,
+    color: t.colors.textSecondary,
   },
   labelActive: {
-    color: Colors.background,
+    color: t.colors.onAccent,
   },
-});
+}));

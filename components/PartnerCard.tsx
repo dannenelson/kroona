@@ -1,7 +1,8 @@
 import { Text, TouchableOpacity, StyleSheet, ImageBackground } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors } from '../constants/colors';
-import { Radius } from '../constants/spacing';
+import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius } from '../theme';
+
+const FOLLOW_SIZE = 28;
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 
 type Props = {
@@ -20,13 +21,14 @@ type Props = {
 export default function PartnerCard({ id, name, tag, itemCount, imageUrl, variant }: Props) {
   const { isFollowed, toggleFollowed } = useFollowedCollections();
   const followed = isFollowed(id);
+  const styles = useStyles();
 
   return (
     <TouchableOpacity style={styles.card}>
       <ImageBackground
         source={{ uri: imageUrl }}
         style={styles.image}
-        imageStyle={{ borderRadius: Radius.card }}
+        imageStyle={styles.imageRadius}
       >
         <TouchableOpacity style={styles.followButton} onPress={() => toggleFollowed(id)}>
           <Text style={[styles.followIcon, followed && styles.followIconActive]}>
@@ -35,13 +37,8 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
         </TouchableOpacity>
 
         <LinearGradient
-            colors={[
-                'rgba(26,28,33,0.0)',
-                'rgba(26,28,33,0.56)',
-                'rgba(26,28,33,0.75)',
-                'rgba(26,28,33,1.0)',
-            ]}
-            locations={[0, 0.4, 0.65, 1]}
+            colors={overlay.scrimStops.colors}
+            locations={overlay.scrimStops.locations}
             style={styles.gradient}
         >
           {variant === 'brand' ? (
@@ -62,37 +59,43 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   );
 }
 
-const styles = StyleSheet.create({
-card: {
+// Allt innehåll ligger på foto + scrim, som är mörk i båda teman. Därför
+// används fasta overlay-färger (onPhoto). accent är samma i båda teman.
+const useStyles = makeStyles((t) => ({
+  card: {
     width: 150,
     height: 310,
-    borderRadius: Radius.card,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
-    },
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
+  },
+  imageRadius: {
+    borderRadius: radius.card,
+  },
   image: {
     width: '100%',
     height: '100%',
   },
   followButton: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 28,
-    height: 28,
-    borderRadius: 18,
-    backgroundColor: 'rgba(15,15,14,0.6)',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: FOLLOW_SIZE,
+    height: FOLLOW_SIZE,
+    borderRadius: radius.full,
+    backgroundColor: overlay.scrimSoft,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
   },
   followIcon: {
-    color: Colors.textPrimary,
-    fontSize: 15,
+    ...typography.body,
+    color: overlay.onPhoto,
   },
   followIconActive: {
-    color: Colors.gold,
+    color: t.colors.accent,
   },
   gradient: {
     position: 'absolute',
@@ -100,39 +103,39 @@ card: {
     left: 0,
     right: 0,
     height: '50%',
-    borderBottomLeftRadius: Radius.card,
-    borderBottomRightRadius: Radius.card,
+    borderBottomLeftRadius: radius.card,
+    borderBottomRightRadius: radius.card,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    paddingBottom: 14,
-    paddingHorizontal: 10,
+    paddingBottom: spacing.md,
+    paddingHorizontal: spacing.sm,
   },
   tag: {
-    color: Colors.gold,
-    fontSize: 9,
-    letterSpacing: 1.5,
+    ...typography.micro,
+    color: t.colors.accent,
+    letterSpacing: letterSpacing.caps,
     textTransform: 'uppercase',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
     textAlign: 'center',
   },
   name: {
-    color: Colors.textPrimary,
-    fontSize: 14,
-    letterSpacing: 0.3,
-    marginBottom: 4,
+    ...typography.body,
+    color: overlay.onPhoto,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    marginBottom: spacing.xs,
     textAlign: 'center',
   },
   brandName: {
-    color: Colors.textPrimary,
-    fontFamily: 'GoogleSansFlex_700Bold',
-    fontSize: 28,
-    letterSpacing: 0.3,
+    ...typography.title1,
+    color: overlay.onPhoto,
+    letterSpacing: 0.3, // lokal optisk spärrning
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   count: {
-    color: Colors.textSecondary,
-    fontSize: 11,
+    ...typography.micro,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: overlay.onPhotoSecondary,
     textAlign: 'center',
   },
-});
+}));

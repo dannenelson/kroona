@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Spacing, Radius } from '../constants/spacing';
+import { makeStyles, typography, spacing, radius } from '../theme';
+
+const PLATE_HEIGHT = 120;
 
 const AVATAR_SIZE = 48;
 const AVATAR_OVERLAP = 18; // pixlar de överlappande cirklarna kryper in i varandra
@@ -17,11 +18,12 @@ type Props = {
 };
 
 export default function ClusterCard({ title, avatars, related }: Props) {
+  const styles = useStyles();
   return (
     <View style={styles.section}>
       <View style={styles.wrapper}>
         <TouchableOpacity style={styles.card}>
-          {/* sustainGreenBg återanvänds som platshållar-"platta" — ingen
+          {/* successSubtle återanvänds som platshållar-"platta" — ingen
               dedikerad ClusterCard-färgtoken finns ännu. */}
           <View style={styles.plate}>
             <View style={styles.avatarStack}>
@@ -49,24 +51,25 @@ export default function ClusterCard({ title, avatars, related }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   wrapper: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   card: {
     width: '100%',
-    backgroundColor: Colors.cardBg,
-    borderRadius: Radius.card,
+    backgroundColor: t.colors.surface,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   plate: {
-    height: 120,
-    backgroundColor: Colors.sustainGreenBg,
+    height: PLATE_HEIGHT,
+    backgroundColor: t.colors.successSubtle,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -76,9 +79,9 @@ const styles = StyleSheet.create({
   avatarCircle: {
     width: AVATAR_SIZE,
     height: AVATAR_SIZE,
-    borderRadius: AVATAR_SIZE / 2,
-    borderWidth: 3,
-    borderColor: Colors.sustainGreenBg,
+    borderRadius: radius.full,
+    borderWidth: 3, // lokal: avatarring mot plattan
+    borderColor: t.colors.successSubtle,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -86,24 +89,21 @@ const styles = StyleSheet.create({
     marginLeft: -AVATAR_OVERLAP,
   },
   avatarInitial: {
-    color: Colors.background,
-    fontFamily: 'GoogleSansFlex_700Bold',
-    fontSize: 16,
+    ...typography.headline,
+    color: t.colors.onAccent,
   },
   content: {
-    padding: 16,
+    padding: spacing.lg,
   },
   title: {
-    color: Colors.textPrimary,
-    fontFamily: 'GoogleSansFlex_700Bold',
-    fontSize: 18,
-    letterSpacing: 0.3,
-    marginBottom: 4,
+    ...typography.headline,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    marginBottom: spacing.xs,
   },
   related: {
-    color: Colors.textSecondary,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    fontSize: 12,
-    letterSpacing: 0.3,
+    ...typography.caption,
+    color: t.colors.textSecondary,
+    letterSpacing: 0.3, // lokal optisk spärrning
   },
-});
+}));

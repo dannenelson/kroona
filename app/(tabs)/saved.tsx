@@ -1,12 +1,12 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '../../constants/colors';
-import { Spacing } from '../../constants/spacing';
+import { makeStyles, typography, fonts, spacing } from '../../theme';
 import { useSavedProducts } from '../../context/SavedProductsContext';
 import ProductGrid from '../../components/ProductGrid';
 
 export default function SavedScreen() {
   const insets = useSafeAreaInsets();
+  const styles = useStyles();
   const { savedProducts } = useSavedProducts();
 
   return (
@@ -32,34 +32,35 @@ export default function SavedScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: t.colors.bg,
   },
   title: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    letterSpacing: 0.3,
-    paddingHorizontal: Spacing.screenMargin,
-    paddingVertical: 12,
+    ...typography.headline,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    paddingHorizontal: spacing.screenMargin,
+    paddingVertical: spacing.md,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.screenMargin,
-    paddingTop: 80,
-    gap: 8,
+    paddingHorizontal: spacing.screenMargin,
+    paddingTop: spacing.xxxl + spacing.xxl,
+    gap: spacing.sm,
   },
   emptyTitle: {
-    color: Colors.textPrimary,
-    fontSize: 15,
+    ...typography.body,
+    color: t.colors.textPrimary,
     textAlign: 'center',
   },
   emptyHint: {
-    color: Colors.textSecondary,
-    fontSize: 13,
+    ...typography.label,
+    fontFamily: fonts.ui400, // regular som tidigare, storlek från label
+    color: t.colors.textSecondary,
     textAlign: 'center',
   },
-});
+}));

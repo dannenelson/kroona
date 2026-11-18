@@ -3,7 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Product } from '../types/product';
 import ProductCard from './ProductCard';
 import SectionTitle from './SectionTitle';
-import { Spacing } from '../constants/spacing';
+import { spacing } from '../theme';
 import { TAB_BAR_HEIGHT } from './CustomTabBar';
 
 type Props = {
@@ -48,21 +48,21 @@ export default function ProductGrid({ products, title, compact }: Props) {
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 32,
-    paddingHorizontal: Spacing.screenMargin,
+    marginTop: spacing.xxl,
+    paddingHorizontal: spacing.screenMargin,
   },
   sectionCompact: {
-    marginTop: 12,
+    marginTop: spacing.md,
     paddingHorizontal: 0,
     paddingBottom: 0,
   },
   grid: {
     flexDirection: 'row',
-    gap: Spacing.gutter,
+    gap: spacing.gutter,
   },
   column: {
     flex: 1,
-    gap: 16,
+    gap: spacing.lg,
   },
   cardWrapper: {
     width: '100%',

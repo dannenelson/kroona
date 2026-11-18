@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Colors } from '../constants/colors';
-import { Spacing } from '../constants/spacing';
+import { makeStyles, useTheme, typography, fonts, spacing, radius } from '../theme';
 
 // "Fråga Kroona"-sökfält. Riktig inmatning — texten skickas till Hitta som
 // en router-param (`query`) och auto-skickas där som första meddelandet i
@@ -12,6 +11,8 @@ import { Spacing } from '../constants/spacing';
 export default function AskBar() {
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const { colors } = useTheme();
+  const styles = useStyles();
 
   const handleSend = () => {
     const trimmed = query.trim();
@@ -28,7 +29,7 @@ export default function AskBar() {
           value={query}
           onChangeText={setQuery}
           placeholder="Vad letar du efter idag?"
-          placeholderTextColor={Colors.textTertiary}
+          placeholderTextColor={colors.textTertiary}
           onSubmitEditing={handleSend}
           returnKeyType="send"
         />
@@ -44,30 +45,31 @@ export default function AskBar() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   wrapper: {
-    paddingHorizontal: Spacing.screenMargin,
-    marginTop: 8,
+    paddingHorizontal: spacing.screenMargin,
+    marginTop: spacing.sm,
   },
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    backgroundColor: Colors.cardBgAlt,
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    gap: spacing.sm,
+    backgroundColor: t.colors.surfaceRaised,
+    borderRadius: radius.full,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   input: {
     flex: 1,
-    color: Colors.textPrimary,
-    fontSize: 13,
-    fontFamily: 'GoogleSansFlex_400Regular',
+    ...typography.label,
+    fontFamily: fonts.ui400, // regular som tidigare
+    lineHeight: undefined, // TextInput: låt plattformen styra radhöjden
+    color: t.colors.textPrimary,
     padding: 0,
   },
   arrowButton: {
-    width: 24,
-    height: 24,
+    width: spacing.xl,
+    height: spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -75,7 +77,7 @@ const styles = StyleSheet.create({
     opacity: 0.4,
   },
   arrow: {
-    color: Colors.gold,
-    fontSize: 15,
+    ...typography.body,
+    color: t.colors.accent, // pil-ikon: accent som fyllning/ikon
   },
-});
+}));

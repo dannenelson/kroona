@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import MixCard from './MixCard';
 import SectionTitle from './SectionTitle';
-import { Spacing } from '../constants/spacing';
+import { spacing } from '../theme';
 import { PRODUCTS } from '../data/products';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
@@ -189,13 +189,13 @@ export default function MixRow() {
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   title: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: Spacing.gutter,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.gutter,
   },
 });

@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { makeStyles, typography, fonts, spacing, radius } from '../theme';
 
 const SIZE = 76;
 
@@ -13,6 +13,7 @@ type Props = {
 // ingen sådan route finns i Fas 0 (bara fyra flikar, ingen dynamisk
 // profil-URL i app/). Ingen onPress kopplas in idag.
 export default function ProfileCard({ name, initial }: Props) {
+  const styles = useStyles();
   return (
     <TouchableOpacity style={styles.wrapper}>
       <View style={styles.circle}>
@@ -23,7 +24,7 @@ export default function ProfileCard({ name, initial }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   wrapper: {
     width: SIZE,
     alignItems: 'center',
@@ -31,24 +32,23 @@ const styles = StyleSheet.create({
   circle: {
     width: SIZE,
     height: SIZE,
-    borderRadius: SIZE / 2,
-    backgroundColor: Colors.cardBg,
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderRadius: radius.full,
+    backgroundColor: t.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 8,
+    marginBottom: spacing.sm,
   },
   initial: {
-    color: Colors.gold,
-    fontFamily: 'GoogleSansFlex_700Bold',
-    fontSize: 22,
+    ...typography.headline,
+    color: t.colors.accentText,
   },
   name: {
-    color: Colors.textPrimary,
-    fontSize: 12,
-    fontFamily: 'GoogleSansFlex_500Medium',
-    letterSpacing: 0.2,
+    ...typography.caption,
+    fontFamily: fonts.ui500, // vikt 500 behålls, storlek från caption
+    color: t.colors.textPrimary,
+    letterSpacing: 0.2, // lokal optisk spärrning
     textAlign: 'center',
   },
-});
+}));

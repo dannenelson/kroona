@@ -1,6 +1,6 @@
 import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { Spacing } from '../constants/spacing';
+import { spacing } from '../theme';
 import LinkCard from './LinkCard';
 
 // "Fortsätt din dialog" — ingen rubrik ovanför (matchar mockupen exakt,
@@ -32,8 +32,8 @@ export default function ContinueDialogRow() {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 12,
-    paddingHorizontal: Spacing.screenMargin,
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.screenMargin,
   },
   card: {
     width: '100%',

@@ -11,9 +11,8 @@
  * snart granskningen är klar. Ska ALDRIG hamna i produktion.
  * ============================================================
  */
-import { View, ScrollView, StyleSheet, Dimensions } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Spacing } from '../constants/spacing';
+import { View, ScrollView, Dimensions } from 'react-native';
+import { makeStyles, useTheme, spacing } from '../theme';
 import SectionTitle from './SectionTitle';
 import CollectionCard from './CollectionCard';
 import DiscoveryMosaicCard from './DiscoveryMosaicCard';
@@ -58,21 +57,25 @@ const LINK_CARDS = [
   { id: 'l6', title: 'Urban vardag', subtitle: 'Kategori', imageUrl: w(5, 200) },
 ];
 
-const CLUSTER_AVATARS: [
-  { initial: string; color: string },
-  { initial: string; color: string },
-  { initial: string; color: string },
-] = [
-  { initial: 'J', color: Colors.gold },
-  { initial: 'F', color: Colors.sustainGreen },
-  { initial: 'H', color: Colors.sustainAmber },
-];
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-const GRID_ITEM_WIDTH = (SCREEN_WIDTH - Spacing.screenMargin * 2 - Spacing.gutter) / 2;
-const LIST_ITEM_WIDTH = SCREEN_WIDTH - Spacing.screenMargin * 2;
+const GRID_ITEM_WIDTH = (SCREEN_WIDTH - spacing.screenMargin * 2 - spacing.gutter) / 2;
+const LIST_ITEM_WIDTH = SCREEN_WIDTH - spacing.screenMargin * 2;
 
 export default function CardShowcase() {
+  const { colors } = useTheme();
+  const styles = useStyles();
+  // Avatarfärger läses vid render så att de följer temat.
+  const clusterAvatars: [
+    { initial: string; color: string },
+    { initial: string; color: string },
+    { initial: string; color: string },
+  ] = [
+    { initial: 'J', color: colors.accent },
+    { initial: 'F', color: colors.success },
+    { initial: 'H', color: colors.warning },
+  ];
+
   return (
     <View style={styles.showcaseWrapper}>
       <SectionTitle
@@ -113,7 +116,7 @@ export default function CardShowcase() {
       {/* ClusterCard — alltid ensam, egen sektion */}
       <ClusterCard
         title="Skandinavisk stil"
-        avatars={CLUSTER_AVATARS}
+        avatars={clusterAvatars}
         related={['Minimalistisk', 'HAY', 'Ljusa toner']}
       />
 
@@ -159,36 +162,36 @@ export default function CardShowcase() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   showcaseWrapper: {
-    marginTop: 32,
-    borderTopWidth: 2,
-    borderBottomWidth: 2,
-    borderColor: Colors.sustainAmber,
+    marginTop: spacing.xxl,
+    borderTopWidth: 2, // lokal: tydlig streckad markering av tillfällig yta
+    borderBottomWidth: 2, // lokal: se ovan
+    borderColor: t.colors.warning,
     borderStyle: 'dashed',
-    paddingVertical: 16,
+    paddingVertical: spacing.lg,
   },
   banner: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   title: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: Spacing.gutter,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.gutter,
   },
   grid: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: Spacing.gutter,
+    gap: spacing.gutter,
   },
   list: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: Spacing.gutter,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.gutter,
   },
-});
+}));

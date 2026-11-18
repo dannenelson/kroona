@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, StyleProp, ViewStyle } from 'react-native';
-import { Colors } from '../constants/colors';
+import { View, Text, TouchableOpacity, StyleProp, ViewStyle } from 'react-native';
+import { makeStyles, typography, letterSpacing, spacing } from '../theme';
 
 type PreOrSubHeader =
   | { preheader?: string; subheader?: never }
@@ -16,6 +16,7 @@ type Props = {
 } & PreOrSubHeader & IconOrCta;
 
 export default function SectionTitle({ title, preheader, subheader, icon, cta, style }: Props) {
+  const styles = useStyles();
   return (
     <View style={[styles.wrapper, style]}>
       <View style={styles.textBlock}>
@@ -33,35 +34,32 @@ export default function SectionTitle({ title, preheader, subheader, icon, cta, s
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   wrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    marginBottom: 12,
+    gap: spacing.md,
+    marginBottom: spacing.md,
   },
   textBlock: {
     flex: 1,
   },
   preheader: {
-    color: Colors.gold,
-    fontSize: 10,
-    letterSpacing: 1.5,
+    ...typography.micro,
+    color: t.colors.accentText,
+    letterSpacing: letterSpacing.caps,
     textTransform: 'uppercase',
-    fontFamily: 'GoogleSansFlex_500Medium',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   title: {
-    color: Colors.textPrimary,
-    fontFamily: 'GoogleSansFlex_700Bold',
-    fontSize: 20,
-    letterSpacing: 0.3,
+    ...typography.title2,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
   },
   subheader: {
-    color: Colors.textTertiary,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    fontSize: 12,
-    marginTop: 2,
+    ...typography.caption,
+    color: t.colors.textTertiary,
+    marginTop: 2, // lokal optisk justering: rubrik → underrubrik
   },
   iconSlot: {
     width: 28,
@@ -70,11 +68,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   ctaSlot: {
-    paddingVertical: 4,
+    paddingVertical: spacing.xs,
   },
   ctaLabel: {
-    color: Colors.gold,
-    fontSize: 13,
-    fontFamily: 'GoogleSansFlex_500Medium',
+    ...typography.label,
+    color: t.colors.accentText,
   },
-});
+}));

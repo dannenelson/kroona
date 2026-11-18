@@ -1,6 +1,6 @@
-import { View, ScrollView, StyleSheet } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '../../constants/colors';
+import { makeStyles } from '../../theme';
 import Header from '../../components/Header';
 import FilterPills from '../../components/FilterPills';
 import AskBar from '../../components/AskBar';
@@ -16,6 +16,7 @@ import { TAB_BAR_HEIGHT } from '../../components/CustomTabBar';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
+  const styles = useStyles();
 
   return (
     <View style={styles.container}>
@@ -58,9 +59,9 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: t.colors.bg,
   },
-});
+}));

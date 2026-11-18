@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Colors } from '../../constants/colors';
-import { Spacing, Radius } from '../../constants/spacing';
+import { makeStyles, useTheme, typography, fonts, spacing, radius } from '../../theme';
+
+const SEND_HEIGHT = 40;
+const INPUT_MAX_HEIGHT = 100;
 import { PRODUCTS } from '../../data/products';
 import { Product } from '../../types/product';
 import { askClaude, ClaudeMessage } from '../../lib/claudeProxy';
@@ -69,14 +71,23 @@ class ProductGridErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
-      return <Text style={styles.bubbleTextError}>Kunde inte visa produkterna.</Text>;
+      return <ProductGridErrorText />;
     }
     return this.props.children;
   }
 }
 
+// Klasskomponenten ovan kan inte använda hooks, så felraden är en egen
+// funktionskomponent som läser temat.
+function ProductGridErrorText() {
+  const styles = useStyles();
+  return <Text style={styles.bubbleTextError}>Kunde inte visa produkterna.</Text>;
+}
+
 export default function FindScreen() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useStyles();
   const listRef = useRef<FlatList>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
@@ -185,7 +196,7 @@ export default function FindScreen() {
             if (item.id === LOADING_ID) {
               return (
                 <View style={[styles.bubble, styles.bubbleAssistant]}>
-                  <ActivityIndicator color={Colors.gold} />
+                  <ActivityIndicator color={colors.accent} />
                 </View>
               );
             }
@@ -233,10 +244,10 @@ export default function FindScreen() {
           }
           contentContainerStyle={{
             paddingTop: insets.top,
-            paddingHorizontal: Spacing.screenMargin,
-            paddingBottom: 16,
+            paddingHorizontal: spacing.screenMargin,
+            paddingBottom: spacing.lg,
             flexGrow: 1,
-            gap: 16,
+            gap: spacing.lg,
           }}
           onContentSizeChange={() => listRef.current?.scrollToEnd({ animated: true })}
           keyboardShouldPersistTaps="handled"
@@ -249,7 +260,7 @@ export default function FindScreen() {
             value={inputText}
             onChangeText={setInputText}
             placeholder="Skriv ett meddelande..."
-            placeholderTextColor={Colors.textSecondary}
+            placeholderTextColor={colors.textSecondary}
             multiline
           />
           <TouchableOpacity
@@ -265,36 +276,37 @@ export default function FindScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: t.colors.bg,
   },
   flex: {
     flex: 1,
   },
   title: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    letterSpacing: 0.3,
-    paddingVertical: 12,
+    ...typography.headline,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    paddingVertical: spacing.md,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: Spacing.screenMargin,
-    paddingTop: 80,
-    gap: 8,
+    paddingHorizontal: spacing.screenMargin,
+    paddingTop: spacing.xxxl + spacing.xxl,
+    gap: spacing.sm,
   },
   emptyTitle: {
-    color: Colors.textPrimary,
-    fontSize: 15,
+    ...typography.body,
+    color: t.colors.textPrimary,
     textAlign: 'center',
   },
   emptyHint: {
-    color: Colors.textSecondary,
-    fontSize: 13,
+    ...typography.label,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: t.colors.textSecondary,
     textAlign: 'center',
   },
   messageRow: {
@@ -307,72 +319,72 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   bubble: {
-    borderRadius: Radius.card,
-    borderWidth: 0.5,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    borderWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
   },
   bubbleUser: {
-    backgroundColor: Colors.cardBgAlt,
-    borderColor: Colors.gold,
-    borderBottomRightRadius: 4,
+    backgroundColor: t.colors.surfaceRaised,
+    borderColor: t.colors.accent,
+    borderBottomRightRadius: 4, // lokal: bubblans "svans"-hörn
   },
   bubbleAssistant: {
-    backgroundColor: Colors.cardBg,
-    borderColor: Colors.cardBorder,
-    borderBottomLeftRadius: 4,
+    backgroundColor: t.colors.surface,
+    borderColor: t.colors.border,
+    borderBottomLeftRadius: 4, // lokal: bubblans "svans"-hörn
   },
   bubbleError: {
-    backgroundColor: Colors.cardBg,
-    borderColor: Colors.sustainAmber,
-    borderBottomLeftRadius: 4,
+    backgroundColor: t.colors.surface,
+    borderColor: t.colors.warning,
+    borderBottomLeftRadius: 4, // lokal: bubblans "svans"-hörn
   },
   bubbleText: {
-    color: Colors.textPrimary,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    fontSize: 14,
-    lineHeight: 20,
+    ...typography.body,
+    color: t.colors.textPrimary,
   },
   bubbleTextError: {
-    color: Colors.sustainAmber,
+    color: t.colors.warning,
   },
   inputRow: {
     flexDirection: 'row',
-    gap: 10,
+    gap: spacing.sm,
     alignItems: 'flex-end',
-    paddingHorizontal: Spacing.screenMargin,
-    paddingTop: 12,
-    backgroundColor: Colors.background,
-    borderTopWidth: 0.5,
-    borderTopColor: Colors.cardBorder,
+    paddingHorizontal: spacing.screenMargin,
+    paddingTop: spacing.md,
+    backgroundColor: t.colors.bg,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: t.colors.border,
   },
   input: {
     flex: 1,
-    color: Colors.textPrimary,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    fontSize: 14,
-    backgroundColor: Colors.cardBg,
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
-    borderRadius: Radius.card,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    maxHeight: 100,
+    ...typography.body,
+    lineHeight: undefined, // TextInput: låt plattformen styra radhöjden
+    color: t.colors.textPrimary,
+    backgroundColor: t.colors.surface,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    maxHeight: INPUT_MAX_HEIGHT,
   },
   sendButton: {
-    backgroundColor: Colors.gold,
-    borderRadius: Radius.card,
-    paddingHorizontal: 16,
+    backgroundColor: t.colors.accent,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    height: 40,
+    height: SEND_HEIGHT,
   },
   sendButtonDisabled: {
     opacity: 0.4,
   },
   sendButtonText: {
-    color: Colors.background,
-    fontFamily: 'GoogleSansFlex_500Medium',
-    fontSize: 13,
+    ...typography.label,
+    color: t.colors.onAccent,
   },
-});
+}));

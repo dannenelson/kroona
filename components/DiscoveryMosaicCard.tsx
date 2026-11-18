@@ -1,6 +1,5 @@
 import { View, Image, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Spacing, Radius } from '../constants/spacing';
+import { makeStyles, spacing, radius } from '../theme';
 import SectionTitle from './SectionTitle';
 
 const MOSAIC_HEIGHT = 280;
@@ -11,6 +10,7 @@ type Props = {
 };
 
 export default function DiscoveryMosaicCard({ title, images }: Props) {
+  const styles = useStyles();
   return (
     <View style={styles.section}>
       <SectionTitle title={title} style={styles.sectionTitleWrapper} />
@@ -34,31 +34,32 @@ export default function DiscoveryMosaicCard({ title, images }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   sectionTitleWrapper: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   gridWrapper: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   mosaic: {
     flexDirection: 'row',
-    gap: Spacing.gutter,
+    gap: spacing.gutter,
     height: MOSAIC_HEIGHT,
   },
   column: {
     flex: 1,
     height: '100%',
-    gap: Spacing.gutter,
+    gap: spacing.gutter,
   },
   tile: {
     width: '100%',
-    borderRadius: Radius.tile,
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderRadius: radius.tile,
+    borderCurve: 'continuous',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   // Höjdfördelning skiljer sig medvetet mellan kolumnerna — det är det som
   // ger masonry-känslan istället för ett uniformt rutnät.
@@ -68,4 +69,4 @@ const styles = StyleSheet.create({
   tileBottom2: { flex: 0.65 },
   tileTop3: { flex: 0.65 },
   tileBottom3: { flex: 0.35 },
-});
+}));

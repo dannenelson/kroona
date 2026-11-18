@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
-import { Spacing } from '../constants/spacing';
+import { spacing } from '../theme';
 import { PRODUCTS } from '../data/products';
 import { Product } from '../types/product';
 import { useSavedProducts } from '../context/SavedProductsContext';
@@ -61,14 +61,14 @@ export default function RecommendedProductsRow() {
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   title: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: Spacing.gutter,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.gutter,
   },
   cardWrapper: {
     width: 140,

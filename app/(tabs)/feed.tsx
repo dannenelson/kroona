@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '../../constants/colors';
-import { Spacing } from '../../constants/spacing';
+import { makeStyles, typography, fonts, spacing } from '../../theme';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
 import { COLLECTIONS, getCollectionProducts } from '../../data/collections';
 import { Product } from '../../types/product';
@@ -10,6 +9,7 @@ import ProductGrid from '../../components/ProductGrid';
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();
+  const styles = useStyles();
   const { followedCollectionIds } = useFollowedCollections();
 
   const feedProducts = useMemo(() => {
@@ -33,7 +33,7 @@ export default function FeedScreen() {
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: insets.top, paddingHorizontal: Spacing.screenMargin, flexGrow: 1 }}
+        contentContainerStyle={{ paddingTop: insets.top, paddingHorizontal: spacing.screenMargin, flexGrow: 1 }}
       >
         <Text style={styles.title}>Flöde</Text>
 
@@ -52,32 +52,33 @@ export default function FeedScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: t.colors.bg,
   },
   title: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    letterSpacing: 0.3,
-    paddingVertical: 12,
+    ...typography.headline,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    paddingVertical: spacing.md,
   },
   emptyState: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 80,
-    gap: 8,
+    paddingTop: spacing.xxxl + spacing.xxl,
+    gap: spacing.sm,
   },
   emptyTitle: {
-    color: Colors.textPrimary,
-    fontSize: 15,
+    ...typography.body,
+    color: t.colors.textPrimary,
     textAlign: 'center',
   },
   emptyHint: {
-    color: Colors.textSecondary,
-    fontSize: 13,
+    ...typography.label,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: t.colors.textSecondary,
     textAlign: 'center',
   },
-});
+}));

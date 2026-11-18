@@ -1,7 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Colors } from '../constants/colors';
-import { Radius } from '../constants/spacing';
+import { makeStyles, useTheme, overlay, typography, fonts, letterSpacing, spacing, radius } from '../theme';
+
+const SAVE_SIZE = 28;
+const SUSTAIN_DOT = 5;
 import { useSavedProducts } from '../context/SavedProductsContext';
 
 type Props = {
@@ -35,8 +37,10 @@ type Props = {
     aspectRatio,
     fixedHeight,
   }: Props) {
+  const { colors } = useTheme();
+  const styles = useStyles();
   const sustainColor =
-    sustainabilityScore >= 4 ? Colors.sustainGreen : Colors.sustainAmber;
+    sustainabilityScore >= 4 ? colors.success : colors.warning;
 
   const { isSaved, toggleSaved } = useSavedProducts();
   const saved = isSaved(id);
@@ -58,7 +62,7 @@ type Props = {
         {/* Badge — Nyhet eller Begagnad */}
         {(isNew || isUsed) && (
           <View style={[styles.badge, isUsed && styles.badgeUsed]}>
-            <Text style={styles.badgeText}>{isUsed ? 'Begagnad' : 'Nyhet'}</Text>
+            <Text style={[styles.badgeText, isUsed && styles.badgeTextUsed]}>{isUsed ? 'Begagnad' : 'Nyhet'}</Text>
           </View>
         )}
 
@@ -87,7 +91,7 @@ type Props = {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   card: {
     flex: 1,
   },
@@ -98,10 +102,11 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: '100%',
     position: 'relative',
-    borderRadius: Radius.card,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   image: {
     width: '100%',
@@ -109,84 +114,83 @@ const styles = StyleSheet.create({
   },
   badge: {
     position: 'absolute',
-    top: 8,
-    left: 8,
-    backgroundColor: Colors.badgeNew,
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-    borderRadius: 4,
+    top: spacing.sm,
+    left: spacing.sm,
+    backgroundColor: t.colors.accent,
+    paddingHorizontal: 6, // lokal optisk justering: tät badge
+    paddingVertical: 3, // lokal optisk justering: tät badge
+    borderRadius: 4, // lokal: liten badge, under tile-radien
+    borderCurve: 'continuous',
   },
   badgeUsed: {
-    backgroundColor: Colors.badgeUsed,
+    backgroundColor: t.colors.surfaceRaised,
   },
   badgeText: {
-    color: '#fff',
-    fontSize: 9,
-    fontFamily: 'GoogleSansFlex_500Medium',
-    letterSpacing: 0.5,
+    ...typography.micro,
+    color: t.colors.onAccent,
+    letterSpacing: letterSpacing.wide,
+  },
+  badgeTextUsed: {
+    color: t.colors.textPrimary,
   },
   saveButton: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 28,
-    height: 28,
-    borderRadius: 18,
-    backgroundColor: 'rgba(15,15,14,0.6)',
+    top: spacing.sm,
+    right: spacing.sm,
+    width: SAVE_SIZE,
+    height: SAVE_SIZE,
+    borderRadius: radius.full,
+    backgroundColor: overlay.scrimSoft,
     alignItems: 'center',
     justifyContent: 'center',
   },
   saveIcon: {
-    color: Colors.textPrimary,
-    fontSize: 14,
+    ...typography.body,
+    color: overlay.onPhoto, // på foto: fast vit i båda teman
   },
   saveIconActive: {
-    color: Colors.gold,
+    color: t.colors.accent,
   },
   info: {
-    paddingTop: 10,
+    paddingTop: spacing.sm,
   },
   infoTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   brand: {
-    color: Colors.textSecondary,
-    fontSize: 9,
-    fontFamily: 'GoogleSansFlex_500Medium',
-    letterSpacing: 1.5,
+    ...typography.micro,
+    color: t.colors.textSecondary,
+    letterSpacing: letterSpacing.caps,
     textTransform: 'uppercase',
   },
   sustainBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 0.5,
-    borderRadius: 10,
-    paddingHorizontal: 5,
-    paddingVertical: 2,
-    gap: 3,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: radius.full,
+    paddingHorizontal: 5, // lokal optisk justering: tät hållbarhetsbadge
+    paddingVertical: 2, // lokal optisk justering
+    gap: 3, // lokal optisk justering: prick → siffra
   },
   sustainDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 3,
+    width: SUSTAIN_DOT,
+    height: SUSTAIN_DOT,
+    borderRadius: radius.full,
   },
   sustainScore: {
-    fontSize: 9,
-    fontFamily: 'GoogleSansFlex_500Medium',
+    ...typography.micro,
   },
   name: {
-    color: Colors.textSecondary,
-    fontSize: 11,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    marginBottom: 4,
-    lineHeight: 15,
+    ...typography.micro,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: t.colors.textSecondary,
+    marginBottom: spacing.xs,
   },
   price: {
-    color: '#ccc8c0',
-    fontSize: 13,
-    fontFamily: 'GoogleSansFlex_500Medium',
+    ...typography.label,
+    color: t.colors.textSecondary,
   },
-});
+}));

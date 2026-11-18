@@ -1,6 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Radius } from '../constants/spacing';
+import { makeStyles, typography, fonts, spacing, radius } from '../theme';
 
 type Props = {
   title: string;
@@ -9,6 +8,7 @@ type Props = {
 };
 
 export default function MixCard({ title, subtitle, images }: Props) {
+  const styles = useStyles();
   return (
     <TouchableOpacity style={styles.card}>
       <View style={styles.imagesContainer}>
@@ -26,19 +26,20 @@ export default function MixCard({ title, subtitle, images }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   card: {
     width: 220,
-    backgroundColor: Colors.cardBg,
-    borderRadius: Radius.card,
+    backgroundColor: t.colors.surface,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   imagesContainer: {
     flexDirection: 'row',
     height: 160,
-    gap: 1,
+    gap: StyleSheet.hairlineWidth, // tunn bildskarv
   },
   imageLarge: {
     flex: 2,
@@ -46,26 +47,25 @@ const styles = StyleSheet.create({
   },
   imagesSmall: {
     flex: 1,
-    gap: 1,
+    gap: StyleSheet.hairlineWidth, // tunn bildskarv
   },
   imageSmall: {
     flex: 1,
     width: '100%',
   },
   content: {
-    padding: 12,
+    padding: spacing.md,
   },
   title: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    letterSpacing: 0.3,
-    marginBottom: 4,
+    ...typography.body,
+    color: t.colors.textPrimary,
+    letterSpacing: 0.3, // lokal optisk spärrning
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    color: Colors.textSecondary,
-    fontSize: 11,
-    fontFamily: 'GoogleSansFlex_400Regular',
-    letterSpacing: 0.3,
+    ...typography.micro,
+    fontFamily: fonts.ui400, // regular som tidigare
+    color: t.colors.textSecondary,
+    letterSpacing: 0.3, // lokal optisk spärrning
   },
-});
+}));

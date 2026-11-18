@@ -1,6 +1,6 @@
 # Kroona — Design
 
-*Grunden för hur Kroona ser ut och byggs visuellt. Levande dokument: justera värden här först, sedan i koden. Senast: 2026-11-17.*
+*Grunden för hur Kroona ser ut och byggs visuellt. Levande dokument: justera värden här först, sedan i koden. Senast: 2026-11-18.*
 
 **Status på varje rad:**
 ✅ **Låst** = beslutat i designarbetet · 🔵 **Grund** = best-practice-värde så att ingenting är tomt, justeras fritt · 🟡 **Öppet** = behöver beslut
@@ -32,11 +32,18 @@ Då byts tema, märkesfärg eller typsnitt på ett ställe. Ingen hex, fontstorl
 | `cta` / `onCta` | `#F5F6F8` / `#15171B` | `#15171B` / `#F5F6F8` | ✅ |
 | `success` (hållbarhet hög) | `#4A9E5C` | `#2F7D43` | 🔵 |
 | `warning` (hållbarhet medel) | `#C08A4A` | `#8A5A1C` | 🔵 |
+| `successSubtle` (tonad yta bakom hållbarhet/kluster) | `#0C1A0E` | `#E4F1E7` | 🔵 |
 | `danger` | — | — | 🟡 behövs först vid fel- och raderingsstate |
 
 **Kontrast kontrollerad (WCAG AA ≥ 4,5 för text):** alla textroller ovan klarar AA (lägst 4,63). Guld `#B8965A` på ljus bakgrund ger bara 2,57, så det får **aldrig** användas som text i ljust tema. Där gäller `accentText`.
 
 **Foto-overlayer är fasta och identiska i båda teman** ✅: scrim `rgba(14,16,20,0→0.65)`, mjuk och lång utfasning. Hero-rubriker på foto är det enda medvetna AA-undantaget. Knappar, pillar och priser ska alltid klara AA.
+
+| Overlay-token | Värde (båda teman) | Status |
+|---|---|---|
+| `scrimStops` (hero- och partnerkort, toning till solid botten) | `rgba(14,16,20)` med alfa 0 / .56 / .75 / 1 vid 0 / .4 / .65 / 1 | 🔵 |
+| `scrimSoft` (knapp/badge på foto) | `rgba(14,16,20,.6)` | 🔵 |
+| `onPhoto` / `onPhotoSecondary` (text på scrim) | `#FFFFFF` / `#C4C4C4` | 🔵 |
 
 ## 3. Glas (chrome på foto och på ren yta) ✅
 Följer temat: mörkt glas i mörkt tema, ljust i ljust.
@@ -65,6 +72,7 @@ Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex ä
 | `body` | Google Sans Flex | 400 | 15 / 22 | 🔵 |
 | `label` | Google Sans Flex | 500 | 13 / 18 | 🔵 |
 | `caption` | Google Sans Flex | 400 | 12 / 16 | 🔵 |
+| `micro` (täta kortetiketter, badges, overline) | Google Sans Flex | 500 | 10 / 14 | 🔵 |
 | `price` | Google Sans Flex | 600 | enligt kontext | ✅ format |
 
 **Prisformat** ✅: `1 490 kr`, "kr" direkt efter siffran på samma rad och cirka 70 % av prisets storlek. **Betyg** ✅: ikon före värde, `★ 4,8 (312)` och `🍃 4,2`.

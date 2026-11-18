@@ -1,5 +1,5 @@
 import { View, ScrollView, StyleSheet } from 'react-native';
-import { Spacing } from '../constants/spacing';
+import { spacing } from '../theme';
 import SectionTitle from './SectionTitle';
 import CollectionCard from './CollectionCard';
 
@@ -85,13 +85,13 @@ export default function PopularCollectionsRow() {
 
 const styles = StyleSheet.create({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   title: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   scroll: {
-    paddingHorizontal: Spacing.screenMargin,
-    gap: Spacing.gutter,
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.gutter,
   },
 });

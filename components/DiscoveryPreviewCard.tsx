@@ -1,6 +1,5 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
-import { Spacing, Radius } from '../constants/spacing';
+import { makeStyles, typography, fonts, spacing, radius } from '../theme';
 import SectionTitle from './SectionTitle';
 
 type PreOrSubHeader =
@@ -13,6 +12,7 @@ type Props = {
 } & PreOrSubHeader;
 
 export default function DiscoveryPreviewCard({ title, preheader, subheader, images }: Props) {
+  const styles = useStyles();
   // Pil = "fördjupa dig", inte en sökfunktion. Text-glyf, samma
   // lättviktsmönster som +/✓/♥ på följ-/spara-knapparna i appen.
   const icon = <Text style={styles.arrowIcon}>→</Text>;
@@ -36,32 +36,33 @@ export default function DiscoveryPreviewCard({ title, preheader, subheader, imag
   );
 }
 
-const styles = StyleSheet.create({
+const useStyles = makeStyles((t) => ({
   section: {
-    marginTop: 32,
+    marginTop: spacing.xxl,
   },
   header: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   arrowIcon: {
-    color: Colors.textSecondary,
-    fontSize: 20,
-    fontFamily: 'GoogleSansFlex_500Medium',
+    ...typography.title2,
+    fontFamily: fonts.ui500, // pil-glyf: UI-typsnitt, storlek från title2
+    color: t.colors.textSecondary,
   },
   rowWrapper: {
-    paddingHorizontal: Spacing.screenMargin,
+    paddingHorizontal: spacing.screenMargin,
   },
   row: {
     flexDirection: 'row',
     height: 160,
-    gap: 1,
-    borderRadius: Radius.card,
+    gap: StyleSheet.hairlineWidth, // tunn bildskarv
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
     overflow: 'hidden',
-    borderWidth: 0.5,
-    borderColor: Colors.cardBorder,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: t.colors.border,
   },
   image: {
     flex: 1,
     height: '100%',
   },
-});
+}));
