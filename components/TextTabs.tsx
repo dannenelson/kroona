@@ -1,5 +1,6 @@
-import { Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, typography, spacing, motion, touchTarget } from '../theme';
+import { usePressAnimation } from '../hooks/usePressAnimation';
 
 type Props<T extends string> = {
   items: readonly T[];
@@ -16,7 +17,7 @@ const UNDERLINE = 2; // lokal linjetjocklek för understrykningen
 /**
  * Text-flikar med understrykning (design.md §11), 44 px höga, scrollar
  * horisontellt vid många. Används för filtrering i stället för pillar.
- * States enligt design.md §0: default (mute), pressed (text-färg, opacitet 0,55),
+ * States enligt design.md §0: default (mute), pressed (text-färg, opacitet 0,55, animerat),
  * selected (text-färg + understrykning i text-färg), disabled (35 % opacitet).
  */
 export default function TextTabs<T extends string>({
@@ -34,36 +35,62 @@ export default function TextTabs<T extends string>({
       contentContainerStyle={styles.row}
       style={style}
     >
-      {items.map((item) => {
-        const isSelected = item === selected;
-        const isDisabled = disabledItems?.includes(item) ?? false;
-        return (
-          <Pressable
-            key={item}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isSelected, disabled: isDisabled }}
-            disabled={isDisabled}
-            onPress={() => onSelect(item)}
-            style={[styles.tab, isDisabled && styles.disabled]}
-          >
-            {({ pressed }) => (
-              <>
-                <Text
-                  style={[
-                    styles.label,
-                    (isSelected || pressed) && styles.labelActive,
-                    pressed && !isSelected && styles.pressed,
-                  ]}
-                >
-                  {item}
-                </Text>
-                {isSelected && <View style={styles.underline} />}
-              </>
-            )}
-          </Pressable>
-        );
-      })}
+      {items.map((item) => (
+        <Tab
+          key={item}
+          label={item}
+          selected={item === selected}
+          disabled={disabledItems?.includes(item) ?? false}
+          onPress={() => onSelect(item)}
+        />
+      ))}
     </ScrollView>
+  );
+}
+
+/**
+ * En flik. Nedtryckt tonar en label i text-färg (opacitet upp till 0,55)
+ * över mute-labeln, animerat (brief 06). Ingen skala på text-flikar.
+ */
+function Tab({
+  label,
+  selected,
+  disabled,
+  onPress,
+}: {
+  label: string;
+  selected: boolean;
+  disabled: boolean;
+  onPress: () => void;
+}) {
+  const styles = useStyles();
+  const press = usePressAnimation(1);
+  const pressedOpacity = press.progress.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, motion.pressedTextOpacity],
+  });
+  return (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityState={{ selected, disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      style={[styles.tab, disabled && styles.disabled]}
+    >
+      <View>
+        <Text style={[styles.label, selected && styles.labelActive]}>{label}</Text>
+        {!selected && (
+          <Animated.Text
+            style={[styles.label, styles.labelActive, styles.overlay, { opacity: pressedOpacity }]}
+          >
+            {label}
+          </Animated.Text>
+        )}
+      </View>
+      {selected && <View style={styles.underline} />}
+    </Pressable>
   );
 }
 
@@ -76,8 +103,10 @@ const useStyles = makeStyles((t) => ({
     height: touchTarget,
     justifyContent: 'center',
   },
-  pressed: {
-    opacity: motion.pressedTextOpacity,
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   disabled: {
     opacity: motion.disabledOpacity,

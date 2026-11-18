@@ -1,6 +1,7 @@
-import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme, typography, spacing, radius, motion, touchTarget } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
+import { usePressAnimation } from '../hooks/usePressAnimation';
 
 type Props = {
   children: string;
@@ -38,6 +39,38 @@ export default function Pill({
   const { colors } = useTheme();
   const g = useGlass(tone);
   const isGlass = variant === 'glass';
+  const press = usePressAnimation(motion.pressedScale);
+
+  // Ytbytet vid tryck tonar in som ett lager (pressed-yta eller glasets tint).
+  const renderBody = () => {
+    if (selected) {
+      // Inverterad: glasets innehållsfärg (glas) eller textfärg (fylld) som yta.
+      const bg = isGlass ? g.content : colors.textPrimary;
+      return (
+        <View style={[styles.shape, { backgroundColor: bg }]}>
+          <Text style={[styles.label, { color: colors.bg }]}>{children}</Text>
+        </View>
+      );
+    }
+    if (isGlass) {
+      return (
+        <Glass tone={tone} dimmed={disabled} style={styles.shape}>
+          <Animated.View
+            style={[StyleSheet.absoluteFill, { backgroundColor: g.borderColor, opacity: press.progress }]}
+          />
+          <Text style={[styles.label, { color: g.content }]}>{children}</Text>
+        </Glass>
+      );
+    }
+    return (
+      <View style={[styles.shape, styles.filled, { backgroundColor: colors.surfaceRaised }]}>
+        <Animated.View
+          style={[StyleSheet.absoluteFill, { backgroundColor: colors.pressed, opacity: press.progress }]}
+        />
+        <Text style={[styles.label, { color: colors.textPrimary }]}>{children}</Text>
+      </View>
+    );
+  };
 
   return (
     <Pressable
@@ -46,45 +79,15 @@ export default function Pill({
       disabled={disabled}
       onPress={onPress}
       hitSlop={{ top: HIT, bottom: HIT }}
-      style={({ pressed }) => [
-        pressed && styles.pressed,
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      style={[
         // Glas tonas inuti Glass (dimmed): opacitet på blurrens förälder bryter effekten.
         disabled && !(isGlass && !selected) && styles.disabled,
         style,
       ]}
     >
-      {({ pressed }) => {
-        if (selected) {
-          // Inverterad: glasets innehållsfärg (glas) eller textfärg (fylld) som yta.
-          const bg = isGlass ? g.content : colors.textPrimary;
-          const fg = colors.bg;
-          return (
-            <View style={[styles.shape, { backgroundColor: bg }]}>
-              <Text style={[styles.label, { color: fg }]}>{children}</Text>
-            </View>
-          );
-        }
-        if (isGlass) {
-          return (
-            <Glass tone={tone} dimmed={disabled} style={styles.shape}>
-              {pressed && (
-                <View style={[StyleSheet.absoluteFill, { backgroundColor: g.borderColor }]} />
-              )}
-              <Text style={[styles.label, { color: g.content }]}>{children}</Text>
-            </Glass>
-          );
-        }
-        return (
-          <View
-            style={[
-              styles.shape,
-              { backgroundColor: pressed ? colors.pressed : colors.surfaceRaised },
-            ]}
-          >
-            <Text style={[styles.label, { color: colors.textPrimary }]}>{children}</Text>
-          </View>
-        );
-      }}
+      <Animated.View style={press.scaleStyle}>{renderBody()}</Animated.View>
     </Pressable>
   );
 }
@@ -100,8 +103,8 @@ const styles = StyleSheet.create({
   label: {
     ...typography.label,
   },
-  pressed: {
-    transform: [{ scale: motion.pressedScale }],
+  filled: {
+    overflow: 'hidden',
   },
   disabled: {
     opacity: motion.disabledOpacity,

@@ -2,7 +2,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
@@ -10,7 +9,6 @@ import {
   type ReactNode,
 } from 'react';
 import {
-  AccessibilityInfo,
   Animated,
   Image,
   Pressable,
@@ -23,6 +21,7 @@ import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, edgeBlur, typography, spacing, radius, motion, iconSize } from '../theme';
+import { useReduceMotion } from '../hooks/useReduceMotion';
 
 type IconProps = { color: string; size?: number };
 
@@ -38,7 +37,13 @@ export type AnchorRect = { x: number; y: number; width: number; height: number }
 export type ContextMenuRequest = {
   anchor: AnchorRect;
   imageUrl: string;
+  /** Originalbildens hörnradie, så att kopian är identisk vid skala 1. */
+  imageRadius: number;
   items: readonly ContextMenuItem[];
+  /** Mäter originalbilden igen (listan kan ha rört sig medan menyn var öppen). */
+  measure: (done: (rect: AnchorRect) => void) => void;
+  /** Döljer/visar originalbilden. Anropas i samma render som kopian visas/tas bort. */
+  setOriginalHidden: (hidden: boolean) => void;
 };
 
 type ContextMenuApi = {
@@ -142,7 +147,9 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
   const win = useWindowDimensions();
   const [request, setRequest] = useState<ContextMenuRequest | null>(null);
   const [highlighted, setHighlighted] = useState<number | null>(null);
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const reduceMotion = useReduceMotion();
+  // Originalets läge: där kopian börjar och slutar (p = 0).
+  const [home, setHome] = useState<AnchorRect | null>(null);
 
   const progress = useRef(new Animated.Value(0)).current;
   const backdrop = useRef(new Animated.Value(0)).current;
@@ -164,12 +171,6 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
   state.request = request;
   state.layout = layout;
 
-  useEffect(() => {
-    AccessibilityInfo.isReduceMotionEnabled().then(setReduceMotion);
-    const sub = AccessibilityInfo.addEventListener('reduceMotionChanged', setReduceMotion);
-    return () => sub.remove();
-  }, []);
-
   const setHighlight = useCallback(
     (i: number | null) => {
       if (state.highlighted === i) return;
@@ -181,28 +182,46 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
   );
 
   const close = useCallback(() => {
-    if (!state.request || state.closing) return;
+    const req = state.request;
+    if (!req || state.closing) return;
     state.closing = true;
+
+    // Bytet kopia → original sker i samma React-batch (en commit, samma frame):
+    // kopian tas bort och originalet blir synligt samtidigt.
     const done = () => {
       state.closing = false;
       state.highlighted = null;
       setHighlighted(null);
       setRequest(null);
+      setHome(null);
+      req.setOriginalHidden(false);
     };
+
     Animated.timing(backdrop, {
       toValue: 0,
       duration: motion.menuFadeDuration,
       useNativeDriver: true,
     }).start();
-    if (reduceMotion) {
-      Animated.timing(progress, {
-        toValue: 0,
-        duration: motion.menuFadeDuration,
-        useNativeDriver: true,
-      }).start(done);
-    } else {
-      Animated.spring(progress, { toValue: 0, ...motion.menuSpring, useNativeDriver: true }).start(done);
-    }
+
+    // Mät om originalet och låt kopian landa exakt där.
+    req.measure((rect) => {
+      setHome(rect);
+      if (reduceMotion) {
+        Animated.timing(progress, {
+          toValue: 0,
+          duration: motion.menuFadeDuration,
+          useNativeDriver: true,
+        }).start(done);
+      } else {
+        // Ingen översvängning på vägen tillbaka: kopian blir aldrig mindre än originalet.
+        Animated.spring(progress, {
+          toValue: 0,
+          ...motion.menuSpring,
+          overshootClamping: true,
+          useNativeDriver: true,
+        }).start(done);
+      }
+    });
   }, [state, backdrop, progress, reduceMotion]);
 
   const select = useCallback(
@@ -223,7 +242,10 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
       state.dragged = false;
       state.highlighted = null;
       setHighlighted(null);
+      setHome(req.anchor);
       setRequest(req);
+      // Samma batch som kopian monteras: originalet döljs i samma frame.
+      req.setOriginalHidden(true);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       progress.setValue(0);
       backdrop.setValue(0);
@@ -276,6 +298,7 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
         <MenuOverlay
           request={request}
           layout={layout}
+          home={home ?? request.anchor}
           highlighted={highlighted}
           progress={progress}
           backdrop={backdrop}
@@ -291,6 +314,7 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
 type OverlayProps = {
   request: ContextMenuRequest;
   layout: MenuLayout;
+  home: AnchorRect;
   highlighted: number | null;
   progress: Animated.Value;
   backdrop: Animated.Value;
@@ -302,6 +326,7 @@ type OverlayProps = {
 function MenuOverlay({
   request,
   layout,
+  home,
   highlighted,
   progress,
   backdrop,
@@ -312,9 +337,18 @@ function MenuOverlay({
   const { scheme, shadows } = useTheme();
   const styles = useStyles();
 
+  // Kopian har originalets storlek och radie och ligger på originalets plats.
+  // Lyftet sker bara med transform (native driver): förflyttning till
+  // lyft-layoutens mitt och skala upp till lyft-storleken × 1,04.
+  const a = request.anchor;
+  const k = (layout.lift.width / a.width) * motion.liftScale;
+  const dx = layout.lift.x + layout.lift.width / 2 - (home.x + a.width / 2);
+  const dy = layout.lift.y + layout.lift.height / 2 - (home.y + a.height / 2);
+  const lift = (to: number) =>
+    reduceMotion ? 0 : progress.interpolate({ inputRange: [0, 1], outputRange: [0, to] });
   const liftScale = reduceMotion
     ? 1
-    : progress.interpolate({ inputRange: [0, 1], outputRange: [1, motion.liftScale] });
+    : progress.interpolate({ inputRange: [0, 1], outputRange: [1, k] });
   const menuScale = reduceMotion
     ? 1
     : progress.interpolate({ inputRange: [0, 1], outputRange: [motion.menuEnterScale, 1] });
@@ -343,17 +377,35 @@ function MenuOverlay({
         </Pressable>
       </Animated.View>
 
+      {/* Skuggan är ett eget lager som tonar med lyftet, så att den inte
+          försvinner med ett ryck när kopian byts mot originalet. */}
+      <Animated.View
+        pointerEvents="none"
+        style={[
+          styles.liftShadow,
+          {
+            left: home.x,
+            top: home.y,
+            width: a.width,
+            height: a.height,
+            borderRadius: request.imageRadius,
+            boxShadow: shadows.lift,
+            opacity: menuOpacity,
+            transform: [{ translateX: lift(dx) }, { translateY: lift(dy) }, { scale: liftScale }],
+          },
+        ]}
+      />
       <Animated.View
         pointerEvents="none"
         style={[
           styles.lift,
           {
-            left: layout.lift.x,
-            top: layout.lift.y,
-            width: layout.lift.width,
-            height: layout.lift.height,
-            boxShadow: shadows.lift,
-            transform: [{ scale: liftScale }],
+            left: home.x,
+            top: home.y,
+            width: a.width,
+            height: a.height,
+            borderRadius: request.imageRadius,
+            transform: [{ translateX: lift(dx) }, { translateY: lift(dy) }, { scale: liftScale }],
           },
         ]}
       >
@@ -431,9 +483,12 @@ const useStyles = makeStyles((t) => ({
   scrim: {
     backgroundColor: t.colors.scrim,
   },
+  liftShadow: {
+    position: 'absolute',
+    borderCurve: 'continuous',
+  },
   lift: {
     position: 'absolute',
-    borderRadius: radius.lifted,
     borderCurve: 'continuous',
     overflow: 'hidden',
     backgroundColor: t.colors.placeholder,

@@ -1,7 +1,8 @@
 import type { ComponentType } from 'react';
-import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme, motion, radius, touchTarget, iconSize } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
+import { usePressAnimation } from '../hooks/usePressAnimation';
 
 type IconProps = { color: string; size?: number };
 
@@ -23,7 +24,7 @@ type Props = {
 
 /**
  * Rund ikonknapp, 44 px (touchTarget). States enligt design.md §0:
- * pressed = djupare yta + skala 0,96, selected = inverterad yta/ikon,
+ * pressed = djupare yta + skala 0,96 (animerat, brief 06), selected = inverterad yta/ikon,
  * disabled = 35 % opacitet.
  */
 export default function IconButton({
@@ -48,6 +49,16 @@ export default function IconButton({
   // Djupare yta vid tryck: en hårlinjefärg ovanpå glaset (samma som menyrader).
   const pressedTint = tone === 'photo' ? g.borderColor : colors.border;
   const isGlass = variant === 'glass';
+  const press = usePressAnimation(motion.pressedScale);
+
+  const content = <ShownIcon color={selected ? invertedFg : g.content} size={iconSize.lg} />;
+  const fill = selected ? (
+    <View style={[StyleSheet.absoluteFill, { backgroundColor: invertedBg }]} />
+  ) : (
+    <Animated.View
+      style={[StyleSheet.absoluteFill, { backgroundColor: pressedTint, opacity: press.progress }]}
+    />
+  );
 
   return (
     <Pressable
@@ -56,39 +67,28 @@ export default function IconButton({
       accessibilityState={{ selected, disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={({ pressed }) => [
-        pressed && styles.pressed,
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      style={[
         // Glas tonas inuti Glass (dimmed): opacitet på blurrens förälder bryter effekten.
         disabled && !isGlass && styles.disabled,
         style,
       ]}
     >
-      {({ pressed }) => {
-        const content = (
-          <ShownIcon color={selected ? invertedFg : g.content} size={iconSize.lg} />
-        );
-        const fill = selected ? (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: invertedBg }]} />
-        ) : pressed ? (
-          <View style={[StyleSheet.absoluteFill, { backgroundColor: pressedTint }]} />
-        ) : null;
-
-        if (isGlass) {
-          return (
-            <Glass tone={tone} dimmed={disabled} style={styles.circle}>
-              {fill}
-              {content}
-            </Glass>
-          );
-        }
-        // I en glaskapsel (kapselns kant är ett eget lager och tar ingen plats).
-        return (
+      <Animated.View style={press.scaleStyle}>
+        {isGlass ? (
+          <Glass tone={tone} dimmed={disabled} style={styles.circle}>
+            {fill}
+            {content}
+          </Glass>
+        ) : (
+          // I en glaskapsel (kapselns kant är ett eget lager och tar ingen plats).
           <View style={[styles.circle, styles.bare]}>
             {fill}
             {content}
           </View>
-        );
-      }}
+        )}
+      </Animated.View>
     </Pressable>
   );
 }
@@ -103,9 +103,6 @@ const styles = StyleSheet.create({
   },
   bare: {
     overflow: 'hidden',
-  },
-  pressed: {
-    transform: [{ scale: motion.pressedScale }],
   },
   disabled: {
     opacity: motion.disabledOpacity,

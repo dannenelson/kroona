@@ -13,6 +13,10 @@ export const motion = {
   disabledOpacity: 0.35,
   /** Nedtryckt text-flik (text utan yta). */
   pressedTextOpacity: 0.55,
+  /** Tryck in: snabb, mjuk övergång till nedtryckt (ms). */
+  pressIn: 90,
+  /** Släpp: lätt fjäder tillbaka. */
+  pressOutSpring: { damping: 14, stiffness: 320, mass: 0.6 },
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */

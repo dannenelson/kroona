@@ -4,7 +4,12 @@
 // `blurIntensity` är översättningen till BlurView: blur 10 ≈ intensity 30,
 // blur 20 ≈ intensity 50. Saturate saknas helt i expo-blur (närmast är
 // tint-lagret). Värdena `blur` och `saturate` står kvar som designens källa.
-export type GlassTint = 'dark' | 'light';
+//
+// Opacitet (brief 06): fyllningen är sänkt till lägsta alfa som klarar
+// kontrastkraven (text ≥ 4,5:1, ikoner ≥ 3:1) mot de ljusaste och mörkaste
+// produktfotona, med golv 0,20 och utan att höja något. iOS systemmaterial
+// som tint bär resten (dämpning + mättnad); dess bidrag bedöms på enhet.
+export type GlassTint = 'systemThinMaterialDark' | 'systemThinMaterialLight';
 
 export type Glass = {
   fill: string;
@@ -18,49 +23,49 @@ export type Glass = {
 };
 
 export const darkGlass: Glass = {
-  fill: 'rgba(42,45,51,0.72)',
+  fill: 'rgba(42,45,51,0.28)', // ikoner: 3,1 / 5,9 mot ljusaste / mörkaste foto
   blur: 20,
   saturate: 1.6,
   borderWidth: 1,
   borderColor: 'rgba(255,255,255,0.14)',
   content: '#F5F6F8',
-  tint: 'dark',
+  tint: 'systemThinMaterialDark',
   blurIntensity: 50,
 };
 
 export const lightGlass: Glass = {
-  fill: 'rgba(255,255,255,0.72)',
+  fill: 'rgba(255,255,255,0.20)', // ikoner: golv 0,20 (9,8 / 5,5)
   blur: 20,
   saturate: 1.6,
   borderWidth: 1,
   borderColor: 'rgba(21,23,27,0.10)',
   content: '#15171B',
-  tint: 'light',
+  tint: 'systemThinMaterialLight',
   blurIntensity: 50,
 };
 
 // Glas på foto (design.md §0/§3, ändrat 2026-11-18): följer temat.
 // Mörkt: mörkt och genomskinligt med vitt innehåll (referensen "Kroona Looken A").
 export const darkPhotoGlass: Glass = {
-  fill: 'rgba(20,22,26,0.34)',
+  fill: 'rgba(20,22,26,0.34)', // text: tak 0,34 (4,2 / 7,7), tinten bär resten
   blur: 20,
   saturate: 1.6,
   borderWidth: 1,
   borderColor: 'rgba(255,255,255,0.24)',
   content: '#FFFFFF',
-  tint: 'dark',
+  tint: 'systemThinMaterialDark',
   blurIntensity: 50,
 };
 
 // Ljust: ljus fyllning, ljus kant och mörkt innehåll (brief 05).
 export const lightPhotoGlass: Glass = {
-  fill: 'rgba(255,255,255,0.62)',
+  fill: 'rgba(255,255,255,0.20)', // text: golv 0,20 (9,8 / 5,5)
   blur: 20,
   saturate: 1.6,
   borderWidth: 1,
   borderColor: 'rgba(255,255,255,0.60)',
   content: '#15171B',
-  tint: 'light',
+  tint: 'systemThinMaterialLight',
   blurIntensity: 50,
 };
 

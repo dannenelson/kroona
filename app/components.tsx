@@ -5,7 +5,7 @@ import { useState, type ReactNode } from 'react';
 import { View, Text, ScrollView, ImageBackground, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius } from '../theme';
+import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, touchTarget } from '../theme';
 import { PRODUCTS } from '../data/products';
 import IconButton from '../components/IconButton';
 import Pill from '../components/Pill';
@@ -38,6 +38,7 @@ const STATES = [
   { label: 'Inaktiv', disabled: true },
 ] as const;
 
+const PRESS_TABS = ['Alla', 'Kläder', 'Möbler'] as const;
 const TABS = ['Alla', 'Kläder', 'Möbler', 'Begagnat', 'Belysning', 'Textil', 'Dekor'] as const;
 type Tab = (typeof TABS)[number];
 
@@ -47,6 +48,7 @@ export default function ComponentsScreen() {
   const styles = useStyles();
   const { scheme, setScheme } = useTheme();
   const [tab, setTab] = useState<Tab>('Alla');
+  const [pressTab, setPressTab] = useState<(typeof PRESS_TABS)[number]>('Alla');
   const [topSaved, setTopSaved] = useState(false);
   const [fadeBlur, setFadeBlur] = useState(true);
 
@@ -66,6 +68,18 @@ export default function ComponentsScreen() {
         <Text style={styles.hint}>
           Nedtryckt visas genom att hålla in. Växla tema uppe till höger: glas på foto följer temat.
         </Text>
+
+        <Section title="0 · Press (jämför)">
+          <Caption>Håll in och släpp: in snabbt, ut med lätt fjäder. Ingen haptik på vanliga tryck.</Caption>
+          <View style={styles.pressRow}>
+            <IconButton tone="plain" icon={BookmarkIcon} accessibilityLabel="Press, ikonknapp" onPress={() => {}} />
+            <Pill onPress={() => {}}>Pill</Pill>
+            <View style={styles.pressCard}>
+              <ProductCard {...P2} size="S" menu={false} />
+            </View>
+          </View>
+          <TextTabs items={PRESS_TABS} selected={pressTab} onSelect={setPressTab} />
+        </Section>
 
         <Section title="1 · IconButton (glas)">
           {PHOTOS.map((photo) => (
@@ -144,7 +158,7 @@ export default function ComponentsScreen() {
             ))}
           </View>
           <Caption>
-            Medium · håll in för menyn, dra fingret till en rad och släpp (haptik: känn efter) · höger: inaktiv
+            Medium · håll in för menyn, dra till en rad och släpp (haptik: känn efter). Titta på stängningen: bilden ska glida tillbaka utan hopp eller dubbelbild · höger: inaktiv
           </Caption>
           <View style={styles.row}>
             <ProductCard {...P1} {...DEMO_RATING} />
@@ -282,6 +296,14 @@ const useStyles = makeStyles((t) => ({
   },
   captionOnPhoto: {
     color: overlay.onPhoto, // på foto: fast vit i båda teman
+  },
+  pressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+  },
+  pressCard: {
+    width: touchTarget * 2,
   },
   photoBlock: {
     gap: spacing.sm,

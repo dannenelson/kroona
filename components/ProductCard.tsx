@@ -1,7 +1,8 @@
-import { useRef, type ComponentRef } from 'react';
-import { View, Text, Pressable, Image, type StyleProp, type ViewStyle } from 'react-native';
+import { useRef, useState, type ComponentRef } from 'react';
+import { Animated, View, Text, Pressable, Image, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
+import { usePressAnimation } from '../hooks/usePressAnimation';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import BookmarkIcon from '../assets/icons/BookmarkIcon';
@@ -58,7 +59,7 @@ function formatScore(score: number): string {
  * ProductCard enligt referensen "Kroona Looken A" och design.md §0/§4. Bara
  * bilden är rundad (squircle), texten ligger under utan bakgrund.
  * Ingen Spara-knapp på kortet: Spara m.fl. ligger i menyn vid långt tryck.
- * States: default, pressed (skala 0,96), disabled (35 % opacitet).
+ * States: default, pressed (skala 0,96, animerat), disabled (35 % opacitet).
  */
 export default function ProductCard({
   id,
@@ -86,6 +87,9 @@ export default function ProductCard({
   const saved = isSaved(id);
   const imageRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
+  const press = usePressAnimation(motion.pressedScale);
+  // Medan menyn är öppen syns bara den lyfta kopian, inte originalbilden.
+  const [imageHidden, setImageHidden] = useState(false);
 
   const isSmall = size === 'S';
   const isLarge = size === 'L';
@@ -103,9 +107,20 @@ export default function ProductCard({
     { label: 'Visa liknande', icon: SimilarIcon },
   ];
 
+  const measureImage = (done: (rect: { x: number; y: number; width: number; height: number }) => void) => {
+    imageRef.current?.measureInWindow((x, y, width, height) => done({ x, y, width, height }));
+  };
+
   const openMenu = () => {
-    imageRef.current?.measureInWindow((x, y, width, height) =>
-      contextMenu.open({ anchor: { x, y, width, height }, imageUrl, items: menuItems }),
+    measureImage((anchor) =>
+      contextMenu.open({
+        anchor,
+        imageUrl,
+        imageRadius: isSmall ? radius.tile : radius.card,
+        items: menuItems,
+        measure: measureImage,
+        setOriginalHidden: setImageHidden,
+      }),
     );
   };
 
@@ -131,67 +146,70 @@ export default function ProductCard({
         accessibilityState={{ disabled }}
         disabled={disabled}
         onPress={onPress}
-        style={({ pressed }) => [
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
+        style={[
           styles.card,
           featured && styles.cardFeatured,
-          pressed && styles.pressed,
           disabled && styles.disabled,
           containerStyle,
         ]}
       >
-        <View
-          ref={imageRef}
-          collapsable={false}
-          style={[
-            styles.imageContainer,
-            isSmall && styles.imageContainerSmall,
-            fixedHeight ? { height: fixedHeight } : { aspectRatio: aspectRatio ?? 3 / 4 },
-          ]}
-        >
-          <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+        <Animated.View style={press.scaleStyle}>
+          <View
+            ref={imageRef}
+            collapsable={false}
+            style={[
+              styles.imageContainer,
+              isSmall && styles.imageContainerSmall,
+              fixedHeight ? { height: fixedHeight } : { aspectRatio: aspectRatio ?? 3 / 4 },
+              imageHidden && styles.hidden,
+            ]}
+          >
+            <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
 
-          {!isSmall && (isNew || isUsed) && (
-            // Avvikelse från komponentsidan: badgen behålls (Daniels beslut).
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{isUsed ? 'Begagnad' : 'Nyhet'}</Text>
-            </View>
-          )}
+            {!isSmall && (isNew || isUsed) && (
+              // Avvikelse från komponentsidan: badgen behålls (Daniels beslut).
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{isUsed ? 'Begagnad' : 'Nyhet'}</Text>
+              </View>
+            )}
 
-        </View>
+          </View>
 
-        {!isSmall && (
-          <View style={styles.info}>
-            <Text style={styles.brand} numberOfLines={1}>
-              {brand}
-            </Text>
-            <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
-              {name}
-            </Text>
-            <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
-              {formatPrice(price)}
-              <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
-            </Text>
-            <View style={styles.ratings}>
-              {rating !== undefined && (
+          {!isSmall && (
+            <View style={styles.info}>
+              <Text style={styles.brand} numberOfLines={1}>
+                {brand}
+              </Text>
+              <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
+                {name}
+              </Text>
+              <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
+                {formatPrice(price)}
+                <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
+              </Text>
+              <View style={styles.ratings}>
+                {rating !== undefined && (
+                  <View style={styles.rating}>
+                    <StarIcon color={colors.textSecondary} size={typography.caption.fontSize} />
+                    <Text style={styles.ratingText}>{formatScore(rating)}</Text>
+                    {reviewCount !== undefined && (
+                      <Text style={styles.ratingCount}>({reviewCount})</Text>
+                    )}
+                  </View>
+                )}
+                {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
                 <View style={styles.rating}>
-                  <StarIcon color={colors.textSecondary} size={typography.caption.fontSize} />
-                  <Text style={styles.ratingText}>{formatScore(rating)}</Text>
-                  {reviewCount !== undefined && (
-                    <Text style={styles.ratingCount}>({reviewCount})</Text>
-                  )}
+                  <LeafIcon color={colors.textSecondary} size={typography.caption.fontSize} />
+                  <Text style={styles.ratingText}>
+                    {formatScore(sustainabilityScore)}
+                  </Text>
                 </View>
-              )}
-              {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
-              <View style={styles.rating}>
-                <LeafIcon color={colors.textSecondary} size={typography.caption.fontSize} />
-                <Text style={styles.ratingText}>
-                  {formatScore(sustainabilityScore)}
-                </Text>
               </View>
             </View>
-          </View>
-        )}
-
+          )}
+        </Animated.View>
       </Pressable>
     </GestureDetector>
   );
@@ -205,8 +223,8 @@ const useStyles = makeStyles((t) => ({
     flex: 0,
     width: '100%',
   },
-  pressed: {
-    transform: [{ scale: motion.pressedScale }],
+  hidden: {
+    opacity: 0,
   },
   disabled: {
     opacity: motion.disabledOpacity,

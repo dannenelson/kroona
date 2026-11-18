@@ -1,8 +1,10 @@
-import { View, Text, Pressable } from 'react-native';
+import type { ReactNode } from 'react';
+import { Animated, View, Text, Pressable } from 'react-native';
 import { BottomTabBarProps } from 'expo-router/js-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, typography, spacing, motion, touchTarget, iconSize } from '../theme';
 import EdgeFade from './EdgeFade';
+import { usePressAnimation } from '../hooks/usePressAnimation';
 
 import HomeIcon from '../assets/icons/HomeIcon';
 import HomeIconFilled from '../assets/icons/HomeIcon_filled';
@@ -72,21 +74,42 @@ export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTa
           const color = isFocused ? colors.textPrimary : colors.textSecondary;
 
           return (
-            <Pressable
-              key={route.key}
-              accessibilityRole="tab"
-              accessibilityLabel={label}
-              accessibilityState={{ selected: isFocused }}
-              style={({ pressed }) => [styles.tab, pressed && styles.pressed]}
-              onPress={onPress}
-            >
+            <NavTab key={route.key} label={label} selected={isFocused} onPress={onPress}>
               <Icon color={color} size={iconSize.lg} />
               <Text style={[styles.label, { color }]}>{label}</Text>
-            </Pressable>
+            </NavTab>
           );
         })}
       </View>
     </View>
+  );
+}
+
+/** En nav-flik med animerad nedskalning (0,92) vid tryck, brief 06. */
+function NavTab({
+  label,
+  selected,
+  onPress,
+  children,
+}: {
+  label: string;
+  selected: boolean;
+  onPress: () => void;
+  children: ReactNode;
+}) {
+  const styles = useStyles();
+  const press = usePressAnimation(motion.navPressedScale);
+  return (
+    <Pressable
+      accessibilityRole="tab"
+      accessibilityLabel={label}
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+    >
+      <Animated.View style={[styles.tab, press.scaleStyle]}>{children}</Animated.View>
+    </Pressable>
   );
 }
 
@@ -109,9 +132,6 @@ const useStyles = makeStyles(() => ({
     alignItems: 'center',
     justifyContent: 'center',
     gap: TAB_GAP,
-  },
-  pressed: {
-    transform: [{ scale: motion.navPressedScale }],
   },
   label: {
     ...typography.micro,

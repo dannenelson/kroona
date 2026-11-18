@@ -89,10 +89,13 @@ Följer temat. Tre toner i `components/Glass.tsx`: `theme` (över innehåll), `p
 
 | Egenskap | Mörkt (`glass`) | Ljust (`glass`) | Foto mörkt (`darkPhotoGlass`) | Foto ljust (`lightPhotoGlass`) |
 |---|---|---|---|---|
-| Fyllning | `rgba(42,45,51,.72)` | `rgba(255,255,255,.72)` | `rgba(20,22,26,.34)` | `rgba(255,255,255,.62)` |
+| Fyllning | `rgba(42,45,51,.28)` | `rgba(255,255,255,.20)` | `rgba(20,22,26,.34)` | `rgba(255,255,255,.20)` |
 | Kant (1 px, en linje) | `rgba(255,255,255,.14)` | `rgba(21,23,27,.10)` | `rgba(255,255,255,.24)` | `rgba(255,255,255,.60)` |
 | Innehåll | `#F5F6F8` | `#15171B` | `#FFFFFF` | `#15171B` |
 | Blur / saturate | 20 / 160 % | 20 / 160 % | 20 / 160 % | 20 / 160 % |
+| Tint (expo-blur) | `systemThinMaterialDark` | `systemThinMaterialLight` | `systemThinMaterialDark` | `systemThinMaterialLight` |
+
+**Opacitet (brief 06, Daniels kriterium):** lägsta fyllning som klarar text ≥ 4,5:1 och ikoner ≥ 3:1 mot de ljusaste och mörkaste produktfotona (inte helt svart/vitt), med iOS-materialets tint som extra stöd, golv 0,20 och utan att höja något. Temaglas bär ikoner (ikonkrav), foto-glas bär pillar (textkrav). Mörkt foto-glas står kvar på taket 0,34: fyllningen ensam ger 4,2:1 mot det ljusaste fotot, resten bärs av tinten och bedöms på enhet. 🟡
 
 Vald på glas är inverterad mot glaset: glasets innehållsfärg som yta, `bg` som ikon/text (mörkt tema ljus yta, ljust tema mörk yta, även på foto).
 
@@ -169,7 +172,8 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 | Nedtryckt | `pressed`-yta + skala 0,96 (navigation 0,92). Text-flik: opacitet 0,55 | ✅ |
 | Inaktiv | opacitet 0,35 | ✅ |
 | Långt tryck | 450 ms, lyft skala 1,04 | ✅ |
-| Kontextmeny | spring damping 18, stiffness 260, mass 1 (in och ut). Menyn växer från 0,6 och glider 12 px från kortet. Bakgrund tonar 150 / 180 ms. Reduce motion: bara toning | ✅ |
+| Tryck (`pressIn` / `pressOutSpring`) | in 90 ms ease-out, ut fjäder damping 14, stiffness 320, mass 0,6. Skala och ytbyte animeras med native driver. Reduce motion: bara ytbytet. Ingen haptik på vanliga tryck | ✅ |
+| Kontextmeny | spring damping 18, stiffness 260, mass 1 (in, ut utan översvängning). Kopian har originalets storlek och radie och lyfts med transform; originalet är dolt medan menyn är öppen och byts tillbaka i samma frame. Menyn växer från 0,6 och glider 12 px från kortet. Bakgrund tonar 150 / 180 ms. Reduce motion: bara toning | ✅ |
 | Haptik (meny) | lätt vid öppning, `selection` vid radbyte, `success` vid val | ✅ |
 | Äldre komponenter | opacity 0,8 tills de görs om | 🔵 |
 | Reduce motion | respekteras alltid | ✅ krav |
