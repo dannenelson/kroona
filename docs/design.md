@@ -11,6 +11,38 @@ Komponenternas former (korttaxonomi, SectionHeader, TopBar, FilterPills) ligger 
 
 ---
 
+## 0. Riktning: Apple-ren ✅ (godkänd 2026-11-18)
+Källa: Claude Design "Kroona Looken A" (hela setet, mörkt och ljust). Detta **ersätter** guld som accent och justerar färg-, glas- och radietabellerna nedan. Tabellerna i §2–§6 uppdateras till dessa värden när brief 04 körs.
+
+- **Ingen accentfärg.** Neutral gråskala, fotot är enda färgen. Guld `#B8965A` utgår.
+- **Vald** = inverterad text/yta (mörk pill på ljust, ljus pill på mörkt). **Nedtryckt** = djupare yta + lätt nedskalning. **Inaktiv** = 35 % opacitet.
+- **Hörn:** squircle (`borderCurve: 'continuous'` i RN) på alla rundningar utom cirklar och pillar.
+- **Kanter:** kort toning + gradvis blur överst (bakom statusfält/Dynamic Island, något högre än den) och underst (bakom navigationen). Nav-ikoner låga, nära hemindikatorn. Komponent "kantblur", byggs i brief 04.
+- **Spara:** bokmärke, via långt tryck-meny (Spara · Följ varumärke · Dela · Visa liknande) plus en Spara-knapp på Produktdetalj.
+- **Typsnitt:** Familjen Grotesk (rubriker) + Google Sans Flex (UI) ✅ (Daniel, 2026-11-18).
+
+| Token | Mörkt | Ljust |
+|---|---|---|
+| `bg` | `#15171B` | `#F5F6F8` |
+| `surface` | `#1F2227` | `#FFFFFF` |
+| `surface2` | `#2A2D33` | `#E9EBEE` |
+| `pressed` | `#353840` | `#DCDFE3` |
+| `text` | `#F5F6F8` | `#15171B` |
+| `mute` | `#9298A2` | `#686E78` |
+| `line` | `rgba(255,255,255,.10)` | `rgba(21,23,27,.10)` |
+| `sep` | `rgba(255,255,255,.07)` | `rgba(21,23,27,.07)` |
+| `placeholder` | `#24272D` | `#E2E5E9` |
+| `glass` | `rgba(42,45,51,.72)` | `rgba(255,255,255,.72)` |
+| `glassLine` | `rgba(255,255,255,.14)` | `rgba(21,23,27,.10)` |
+| `scrim` | `rgba(8,9,11,.40)` | `rgba(21,23,27,.12)` |
+| `menu` | `rgba(44,46,52,.80)` | `rgba(255,255,255,.82)` |
+
+Radier: bildkort/lista/meny 14 · samlingskort 16–18 · jämförelse 18 · pill 17 (34 hög) · knapp/glasknapp 22 (44) · sökfält 25 (50) · bubbla 20 (6 nere höger) · varumärke cirkel. Kantblur: 8 px max, tre lager (20 / 50 / 100 %) med mask.
+
+**Hållbarhet visas neutralt** (ingen grön/röd). `success`/`warning` i §2 gäller därför inte hållbarhetsvisning och ska tas bort eller användas bara för system-states.
+
+**Kvar att avgöra:** ljust glas över ren yta (syns knappt), solid scrim i botten i ljust, Spara-knappens storlek på små kort, ikonstil, om översta toningen i Expo Go är iOS 26 native scroll-edge.
+
 ## 1. Princip: två lager
 1. **Grundtokens** är råa värden (`#15171B`, `16`). De används bara inuti temat.
 2. **Semantiska tokens** är roller (`bg`, `textPrimary`, `accent`). Komponenter använder bara dessa.
@@ -137,7 +169,7 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 - **Pillar** byter innehåll överst på en skärm (vad skärmen handlar om), som Spotify. Används tills vidare **bara överst på Hem** (t.ex. Allt · Mode · Heminredning). Text-flikar snävar in en lista inom ett innehåll. Känns gränsen otydlig när det är byggt slås de ihop. 🔵
 
 ## 🟡 Öppet
-0. UI-typsnitt: Google Sans Flex är tillfälligt, byt vid behov
+0. ~~UI-typsnitt~~ ✅ Google Sans Flex vald 2026-11-18
 1. `danger`-färg (först när fel/radera behövs)
 2. Glasets exakta alfa
 3. Ikonbibliotek och ikonvikt (nuvarande SVG-pipeline eller en samlad ikonuppsättning)

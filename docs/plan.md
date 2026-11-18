@@ -38,7 +38,8 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 1a. ✅ **Tema** (`theme/`, typsnitt, migrering) — klart 2026-11-18, commit `d048031`. Besiktigas i Expo Go (mörkt och ljust).
 1a.5 ✅ **SDK-uppgradering 54 → 58** — klart 2026-11-18, commit `dcc94fb`. Besiktigas i Expo Go (kör `nvm use` först).
 1b. 🟡 **Basskomponenter** byggda som teknisk grund (commit `cb39669`, brief 03), men **inte godkända visuellt** (2026-11-18). Looken var inte designad innan koden byggdes. Pausad tills 1c är klar.
-1c. **Designriktning, skärmar före komponenter.** Tre hela skärmar (Hem, Produktdetalj, Samling) med riktiga foton i 2–3 stilriktningar i Claude Design. Daniel väljer visuellt. Komponenter härleds sedan från det godkända och justerar 1b. Frågor som ska avgöras här:
+1c. ✅ **Designriktning klar 2026-11-18: "Apple-ren"** (se design.md §0). Nästa: brief 04 bygger om basskomponenterna (accentlösa states, TextTabs, långt tryck-meny, kantblur, squircle). Ursprunglig frågelista nedan, besvarad i design.md.
+    **Designriktning, skärmar före komponenter.** Tre hela skärmar (Hem, Produktdetalj, Samling) med riktiga foton i 2–3 stilriktningar i Claude Design. Daniel väljer visuellt. Komponenter härleds sedan från det godkända och justerar 1b. Frågor som ska avgöras här:
     - Spara: dölj åtgärder i en meny vid långt tryck (Pinterest/Apple-mönster) i stället för en knapp per kort?
     - Accentfärgen (guld) känns osäker. Behåll, justera eller byt?
     - Ikonstil (hörn, linjevikt), glas och kanter i ljust läge, scrim, kortens form.
