@@ -132,9 +132,14 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 - Typsnitt laddas med `expo-font` via `@expo-google-fonts`-paketen (Familjen Grotesk 600/700, Google Sans Flex 400/500/600).
 - **Migrering:** nuvarande kod har `#0f0f0e` och bara Google Sans Flex (400/500/700). Färgerna migreras i steg 1a och Familjen Grotesk läggs till för rubriker.
 
+## 11. Filter och pillar ✅
+- **Filtrering** görs med **text-flikar med understrykning** (Pinterest-mönstret), 44 px höga. Gäller Hem, Flöde och Samlingsdetalj.
+- **Pillar** (glas och fylld) behålls som komponent men används **inte** för filtrering. Funktionen är 🟡 öppen (se nedan).
+
 ## 🟡 Öppet
 0. UI-typsnitt: Google Sans Flex är tillfälligt, byt vid behov
 1. `danger`-färg (först när fel/radera behövs)
 2. Glasets exakta alfa
 3. Ikonbibliotek och ikonvikt (nuvarande SVG-pipeline eller en samlad ikonuppsättning)
 4. Ljust temas foto-tonade ytor (hur färgtonad fotografi beter sig i ljust läge)
+5. Pillens funktion (annat än filter)
