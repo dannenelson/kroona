@@ -68,6 +68,8 @@ Supabase-projekt och schema (collections, collection_items, follows) · konton �
 - [ ] Ljust glas över ren yta syns inte: använd surface + kant + skugga där, glas bara över foto?
 - [x] FilterPills 36 px: försvinner som problem när filter blir text-flikar (44 px höga)
 - [x] Pillens funktion: byter innehåll överst på Hem. Text-flikar filtrerar i listor (2026-11-18)
+- [ ] Ljust foto-glas ser fel ut över mörka bilder i ljust tema (Daniel, 2026-11-18). Pausat, tweakas visuellt senare. Idéer: lägre alfa med mörk tint, eller tunn scrim bakom glaset.
+- [ ] Vågig toppkant på kantblur (prototyp i designen v11, Daniel: kan fungera). Brief 06 när 1b är godkänd.
 - [ ] Hitta: hur ser dialog med urval och jämförelse ut? (designfråga när Hitta är på tur)
 - [ ] Ska ia-karta och wireframes justeras till de nya flikrollerna?
 
