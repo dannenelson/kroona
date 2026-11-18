@@ -13,6 +13,8 @@
 | **Kod** | Brief i `docs/briefs/`, byggd av Claude Code | Claude Code + Claude | Plan Mode först. Efteråt kontrollerar Claude `tsc`, grep och diff mot briefen. |
 | **Besiktning** | Appen på telefonen | Daniel | Mörkt och ljust läge, alla flikar |
 
+**Skärmar före komponenter.** Look och känsla designas på hela skärmar med riktiga foton och godkänns visuellt av Daniel innan basskomponenter byggs i kod (lärdom från brief 03, 2026-11-18).
+
 Före pilotdemot: en samlad granskning av hela appen (säkerhet, tillgänglighet, kod), med Ultracode eller motsvarande. Inte tidigare.
 
 ## Spelregler
