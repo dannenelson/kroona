@@ -82,6 +82,8 @@ export const overlay = {
   onPhoto: raw.white,
   onPhotoSecondary: raw.grey300,
   scrimSoft: 'rgba(14,16,20,0.6)',
+  // TODO(design): scrimen slutar i solid rgba(14,16,20,1). I ljust tema
+  // möter den bg #F5F6F8 med en tydlig mörk kant (öppen designfråga b).
   scrimStops: {
     colors: [
       'rgba(14,16,20,0)',

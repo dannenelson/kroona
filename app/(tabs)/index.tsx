@@ -1,8 +1,10 @@
-import { View, ScrollView } from 'react-native';
+import { useState } from 'react';
+import { View, ScrollView, Text } from 'react-native';
+import { Link } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles } from '../../theme';
+import { makeStyles, typography, spacing } from '../../theme';
 import Header from '../../components/Header';
-import FilterPills from '../../components/FilterPills';
+import TextTabs from '../../components/TextTabs';
 import AskBar from '../../components/AskBar';
 import ContinueDialogRow from '../../components/ContinueDialogRow';
 import CollectionsRow from '../../components/CollectionRow';
@@ -14,9 +16,15 @@ import HeroRow from '../../components/HeroRow';
 import DiscoveryPreviewCard from '../../components/DiscoveryPreviewCard';
 import { TAB_BAR_HEIGHT } from '../../components/CustomTabBar';
 
+// Rent visuell filterrad, som tidigare FilterPills: byter bara vald flik och
+// filtrerar ingenting ännu.
+const FILTERS = ['Allt', 'Kläder', 'Möbler', 'Begagnat'] as const;
+type Filter = (typeof FILTERS)[number];
+
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const styles = useStyles();
+  const [filter, setFilter] = useState<Filter>('Allt');
 
   return (
     <View style={styles.container}>
@@ -25,8 +33,15 @@ export default function HomeScreen() {
         contentContainerStyle={{ paddingTop: insets.top, paddingBottom: TAB_BAR_HEIGHT + insets.bottom }}
       >
         <Header />
-        <FilterPills />
+        <TextTabs items={FILTERS} selected={filter} onSelect={setFilter} />
         <AskBar />
+        {/* Dev-länk till komponentsidan, bara i utvecklingsläge.
+            Flyttas eller tas bort när Hem byggs om. */}
+        {__DEV__ && (
+          <Link href="/components" style={styles.devLink}>
+            <Text style={styles.devLinkText}>Komponenter (dev)</Text>
+          </Link>
+        )}
         <ContinueDialogRow />
         <CollectionsRow />
         <PopularCollectionsRow />
@@ -63,5 +78,13 @@ const useStyles = makeStyles((t) => ({
   container: {
     flex: 1,
     backgroundColor: t.colors.bg,
+  },
+  devLink: {
+    paddingHorizontal: spacing.screenMargin,
+    paddingVertical: spacing.sm,
+  },
+  devLinkText: {
+    ...typography.caption,
+    color: t.colors.textTertiary,
   },
 }));
