@@ -37,7 +37,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 ## Näst — i den här ordningen
 1a. ✅ **Tema** (`theme/`, typsnitt, migrering) — klart 2026-11-18, commit `d048031`. Besiktigas i Expo Go (mörkt och ljust).
 1a.5 ✅ **SDK-uppgradering 54 → 58** — klart 2026-11-18, commit `dcc94fb`. Besiktigas i Expo Go (kör `nvm use` först).
-1b. **Basskomponenter** (Glas, Pill, Kort, TopBar) på temat. Ta med två fynd från 1a:
+1b. **Basskomponenter** (Glas/IconButton, Pill, TextTabs, ProductCard S/M/L, TopBar) på temat. Brief: `docs/briefs/03-basskomponenter.md`. Ljust glas och scrim avgörs senare. Ta med två fynd från 1a:
     - Guld som ikon på ljus yta ger 2,57:1 (ikoner kräver 3:1). Använd `accentText` för ikoner i ljust tema.
     - Hero- och Partner-toningen slutar i solid mörk botten, vilket kan se ut som ett mörkt block i ljust läge. Avgörs visuellt.
 2. **Datamodell i koden:** Produkt / Återförsäljare / Erbjudande (koden speglar troligen den gamla modellen). Lägg in "följbar" för återförsäljare, samling och område.
