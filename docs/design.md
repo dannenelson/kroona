@@ -37,7 +37,7 @@ Då byts tema, märkesfärg eller typsnitt på ett ställe. Ingen hex, fontstorl
 
 **Kontrast kontrollerad (WCAG AA ≥ 4,5 för text):** alla textroller ovan klarar AA (lägst 4,63). Guld `#B8965A` på ljus bakgrund ger bara 2,57, så det får **aldrig** användas som text i ljust tema. Där gäller `accentText`.
 
-**Foto-overlayer är fasta och identiska i båda teman** ✅: scrim `rgba(14,16,20,0→0.65)`, mjuk och lång utfasning. Hero-rubriker på foto är det enda medvetna AA-undantaget. Knappar, pillar och priser ska alltid klara AA.
+**Foto-overlayer är fasta och identiska i båda teman** ✅: scrim enligt `scrimStops` nedan, mjuk och lång utfasning. Hero-rubriker på foto är det enda medvetna AA-undantaget. Knappar, pillar och priser ska alltid klara AA.
 
 | Overlay-token | Värde (båda teman) | Status |
 |---|---|---|
