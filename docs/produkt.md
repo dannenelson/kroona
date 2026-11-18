@@ -44,6 +44,7 @@ Hem är det som är relevant nu, Flöde är det man följer.
 - **Hållbarhet** informerar och dömer aldrig. Data visas neutralt.
 - **Tillbaka-knappen** går alltid till skärmen man kom från.
 - **Egna samlingar** byggs i Fas 0 med lokal lagring (AsyncStorage).
+- **Område** = kategori eller stil med kurerat innehåll (t.ex. Hemmakontor, Skandinavisk stil).
 - **Följa** (varumärke, företag, område, samling) byggs i Fas 0 lokalt, med några förvalda följda i demot. Konton och följa användare är Fas 1+.
 - **Personalisering:** Kroona minns lokalt vad man söker och jämför. Riktig personalisering över tid är Fas 1+.
 

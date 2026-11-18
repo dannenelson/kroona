@@ -59,7 +59,10 @@ Supabase-projekt och schema (collections, collection_items, follows) · konton �
 - [x] Mål och "klart när" bekräftade (2026-11-17)
 - [ ] Hosting: Supabase i Fas 1, och proxyn för API-nyckeln i 0.6 eller tidigare?
 - [ ] Schemajämförelse (researchloggen) före Fas 1
-- [ ] Vad menas med "område" (kategori, stil eller plats)?
+- [x] "Område" = kategori eller stil med kurerat innehåll (2026-11-18)
+- [ ] Filterstil: pill-badges (design.md) eller text-flikar med understrykning (wireframes aug 2026)? Avgörs före 1b
+- [ ] Ljust glas över ren yta syns inte: använd surface + kant + skugga där, glas bara över foto?
+- [ ] FilterPills 36 px: höjd eller osynlig tryckyta till 44?
 - [ ] Hitta: hur ser dialog med urval och jämförelse ut? (designfråga när Hitta är på tur)
 - [ ] Ska ia-karta och wireframes justeras till de nya flikrollerna?
 
