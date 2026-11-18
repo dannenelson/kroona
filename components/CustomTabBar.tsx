@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BottomTabBarProps } from 'expo-router/js-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { makeStyles, useTheme, withAlpha, typography, fonts, spacing, motion } from '../theme';
@@ -39,7 +39,7 @@ const CONTAINER_PADDING_TOP = spacing.xxl;
 const CONTAINER_PADDING_BOTTOM = spacing.xs;
 const TAB_GAP = 6; // lokal optisk justering: ikon → etikett
 
-export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
+export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useStyles();
@@ -51,7 +51,7 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
       <LinearGradient
         colors={[withAlpha(colors.bg, 0), withAlpha(colors.bg, 0.8), colors.bg]}
         locations={[0, 0.5, 1]}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
       />
 
       {/* Meny-rad, se TAB_BAR_HEIGHT nedan — ej påverkad av insets */}
@@ -63,13 +63,15 @@ export default function CustomTabBar({ state, navigation }: BottomTabBarProps) {
           const label = LABELS[route.name];
 
           const onPress = () => {
-            const event = navigation.emit({
+            // SDK 58: expo-router:s tab-bar-props ger emitter + navigateToTab i
+            // stället för navigation (samma logik som expo-router:s BottomTabBar).
+            const event = emitter.emit({
               type: 'tabPress',
               target: route.key,
               canPreventDefault: true,
             });
             if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
+              navigateToTab(route.key);
             }
           };
 
