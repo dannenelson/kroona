@@ -41,7 +41,7 @@ export default function IconButton({
   variant = 'glass',
   style,
 }: Props) {
-  const { colors } = useTheme();
+  const { colors, shadows } = useTheme();
   const g = useGlass(tone);
   // Vald = fylld ikon. Saknas fylld variant visas outline.
   const ShownIcon = selected && selectedIcon ? selectedIcon : Icon;
@@ -84,10 +84,13 @@ export default function IconButton({
     >
       <Animated.View style={press.scaleStyle}>
         {isGlass ? (
-          <Glass tone={tone} dimmed={disabled} style={styles.circle}>
-            {fill}
-            {content}
-          </Glass>
+          // Skuggan på ett yttre lager, så att Glass overflow: hidden inte klipper den.
+          <View style={[styles.circle, { boxShadow: shadows.glassButton }]}>
+            <Glass tone={tone} dimmed={disabled} style={styles.circle}>
+              {fill}
+              {content}
+            </Glass>
+          </View>
         ) : (
           // I en glaskapsel (kapselns kant är ett eget lager och tar ingen plats).
           <View style={[styles.circle, styles.bare]}>

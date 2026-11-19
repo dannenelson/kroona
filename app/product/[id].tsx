@@ -3,12 +3,11 @@
 // ovanför flikarna, så tab-baren syns inte och tillbaka går till skärmen man
 // kom från. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { setStatusBarStyle, StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, typography, spacing, radius, touchTarget } from '../../theme';
+import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import {
   getLowestPrice,
@@ -47,7 +46,6 @@ export default function ProductScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
-  const { scheme } = useTheme();
   const styles = useStyles();
   const toast = useToast();
 
@@ -57,13 +55,6 @@ export default function ProductScreen() {
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = heroHeight - insets.top - barHeight;
   const scrollY = useRef(new Animated.Value(0)).current;
-  // Bara för statusfältet (kan inte tonas): byter vid halva toppens toning.
-  const [scrolled, setScrolled] = useState(false);
-  const statusSwitchAt = threshold - spacing.xl / 2;
-
-  // Statusfältet: ljust över foto, temats när nedscrollad. Återställs när man lämnar.
-  const themeBar = scheme === 'dark' ? 'light' : 'dark';
-  useEffect(() => () => setStatusBarStyle(themeBar), [themeBar]);
 
   const data = useMemo(() => {
     if (!product) return null;
@@ -106,28 +97,22 @@ export default function ProductScreen() {
       : []),
   ];
 
-  // En gemensam övergång för toppen (brief 14): toningen och titeln följer
-  // scrollen över samma sträcka, ingen tröskel som byter läge.
-  const topProgress = scrollY.interpolate({
+  // Titeln tonar in när hero passerat under toppbaren. Toppkanten och
+  // statusfältet följer temat hela vägen (brief 15), inget byte vid scroll.
+  const titleOpacity = scrollY.interpolate({
     inputRange: [threshold - spacing.xl, threshold],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
-  const titleOpacity = topProgress;
 
   return (
     <View style={styles.container}>
-      <StatusBar style={scrolled ? themeBar : 'light'} />
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: true,
-          listener: (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-            const next = e.nativeEvent.contentOffset.y > statusSwitchAt;
-            if (next !== scrolled) setScrolled(next);
-          },
         })}
       >
         <View style={[styles.hero, { height: heroHeight }]}>
@@ -223,12 +208,12 @@ export default function ProductScreen() {
         )}
       </Animated.ScrollView>
 
-      {/* Toppen: en enda kant med konstant höjd. Foto- och tematoningen tonas
-          mot varandra med scrollen; blurren är konstant. */}
+      {/* Toppen: en enda kant i temats toning (brief 15). Toningen täcker
+          titelraden; blurren ligger kvar kort bakom statusfält/Dynamic Island. */}
       <EdgeFade
         position="top"
         height={insets.top + barHeight + spacing.lg}
-        fadeProgress={topProgress}
+        blurHeight={insets.top + edgeBlur.topExtra}
       />
       <View style={[styles.topChrome, { paddingTop: insets.top }]} pointerEvents="box-none">
         <Animated.Text

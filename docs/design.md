@@ -159,7 +159,7 @@ Layout sker med `gap`, aldrig `marginRight` eller `marginBottom` på enskilda ko
 
 ## 7. Elevation
 Mörkt tema: ingen skugga, djup uttrycks med `surface`-steg och `border`. 🔵 Undantag i båda teman: `lift` (`0 30px 70px`, alfa .55 mörkt / .22 ljust) för lyft kort och `menu` (`0 20px 50px rgba(0,0,0,.25)`).
-Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` · `raised` `0 4px 12px rgba(20,24,29,.10)` · `overlay` `0 8px 24px rgba(20,24,29,.18)`.
+Glasknappar (IconButton på glas, TopBar-kapseln) har subtil skugga `glassButton` på ett yttre lager (Glass klipper): mörkt `0 1px 3px rgba(0,0,0,.18)`, ljust `0 2px 8px rgba(21,23,27,.14)` (brief 15). Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` · `raised` `0 4px 12px rgba(20,24,29,.10)` · `overlay` `0 8px 24px rgba(20,24,29,.18)`.
 
 ## 8. Rörelse
 *Lugnt och sansat: kontrollerad rörelse, inget som blinkar eller spelar av sig självt.* ✅
@@ -183,7 +183,7 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 
 ## 8b. Produktdetalj (brief 13)
 Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, FactList, OfferRow) och den delade `Toast`.
-- **Topp (brief 14):** en enda `EdgeFade` med konstant höjd (safe area + 44 + 2 × 8 + 16). Foto-toningen tonas över i tema-toningen med scrollen (samma sträcka som titeln, `spacing.xl`); blur-lagren är konstanta. Glaset har en ton (`photo`) hela vägen. Statusfältet byter vid halva toningen. Toppkanten på detaljvyer är alltså en komponent som tonas med scroll, inget lägesbyte.
+- **Topp (brief 15):** en enda `EdgeFade` i temats toning hela vägen (ljus i ljust tema, även över hero; ingen foto-toning). Toningen är safe area + 44 + 2 × 8 + 16 hög och täcker titelraden; blurzonen är kort, safe area + `edgeBlur.topExtra` (≈ 68). Statusfältet följer temat, inget byte vid scroll. Glaset har en ton (`photo`). Titeln tonar in med scroll.
 - **Hero** 4:5 full bredd. **Märke** `label`/mute, **namn** `title1`. **Pris** "Från X kr" i `price` med `title2`-storlek, "kr" i `label`. **Spara** 44 hög pill på `surfaceRaised`, fylld ikon + "Sparad" när sparad.
 - **Listor:** grupperade (radie `card`, `surface`, `sep`-linjer), faktarader minst 44, erbjudanderader minst 64 med initialcirkel 36, namn `body` 500, detalj `label` 400 mute, pris `body` 600, lager `caption`. Tryck tonar raden till `pressed`.
 - **Liknande:** horisontell rad med ProductCard M, 140 bred, bild 176.
