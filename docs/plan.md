@@ -45,7 +45,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
     - Ikonstil (hörn, linjevikt), glas och kanter i ljust läge, scrim, kortens form.
     - Referenser: Apple, Pinterest, Spotify.
 2. **Datamodell i koden** (brief 12, `docs/briefs/12-datamodell.md`): Produkt / Återförsäljare / Erbjudande (koden speglar troligen den gamla modellen). Lägg in "följbar" för återförsäljare, samling och område.
-3. **Produktdetalj** (mest efterfrågade luckan), sedan **Samlingsdetalj**
+3. **Produktdetalj** (brief 13, `docs/briefs/13-produktdetalj.md`) (mest efterfrågade luckan), sedan **Samlingsdetalj**
 4. **Sparat** med egna samlingar och följda (AsyncStorage)
 5. **Hem** (hyllor) i ny design, sedan **Flöde** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning
