@@ -43,6 +43,12 @@ export const motion = {
     open: { stiffness: 1000, damping: 500, mass: 3, overshootClamping: false },
     close: { stiffness: 1100, damping: 98, mass: 3, overshootClamping: false },
   },
+  /** Stängning vid släpp (Produktdetalj): biblioteket stänger om
+   *  förflyttning/skärmhöjd + hastighet/skärmhöjd × detta > 0,5 (fast tröskel i
+   *  react-native-screen-transitions). 1,0 gör att ett lugnt drag på ca 20–25 %
+   *  stänger, ett kort (< 10 %) fjädrar tillbaka och flick följer riktningen.
+   *  Bibliotekets standard är 0,3. */
+  dismissVelocityImpact: 1.0,
   /** Remsa vid vänsterkanten där kantswipe stänger Produktdetalj. */
   dismissEdgeWidth: 24,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */

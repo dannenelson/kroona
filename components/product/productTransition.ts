@@ -61,6 +61,8 @@ export const productScreenOptions: BlankStackNavigationOptions = {
     'vertical',
     { gesture: 'horizontal', area: motion.dismissEdgeWidth },
   ],
+  // Hur mycket släpphastigheten väger in i stängningsbeslutet (se motion.ts).
+  gestureVelocityImpact: motion.dismissVelocityImpact,
   screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
     'worklet';
     const id = (active.route.params as { id?: string } | undefined)?.id;
