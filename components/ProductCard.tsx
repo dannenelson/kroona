@@ -1,8 +1,10 @@
 import { useMemo, useRef, useState, type ComponentRef } from 'react';
+import { useRouter } from 'expo-router';
 import { Animated, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { usePressAnimation } from '../hooks/usePressAnimation';
+import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import BookmarkIcon from '../assets/icons/BookmarkIcon';
@@ -45,15 +47,6 @@ type Props = {
   containerStyle?: StyleProp<ViewStyle>;
 };
 
-/** 1995 → "1 995" (hårt mellanslag som tusentalsavgränsare). */
-function formatPrice(price: number): string {
-  return String(Math.round(price)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-}
-
-/** 4.2 → "4,2" */
-function formatScore(score: number): string {
-  return score.toFixed(1).replace('.', ',');
-}
 
 /**
  * ProductCard enligt referensen "Kroona Looken A" och design.md §0/§4. Bara
@@ -87,6 +80,9 @@ export default function ProductCard({
   const saved = isSaved(id);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
+  const router = useRouter();
+  // Standard: öppna Produktdetalj (brief 13). Anroparen kan skicka egen onPress.
+  const handlePress = onPress ?? (() => router.push(`/product/${id}`));
   // Samma source-objekt för originalet och menyns kopia (samma bildcache).
   const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
 
@@ -190,7 +186,7 @@ export default function ProductCard({
         accessibilityHint={menu ? 'Håll in för fler val' : undefined}
         accessibilityState={{ disabled }}
         disabled={disabled}
-        onPress={onPress}
+        onPress={handlePress}
         onPressIn={press.onPressIn}
         onPressOut={onPressOut}
         style={[

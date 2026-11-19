@@ -11,7 +11,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 
 ---
 
-## 1. Produktdetalj — ✅ Wireframe klar
+## 1. Produktdetalj — ✅ Wireframe klar · 🚧 Byggd i brief 13 (`app/product/[id].tsx`)
 **Nås från:** alla produktkort. Är navet för stegen Jämför och Köp (se Resan).
 
 1. Hero-bild — produktens kanoniska bild
@@ -21,6 +21,8 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 5. **"Finns begagnad hos"** — begagnat-erbjudanden, visas FÖRE nytt. Rad: tjänst, prisläge ("Fast pris: X kr" eller "Auktion, bud från X kr"), länk ut.
 6. **"Köp hos"** — nytt-erbjudanden: AF-namn, pris, lager, geografi. Sortering, default pris. Påverkar aldrig begagnat-listan.
 7. Liknande produkter — horisontell rad
+
+**Byggd (brief 13), beslutade avvikelser från designen (Looken A):** hållbarhetsindex som siffra ("4,2 av 5") i faktatabellen · prisläge (Fast pris / Auktion, bud från) på begagnade rader · ingen sorteringskontroll i "Köp hos", pris stigande · inga pricksidor på hero (en bild per produkt) · Spara = fylld ikon och "Sparad", ingen inverterad yta · priset överst = "Från lägsta pris" (med "Begagnat" om lägst är begagnat). Tryck på en erbjudanderad ger haptik och en toast ("Du skulle nu gå till …"), ingen utlänk i Fas 0.
 
 **Beslut:** Nytt/Begagnat ligger på Erbjudande. Flera begagnat-erbjudanden samtidigt. Prisläge undviker missvisande låga startbud. Begagnat före nytt.
 **Öppet:** signal på produktkort för "finns begagnad". Hur begagnat inhämtas (integration eller manuellt i Fas 0).

@@ -78,6 +78,15 @@ export default function ComponentsScreen() {
           Toppkanten: scrolla och titta upp mot Dynamic Island, växla Rak/Vågig längst ner.
         </Text>
 
+        <Section title="Produktdetalj">
+          <Caption>Öppna en produkt av varje typ. Alla produktkort öppnar också detaljen.</Caption>
+          <View style={styles.detailLinks}>
+            <Pill onPress={() => router.push('/product/2')}>Nytt och begagnat</Pill>
+            <Pill onPress={() => router.push('/product/3')}>Bara begagnat</Pill>
+            <Pill onPress={() => router.push('/product/1')}>Bara nytt</Pill>
+          </View>
+        </Section>
+
         <Section title="0 · Press (jämför)">
           <Caption>Håll in och släpp: in snabbt, ut med lätt fjäder. Ingen haptik på vanliga tryck.</Caption>
           <View style={styles.pressRow}>
@@ -239,6 +248,7 @@ export default function ComponentsScreen() {
           ))}
           <View style={styles.edgePlain} />
         </Section>
+
       </ScrollView>
 
       {/* Skärmens egen toppkant, bakom statusfält och Dynamic Island. Det är den som testas. */}
@@ -367,6 +377,11 @@ const useStyles = makeStyles((t) => ({
   },
   topBarPhoto: {
     paddingVertical: spacing.xl,
+  },
+  detailLinks: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
   },
   edgeControls: {
     position: 'absolute',

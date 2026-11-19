@@ -1,9 +1,9 @@
-import { useEffect, useRef, type ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import { Animated, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme, motion, radius, touchTarget, iconSize } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
 import { usePressAnimation } from '../hooks/usePressAnimation';
-import { useReduceMotion } from '../hooks/useReduceMotion';
+import { usePop } from '../hooks/usePop';
 import { haptic } from '../utils/haptic';
 
 type IconProps = { color: string; size?: number };
@@ -45,22 +45,8 @@ export default function IconButton({
   const g = useGlass(tone);
   // Vald = fylld ikon. Saknas fylld variant visas outline.
   const ShownIcon = selected && selectedIcon ? selectedIcon : Icon;
-  const reduceMotion = useReduceMotion();
-
-  // Pop när ikonen blir fylld: 1 → popScale → 1. Inte vid första render
-  // eller avmarkering, och inte med reduce motion.
-  const pop = useRef(new Animated.Value(1)).current;
-  const wasSelected = useRef(selected);
-  useEffect(() => {
-    if (selected && !wasSelected.current && !reduceMotion) {
-      pop.setValue(1);
-      Animated.sequence([
-        Animated.timing(pop, { toValue: motion.popScale, duration: motion.popIn, useNativeDriver: true }),
-        Animated.spring(pop, { toValue: 1, ...motion.popSpring, useNativeDriver: true }),
-      ]).start();
-    }
-    wasSelected.current = selected;
-  }, [selected, reduceMotion, pop]);
+  // Pop när ikonen blir fylld (inte vid avmarkering eller med reduce motion).
+  const pop = usePop(selected);
 
   // Djupare yta vid tryck: en hårlinjefärg ovanpå glaset (samma som menyrader).
   const pressedTint = tone === 'photo' ? g.borderColor : colors.border;

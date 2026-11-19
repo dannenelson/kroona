@@ -32,6 +32,9 @@ export const motion = {
   popScale: 1.15,
   popIn: 90,
   popSpring: { damping: 10, stiffness: 300, mass: 0.6 },
+  /** Toast: hur länge den syns (ms) och hur långt den glider in (px). */
+  toastDuration: 2200,
+  toastSlide: 24,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */

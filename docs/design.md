@@ -181,6 +181,15 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 | Äldre komponenter | opacity 0,8 tills de görs om | 🔵 |
 | Reduce motion | respekteras alltid | ✅ krav |
 
+## 8b. Produktdetalj (brief 13)
+Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, FactList, OfferRow) och den delade `Toast`.
+- **Topp:** över hero glas på foto + mörk foto-toning; nedscrollad (hero förbi toppbaren) temats glas, rak `EdgeFade` (safe area + 44 + 2 × 8 + 16) och produktnamnet centrerat, som tonar in. Glas och toning växlar vid tröskeln, namnet tonar.
+- **Hero** 4:5 full bredd. **Märke** `label`/mute, **namn** `title1`. **Pris** "Från X kr" i `price` med `title2`-storlek, "kr" i `label`. **Spara** 44 hög pill på `surfaceRaised`, fylld ikon + "Sparad" när sparad.
+- **Listor:** grupperade (radie `card`, `surface`, `sep`-linjer), faktarader minst 44, erbjudanderader minst 64 med initialcirkel 36, namn `body` 500, detalj `label` 400 mute, pris `body` 600, lager `caption`. Tryck tonar raden till `pressed`.
+- **Liknande:** horisontell rad med ProductCard M, 140 bred, bild 176.
+- **Toast:** glasruta längst ner, glider in (fjäder) och ut, visas 2,2 s. Reduce motion: direkt.
+- **Avvikelser från referensen (egna):** sidmarginal 16 (referens 20) · typstorlekar närmast token (märke 13 mot 15, namn 26 mot 25, pris 20 mot 22, rubriker 20 mot 19) · Liknande-korten visar också namn och betyg (ProductCard M) · toppens toning växlar vid en tröskel i stället för kontinuerligt.
+
 ## 9. Komponentkontrakt
 Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (`sm`/`md`/`lg`, default `md`), **states** (default, pressed, disabled, loading, selected), och en **`style`-prop som slås ihop sist** (anroparen justerar layout, aldrig identitet). Innehåll går via `children`, inte via fler props.
 

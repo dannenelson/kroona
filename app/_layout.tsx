@@ -16,6 +16,7 @@ import { ThemeProvider, useTheme, type ColorScheme } from '../theme';
 import { SavedProductsProvider } from '../context/SavedProductsContext';
 import { FollowedCollectionsProvider } from '../context/FollowedCollectionsContext';
 import { ContextMenuProvider } from '../components/ProductContextMenu';
+import { ToastProvider } from '../components/Toast';
 
 // Aktivt tema. Byt till 'light' här för att testa ljust tema (ingen UI för
 // det än).
@@ -57,7 +58,10 @@ function AppShell() {
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         {/* Kontextmenyn ritas ovanför alla skärmar (ingen Modal, se ProductContextMenu). */}
         <ContextMenuProvider>
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+          {/* Tillfälliga bekräftelser (toast) ovanför alla skärmar. */}
+          <ToastProvider>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+          </ToastProvider>
         </ContextMenuProvider>
       </FollowedCollectionsProvider>
     </SavedProductsProvider>
