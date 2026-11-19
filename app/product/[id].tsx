@@ -153,12 +153,11 @@ export default function ProductScreen() {
   const back = () => router.back();
   const heroBoundaryId = b ?? id;
   // Valt bildindex delas via lib/lightboxStore (sätts av HeroPager vid tryck).
-  // Index skickas både som route-param (lightboxens första rendering) och som
-  // shared value (interpolatorn), se HeroPager.
+  // Index skickas som route-param (lightboxens första bild) och som shared value (HeroPager).
   const openLightbox = (index: number) =>
     router.push({
       pathname: '/lightbox/[id]',
-      params: { id, hero: heroBoundaryId, index: String(index) },
+      params: { id, index: String(index) },
     });
   const onOffer = (offer: Offer) => {
     const name = getRetailer(offer.retailerId)?.name ?? 'återförsäljaren';
@@ -213,7 +212,7 @@ export default function ProductScreen() {
               lightboxen på den. Knapparna ovanpå ligger i en egen yta. */}
           <HeroPager
             images={getProductImages(product)}
-            heroBoundaryId={heroBoundaryId}
+            heroKey={heroBoundaryId}
             width={width}
             height={heroHeight}
             onOpen={openLightbox}

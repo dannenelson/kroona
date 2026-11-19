@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
 import Reanimated, {
   scrollTo,
@@ -8,15 +7,15 @@ import Reanimated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Transition from 'react-native-screen-transitions';
+import { Pressable } from 'react-native-gesture-handler';
 import { spacing } from '../../theme';
 import PagerDots from '../PagerDots';
-import { LIGHTBOX_BOUNDARY_GROUP, lightboxBoundaryId } from './productTransition';
-import { lightboxHero, lightboxIndex, lightboxTargetIndex, prefetchImageSizes } from '../../lib/lightboxStore';
+import { lightboxHero, lightboxIndex } from '../../lib/lightboxStore';
 
 type Props = {
   images: string[];
-  /** Herons boundary-id (kortets id); lightboxens id byggs på det per bild. */
-  heroBoundaryId: string;
+  /** Identifierar heron (dess boundary-id från kortet), så att bara den hero som öppnade lightboxen följer indexet. */
+  heroKey: string;
   width: number;
   height: number;
   /** Tryck på en bild öppnar lightboxen på den bilden. */
@@ -26,12 +25,12 @@ type Props = {
 /**
  * Heron som bildbläddrare (brief 20). Fler än en bild: horisontell pager med
  * PagerDots nedtill direkt på fotot (mjuk skugga, läsbar mot ljusa och mörka foton). En
- * bild: bara bilden. Varje bild är en egen boundary (lb_<heroId>_<index>) så
- * att lightboxen öppnas från och stängs till rätt bild. Transition.ScrollView
+ * bild: bara bilden. Tryck öppnar lightboxen (fade, brief 22) på den bild som
+ * visas. Transition.ScrollView
  * gör att biblioteket vet pagerns läge: kantswipe stänger på första bilden,
  * och vertikala drag går vidare till detaljvyns scroll och stängningsgest.
  */
-export default function HeroPager({ images, heroBoundaryId, width, height, onOpen }: Props) {
+export default function HeroPager({ images, heroKey, width, height, onOpen }: Props) {
   const position = useSharedValue(0);
   const scrollRef = useAnimatedRef<Reanimated.ScrollView>();
 
@@ -39,42 +38,31 @@ export default function HeroPager({ images, heroBoundaryId, width, height, onOpe
     position.value = e.contentOffset.x / Math.max(1, width);
   });
 
-  // Lightboxens zoommål kräver bildernas storlek redan när den öppnas (brief 21).
-  const imagesKey = images.join('|');
-  useEffect(() => {
-    prefetchImageSizes(images);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [imagesKey]);
-
-  // Rätt bild tillbaka (brief 21): när man bläddrar i lightboxen hoppar heron
-  // till samma bild utan animation, på UI-tråden i samma ögonblick som indexet
-  // ändras. Då står heron rätt innan biblioteket mäter källan för stängningen.
+  // Rätt bild tillbaka: när man bläddrar i lightboxen hoppar heron till samma
+  // bild utan animation (UI-tråden), så att man landar på den bild man lämnade.
   // Bara den hero som öppnade lightboxen (andra detaljvyer i stacken rörs inte).
   useAnimatedReaction(
     () => lightboxIndex.value,
     (index, previous) => {
-      if (index === previous || lightboxHero.value !== heroBoundaryId) return;
+      if (index === previous || lightboxHero.value !== heroKey) return;
       scrollTo(scrollRef, index * width, 0, false);
     },
-    [heroBoundaryId, width],
+    [heroKey, width],
   );
 
   const page = (uri: string, index: number) => (
-    <Transition.Boundary
+    <Pressable
       key={uri + index}
-      id={lightboxBoundaryId(heroBoundaryId, index)}
-      group={LIGHTBOX_BOUNDARY_GROUP}
       onPress={() => {
-        lightboxHero.value = heroBoundaryId;
+        lightboxHero.value = heroKey;
         lightboxIndex.value = index;
-        lightboxTargetIndex.value = index;
         onOpen(index);
       }}
       accessibilityRole="imagebutton"
       accessibilityLabel={`Visa bild ${index + 1} av ${images.length} i helskärm`}
     >
       <Image source={{ uri }} style={{ width, height }} resizeMode="cover" />
-    </Transition.Boundary>
+    </Pressable>
   );
 
   if (images.length < 2) return images[0] ? page(images[0], 0) : null;

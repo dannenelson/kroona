@@ -5,8 +5,9 @@
 import type { TransitionInterpolatedStyle } from 'react-native-screen-transitions';
 import type { BlankStackNavigationOptions } from 'react-native-screen-transitions/expo-router';
 import { scheduleOnUI } from 'react-native-worklets';
-import { motion, radius, spacing } from '../../theme';
-import { lightboxGestureLock, lightboxTargetIndex } from '../../lib/lightboxStore';
+import { interpolate } from 'react-native-reanimated';
+import { motion, overlay, radius, spacing } from '../../theme';
+import { lightboxGestureLock } from '../../lib/lightboxStore';
 
 /** Grupp för produktbilder: kort (källa) och hero (mål) delar `id` = produkt-id. */
 export const PRODUCT_BOUNDARY_GROUP = 'product';
@@ -105,43 +106,54 @@ export const productScreenOptions: BlankStackNavigationOptions = {
   transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
 };
 
-/** Grupp för lightboxen: herons bilder (källa) och lightboxens bilder (mål), id `lb_<heroId>_<index>`. */
-export const LIGHTBOX_BOUNDARY_GROUP = 'lightbox';
-
-/** Lightbox-id för en bild i heron: eget id per bildindex, så att lightboxen
- *  öppnas från och stängs till rätt bild, utan krock med kortets zoom till heron. */
-export function lightboxBoundaryId(heroBoundaryId: string, index: number): string {
-  return `lb_${heroBoundaryId}_${index}`;
-}
-
 /**
- * Lightboxen (brief 19–20): samma hierarkirörelse som kort → detalj, ett steg
- * djupare. Bilden zoomar från den bild som visas i heron och tillbaka till den
- * bild man är på (index i lib/lightboxStore). Stängningsgesten (swipe ned,
- * kantswipe) stängs av per bildruta på UI-tråden när bilden är inzoomad eller
- * nyps (`options.gestureEnabled`), så att drag då panorerar bilden.
+ * Lightboxen (brief 22): ren fade i stället för zoom från heron. Öppning tonar
+ * in (opacitet 0 → 1, skala `motion.lightboxFade.fromScale` → 1) över mörk
+ * backdrop; detaljvyn bakom skalas lätt och dämpas som tidigare. Stängning
+ * (kryss, swipe ned, kantswipe) är omvänd; vid drag följer lightboxen fingret
+ * (bibliotekets gestvärden, samma tröskel och aktivering som Produktdetalj) och
+ * tonar ut. Stängningsgesten stängs av per bildruta på UI-tråden när bilden är
+ * inzoomad eller nyps (`options.gestureEnabled`), så att drag då panorerar bilden.
  */
 export const lightboxScreenOptions: BlankStackNavigationOptions = {
-  ...productScreenOptions,
-  screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
+  gestureEnabled: true,
+  gestureDirection: productScreenOptions.gestureDirection,
+  gestureVelocityImpact: motion.dismissVelocityImpact,
+  screenStyleInterpolator: ({ focused, current, progress, stackProgress }) => {
     'worklet';
-    const params = active.route.params as { hero?: string } | undefined;
-    const hero = params?.hero;
     const gestureEnabled = lightboxGestureLock.value === 0;
-    if (!hero) {
-      return { ...withDepthVisibility({}, stackProgress), options: { gestureEnabled } };
+    if (!focused) {
+      // Detaljvyn bakom: lätt inzoomad medan lightboxen är öppen, följer draget.
+      const scale = interpolate(progress, [1, 2], [1, motion.zoomBackgroundScale], 'clamp');
+      return withDepthVisibility({ content: { style: { transform: [{ scale }] } } }, stackProgress);
     }
-    const id = `lb_${hero}_${lightboxTargetIndex.value}`;
+    const p = Math.min(1, Math.max(0, current.progress));
+    // Handoff = live drag medan man drar, ögonblicksbild från släppet under stängningen.
+    const drag = current.gesture.handoff;
     return {
       ...withDepthVisibility(
-        bounds({ id, group: LIGHTBOX_BOUNDARY_GROUP }).navigation.zoom({
-          borderRadius: screenCornerRadius(insets.top),
-          backgroundScale: motion.zoomBackgroundScale,
-          backdropOpacity: motion.lightboxBackdropOpacity,
-        }),
+        {
+          backdrop: {
+            style: {
+              backgroundColor: overlay.lightboxBg,
+              opacity: p * motion.lightboxBackdropOpacity,
+            },
+          },
+          content: {
+            style: {
+              opacity: p,
+              transform: [
+                { translateX: drag.x },
+                { translateY: drag.y },
+                { scale: interpolate(p, [0, 1], [motion.lightboxFade.fromScale, 1], 'clamp') },
+              ],
+            },
+          },
+        },
         stackProgress,
       ),
       options: { gestureEnabled },
     };
   },
+  transitionSpec: { open: motion.lightboxFade.open, close: motion.lightboxFade.close },
 };

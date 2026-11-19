@@ -74,6 +74,13 @@ export const motion = {
   lightboxMaxZoom: 4,
   lightboxDoubleTapZoom: 2.5,
   lightboxBackdropOpacity: 0.85,
+  /** Lightboxens öppning/stängning (brief 22): ren fade med mycket lätt skala,
+   *  ingen zoom från heron. Swipe ned följer fingret och tonar ut. */
+  lightboxFade: {
+    open: { duration: 240 },
+    close: { duration: 200 },
+    fromScale: 0.96,
+  },
   /** Bläddring i lightboxen: släpp med minst denna fart (px/s) byter bild även under halva bredden. */
   pageFlickVelocity: 500,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
