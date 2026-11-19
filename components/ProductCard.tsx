@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState, type ComponentRef } from 'react';
+import { useId, useMemo, useRef, useState, type ComponentRef } from 'react';
 import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
@@ -86,7 +86,14 @@ export default function ProductCard({
   // spik brief 18). Skickar anroparen egen onPress används den, utan zoom.
   const navigates = onPress === undefined;
   const router = useRouter();
-  const handlePress = onPress ?? (() => router.push(`/product/${id}`));
+  // Unikt boundary-id per kortinstans: samma produkt kan ligga på flera ställen
+  // samtidigt (hyllor, Liknande, Sparat, Hitta), och zoomen ska gå från/till
+  // exakt det kort man tryckte på. Skickas till detaljvyn som param `b`.
+  // Avgränsare `_`, inte `:` (biblioteket tolkar `:` som grupp:id).
+  const instanceKey = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const boundaryId = `${id}_${instanceKey}`;
+  const handlePress =
+    onPress ?? (() => router.push({ pathname: '/product/[id]', params: { id, b: boundaryId } }));
   // Samma source-objekt för originalet och menyns kopia (samma bildcache).
   const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
 
@@ -220,7 +227,7 @@ export default function ProductCard({
         <Animated.View style={press.scaleStyle}>
           {/* Spik (brief 18): bilden är källan för zoomen till Produktdetaljs hero. */}
           {navigates ? (
-            <Transition.Boundary id={id} group={PRODUCT_BOUNDARY_GROUP}>
+            <Transition.Boundary id={boundaryId} group={PRODUCT_BOUNDARY_GROUP}>
               {imageBlock}
             </Transition.Boundary>
           ) : (

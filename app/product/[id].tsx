@@ -53,7 +53,8 @@ const STOCK_LABEL: Record<Offer['stock'], string> = {
 };
 
 export default function ProductScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  // `b` = boundary-id för det kort man öppnade från (zoomen går från/till det).
+  const { id, b } = useLocalSearchParams<{ id: string; b?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
@@ -153,7 +154,7 @@ export default function ProductScreen() {
       >
         {/* Heron är målet för zoomen från kortet (samma id och grupp som kortets bild). */}
         <Transition.Boundary
-          id={product.id}
+          id={b ?? product.id}
           group={PRODUCT_BOUNDARY_GROUP}
           style={[styles.hero, { width, height: heroHeight }]}
         >

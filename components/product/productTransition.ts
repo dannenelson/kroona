@@ -65,7 +65,9 @@ export const productScreenOptions: BlankStackNavigationOptions = {
   gestureVelocityImpact: motion.dismissVelocityImpact,
   screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
     'worklet';
-    const id = (active.route.params as { id?: string } | undefined)?.id;
+    // Kortinstansens boundary-id (param `b`), annars produkt-id (t.ex. djuplänk).
+    const params = active.route.params as { id?: string; b?: string } | undefined;
+    const id = params?.b ?? params?.id;
     if (!id) return withDepthVisibility({}, stackProgress);
     return withDepthVisibility(
       bounds({ id, group: PRODUCT_BOUNDARY_GROUP }).navigation.zoom({
