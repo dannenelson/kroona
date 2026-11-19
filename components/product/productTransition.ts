@@ -8,10 +8,6 @@ import { motion, radius, spacing } from '../../theme';
 /** Grupp för produktbilder: kort (källa) och hero (mål) delar `id` = produkt-id. */
 export const PRODUCT_BOUNDARY_GROUP = 'product';
 
-// Marginal för stackProgress (summan av progress ovanför skärmen) så att en
-// skärm som just blivit näst översta inte blinkar till.
-const STACK_DEPTH_EPSILON = 0.001;
-
 /** Telefonens egen hörnradie, uppskattad från övre safe area (inget officiellt API). */
 function screenCornerRadius(insetTop: number): number {
   'worklet';
@@ -26,14 +22,8 @@ export const productScreenOptions: BlankStackNavigationOptions = {
     'vertical',
     { gesture: 'horizontal', area: motion.dismissEdgeWidth },
   ],
-  screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
+  screenStyleInterpolator: ({ bounds, active, insets }) => {
     'worklet';
-    // Bara ETT steg bakom ska synas (grid → A → B: när B dras syns A, inte
-    // gridden i A:s kanter). Skärmar med mer än en skärm ovanför sig döljs;
-    // bakom A syns då rotens solida temabakgrund (colors.bg i app/_layout).
-    if (stackProgress > 1 + STACK_DEPTH_EPSILON) {
-      return { content: { style: { opacity: 0 } } };
-    }
     const id = (active.route.params as { id?: string } | undefined)?.id;
     if (!id) return {};
     return bounds({ id, group: PRODUCT_BOUNDARY_GROUP }).navigation.zoom({
