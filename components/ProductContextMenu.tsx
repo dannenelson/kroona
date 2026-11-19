@@ -16,6 +16,7 @@ import {
   Text,
   View,
   useWindowDimensions,
+  type ImageSourcePropType,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import * as Haptics from 'expo-haptics';
@@ -36,9 +37,14 @@ export type AnchorRect = { x: number; y: number; width: number; height: number }
 
 export type ContextMenuRequest = {
   anchor: AnchorRect;
-  imageUrl: string;
+  /** Exakt samma source-objekt som originalet använder (samma cache, ingen omladdning). */
+  imageSource: ImageSourcePropType;
   /** Originalbildens hörnradie, så att kopian är identisk vid skala 1. */
   imageRadius: number;
+  /** Hur mycket bilden lyfts (alltid > 1, mindre för stora kort). */
+  liftScale: number;
+  /** Innehåll ovanpå bilden som ska följa med lyftet (t.ex. märket Nyhet/Begagnad). */
+  renderOverlay?: () => ReactNode;
   items: readonly ContextMenuItem[];
   /** Mäter originalbilden igen (listan kan ha rört sig medan menyn var öppen). */
   measure: (done: (rect: AnchorRect) => void) => void;
@@ -59,8 +65,6 @@ type ContextMenuApi = {
 // Lokala mått från referensen "Kroona Looken A": menybredd 250, rad 46.
 const MENU_WIDTH = 250;
 const ROW_HEIGHT = 46;
-// Lyft kort får högst denna höjd så att menyn ryms under.
-const MAX_LIFT_HEIGHT = 250;
 // Så långt fingret måste röra sig innan det räknas som drag (iOS: ca 10 pt).
 const DRAG_SLOP = spacing.sm;
 
@@ -72,47 +76,62 @@ type MenuLayout = {
 };
 
 /**
- * Placering: bilden står kvar där den var om allt ryms, annars flyttas den in
- * på skärmen. Menyn läggs under bilden, eller ovanför om den inte ryms.
+ * Placering (brief 07): lyftet är originalet × lyftskalan, centrerat på
+ * originalets mitt. Bilden krymps aldrig. Ryms den inte flyttas den inåt
+ * (inom marginaler och safe area), så att menyn ryms under, annars ovanför.
+ * Ryms inte kort och meny ens då läggs menyn mot nederkanten och får
+ * överlappa kortets nederdel.
  */
 function layoutMenu(
   anchor: AnchorRect,
+  liftScale: number,
   itemCount: number,
   win: { width: number; height: number },
   insets: EdgeInsets,
 ): MenuLayout {
   const menuHeight = itemCount * ROW_HEIGHT;
-  const scale = Math.min(1, MAX_LIFT_HEIGHT / anchor.height);
-  const width = anchor.width * scale;
-  const height = anchor.height * scale;
+  const width = anchor.width * liftScale;
+  const height = anchor.height * liftScale;
   const top = insets.top + spacing.lg;
   const bottom = win.height - insets.bottom - spacing.lg;
-  const needed = height + spacing.xl + menuHeight;
+  const gap = spacing.xl;
 
-  const x = Math.min(
-    Math.max(anchor.x + (anchor.width - width) / 2, spacing.screenMargin),
+  const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi));
+  const x = clamp(
+    anchor.x + (anchor.width - width) / 2,
+    spacing.screenMargin,
     win.width - spacing.screenMargin - width,
   );
-  const menuX = Math.min(
-    Math.max(x + width / 2 - MENU_WIDTH / 2, spacing.screenMargin),
+  const menuX = clamp(
+    x + width / 2 - MENU_WIDTH / 2,
+    spacing.screenMargin,
     win.width - spacing.screenMargin - MENU_WIDTH,
   );
+  const naturalY = anchor.y + (anchor.height - height) / 2;
 
-  // Ryms menyn under kortet på dess nuvarande plats?
-  const below = anchor.y + needed <= bottom || anchor.y - spacing.xl - menuHeight < top;
-  if (below) {
-    const y = Math.min(Math.max(anchor.y, top), bottom - needed);
+  // Under: kortet flyttas upp så långt som behövs för att menyn ska rymmas.
+  const yBelow = clamp(naturalY, top, bottom - menuHeight - gap - height);
+  if (yBelow + height + gap + menuHeight <= bottom) {
     return {
-      lift: { x, y, width, height },
-      menu: { x: menuX, y: y + height + spacing.xl, width: MENU_WIDTH, height: menuHeight },
+      lift: { x, y: yBelow, width, height },
+      menu: { x: menuX, y: yBelow + height + gap, width: MENU_WIDTH, height: menuHeight },
       below: true,
     };
   }
-  const y = Math.max(anchor.y, top + menuHeight + spacing.xl);
+  // Ovanför: kortet flyttas ner så att menyn ryms över det.
+  const yAbove = clamp(naturalY, top + menuHeight + gap, bottom - height);
+  if (yAbove + height <= bottom) {
+    return {
+      lift: { x, y: yAbove, width, height },
+      menu: { x: menuX, y: yAbove - gap - menuHeight, width: MENU_WIDTH, height: menuHeight },
+      below: false,
+    };
+  }
+  // Ryms inte alls: kortet överst, menyn mot nederkanten.
   return {
-    lift: { x, y, width, height },
-    menu: { x: menuX, y: y - spacing.xl - menuHeight, width: MENU_WIDTH, height: menuHeight },
-    below: false,
+    lift: { x, y: top, width, height },
+    menu: { x: menuX, y: bottom - menuHeight, width: MENU_WIDTH, height: menuHeight },
+    below: true,
   };
 }
 
@@ -165,7 +184,7 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
   }).current;
 
   const layout = useMemo(
-    () => (request ? layoutMenu(request.anchor, request.items.length, win, insets) : null),
+    () => (request ? layoutMenu(request.anchor, request.liftScale, request.items.length, win, insets) : null),
     [request, win, insets],
   );
   state.request = request;
@@ -341,7 +360,7 @@ function MenuOverlay({
   // Lyftet sker bara med transform (native driver): förflyttning till
   // lyft-layoutens mitt och skala upp till lyft-storleken × 1,04.
   const a = request.anchor;
-  const k = (layout.lift.width / a.width) * motion.liftScale;
+  const k = request.liftScale;
   const dx = layout.lift.x + layout.lift.width / 2 - (home.x + a.width / 2);
   const dy = layout.lift.y + layout.lift.height / 2 - (home.y + a.height / 2);
   const lift = (to: number) =>
@@ -409,7 +428,13 @@ function MenuOverlay({
           },
         ]}
       >
-        <Image source={{ uri: request.imageUrl }} style={styles.liftImage} resizeMode="cover" />
+        <Image
+          source={request.imageSource}
+          style={styles.liftImage}
+          resizeMode="cover"
+          fadeDuration={0}
+        />
+        {request.renderOverlay?.()}
       </Animated.View>
 
       <Animated.View

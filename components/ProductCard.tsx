@@ -1,5 +1,5 @@
-import { useRef, useState, type ComponentRef } from 'react';
-import { Animated, View, Text, Pressable, Image, type StyleProp, type ViewStyle } from 'react-native';
+import { useMemo, useRef, useState, type ComponentRef } from 'react';
+import { Animated, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { usePressAnimation } from '../hooks/usePressAnimation';
@@ -85,9 +85,24 @@ export default function ProductCard({
   const styles = useStyles();
   const { isSaved, toggleSaved } = useSavedProducts();
   const saved = isSaved(id);
-  const imageRef = useRef<ComponentRef<typeof View>>(null);
+  const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
-  const press = usePressAnimation(motion.pressedScale);
+  // Samma source-objekt för originalet och menyns kopia (samma bildcache).
+  const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
+
+  // Tryck i pixlar (brief 07): ungefär lika många pixlar på alla kortstorlekar.
+  const [cardWidth, setCardWidth] = useState(0);
+  const pressScale = cardWidth
+    ? Math.min(
+        Math.max(1 - motion.pressInsetPx / cardWidth, motion.pressScaleMin),
+        motion.pressScaleMax,
+      )
+    : motion.pressScaleMin;
+  const press = usePressAnimation(pressScale);
+  // Bildytans storlek ur layout (utan transform), för menyns kopia.
+  const imageSize = useRef({ width: 0, height: 0 });
+  // Sant medan menyn är öppen: då startar ingen pressOut-fjäder på kortet.
+  const menuOpenRef = useRef(false);
   // Medan menyn är öppen syns bara den lyfta kopian, inte originalbilden.
   const [imageHidden, setImageHidden] = useState(false);
 
@@ -107,21 +122,48 @@ export default function ProductCard({
     { label: 'Visa liknande', icon: SimilarIcon },
   ];
 
+  // Mäter bilden utan tryck-skalan: Pressable bär ingen transform (skalan
+  // ligger på det inre Animated.View) och bildytan ligger överst i kortet,
+  // så läget tas från Pressable och storleken från bildytans layout.
   const measureImage = (done: (rect: { x: number; y: number; width: number; height: number }) => void) => {
-    imageRef.current?.measureInWindow((x, y, width, height) => done({ x, y, width, height }));
+    cardRef.current?.measureInWindow((x, y) => done({ x, y, ...imageSize.current }));
   };
 
+  const setOriginalHidden = (hidden: boolean) => {
+    if (!hidden) menuOpenRef.current = false;
+    setImageHidden(hidden);
+  };
+
+  const badgeLabel = !isSmall && (isNew || isUsed) ? (isUsed ? 'Begagnad' : 'Nyhet') : null;
+  const renderBadge = () =>
+    badgeLabel ? (
+      // Avvikelse från komponentsidan: badgen behålls (Daniels beslut).
+      <View style={styles.badge}>
+        <Text style={styles.badgeText}>{badgeLabel}</Text>
+      </View>
+    ) : null;
+
   const openMenu = () => {
+    // Kortet går direkt till skala 1 (ingen fjäder), så kopian börjar och
+    // slutar i exakt originalstorlek.
+    menuOpenRef.current = true;
+    press.reset();
     measureImage((anchor) =>
       contextMenu.open({
         anchor,
-        imageUrl,
+        imageSource,
         imageRadius: isSmall ? radius.tile : radius.card,
+        liftScale: isLarge ? motion.liftScaleLarge : motion.liftScale,
+        renderOverlay: renderBadge,
         items: menuItems,
         measure: measureImage,
-        setOriginalHidden: setImageHidden,
+        setOriginalHidden,
       }),
     );
+  };
+
+  const onPressOut = () => {
+    if (!menuOpenRef.current) press.onPressOut();
   };
 
   // Långt tryck som övergår i drag (brief 05): gesten stannar på kortet så att
@@ -140,6 +182,9 @@ export default function ProductCard({
   return (
     <GestureDetector gesture={longPress}>
       <Pressable
+        ref={cardRef}
+        collapsable={false}
+        onLayout={(e: LayoutChangeEvent) => setCardWidth(e.nativeEvent.layout.width)}
         accessibilityRole="button"
         accessibilityLabel={`${brand} ${name}`}
         accessibilityHint={menu ? 'Håll in för fler val' : undefined}
@@ -147,7 +192,7 @@ export default function ProductCard({
         disabled={disabled}
         onPress={onPress}
         onPressIn={press.onPressIn}
-        onPressOut={press.onPressOut}
+        onPressOut={onPressOut}
         style={[
           styles.card,
           featured && styles.cardFeatured,
@@ -157,8 +202,10 @@ export default function ProductCard({
       >
         <Animated.View style={press.scaleStyle}>
           <View
-            ref={imageRef}
-            collapsable={false}
+            onLayout={(e: LayoutChangeEvent) => {
+              const { width, height } = e.nativeEvent.layout;
+              imageSize.current = { width, height };
+            }}
             style={[
               styles.imageContainer,
               isSmall && styles.imageContainerSmall,
@@ -166,14 +213,9 @@ export default function ProductCard({
               imageHidden && styles.hidden,
             ]}
           >
-            <Image source={{ uri: imageUrl }} style={styles.image} resizeMode="cover" />
+            <Image source={imageSource} style={styles.image} resizeMode="cover" />
 
-            {!isSmall && (isNew || isUsed) && (
-              // Avvikelse från komponentsidan: badgen behålls (Daniels beslut).
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{isUsed ? 'Begagnad' : 'Nyhet'}</Text>
-              </View>
-            )}
+            {renderBadge()}
 
           </View>
 

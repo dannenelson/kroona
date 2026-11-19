@@ -169,9 +169,9 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 | `fast` / `base` / `slow` | 150 / 250 / 400 ms | 🔵 |
 | Easing | `cubic-bezier(0.2, 0, 0, 1)` | 🔵 |
 | Spring (gester, sheets) | damping 20, stiffness 220, mass 1 | 🔵 |
-| Nedtryckt | `pressed`-yta + skala 0,96 (navigation 0,92). Text-flik: opacitet 0,55 | ✅ |
+| Nedtryckt | `pressed`-yta + skala 0,96 (navigation 0,92). Text-flik: opacitet 0,55. Produktkort: i pixlar, `1 − pressInsetPx (7) / bredd`, klämt till 0,96–0,985 | ✅ |
 | Inaktiv | opacitet 0,35 | ✅ |
-| Långt tryck | 450 ms, lyft skala 1,04 | ✅ |
+| Långt tryck | 450 ms, lyft skala 1,04 (S och M) och 1,02 (L), alltid större än originalet; ryms den inte flyttas den inåt, krymps aldrig | ✅ |
 | Tryck (`pressIn` / `pressOutSpring`) | in 90 ms ease-out, ut fjäder damping 14, stiffness 320, mass 0,6. Skala och ytbyte animeras med native driver. Reduce motion: bara ytbytet. Ingen haptik på vanliga tryck | ✅ |
 | Kontextmeny | spring damping 18, stiffness 260, mass 1 (in, ut utan översvängning). Kopian har originalets storlek och radie och lyfts med transform; originalet är dolt medan menyn är öppen och byts tillbaka i samma frame. Menyn växer från 0,6 och glider 12 px från kortet. Bakgrund tonar 150 / 180 ms. Reduce motion: bara toning | ✅ |
 | Haptik (meny) | lätt vid öppning, `selection` vid radbyte, `success` vid val | ✅ |

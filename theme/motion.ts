@@ -7,8 +7,15 @@ export const motion = {
   pressedScale: 0.96,
   /** Nedtryckt i navigationen. */
   navPressedScale: 0.92,
-  /** Lyft kort i kontextmenyn. */
+  /** Lyft kort i kontextmenyn: alltid större än originalet (S och M). */
   liftScale: 1.04,
+  /** Lyft för det största kortet (L): minst, men fortfarande märkbart. */
+  liftScaleLarge: 1.02,
+  /** Tryck på kort i pixlar (brief 07): total krympning i bredd, så att stora
+   *  kort inte tappar fler pixlar än små. Skalan kläms mellan min och max. */
+  pressInsetPx: 7,
+  pressScaleMin: 0.96,
+  pressScaleMax: 0.985,
   /** Inaktiv. */
   disabledOpacity: 0.35,
   /** Nedtryckt text-flik (text utan yta). */

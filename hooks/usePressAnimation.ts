@@ -43,6 +43,11 @@ export function usePressAnimation(scale: number = motion.pressedScale) {
         }).start();
       }
     };
+    /** Nollställer direkt utan fjäder (t.ex. när kortet lyfts till menyn). */
+    const reset = () => {
+      progress.stopAnimation();
+      progress.setValue(0);
+    };
     const scaleValue = reduceMotion
       ? 1
       : progress.interpolate({ inputRange: [0, 1], outputRange: [1, scale] });
@@ -55,6 +60,7 @@ export function usePressAnimation(scale: number = motion.pressedScale) {
     return {
       onPressIn,
       onPressOut,
+      reset,
       progress: opacity,
       scaleStyle: { transform: [{ scale: scaleValue }] },
     };

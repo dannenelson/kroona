@@ -151,6 +151,10 @@ export default function ComponentsScreen() {
         </Section>
 
         <Section title="4 · ProductCard">
+          <Caption>
+            Jämför S, M och L: tryck krymper ca 5–7 px på alla, långt tryck lyfter bilden större än
+            originalet (L minst), och stängning går i ett steg tillbaka med märket kvar.
+          </Caption>
           <Caption>Small · bara bild, radie tile</Caption>
           <View style={styles.row}>
             {[P1, P2, P3].map((p) => (
@@ -164,7 +168,7 @@ export default function ComponentsScreen() {
             <ProductCard {...P1} {...DEMO_RATING} />
             <ProductCard {...P2} {...DEMO_RATING} disabled />
           </View>
-          <Caption>Large</Caption>
+          <Caption>Large · tryck ca 0,985, lyft 1,02</Caption>
           <ProductCard {...P2} {...DEMO_RATING} size="L" featured aspectRatio={4 / 5} />
         </Section>
 
