@@ -13,9 +13,9 @@ export const motion = {
   liftScaleLarge: 1.02,
   /** Tryck på kort i pixlar (brief 07): total krympning i bredd, så att stora
    *  kort inte tappar fler pixlar än små. Skalan kläms mellan min och max. */
-  pressInsetPx: 7,
-  pressScaleMin: 0.96,
-  pressScaleMax: 0.985,
+  pressInsetPx: 4,
+  pressScaleMin: 0.975,
+  pressScaleMax: 0.99,
   /** Inaktiv. */
   disabledOpacity: 0.35,
   /** Nedtryckt text-flik (text utan yta). */
