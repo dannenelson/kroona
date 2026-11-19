@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState, type ComponentRef } from 'react';
-import { useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import { Animated, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
@@ -80,9 +80,9 @@ export default function ProductCard({
   const saved = isSaved(id);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
-  const router = useRouter();
-  // Standard: öppna Produktdetalj (brief 13). Anroparen kan skicka egen onPress.
-  const handlePress = onPress ?? (() => router.push(`/product/${id}`));
+  // Standard: öppna Produktdetalj via Link med zoom-övergång (brief 13, spik
+  // brief 16). Skickar anroparen egen onPress används den, utan Link och zoom.
+  const navigates = onPress === undefined;
   // Samma source-objekt för originalet och menyns kopia (samma bildcache).
   const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
 
@@ -175,8 +175,25 @@ export default function ProductCard({
     onDeactivate: () => contextMenu.release(),
   });
 
-  return (
-    <GestureDetector gesture={longPress}>
+  const imageBlock = (
+    <View
+      onLayout={(e: LayoutChangeEvent) => {
+        const { width, height } = e.nativeEvent.layout;
+        imageSize.current = { width, height };
+      }}
+      style={[
+        styles.imageContainer,
+        isSmall && styles.imageContainerSmall,
+        fixedHeight ? { height: fixedHeight } : { aspectRatio: aspectRatio ?? 3 / 4 },
+        imageHidden && styles.hidden,
+      ]}
+    >
+      <Image source={imageSource} style={styles.image} resizeMode="cover" />
+      {renderBadge()}
+    </View>
+  );
+
+  const card = (
       <Pressable
         ref={cardRef}
         collapsable={false}
@@ -186,7 +203,8 @@ export default function ProductCard({
         accessibilityHint={menu ? 'Håll in för fler val' : undefined}
         accessibilityState={{ disabled }}
         disabled={disabled}
-        onPress={handlePress}
+        // Navigerande kort får onPress av Link (asChild).
+        onPress={navigates ? undefined : onPress}
         onPressIn={press.onPressIn}
         onPressOut={onPressOut}
         style={[
@@ -197,23 +215,8 @@ export default function ProductCard({
         ]}
       >
         <Animated.View style={press.scaleStyle}>
-          <View
-            onLayout={(e: LayoutChangeEvent) => {
-              const { width, height } = e.nativeEvent.layout;
-              imageSize.current = { width, height };
-            }}
-            style={[
-              styles.imageContainer,
-              isSmall && styles.imageContainerSmall,
-              fixedHeight ? { height: fixedHeight } : { aspectRatio: aspectRatio ?? 3 / 4 },
-              imageHidden && styles.hidden,
-            ]}
-          >
-            <Image source={imageSource} style={styles.image} resizeMode="cover" />
-
-            {renderBadge()}
-
-          </View>
+          {/* Spik (brief 16): bilden är källan för zoom-övergången till heron. */}
+          {navigates ? <Link.AppleZoom>{imageBlock}</Link.AppleZoom> : imageBlock}
 
           {!isSmall && (
             <View style={styles.info}>
@@ -249,6 +252,17 @@ export default function ProductCard({
           )}
         </Animated.View>
       </Pressable>
+  );
+
+  return (
+    <GestureDetector gesture={longPress}>
+      {navigates ? (
+        <Link href={`/product/${id}`} asChild>
+          {card}
+        </Link>
+      ) : (
+        card
+      )}
     </GestureDetector>
   );
 }

@@ -3,11 +3,12 @@
 // ovanför flikarna, så tab-baren syns inte och tillbaka går till skärmen man
 // kom från. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur } from '../../theme';
+import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur, motion } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import {
   getLowestPrice,
@@ -55,6 +56,19 @@ export default function ProductScreen() {
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = heroHeight - insets.top - barHeight;
   const scrollY = useRef(new Animated.Value(0)).current;
+
+  // Spik (brief 16): informationen under heron tonas in när bilden hunnit
+  // landa från zoom-övergången. Fördröjningen är en uppskattning.
+  const reduceMotion = useReduceMotion();
+  const reveal = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.timing(reveal, {
+      toValue: 1,
+      delay: reduceMotion ? 0 : motion.detailRevealDelay,
+      duration: reduceMotion ? motion.duration.fast : motion.detailRevealDuration,
+      useNativeDriver: true,
+    }).start();
+  }, [reveal, reduceMotion]);
 
   const data = useMemo(() => {
     if (!product) return null;
@@ -115,97 +129,102 @@ export default function ProductScreen() {
           useNativeDriver: true,
         })}
       >
-        <View style={[styles.hero, { height: heroHeight }]}>
-          <Image source={{ uri: product.imageUrl }} style={styles.heroImage} resizeMode="cover" />
-        </View>
-
-        <View style={styles.info}>
-          <Text style={styles.brand}>{product.brand}</Text>
-          <Text style={styles.name}>{product.name}</Text>
-          <View style={styles.priceRow}>
-            <View style={styles.priceBlock}>
-              {data.lowest !== undefined && (
-                <Text style={styles.price}>
-                  <Text style={styles.from}>Från </Text>
-                  {formatPrice(data.lowest)}
-                  <Text style={styles.currency}> kr</Text>
-                </Text>
-              )}
-              {data.lowestIsUsed && <Text style={styles.usedTag}>Begagnat</Text>}
-            </View>
-            <SaveButton productId={product.id} />
+        {/* Spik (brief 16): heron är målet för zoom-övergången från kortet. */}
+        <Link.AppleZoomTarget>
+          <View style={[styles.hero, { height: heroHeight }]}>
+            <Image source={{ uri: product.imageUrl }} style={styles.heroImage} resizeMode="cover" />
           </View>
-        </View>
+        </Link.AppleZoomTarget>
 
-        <SectionTitle title="Hållbarhet" style={styles.sectionTitle} />
-        <FactList facts={facts} />
+        <Animated.View style={{ opacity: reveal }}>
+          <View style={styles.info}>
+            <Text style={styles.brand}>{product.brand}</Text>
+            <Text style={styles.name}>{product.name}</Text>
+            <View style={styles.priceRow}>
+              <View style={styles.priceBlock}>
+                {data.lowest !== undefined && (
+                  <Text style={styles.price}>
+                    <Text style={styles.from}>Från </Text>
+                    {formatPrice(data.lowest)}
+                    <Text style={styles.currency}> kr</Text>
+                  </Text>
+                )}
+                {data.lowestIsUsed && <Text style={styles.usedTag}>Begagnat</Text>}
+              </View>
+              <SaveButton productId={product.id} />
+            </View>
+          </View>
 
-        {data.used.length > 0 && (
-          <>
-            <SectionTitle title="Finns begagnad hos" style={styles.sectionTitle} />
-            <View style={styles.group}>
-              {data.used
-                .flatMap((group) => group.offers.map((offer) => ({ group, offer })))
-                .map(({ group, offer }, i) => (
-                  <OfferRow
-                    key={offer.id}
-                    divider={i > 0}
-                    initial={group.retailer.initial}
-                    name={group.retailer.name}
-                    detail={[
-                      offer.conditionNote,
-                      offer.pricing === 'auction' ? 'Auktion, bud från' : 'Fast pris',
-                    ]
-                      .filter(Boolean)
-                      .join(' · ')}
-                    price={offer.price}
-                    stock={STOCK_LABEL[offer.stock]}
-                    onPress={() => onOffer(offer)}
-                  />
+          <SectionTitle title="Hållbarhet" style={styles.sectionTitle} />
+          <FactList facts={facts} />
+
+          {data.used.length > 0 && (
+            <>
+              <SectionTitle title="Finns begagnad hos" style={styles.sectionTitle} />
+              <View style={styles.group}>
+                {data.used
+                  .flatMap((group) => group.offers.map((offer) => ({ group, offer })))
+                  .map(({ group, offer }, i) => (
+                    <OfferRow
+                      key={offer.id}
+                      divider={i > 0}
+                      initial={group.retailer.initial}
+                      name={group.retailer.name}
+                      detail={[
+                        offer.conditionNote,
+                        offer.pricing === 'auction' ? 'Auktion, bud från' : 'Fast pris',
+                      ]
+                        .filter(Boolean)
+                        .join(' · ')}
+                      price={offer.price}
+                      stock={STOCK_LABEL[offer.stock]}
+                      onPress={() => onOffer(offer)}
+                    />
+                  ))}
+              </View>
+            </>
+          )}
+
+          {data.fresh.length > 0 && (
+            <>
+              <SectionTitle title="Köp hos" style={styles.sectionTitle} />
+              <View style={styles.group}>
+                {data.fresh.map((offer, i) => {
+                  const retailer = getRetailer(offer.retailerId);
+                  return (
+                    <OfferRow
+                      key={offer.id}
+                      divider={i > 0}
+                      initial={retailer?.initial ?? ''}
+                      name={retailer?.name ?? ''}
+                      detail={`Ny · ${offer.shipping}`}
+                      price={offer.price}
+                      stock={STOCK_LABEL[offer.stock]}
+                      onPress={() => onOffer(offer)}
+                    />
+                  );
+                })}
+              </View>
+            </>
+          )}
+
+          {data.similar.length > 0 && (
+            <>
+              <SectionTitle title="Liknande" style={styles.sectionTitle} />
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.similarRow}
+              >
+                {data.similar.map((p) => (
+                  <View key={p.id} style={styles.similarCard}>
+                    <ProductCard {...p} fixedHeight={SIMILAR_IMAGE_HEIGHT} />
+                  </View>
                 ))}
-            </View>
-          </>
-        )}
-
-        {data.fresh.length > 0 && (
-          <>
-            <SectionTitle title="Köp hos" style={styles.sectionTitle} />
-            <View style={styles.group}>
-              {data.fresh.map((offer, i) => {
-                const retailer = getRetailer(offer.retailerId);
-                return (
-                  <OfferRow
-                    key={offer.id}
-                    divider={i > 0}
-                    initial={retailer?.initial ?? ''}
-                    name={retailer?.name ?? ''}
-                    detail={`Ny · ${offer.shipping}`}
-                    price={offer.price}
-                    stock={STOCK_LABEL[offer.stock]}
-                    onPress={() => onOffer(offer)}
-                  />
-                );
-              })}
-            </View>
-          </>
-        )}
-
-        {data.similar.length > 0 && (
-          <>
-            <SectionTitle title="Liknande" style={styles.sectionTitle} />
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.similarRow}
-            >
-              {data.similar.map((p) => (
-                <View key={p.id} style={styles.similarCard}>
-                  <ProductCard {...p} fixedHeight={SIMILAR_IMAGE_HEIGHT} />
-                </View>
-              ))}
-            </ScrollView>
-          </>
-        )}
+              </ScrollView>
+            </>
+          )}
+        </Animated.View>
       </Animated.ScrollView>
 
       {/* Toppen: en enda kant i temats toning (brief 15). Toningen täcker

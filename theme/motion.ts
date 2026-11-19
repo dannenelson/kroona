@@ -35,6 +35,9 @@ export const motion = {
   /** Toast: hur länge den syns (ms) och hur långt den glider in (px). */
   toastDuration: 2200,
   toastSlide: 24,
+  /** Produktdetalj (spik brief 16): informationen tonas in efter att bilden landat. */
+  detailRevealDelay: 280,
+  detailRevealDuration: 250,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */
