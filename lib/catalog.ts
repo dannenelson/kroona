@@ -51,11 +51,12 @@ export function getUsedOffersByService(
     .sort((a, b) => a.offers[0].price - b.offers[0].price);
 }
 
-/** Lägsta pris för en produkt, valfritt per skick. `undefined` om inget erbjudande finns. */
 /** Alla bilder för en produkt: kanonisk bild först, sedan eventuella extra. */
 export function getProductImages(product: { imageUrl: string; images?: string[] }): string[] {
   return [product.imageUrl, ...(product.images ?? [])];
 }
+
+/** Lägsta pris för en produkt, valfritt per skick. `undefined` om inget erbjudande finns. */
 
 export function getLowestPrice(
   productId: string,

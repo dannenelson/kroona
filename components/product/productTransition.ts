@@ -6,6 +6,7 @@ import type { TransitionInterpolatedStyle } from 'react-native-screen-transition
 import type { BlankStackNavigationOptions } from 'react-native-screen-transitions/expo-router';
 import { scheduleOnUI } from 'react-native-worklets';
 import { motion, radius, spacing } from '../../theme';
+import { lightboxGestureLock, lightboxIndex } from '../../lib/lightboxStore';
 
 /** Grupp för produktbilder: kort (källa) och hero (mål) delar `id` = produkt-id. */
 export const PRODUCT_BOUNDARY_GROUP = 'product';
@@ -104,35 +105,43 @@ export const productScreenOptions: BlankStackNavigationOptions = {
   transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
 };
 
-/** Grupp för lightboxen: heron (källa) och lightboxbilden (mål), id `lb_${heroBoundaryId}`. */
+/** Grupp för lightboxen: herons bilder (källa) och lightboxens bilder (mål), id `lb_<heroId>_<index>`. */
 export const LIGHTBOX_BOUNDARY_GROUP = 'lightbox';
 
-/** Lightbox-id för en hero: eget id så att det inte krockar med kortets zoom till heron. */
-export function lightboxBoundaryId(heroBoundaryId: string): string {
-  return `lb_${heroBoundaryId}`;
+/** Lightbox-id för en bild i heron: eget id per bildindex, så att lightboxen
+ *  öppnas från och stängs till rätt bild, utan krock med kortets zoom till heron. */
+export function lightboxBoundaryId(heroBoundaryId: string, index: number): string {
+  return `lb_${heroBoundaryId}_${index}`;
 }
 
 /**
- * Lightboxen (brief 19): samma hierarkirörelse som kort → detalj, ett steg
- * djupare. Bilden zoomar från heron, stängs med swipe ned, kantswipe eller
- * kryss. Detaljvyn bakom dämpas hårdare (lightboxen är mörk). Swipe ned stängs
- * av från skärmen själv medan bilden är inzoomad (drag panorerar då).
+ * Lightboxen (brief 19–20): samma hierarkirörelse som kort → detalj, ett steg
+ * djupare. Bilden zoomar från den bild som visas i heron och tillbaka till den
+ * bild man är på (index i lib/lightboxStore). Stängningsgesten (swipe ned,
+ * kantswipe) stängs av per bildruta på UI-tråden när bilden är inzoomad eller
+ * nyps (`options.gestureEnabled`), så att drag då panorerar bilden.
  */
 export const lightboxScreenOptions: BlankStackNavigationOptions = {
   ...productScreenOptions,
   screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
     'worklet';
-    const params = active.route.params as { lb?: string } | undefined;
-    const id = params?.lb;
-    if (!id) return withDepthVisibility({}, stackProgress);
-    return withDepthVisibility(
-      bounds({ id, group: LIGHTBOX_BOUNDARY_GROUP }).navigation.zoom({
-        borderRadius: screenCornerRadius(insets.top),
-        backgroundScale: motion.zoomBackgroundScale,
-        backdropOpacity: motion.lightboxBackdropOpacity,
-      }),
-      stackProgress,
-    );
+    const params = active.route.params as { hero?: string } | undefined;
+    const hero = params?.hero;
+    const gestureEnabled = lightboxGestureLock.value === 0;
+    if (!hero) {
+      return { ...withDepthVisibility({}, stackProgress), options: { gestureEnabled } };
+    }
+    const id = `lb_${hero}_${lightboxIndex.value}`;
+    return {
+      ...withDepthVisibility(
+        bounds({ id, group: LIGHTBOX_BOUNDARY_GROUP }).navigation.zoom({
+          borderRadius: screenCornerRadius(insets.top),
+          backgroundScale: motion.zoomBackgroundScale,
+          backdropOpacity: motion.lightboxBackdropOpacity,
+        }),
+        stackProgress,
+      ),
+      options: { gestureEnabled },
+    };
   },
 };
-

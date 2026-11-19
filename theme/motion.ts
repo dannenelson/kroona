@@ -74,6 +74,8 @@ export const motion = {
   lightboxMaxZoom: 4,
   lightboxDoubleTapZoom: 2.5,
   lightboxBackdropOpacity: 0.85,
+  /** Bläddring i lightboxen: släpp med minst denna fart (px/s) byter bild även under halva bredden. */
+  pageFlickVelocity: 500,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */

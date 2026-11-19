@@ -18,17 +18,15 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { useGestureDebug } from '../../utils/devGestureDebug'; // TEMP-DEBUG-GEST
 import Transition, { useScreenAnimation } from 'react-native-screen-transitions';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import {
-  LIGHTBOX_BOUNDARY_GROUP,
-  PRODUCT_BOUNDARY_GROUP,
-  lightboxBoundaryId,
-} from '../../components/product/productTransition';
+import { PRODUCT_BOUNDARY_GROUP } from '../../components/product/productTransition';
+import HeroPager from '../../components/product/HeroPager';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur, motion } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import {
   getLowestPrice,
+  getProductImages,
   getNewOffers,
   getRetailer,
   getSimilarProducts,
@@ -154,10 +152,11 @@ export default function ProductScreen() {
 
   const back = () => router.back();
   const heroBoundaryId = b ?? id;
+  // Valt bildindex delas via lib/lightboxStore (sätts av HeroPager vid tryck).
   const openLightbox = () =>
     router.push({
       pathname: '/lightbox/[id]',
-      params: { id, lb: lightboxBoundaryId(heroBoundaryId) },
+      params: { id, hero: heroBoundaryId },
     });
   const onOffer = (offer: Offer) => {
     const name = getRetailer(offer.retailerId)?.name ?? 'återförsäljaren';
@@ -208,22 +207,15 @@ export default function ProductScreen() {
           group={PRODUCT_BOUNDARY_GROUP}
           style={[styles.hero, { width, height: heroHeight }]}
         >
-          {/* Tryck på bildytan öppnar lightboxen (brief 19). Egen boundary (lb_…)
-              så att den inte krockar med kortets zoom till heron. Knapparna
-              ovanpå ligger i en egen yta och öppnar den inte. */}
-          <Transition.Boundary
-            id={lightboxBoundaryId(heroBoundaryId)}
-            group={LIGHTBOX_BOUNDARY_GROUP}
-            onPress={openLightbox}
-            accessibilityRole="imagebutton"
-            accessibilityLabel="Visa bilden i helskärm"
-          >
-            <Image
-              source={{ uri: product.imageUrl }}
-              style={{ width, height: heroHeight }}
-              resizeMode="cover"
-            />
-          </Transition.Boundary>
+          {/* Bildbläddrare (brief 20): tryck på den bild som visas öppnar
+              lightboxen på den. Knapparna ovanpå ligger i en egen yta. */}
+          <HeroPager
+            images={getProductImages(product)}
+            heroBoundaryId={heroBoundaryId}
+            width={width}
+            height={heroHeight}
+            onOpen={openLightbox}
+          />
         </Transition.Boundary>
 
         <Reanimated.View style={revealStyle}>
