@@ -3,7 +3,14 @@ import { StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedViewClass from '@react-native-masked-view/masked-view';
-import Svg, { Defs, Filter, FeGaussianBlur, Path } from 'react-native-svg';
+import Svg, {
+  Defs,
+  Ellipse,
+  LinearGradient as SvgLinearGradient,
+  RadialGradient,
+  Rect,
+  Stop,
+} from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme, edgeBlur, edgeFadeStops, overlay, withAlpha } from '../theme';
 
@@ -16,7 +23,7 @@ type Props = {
   variant?: 'theme' | 'photo';
   /** Stäng av blur-lagren (bara toning), för prestandajämförelse. */
   blur?: boolean;
-  /** Toppkantens form. 'wave' (test, brief 08) gäller bara position="top". */
+  /** Toppkantens nedre gräns. 'wave' = organisk (test, brief 10), bara position="top". */
   shape?: 'straight' | 'wave';
   style?: StyleProp<ViewStyle>;
 };
@@ -29,42 +36,6 @@ const MaskedView = MaskedViewClass as unknown as ComponentType<
 
 type Stops = [number, number, ...number[]];
 
-/**
- * Path för vågig toppkant i pixlar: fyllt ovanför en lugn, organisk våg.
- * Två sinusar (huvudvåg + svagare överton) ger en form som inte är perfekt
- * regelbunden. Pathen börjar ovanför vyn och går ut förbi sidorna, så att
- * utsuddningen bara mjukar upp den nedre kanten.
- */
-function wavePath(w: number, h: number): string {
-  const { baseline, amplitude, waves, phase, softness, samples } = edgeBlur.wave;
-  const pad = softness * 2;
-  const y = (x: number) => {
-    const t = x / w;
-    return (
-      baseline * h +
-      amplitude *
-        (0.75 * Math.sin(2 * Math.PI * waves * t + phase) +
-          0.25 * Math.sin(2 * Math.PI * waves * 2.3 * t))
-    );
-  };
-  const x0 = -pad;
-  const x1 = w + pad;
-  const pts = Array.from({ length: samples + 1 }, (_, i) => {
-    const x = x0 + ((x1 - x0) * i) / samples;
-    return { x, y: y(x) };
-  });
-  // Mjuk kurva: kvadratiska Bézier med samplepunkterna som kontrollpunkter
-  // och mittpunkterna mellan dem som ändpunkter.
-  let d = `M${x1} ${-softness * 3} L${x0} ${-softness * 3} L${pts[0].x} ${pts[0].y}`;
-  for (let i = 1; i < pts.length - 1; i++) {
-    const mx = (pts[i].x + pts[i + 1].x) / 2;
-    const my = (pts[i].y + pts[i + 1].y) / 2;
-    d += ` Q${pts[i].x} ${pts[i].y} ${mx} ${my}`;
-  }
-  const last = pts[pts.length - 1];
-  d += ` L${last.x} ${last.y} Z`;
-  return d;
-}
 type Colors = [string, string, ...string[]];
 
 /**
@@ -140,30 +111,15 @@ export default function EdgeFade({
   return (
     <View
       pointerEvents="none"
-      onLayout={wave ? (e) => setWidth(e.nativeEvent.layout.width) : undefined}
+      // Bredden mäts alltid, så att växling till vågig ritar direkt.
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       style={[styles.root, isTop ? styles.top : styles.bottom, { height: h }, style]}
     >
       {wave ? (
         width > 0 && (
           <MaskedView
             style={StyleSheet.absoluteFill}
-            maskElement={
-              <Svg width={width} height={h}>
-                <Defs>
-                  <Filter
-                    id="edgeWaveSoft"
-                    filterUnits="userSpaceOnUse"
-                    x={-edgeBlur.wave.softness * 4}
-                    y={-edgeBlur.wave.softness * 4}
-                    width={width + edgeBlur.wave.softness * 8}
-                    height={h + edgeBlur.wave.softness * 8}
-                  >
-                    <FeGaussianBlur stdDeviation={edgeBlur.wave.softness} />
-                  </Filter>
-                </Defs>
-                <Path d={wavePath(width, h)} fill={edgeBlur.maskColors[0]} filter="url(#edgeWaveSoft)" />
-              </Svg>
-            }
+            maskElement={<OrganicMask width={width} height={h} />}
           >
             {layers}
           </MaskedView>
@@ -172,6 +128,44 @@ export default function EdgeFade({
         layers
       )}
     </View>
+  );
+}
+
+/**
+ * Mjukt alfa-fält för organisk toppkant: en bas-gradient över hela bredden
+ * plus överlappande elliptiska radialgradienter från överkanten. Allt är
+ * gradienter, så nedre gränsen syns bara som att toningen når olika djupt.
+ */
+function OrganicMask({ width, height }: { width: number; height: number }) {
+  const { baseSolid, baseDepth, lobes, lobeSolid } = edgeBlur.wave;
+  const solid = edgeBlur.maskColors[0];
+  const clear = edgeBlur.maskColors[2];
+  return (
+    <Svg width={width} height={height}>
+      <Defs>
+        <SvgLinearGradient id="edgeBase" x1="0" y1="0" x2="0" y2={height * baseDepth} gradientUnits="userSpaceOnUse">
+          <Stop offset={0} stopColor={solid} />
+          <Stop offset={baseSolid / baseDepth} stopColor={solid} />
+          <Stop offset={1} stopColor={clear} />
+        </SvgLinearGradient>
+        <RadialGradient id="edgeLobe" cx="50%" cy="50%" r="50%">
+          <Stop offset={0} stopColor={solid} />
+          <Stop offset={lobeSolid} stopColor={solid} />
+          <Stop offset={1} stopColor={clear} />
+        </RadialGradient>
+      </Defs>
+      <Rect x={0} y={0} width={width} height={height * baseDepth} fill="url(#edgeBase)" />
+      {lobes.map((lobe) => (
+        <Ellipse
+          key={lobe.x}
+          cx={lobe.x * width}
+          cy={0}
+          rx={lobe.width * width}
+          ry={lobe.depth * height}
+          fill="url(#edgeLobe)"
+        />
+      ))}
+    </Svg>
   );
 }
 

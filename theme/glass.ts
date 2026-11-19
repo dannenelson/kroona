@@ -86,21 +86,22 @@ export const edgeBlur = {
   /** Standardhöjder: topp ca 68 (något högre än statusfält/Dynamic Island), botten 128. */
   topExtra: 14,
   bottomHeight: 128,
-  /** Vågig toppkant (brief 08, test i dev-routen): statisk mask med en lugn
-   *  våg och gaussisk utsuddning, enligt referensen "Kroona Looken A" v11. */
+  /** Organisk toppkant (brief 10, test i dev-routen): hela kantlagret maskas
+   *  med ett mjukt alfa-fält som når olika djupt över bredden. Bara gradienter,
+   *  ingen ritad form, så det finns ingen kant att se. Andelar av bredd/höjd. */
   wave: {
-    /** Vågens mittlinje som andel av höjden. */
-    baseline: 0.42,
-    /** Utslag i px. */
-    amplitude: 12,
-    /** Antal vågor över bredden. */
-    waves: 1.6,
-    /** Fasförskjutning (radianer), så att vågen inte börjar i en topp. */
-    phase: 0.6,
-    /** Utsuddning (stdDeviation, px), lika i x och y. */
-    softness: 10,
-    /** Antal punkter som kurvan samplas i. */
-    samples: 24,
+    /** Bas över hela bredden: helt synlig till baseSolid, utfasad till baseDepth. */
+    baseSolid: 0.3,
+    baseDepth: 0.62,
+    /** Mjuka "lober" från överkanten: mittpunkt x, halv bredd och djup. */
+    lobes: [
+      { x: 0.08, width: 0.34, depth: 0.92 },
+      { x: 0.42, width: 0.3, depth: 0.8 },
+      { x: 0.7, width: 0.36, depth: 1.0 },
+      { x: 0.98, width: 0.28, depth: 0.84 },
+    ],
+    /** Andel av lobens radie som är helt synlig innan den fasas ut. */
+    lobeSolid: 0.35,
   },
   /** Bakgrundsblur bakom kontextmenyn: lätt, ca hälften av referensens blur 18. */
   menuBackdropIntensity: 30,

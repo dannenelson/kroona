@@ -3,7 +3,7 @@
 // Inte en produktskärm, ska bort eller döljas före demo.
 import { useState, type ReactNode } from 'react';
 import { View, Text, ScrollView, ImageBackground, Image } from 'react-native';
-import { useRouter } from 'expo-router';
+import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, touchTarget } from '../theme';
 import { PRODUCTS } from '../data/products';
@@ -28,8 +28,6 @@ const PHOTOS = [
   { label: 'mörkare foto', source: { uri: P1.imageUrl } },
 ] as const;
 const DEMO_RATING = { rating: 4.8, reviewCount: 312 };
-// Höjd på kantblur-demons fönster (lokalt demomått).
-const FADE_DEMO_HEIGHT = 360;
 
 const STATES = [
   { label: 'Standard' },
@@ -51,8 +49,11 @@ export default function ComponentsScreen() {
   const [pressTab, setPressTab] = useState<(typeof PRESS_TABS)[number]>('Alla');
   const [topSaved, setTopSaved] = useState(false);
   const [fadeBlur, setFadeBlur] = useState(true);
-  // Test av toppkantens form (brief 08). Standard rak.
+  // Test av toppkantens nedre gräns (brief 10). Standard rak.
   const [fadeWave, setFadeWave] = useState(false);
+  // iOS 26:s egen scroll-edge-effekt överst. Av som standard, så att bara vår
+  // kant syns; på för att jämföra och bekräfta källan till flikarnas toning.
+  const [nativeEdge, setNativeEdge] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -69,6 +70,7 @@ export default function ComponentsScreen() {
         </View>
         <Text style={styles.hint}>
           Nedtryckt visas genom att hålla in. Växla tema uppe till höger: glas på foto följer temat.
+          Toppkanten: scrolla och titta upp mot Dynamic Island, växla Rak/Vågig längst ner.
         </Text>
 
         <Section title="0 · Press (jämför)">
@@ -202,43 +204,38 @@ export default function ComponentsScreen() {
           />
         </Section>
 
-        <Section title="6 · EdgeFade (kantblur)">
-          <View style={styles.fadeHeader}>
-            <Caption>Scrolla bilderna. Topp 68 (rak eller vågig), botten 128.</Caption>
-            <View style={styles.fadeToggles}>
-              <Pill selected={fadeWave} onPress={() => setFadeWave((v) => !v)}>
-                {fadeWave ? 'Vågig' : 'Rak'}
-              </Pill>
-              <Pill selected={fadeBlur} onPress={() => setFadeBlur((v) => !v)}>
-                {fadeBlur ? 'Blur på' : 'Blur av'}
-              </Pill>
-            </View>
-          </View>
-          <View style={styles.fadeDemo}>
-            <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
-              {PRODUCTS.slice(0, 6).map((p) => (
-                <Image key={p.id} source={{ uri: p.imageUrl }} style={styles.fadeImage} />
-              ))}
-            </ScrollView>
-            <EdgeFade
-              position="top"
-              height={edgeTopDemo}
-              blur={fadeBlur}
-              shape={fadeWave ? 'wave' : 'straight'}
-            />
-            <EdgeFade position="bottom" blur={fadeBlur} />
-          </View>
+        <Section title="6 · Toppkant" bleed>
+          <Caption inset>
+            Scrolla så att foton och ren yta passerar under statusfältet och Dynamic Island. Växla
+            med kontrollen längst ner.
+          </Caption>
+          {PHOTOS.map((photo) => (
+            <Image key={photo.label} source={photo.source} style={styles.edgePhoto} />
+          ))}
+          <View style={styles.edgePlain} />
         </Section>
       </ScrollView>
 
-      {/* Kantblur överst på hela skärmen, som på riktiga skärmar. */}
-      <EdgeFade position="top" blur={fadeBlur} />
+      {/* Skärmens egen toppkant, bakom statusfält och Dynamic Island. Det är den som testas. */}
+      <EdgeFade position="top" blur={fadeBlur} shape={fadeWave ? 'wave' : 'straight'} />
+      <Stack.Screen options={{ scrollEdgeEffects: { top: nativeEdge ? 'automatic' : 'hidden' } }} />
+
+      {/* Flytande kontroll för toppkanten. */}
+      <View style={[styles.edgeControls, { bottom: insets.bottom + spacing.lg }]}>
+        <Pill selected={fadeWave} onPress={() => setFadeWave((v) => !v)}>
+          {fadeWave ? 'Vågig' : 'Rak'}
+        </Pill>
+        <Pill selected={fadeBlur} onPress={() => setFadeBlur((v) => !v)}>
+          {fadeBlur ? 'Blur på' : 'Blur av'}
+        </Pill>
+        <Pill selected={nativeEdge} onPress={() => setNativeEdge((v) => !v)}>
+          {nativeEdge ? 'iOS-kant på' : 'iOS-kant av'}
+        </Pill>
+      </View>
     </View>
   );
 }
 
-// Toppens höjd i demon: statusfält saknas i rutan, så referensens 68 används direkt.
-const edgeTopDemo = 68;
 
 function Section({ title, bleed, children }: { title: string; bleed?: boolean; children: ReactNode }) {
   const styles = useStyles();
@@ -346,25 +343,21 @@ const useStyles = makeStyles((t) => ({
   topBarPhoto: {
     paddingVertical: spacing.xl,
   },
-  fadeToggles: {
+  edgeControls: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     flexDirection: 'row',
+    justifyContent: 'center',
     gap: spacing.sm,
   },
-  fadeHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-  },
-  fadeDemo: {
-    height: FADE_DEMO_HEIGHT,
-    borderRadius: radius.card,
-    borderCurve: 'continuous',
-    overflow: 'hidden',
-    backgroundColor: t.colors.placeholder,
-  },
-  fadeImage: {
+  edgePhoto: {
     width: '100%',
     aspectRatio: 4 / 5,
+  },
+  // Ren bakgrund under toppkanten, minst en skärmhöjd att scrolla förbi.
+  edgePlain: {
+    height: spacing.xxxl * 10,
+    backgroundColor: t.colors.bg,
   },
 }));
