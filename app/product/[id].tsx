@@ -4,15 +4,18 @@
 // kom från. Öppning och stängning (zoom från kortet, drag nedåt, kantswipe)
 // ägs av react-native-screen-transitions, se components/product/productTransition.ts. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
-import { useMemo } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import Reanimated, {
   Extrapolation,
   interpolate,
   useAnimatedScrollHandler,
   useAnimatedStyle,
+  useAnimatedReaction,
   useSharedValue,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+import { useGestureDebug } from '../../utils/devGestureDebug'; // TEMP-DEBUG-GEST
 import Transition, { useScreenAnimation } from 'react-native-screen-transitions';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { PRODUCT_BOUNDARY_GROUP } from '../../components/product/productTransition';
@@ -97,6 +100,39 @@ export default function ProductScreen() {
         ),
   }));
 
+  // TEMP-DEBUG-GEST: visar för senaste draget scrollY vid start och om
+  // stängningsgesten tog över eller avvisades (och trolig orsak).
+  const gestureDebug = useGestureDebug();
+  const [gestureNote, setGestureNote] = useState('');
+  const dragStart = useRef({ y: 0, momentum: false, taken: false });
+  const momentumRef = useRef(false);
+  const markTaken = () => {
+    if (dragStart.current.taken) return;
+    dragStart.current.taken = true;
+    setGestureNote(`start y=${dragStart.current.y.toFixed(1)}  → TOGS ÖVER av stängningsgesten`);
+  };
+  useAnimatedReaction(
+    () => screenAnimation.value.current.gesture.dragging,
+    (dragging, prev) => {
+      if (gestureDebug && dragging === 1 && prev !== 1) scheduleOnRN(markTaken);
+    },
+  );
+  const onDebugBeginDrag = (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+    if (!gestureDebug) return;
+    dragStart.current = { y: e.nativeEvent.contentOffset.y, momentum: momentumRef.current, taken: false };
+  };
+  const onDebugEndDrag = () => {
+    if (!gestureDebug || dragStart.current.taken) return;
+    const { y, momentum } = dragStart.current;
+    const reason =
+      y > 1
+        ? `scroll ej överst (y > 1 px)`
+        : momentum
+          ? 'momentum pågick vid start'
+          : 'okänd: troligen > 15 px i sidled innan 10 px nedåt, eller start på Liknande-raden/knapp';
+    setGestureNote(`start y=${y.toFixed(1)}  → AVVISAD: ${reason}`);
+  };
+
   const data = useMemo(() => {
     if (!product) return null;
     const lowest = getLowestPrice(product.id);
@@ -151,6 +187,10 @@ export default function ProductScreen() {
         contentInsetAdjustmentBehavior="never"
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
         onScroll={onScroll}
+        onScrollBeginDrag={onDebugBeginDrag /* TEMP-DEBUG-GEST */}
+        onScrollEndDrag={onDebugEndDrag /* TEMP-DEBUG-GEST */}
+        onMomentumScrollBegin={() => (momentumRef.current = true) /* TEMP-DEBUG-GEST */}
+        onMomentumScrollEnd={() => (momentumRef.current = false) /* TEMP-DEBUG-GEST */}
       >
         {/* Heron är målet för zoomen från kortet (samma id och grupp som kortets bild). */}
         <Transition.Boundary
@@ -274,11 +314,30 @@ export default function ProductScreen() {
         right={[{ icon: ShareIcon, accessibilityLabel: 'Dela', onPress: () => {} }]}
       />
     </View>
+    {/* TEMP-DEBUG-GEST: diagnosrad längst ned (bara __DEV__ + växel på dev-sidan). */}
+    {gestureDebug && gestureNote !== '' && (
+      <View pointerEvents="none" style={[styles.debugBar, { bottom: insets.bottom }]}>
+        <Text style={styles.debugText}>{gestureNote}</Text>
+      </View>
+    )}
     </View>
   );
 }
 
 const useStyles = makeStyles((t) => ({
+  // TEMP-DEBUG-GEST
+  debugBar: {
+    position: 'absolute',
+    left: spacing.sm,
+    right: spacing.sm,
+    padding: spacing.sm,
+    borderRadius: radius.control,
+    backgroundColor: t.colors.surfaceRaised,
+  },
+  debugText: {
+    ...typography.caption,
+    color: t.colors.textPrimary,
+  },
   container: {
     flex: 1,
     backgroundColor: t.colors.bg,

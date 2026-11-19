@@ -49,6 +49,17 @@ export const motion = {
    *  stänger, ett kort (< 10 %) fjädrar tillbaka och flick följer riktningen.
    *  Bibliotekets standard är 0,3. */
   dismissVelocityImpact: 1.0,
+  /** Distansbaserad stängning (kräver patchen av react-native-screen-transitions,
+   *  se CLAUDE.md): ett drag nedåt på minst så här många px stänger vid släpp,
+   *  som Pinterest (ca 50 px), om man inte flickar tillbaka uppåt snabbare än
+   *  dismissCancelVelocity (px/s). Kortare drag avgörs av regeln ovan. */
+  dismissMinDistance: 45,
+  dismissCancelVelocity: 300,
+  /** Skärmen bakom Produktdetalj ligger lätt INZOOMAD (1 → 1,05 vid öppning,
+   *  tillbaka mot 1 när man drar/stänger), med samma dämpning som tidigare
+   *  (bibliotekets standard: 0,9375 utzoomad, svart 0,45). */
+  zoomBackgroundScale: 1.05,
+  zoomBackdropOpacity: 0.45,
   /** Remsa vid vänsterkanten där kantswipe stänger Produktdetalj. */
   dismissEdgeWidth: 24,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */

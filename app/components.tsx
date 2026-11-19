@@ -13,6 +13,7 @@ import TextTabs from '../components/TextTabs';
 import ProductCard from '../components/ProductCard';
 import TopBar from '../components/TopBar';
 import EdgeFade from '../components/EdgeFade';
+import { setGestureDebug, useGestureDebug } from '../utils/devGestureDebug'; // TEMP-DEBUG-GEST
 import BackIcon from '../assets/icons/BackIcon';
 import MenuIcon from '../assets/icons/MenuIcon';
 import ArchiveIcon from '../assets/icons/ArchiveIcon';
@@ -54,6 +55,7 @@ export default function ComponentsScreen() {
   const [demoSaved, setDemoSaved] = useState(false);
   const [demoLiked, setDemoLiked] = useState(false);
   const [fadeBlur, setFadeBlur] = useState(true);
+  const gestureDebug = useGestureDebug(); // TEMP-DEBUG-GEST
   // Test av toppkantens nedre gräns (brief 10). Standard rak.
   const [fadeWave, setFadeWave] = useState(false);
   // iOS 26:s egen scroll-edge-effekt överst. Av som standard, så att bara vår
@@ -84,6 +86,10 @@ export default function ComponentsScreen() {
             <Pill onPress={() => router.push('/product/2')}>Nytt och begagnat</Pill>
             <Pill onPress={() => router.push('/product/3')}>Bara begagnat</Pill>
             <Pill onPress={() => router.push('/product/1')}>Bara nytt</Pill>
+            {/* TEMP-DEBUG-GEST: diagnosrad för stängningsgesten på Produktdetalj. */}
+            <Pill selected={gestureDebug} onPress={() => setGestureDebug(!gestureDebug)}>
+              {gestureDebug ? 'Gestdiagnos på' : 'Gestdiagnos av'}
+            </Pill>
           </View>
         </Section>
 

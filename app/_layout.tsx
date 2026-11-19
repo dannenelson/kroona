@@ -1,7 +1,11 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
 import { BlankStack } from 'react-native-screen-transitions/expo-router';
-import { productScreenOptions, tabsScreenOptions } from '../components/product/productTransition';
+import {
+  installDismissThresholds,
+  productScreenOptions,
+  tabsScreenOptions,
+} from '../components/product/productTransition';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
@@ -55,6 +59,8 @@ function FontLoading() {
 
 function AppShell() {
   const { scheme, colors } = useTheme();
+  // Tröskel för distansbaserad stängning av Produktdetalj (patchat bibliotek).
+  useEffect(() => installDismissThresholds(), []);
   // Navigationens tema följer vårt tema (spik brief 16): native-stackens
   // container får sin bakgrund härifrån och syns bakom en skärm som krymper
   // (zoom-stängning). Utan detta syntes standardtemats ljusa grå.

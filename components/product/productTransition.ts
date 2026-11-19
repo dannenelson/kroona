@@ -4,6 +4,7 @@
 // Föregående skärm syns bakom (blank stack, JS-skärmar).
 import type { TransitionInterpolatedStyle } from 'react-native-screen-transitions';
 import type { BlankStackNavigationOptions } from 'react-native-screen-transitions/expo-router';
+import { scheduleOnUI } from 'react-native-worklets';
 import { motion, radius, spacing } from '../../theme';
 
 /** Grupp för produktbilder: kort (källa) och hero (mål) delar `id` = produkt-id. */
@@ -47,6 +48,25 @@ export const tabsScreenOptions: BlankStackNavigationOptions = {
   },
 };
 
+/**
+ * Sätter tröskeln för distansbaserad stängning på UI-runtime, där bibliotekets
+ * (patchade) beslut läses (se patches/react-native-screen-transitions+4.2.0.patch).
+ * Anropas en gång från app/_layout.
+ */
+export function installDismissThresholds() {
+  const minDistance = motion.dismissMinDistance;
+  const cancelVelocity = motion.dismissCancelVelocity;
+  scheduleOnUI(() => {
+    'worklet';
+    const g = globalThis as unknown as {
+      __kroonaDismissMinDistance?: number;
+      __kroonaDismissCancelVelocity?: number;
+    };
+    g.__kroonaDismissMinDistance = minDistance;
+    g.__kroonaDismissCancelVelocity = cancelVelocity;
+  });
+}
+
 /** Telefonens egen hörnradie, uppskattad från övre safe area (inget officiellt API). */
 function screenCornerRadius(insetTop: number): number {
   'worklet';
@@ -72,6 +92,8 @@ export const productScreenOptions: BlankStackNavigationOptions = {
     return withDepthVisibility(
       bounds({ id, group: PRODUCT_BOUNDARY_GROUP }).navigation.zoom({
         borderRadius: screenCornerRadius(insets.top),
+        backgroundScale: motion.zoomBackgroundScale,
+        backdropOpacity: motion.zoomBackdropOpacity,
       }),
       stackProgress,
     );

@@ -1,0 +1,77 @@
+diff --git a/node_modules/react-native-screen-transitions/src/providers/motion/gestures/shared/targets.ts b/node_modules/react-native-screen-transitions/src/providers/motion/gestures/shared/targets.ts
+index 80b38e1..19444c8 100644
+--- a/node_modules/react-native-screen-transitions/src/providers/motion/gestures/shared/targets.ts
++++ b/node_modules/react-native-screen-transitions/src/providers/motion/gestures/shared/targets.ts
+@@ -80,6 +80,42 @@ const shouldDismissAlongAxis = ({
+ 	);
+ };
+ 
++/**
++ * KROONA PATCH (patch-package, patches/react-native-screen-transitions+4.2.0.patch):
++ * distansbaserad stängning på den vertikala axeln. Bibliotekets egen regel
++ * kräver förflyttning/höjd + hastighet/höjd × impact > 0,5, så ett lugnt kort
++ * drag stänger aldrig. Har appen satt globalThis.__kroonaDismissMinDistance (px)
++ * på UI-runtime stänger ett drag nedåt på minst så många px, så länge det inte
++ * flickas tillbaka uppåt snabbare än __kroonaDismissCancelVelocity (px/s).
++ * Värdena är tokens i appens theme/motion.ts. Utan globals: oförändrat beteende.
++ */
++const shouldDismissByMinDistance = (
++	positiveDirectionEnabled: boolean,
++	negativeDirectionEnabled: boolean,
++	translation: number,
++	velocity: number,
++) => {
++	"worklet";
++	const g = globalThis as unknown as {
++		__kroonaDismissMinDistance?: number;
++		__kroonaDismissCancelVelocity?: number;
++	};
++	const minDistance = g.__kroonaDismissMinDistance;
++	if (minDistance === undefined || minDistance <= 0) return false;
++	if (
++		!isMovingTowardDismiss(
++			positiveDirectionEnabled,
++			negativeDirectionEnabled,
++			translation,
++		)
++	) {
++		return false;
++	}
++	const sign = Math.sign(translation);
++	const cancelVelocity = g.__kroonaDismissCancelVelocity ?? 0;
++	return Math.abs(translation) >= minDistance && velocity * sign > -cancelVelocity;
++};
++
+ export const determineDismissal = ({
+ 	event,
+ 	directions,
+@@ -88,14 +124,21 @@ export const determineDismissal = ({
+ }: DetermineDismissalProps) => {
+ 	"worklet";
+ 
+-	const verticalDismiss = shouldDismissAlongAxis({
+-		positiveDirectionEnabled: directions.vertical,
+-		negativeDirectionEnabled: directions.verticalInverted,
+-		translation: event.translationY,
+-		velocity: event.velocityY,
+-		dimension: dimensions.height,
+-		gestureVelocityImpact,
+-	});
++	const verticalDismiss =
++		shouldDismissAlongAxis({
++			positiveDirectionEnabled: directions.vertical,
++			negativeDirectionEnabled: directions.verticalInverted,
++			translation: event.translationY,
++			velocity: event.velocityY,
++			dimension: dimensions.height,
++			gestureVelocityImpact,
++		}) ||
++		shouldDismissByMinDistance(
++			directions.vertical,
++			directions.verticalInverted,
++			event.translationY,
++			event.velocityY,
++		);
+ 	const horizontalDismiss = shouldDismissAlongAxis({
+ 		positiveDirectionEnabled: directions.horizontal,
+ 		negativeDirectionEnabled: directions.horizontalInverted,
