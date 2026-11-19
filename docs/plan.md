@@ -69,7 +69,7 @@ Supabase-projekt och schema (collections, collection_items, follows) · konton �
 - [x] FilterPills 36 px: försvinner som problem när filter blir text-flikar (44 px höga)
 - [x] Pillens funktion: byter innehåll överst på Hem. Text-flikar filtrerar i listor (2026-11-18)
 - [ ] Ljust foto-glas ser fel ut över mörka bilder i ljust tema (Daniel, 2026-11-18). Pausat, tweakas visuellt senare. Idéer: lägre alfa med mörk tint, eller tunn scrim bakom glaset.
-- [ ] Vågig toppkant på kantblur (prototyp i designen v11, Daniel: kan fungera). Brief 08 (docs/briefs/08-vagig-kant.md).
+- [x] Vågig toppkant: avskriven 2026-11-19 (Daniel). iOS-blur klipps hårt av mask och gav en synlig kant trots tre försök (brief 08, 10, 11). Rak EdgeFade gäller. Kvar att städa: vågkoden i EdgeFade/theme och växlarna på dev-sidan.
 - [ ] Hitta: hur ser dialog med urval och jämförelse ut? (designfråga när Hitta är på tur)
 - [ ] Ska ia-karta och wireframes justeras till de nya flikrollerna?
 
