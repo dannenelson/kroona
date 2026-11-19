@@ -1,3 +1,51 @@
+diff --git a/node_modules/react-native-screen-transitions/src/providers/motion/gestures/pan/activation/pan-activation-rules.ts b/node_modules/react-native-screen-transitions/src/providers/motion/gestures/pan/activation/pan-activation-rules.ts
+index 15d449b..f2d6906 100644
+--- a/node_modules/react-native-screen-transitions/src/providers/motion/gestures/pan/activation/pan-activation-rules.ts
++++ b/node_modules/react-native-screen-transitions/src/providers/motion/gestures/pan/activation/pan-activation-rules.ts
+@@ -239,6 +239,27 @@ export function shouldActivateOrFail(params: ShouldActivateOrFailProps) {
+ 	const hasHorizontal = params.allowedLeft || params.allowedRight;
+ 	const hasVertical = params.allowedUp || params.allowedDown;
+ 
++	/**
++	 * KROONA PATCH (patch-package): har appen satt
++	 * globalThis.__kroonaVerticalActivationDistance (px) på UI-runtime avgörs
++	 * ingenting förrän fingret rört sig så långt, sedan aktiveras vertikal
++	 * stängning efter samma avstånd nedåt och avvisas bara om sidoglidningen är
++	 * större än nedåtrörelsen (|dx| > |dy|, ca 45°) i stället för fasta 10/20 px.
++	 * Horisontell gest (kantswipe) är oförändrad. Utan global: originalbeteende.
++	 */
++	const kroonaActivation = (
++		globalThis as unknown as { __kroonaVerticalActivationDistance?: number }
++	).__kroonaVerticalActivationDistance;
++	const kroonaPatchActive =
++		kroonaActivation !== undefined && kroonaActivation > 0;
++	if (
++		kroonaPatchActive &&
++		Math.max(Math.abs(params.deltaX), Math.abs(params.deltaY)) <
++			(kroonaActivation as number)
++	) {
++		return { shouldActivate: false, shouldFail: false };
++	}
++
+ 	if (hasHorizontal && params.isHorizontalSwipe) {
+ 		return resolveAxisActivation({
+ 			movement: params.deltaX,
+@@ -258,8 +279,13 @@ export function shouldActivateOrFail(params: ShouldActivateOrFailProps) {
+ 		return resolveAxisActivation({
+ 			movement: params.deltaY,
+ 			deviation: params.deltaX,
+-			movementThreshold: GESTURE_ACTIVATION_THRESHOLD_Y,
+-			deviationTolerance: GESTURE_FAIL_TOLERANCE_Y,
++			movementThreshold: kroonaPatchActive
++				? (kroonaActivation as number)
++				: GESTURE_ACTIVATION_THRESHOLD_Y,
++			// Med patchen: vertikalt drag är redan |dy| > |dx|, så ingen fast gräns.
++			deviationTolerance: kroonaPatchActive
++				? Number.POSITIVE_INFINITY
++				: GESTURE_FAIL_TOLERANCE_Y,
+ 			positiveSwipe: params.isSwipingUp,
+ 			negativeSwipe: params.isSwipingDown,
+ 			positiveAllowed: params.allowedUp,
 diff --git a/node_modules/react-native-screen-transitions/src/providers/motion/gestures/shared/targets.ts b/node_modules/react-native-screen-transitions/src/providers/motion/gestures/shared/targets.ts
 index 80b38e1..19444c8 100644
 --- a/node_modules/react-native-screen-transitions/src/providers/motion/gestures/shared/targets.ts

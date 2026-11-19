@@ -55,11 +55,17 @@ export const motion = {
    *  dismissCancelVelocity (px/s). Kortare drag avgörs av regeln ovan. */
   dismissMinDistance: 45,
   dismissCancelVelocity: 300,
+  /** Aktivering av stängning nedåt (patchat bibliotek): ingenting avgörs förrän
+   *  fingret rört sig så här många px; sedan aktiveras gesten om rörelsen är
+   *  mer nedåt än i sidled (|dy| > |dx|, ca 45°), annars avvisas den.
+   *  Biblioteket: 10 px nedåt och avvisning vid 20 px sidled (1 px sidled först
+   *  avvisade direkt). */
+  dismissActivationDistance: 7,
   /** Skärmen bakom Produktdetalj ligger lätt INZOOMAD (1 → 1,05 vid öppning,
-   *  tillbaka mot 1 när man drar/stänger), med samma dämpning som tidigare
-   *  (bibliotekets standard: 0,9375 utzoomad, svart 0,45). */
+   *  tillbaka mot 1 när man drar/stänger). Dämpningen är mörkare än
+   *  bibliotekets standard (0,9375 utzoomad, svart 0,45), närmare Pinterest. */
   zoomBackgroundScale: 1.05,
-  zoomBackdropOpacity: 0.45,
+  zoomBackdropOpacity: 0.65,
   /** Remsa vid vänsterkanten där kantswipe stänger Produktdetalj. */
   dismissEdgeWidth: 24,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */

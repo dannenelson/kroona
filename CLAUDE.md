@@ -25,7 +25,7 @@ Kroona är en svensk e-handelsupptäcktsapp (mode + heminredning). Vi bygger **F
 
 ## Navigation och felsökning
 - Roten är react-native-screen-transitions `BlankStack`, inte Expo Routers native stack. Nya detaljskärmar behöver egna transition-options (se `components/product/productTransition.ts`). Reanimated 4 är installerat (krävs av biblioteket).
-- **Patch:** `react-native-screen-transitions` är patchad med patch-package (`patches/react-native-screen-transitions+4.2.0.patch`, körs via `postinstall`). Patchen lägger till distansbaserad stängning (vertikalt) som läser `motion.dismissMinDistance`/`dismissCancelVelocity` via `installDismissThresholds()`. Vid uppgradering av biblioteket: gör om eller ta bort patchen.
+- **Patch:** `react-native-screen-transitions` är patchad med patch-package (`patches/react-native-screen-transitions+4.2.0.patch`, körs via `postinstall`). Patchen lägger till distansbaserad stängning (vertikalt) och tidigare aktivering av drag nedåt (45°-regel), som läser `motion.dismissMinDistance`/`dismissCancelVelocity`/`dismissActivationDistance` via `installDismissThresholds()`. Vid uppgradering av biblioteket: gör om eller ta bort patchen.
 - Tillfällig felsökningskod (autotryck, loggning) får aldrig committas. Undantag: kod märkt `TEMP-DEBUG-GEST` bakom `__DEV__` (gestdiagnos, slås på från dev-sidan), som tas bort när felet är hittat.
 - Döda aldrig Daniels Expo-server (ingen `pkill -f 'expo start'`). Kör egna tester på en egen port och stäng bara din egen process.
 

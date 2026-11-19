@@ -49,21 +49,24 @@ export const tabsScreenOptions: BlankStackNavigationOptions = {
 };
 
 /**
- * Sätter tröskeln för distansbaserad stängning på UI-runtime, där bibliotekets
+ * Sätter tröskeln för distansbaserad stängning och aktiveringen av drag nedåt på UI-runtime, där bibliotekets
  * (patchade) beslut läses (se patches/react-native-screen-transitions+4.2.0.patch).
  * Anropas en gång från app/_layout.
  */
 export function installDismissThresholds() {
   const minDistance = motion.dismissMinDistance;
   const cancelVelocity = motion.dismissCancelVelocity;
+  const activationDistance = motion.dismissActivationDistance;
   scheduleOnUI(() => {
     'worklet';
     const g = globalThis as unknown as {
       __kroonaDismissMinDistance?: number;
       __kroonaDismissCancelVelocity?: number;
+      __kroonaVerticalActivationDistance?: number;
     };
     g.__kroonaDismissMinDistance = minDistance;
     g.__kroonaDismissCancelVelocity = cancelVelocity;
+    g.__kroonaVerticalActivationDistance = activationDistance;
   });
 }
 

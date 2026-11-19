@@ -129,7 +129,7 @@ export default function ProductScreen() {
         ? `scroll ej överst (y > 1 px)`
         : momentum
           ? 'momentum pågick vid start'
-          : 'okänd: troligen > 15 px i sidled innan 10 px nedåt, eller start på Liknande-raden/knapp';
+          : `sidled större än nedåt (|dx| > |dy|) efter ${motion.dismissActivationDistance} px, eller start på Liknande-raden/knapp`;
     setGestureNote(`start y=${y.toFixed(1)}  → AVVISAD: ${reason}`);
   };
 
