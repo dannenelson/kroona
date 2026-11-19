@@ -5,7 +5,7 @@
 // bor i components/product/ tills de behövs på fler ställen.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
-import { Link, useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, useLocalSearchParams, useRouter, usePreventZoomTransitionDismissal } from 'expo-router';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur, motion } from '../../theme';
@@ -56,10 +56,15 @@ export default function ProductScreen() {
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = heroHeight - insets.top - barHeight;
   const scrollY = useRef(new Animated.Value(0)).current;
-  // Spik (brief 16): iOS zoom-stängning (swipe ned) tävlar med scrollvyns studs.
-  // Överst studsar scrollvyn därför inte, så ett drag nedåt går direkt till
-  // stängningen och följer fingret. Längre ned studsar den som vanligt.
-  const [atTop, setAtTop] = useState(true);
+  // Spik (brief 16): zoom-stängningen (swipe ned) gäller bara heron och
+  // toppbaren. Drag på texten scrollar alltid. Gränsen följer heronas nederkant
+  // på skärmen, avrundad nedåt i steg så att skärmen inte renderas om per frame.
+  const topBarBottom = insets.top + barHeight;
+  const dismissStep = spacing.xxl;
+  const [heroBottom, setHeroBottom] = useState(heroHeight);
+  usePreventZoomTransitionDismissal({
+    unstable_dismissalBoundsRect: { maxY: Math.max(topBarBottom, heroBottom) },
+  });
 
   // Spik (brief 16): informationen under heron tonas in när bilden hunnit
   // landa från zoom-övergången. Fördröjningen är en uppskattning.
@@ -128,15 +133,15 @@ export default function ProductScreen() {
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
-        // Exakt 0 överst (ingen automatisk inset), och ingen studs där.
+        // Exakt 0 överst (ingen automatisk inset).
         contentInsetAdjustmentBehavior="never"
-        bounces={!atTop}
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: true,
           listener: (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-            const top = e.nativeEvent.contentOffset.y <= spacing.sm;
-            if (top !== atTop) setAtTop(top);
+            const visible = heroHeight - Math.max(0, e.nativeEvent.contentOffset.y);
+            const next = Math.max(0, Math.floor(visible / dismissStep) * dismissStep);
+            if (next !== heroBottom) setHeroBottom(next);
           },
         })}
       >
