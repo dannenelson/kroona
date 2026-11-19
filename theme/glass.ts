@@ -86,6 +86,22 @@ export const edgeBlur = {
   /** Standardhöjder: topp ca 68 (något högre än statusfält/Dynamic Island), botten 128. */
   topExtra: 14,
   bottomHeight: 128,
+  /** Vågig toppkant (brief 08, test i dev-routen): statisk mask med en lugn
+   *  våg och gaussisk utsuddning, enligt referensen "Kroona Looken A" v11. */
+  wave: {
+    /** Vågens mittlinje som andel av höjden. */
+    baseline: 0.42,
+    /** Utslag i px. */
+    amplitude: 12,
+    /** Antal vågor över bredden. */
+    waves: 1.6,
+    /** Fasförskjutning (radianer), så att vågen inte börjar i en topp. */
+    phase: 0.6,
+    /** Utsuddning (stdDeviation, px), lika i x och y. */
+    softness: 10,
+    /** Antal punkter som kurvan samplas i. */
+    samples: 24,
+  },
   /** Bakgrundsblur bakom kontextmenyn: lätt, ca hälften av referensens blur 18. */
   menuBackdropIntensity: 30,
   /** Menyns egen blur (blur 40). */

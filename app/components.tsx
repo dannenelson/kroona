@@ -51,6 +51,8 @@ export default function ComponentsScreen() {
   const [pressTab, setPressTab] = useState<(typeof PRESS_TABS)[number]>('Alla');
   const [topSaved, setTopSaved] = useState(false);
   const [fadeBlur, setFadeBlur] = useState(true);
+  // Test av toppkantens form (brief 08). Standard rak.
+  const [fadeWave, setFadeWave] = useState(false);
 
   return (
     <View style={styles.container}>
@@ -202,10 +204,15 @@ export default function ComponentsScreen() {
 
         <Section title="6 · EdgeFade (kantblur)">
           <View style={styles.fadeHeader}>
-            <Caption>Scrolla bilderna. Topp 68, botten 128.</Caption>
-            <Pill selected={fadeBlur} onPress={() => setFadeBlur((v) => !v)}>
-              {fadeBlur ? 'Blur på' : 'Blur av'}
-            </Pill>
+            <Caption>Scrolla bilderna. Topp 68 (rak eller vågig), botten 128.</Caption>
+            <View style={styles.fadeToggles}>
+              <Pill selected={fadeWave} onPress={() => setFadeWave((v) => !v)}>
+                {fadeWave ? 'Vågig' : 'Rak'}
+              </Pill>
+              <Pill selected={fadeBlur} onPress={() => setFadeBlur((v) => !v)}>
+                {fadeBlur ? 'Blur på' : 'Blur av'}
+              </Pill>
+            </View>
           </View>
           <View style={styles.fadeDemo}>
             <ScrollView nestedScrollEnabled showsVerticalScrollIndicator={false}>
@@ -213,7 +220,12 @@ export default function ComponentsScreen() {
                 <Image key={p.id} source={{ uri: p.imageUrl }} style={styles.fadeImage} />
               ))}
             </ScrollView>
-            <EdgeFade position="top" height={edgeTopDemo} blur={fadeBlur} />
+            <EdgeFade
+              position="top"
+              height={edgeTopDemo}
+              blur={fadeBlur}
+              shape={fadeWave ? 'wave' : 'straight'}
+            />
             <EdgeFade position="bottom" blur={fadeBlur} />
           </View>
         </Section>
@@ -333,6 +345,10 @@ const useStyles = makeStyles((t) => ({
   },
   topBarPhoto: {
     paddingVertical: spacing.xl,
+  },
+  fadeToggles: {
+    flexDirection: 'row',
+    gap: spacing.sm,
   },
   fadeHeader: {
     flexDirection: 'row',
