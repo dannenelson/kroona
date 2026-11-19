@@ -3,8 +3,24 @@
 // ovanför flikarna, så tab-baren syns inte och tillbaka går till skärmen man
 // kom från. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import Reanimated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
+import {
+  GestureDetector,
+  GestureStateManager,
+  useNativeGesture,
+  usePanGesture,
+} from 'react-native-gesture-handler';
 import { Link, useLocalSearchParams, useRouter, usePreventZoomTransitionDismissal } from 'expo-router';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -55,15 +71,87 @@ export default function ProductScreen() {
   // Toppen byter till nedscrollat läge när hero har passerat under toppbaren.
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = heroHeight - insets.top - barHeight;
-  const scrollY = useRef(new Animated.Value(0)).current;
-  // Spik (brief 16): zoom-stängningen (swipe ned) gäller bara heron och
-  // toppbaren. Drag på texten scrollar alltid. Gränsen följer heronas nederkant
-  // på skärmen, avrundad nedåt i steg så att skärmen inte renderas om per frame.
-  const topBarBottom = insets.top + barHeight;
-  const dismissStep = spacing.xxl;
-  const [heroBottom, setHeroBottom] = useState(heroHeight);
+  // Scroll-positionen på UI-tråden (Reanimated): toppen och stängningsgesten läser den.
+  const scrollY = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => {
+    scrollY.value = e.contentOffset.y;
+  });
+
+  // Spik (brief 17): native zoom-stängning bara från en smal remsa vid
+  // vänsterkanten, så att iOS egen kantswipe finns kvar på hela höjden men inte
+  // tävlar med vår egen nedåtgest nedan.
   usePreventZoomTransitionDismissal({
-    unstable_dismissalBoundsRect: { maxY: Math.max(topBarBottom, heroBottom) },
+    unstable_dismissalBoundsRect: { maxX: motion.dismissEdgeWidth },
+  });
+
+  // Egen stängningsgest (brief 17): överst i innehållet följer hela skärmen
+  // fingret nedåt, krymper lätt och får rundade hörn. Släpp förbi tröskeln
+  // (avstånd eller fart) stänger, annars fjädrar den tillbaka.
+  const dragY = useSharedValue(0);
+  const startX = useSharedValue(0);
+  const startY = useSharedValue(0);
+  const closing = useSharedValue(false);
+  const close = () => router.back();
+  const scrollGesture = useNativeGesture({});
+  const dismissGesture = usePanGesture({
+    manualActivation: true,
+    simultaneousWith: scrollGesture,
+    onTouchesDown: (e) => {
+      const t = e.allTouches[0];
+      if (!t) return;
+      startX.value = t.absoluteX;
+      startY.value = t.absoluteY;
+    },
+    onTouchesMove: (e) => {
+      const t = e.allTouches[0];
+      if (!t || closing.value) return;
+      const dx = t.absoluteX - startX.value;
+      const dy = t.absoluteY - startY.value;
+      if (Math.abs(dx) < motion.dismissSlop && Math.abs(dy) < motion.dismissSlop) return;
+      // Bara överst i innehållet, nedåt och mer vertikalt än horisontellt.
+      if (scrollY.value <= 0 && dy > 0 && dy > Math.abs(dx)) {
+        GestureStateManager.activate(e.handlerTag);
+      } else {
+        GestureStateManager.fail(e.handlerTag);
+      }
+    },
+    onUpdate: (e) => {
+      // Drar man upp igen följer skärmen tillbaka, aldrig förbi utgångsläget.
+      dragY.value = Math.max(0, e.translationY);
+    },
+    onDeactivate: (e) => {
+      const shouldClose =
+        dragY.value > motion.dismissDistance || e.velocityY > motion.dismissVelocity;
+      if (shouldClose) {
+        closing.value = true;
+        // Överlämning: native zoomen tar skärmen som den är, medan vårt drag
+        // fjädrar tillbaka inuti den krympande vyn.
+        scheduleOnRN(close);
+        dragY.value = withTiming(0, { duration: motion.dismissHandoff });
+      } else {
+        dragY.value = withSpring(0, motion.dismissSpring);
+      }
+    },
+  });
+
+  const titleStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(
+      scrollY.value,
+      [threshold - spacing.xl, threshold],
+      [0, 1],
+      Extrapolation.CLAMP,
+    ),
+  }));
+
+  const dismissStyle = useAnimatedStyle(() => {
+    const p = interpolate(dragY.value, [0, motion.dismissDistance * 2], [0, 1], Extrapolation.CLAMP);
+    return {
+      borderRadius: interpolate(p, [0, 0.25], [0, radius.card], Extrapolation.CLAMP),
+      transform: [
+        { translateY: dragY.value },
+        { scale: interpolate(p, [0, 1], [1, motion.dismissScale]) },
+      ],
+    };
   });
 
   // Spik (brief 16): informationen under heron tonas in när bilden hunnit
@@ -122,159 +210,154 @@ export default function ProductScreen() {
 
   // Titeln tonar in när hero passerat under toppbaren. Toppkanten och
   // statusfältet följer temat hela vägen (brief 15), inget byte vid scroll.
-  const titleOpacity = scrollY.interpolate({
-    inputRange: [threshold - spacing.xl, threshold],
-    outputRange: [0, 1],
-    extrapolate: 'clamp',
-  });
-
   return (
-    <View style={styles.container}>
-      <Animated.ScrollView
-        showsVerticalScrollIndicator={false}
-        scrollEventThrottle={16}
-        // Exakt 0 överst (ingen automatisk inset).
-        contentInsetAdjustmentBehavior="never"
-        contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
-          useNativeDriver: true,
-          listener: (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-            const visible = heroHeight - Math.max(0, e.nativeEvent.contentOffset.y);
-            const next = Math.max(0, Math.floor(visible / dismissStep) * dismissStep);
-            if (next !== heroBottom) setHeroBottom(next);
-          },
-        })}
-      >
-        {/* Zoom-målet (spik brief 16) är bilden själv, inte vyn runt den: med en
-            View som målets barn ritades inte bilden i den (laddad och med rätt
-            mått men osynlig). Heron-vyn ger platshållarfärgen runt. */}
-        <View style={[styles.hero, { width, height: heroHeight }]}>
-          <Link.AppleZoomTarget>
-            <Image
-              source={{ uri: product.imageUrl }}
-              style={{ width, height: heroHeight }}
-              resizeMode="cover"
-            />
-          </Link.AppleZoomTarget>
-        </View>
-
-        <Animated.View style={{ opacity: reveal }}>
-          <View style={styles.info}>
-            <Text style={styles.brand}>{product.brand}</Text>
-            <Text style={styles.name}>{product.name}</Text>
-            <View style={styles.priceRow}>
-              <View style={styles.priceBlock}>
-                {data.lowest !== undefined && (
-                  <Text style={styles.price}>
-                    <Text style={styles.from}>Från </Text>
-                    {formatPrice(data.lowest)}
-                    <Text style={styles.currency}> kr</Text>
-                  </Text>
-                )}
-                {data.lowestIsUsed && <Text style={styles.usedTag}>Begagnat</Text>}
-              </View>
-              <SaveButton productId={product.id} />
+    <GestureDetector gesture={dismissGesture}>
+      <Reanimated.View style={[styles.container, styles.dismissable, dismissStyle]}>
+        <GestureDetector gesture={scrollGesture}>
+          <Reanimated.ScrollView
+            showsVerticalScrollIndicator={false}
+            scrollEventThrottle={16}
+            // Exakt 0 överst (ingen automatisk inset). Ingen studs: drag nedåt
+            // överst flyttar hela skärmen (stängningsgesten) i stället.
+            contentInsetAdjustmentBehavior="never"
+            bounces={false}
+            contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
+            onScroll={onScroll}
+          >
+            {/* Zoom-målet (spik brief 16) är bilden själv, inte vyn runt den: med en
+                View som målets barn ritades inte bilden i den (laddad och med rätt
+                mått men osynlig). Heron-vyn ger platshållarfärgen runt. */}
+            <View style={[styles.hero, { width, height: heroHeight }]}>
+              <Link.AppleZoomTarget>
+                <Image
+                  source={{ uri: product.imageUrl }}
+                  style={{ width, height: heroHeight }}
+                  resizeMode="cover"
+                />
+              </Link.AppleZoomTarget>
             </View>
-          </View>
 
-          <SectionTitle title="Hållbarhet" style={styles.sectionTitle} />
-          <FactList facts={facts} />
-
-          {data.used.length > 0 && (
-            <>
-              <SectionTitle title="Finns begagnad hos" style={styles.sectionTitle} />
-              <View style={styles.group}>
-                {data.used
-                  .flatMap((group) => group.offers.map((offer) => ({ group, offer })))
-                  .map(({ group, offer }, i) => (
-                    <OfferRow
-                      key={offer.id}
-                      divider={i > 0}
-                      initial={group.retailer.initial}
-                      name={group.retailer.name}
-                      detail={[
-                        offer.conditionNote,
-                        offer.pricing === 'auction' ? 'Auktion, bud från' : 'Fast pris',
-                      ]
-                        .filter(Boolean)
-                        .join(' · ')}
-                      price={offer.price}
-                      stock={STOCK_LABEL[offer.stock]}
-                      onPress={() => onOffer(offer)}
-                    />
-                  ))}
-              </View>
-            </>
-          )}
-
-          {data.fresh.length > 0 && (
-            <>
-              <SectionTitle title="Köp hos" style={styles.sectionTitle} />
-              <View style={styles.group}>
-                {data.fresh.map((offer, i) => {
-                  const retailer = getRetailer(offer.retailerId);
-                  return (
-                    <OfferRow
-                      key={offer.id}
-                      divider={i > 0}
-                      initial={retailer?.initial ?? ''}
-                      name={retailer?.name ?? ''}
-                      detail={`Ny · ${offer.shipping}`}
-                      price={offer.price}
-                      stock={STOCK_LABEL[offer.stock]}
-                      onPress={() => onOffer(offer)}
-                    />
-                  );
-                })}
-              </View>
-            </>
-          )}
-
-          {data.similar.length > 0 && (
-            <>
-              <SectionTitle title="Liknande" style={styles.sectionTitle} />
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.similarRow}
-              >
-                {data.similar.map((p) => (
-                  <View key={p.id} style={styles.similarCard}>
-                    <ProductCard {...p} fixedHeight={SIMILAR_IMAGE_HEIGHT} />
+            <Animated.View style={{ opacity: reveal }}>
+              <View style={styles.info}>
+                <Text style={styles.brand}>{product.brand}</Text>
+                <Text style={styles.name}>{product.name}</Text>
+                <View style={styles.priceRow}>
+                  <View style={styles.priceBlock}>
+                    {data.lowest !== undefined && (
+                      <Text style={styles.price}>
+                        <Text style={styles.from}>Från </Text>
+                        {formatPrice(data.lowest)}
+                        <Text style={styles.currency}> kr</Text>
+                      </Text>
+                    )}
+                    {data.lowestIsUsed && <Text style={styles.usedTag}>Begagnat</Text>}
                   </View>
-                ))}
-              </ScrollView>
-            </>
-          )}
-        </Animated.View>
-      </Animated.ScrollView>
+                  <SaveButton productId={product.id} />
+                </View>
+              </View>
 
-      {/* Toppen: en enda kant i temats toning (brief 15). Toningen täcker
-          titelraden; blurren ligger kvar kort bakom statusfält/Dynamic Island. */}
-      <EdgeFade
-        position="top"
-        height={insets.top + barHeight + spacing.lg}
-        blurHeight={insets.top + edgeBlur.topExtra}
-      />
-      <View style={[styles.topChrome, { paddingTop: insets.top }]} pointerEvents="box-none">
-        <Animated.Text
-          numberOfLines={1}
-          style={[styles.topTitle, { top: insets.top, opacity: titleOpacity }]}
-        >
-          {product.name}
-        </Animated.Text>
-        {/* En glaston hela vägen: photo och theme skiljer sig bara lite (brief 14). */}
-        <TopBar
-          tone="photo"
-          left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }}
-          right={[{ icon: ShareIcon, accessibilityLabel: 'Dela', onPress: () => {} }]}
+              <SectionTitle title="Hållbarhet" style={styles.sectionTitle} />
+              <FactList facts={facts} />
+
+              {data.used.length > 0 && (
+                <>
+                  <SectionTitle title="Finns begagnad hos" style={styles.sectionTitle} />
+                  <View style={styles.group}>
+                    {data.used
+                      .flatMap((group) => group.offers.map((offer) => ({ group, offer })))
+                      .map(({ group, offer }, i) => (
+                        <OfferRow
+                          key={offer.id}
+                          divider={i > 0}
+                          initial={group.retailer.initial}
+                          name={group.retailer.name}
+                          detail={[
+                            offer.conditionNote,
+                            offer.pricing === 'auction' ? 'Auktion, bud från' : 'Fast pris',
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                          price={offer.price}
+                          stock={STOCK_LABEL[offer.stock]}
+                          onPress={() => onOffer(offer)}
+                        />
+                      ))}
+                  </View>
+                </>
+              )}
+
+              {data.fresh.length > 0 && (
+                <>
+                  <SectionTitle title="Köp hos" style={styles.sectionTitle} />
+                  <View style={styles.group}>
+                    {data.fresh.map((offer, i) => {
+                      const retailer = getRetailer(offer.retailerId);
+                      return (
+                        <OfferRow
+                          key={offer.id}
+                          divider={i > 0}
+                          initial={retailer?.initial ?? ''}
+                          name={retailer?.name ?? ''}
+                          detail={`Ny · ${offer.shipping}`}
+                          price={offer.price}
+                          stock={STOCK_LABEL[offer.stock]}
+                          onPress={() => onOffer(offer)}
+                        />
+                      );
+                    })}
+                  </View>
+                </>
+              )}
+
+              {data.similar.length > 0 && (
+                <>
+                  <SectionTitle title="Liknande" style={styles.sectionTitle} />
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.similarRow}
+                  >
+                    {data.similar.map((p) => (
+                      <View key={p.id} style={styles.similarCard}>
+                        <ProductCard {...p} fixedHeight={SIMILAR_IMAGE_HEIGHT} />
+                      </View>
+                    ))}
+                  </ScrollView>
+                </>
+              )}
+            </Animated.View>
+          </Reanimated.ScrollView>
+        </GestureDetector>
+
+        {/* Toppen: en enda kant i temats toning (brief 15). Toningen täcker
+            titelraden; blurren ligger kvar kort bakom statusfält/Dynamic Island. */}
+        <EdgeFade
+          position="top"
+          height={insets.top + barHeight + spacing.lg}
+          blurHeight={insets.top + edgeBlur.topExtra}
         />
-      </View>
-    </View>
+        <View style={[styles.topChrome, { paddingTop: insets.top }]} pointerEvents="box-none">
+          <Reanimated.Text numberOfLines={1} style={[styles.topTitle, { top: insets.top }, titleStyle]}>
+            {product.name}
+          </Reanimated.Text>
+          {/* En glaston hela vägen: photo och theme skiljer sig bara lite (brief 14). */}
+          <TopBar
+            tone="photo"
+            left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }}
+            right={[{ icon: ShareIcon, accessibilityLabel: 'Dela', onPress: () => {} }]}
+          />
+        </View>
+      </Reanimated.View>
+    </GestureDetector>
   );
 }
 
 const useStyles = makeStyles((t) => ({
+  // Skärmen som dras vid stängning: rundade hörn klipper innehållet.
+  dismissable: {
+    overflow: 'hidden',
+    borderCurve: 'continuous',
+  },
   container: {
     flex: 1,
     backgroundColor: t.colors.bg,

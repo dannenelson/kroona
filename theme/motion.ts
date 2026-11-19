@@ -38,6 +38,15 @@ export const motion = {
   /** Produktdetalj (spik brief 16): informationen tonas in efter att bilden landat. */
   detailRevealDelay: 280,
   detailRevealDuration: 250,
+  /** Egen stängningsgest på Produktdetalj (spik brief 17). */
+  dismissSlop: 8,
+  dismissDistance: 120,
+  dismissVelocity: 900,
+  dismissScale: 0.92,
+  dismissSpring: { damping: 20, stiffness: 220, mass: 1 },
+  dismissHandoff: 300,
+  /** Remsa vid vänsterkanten där iOS egen kantswipe (zoom-stängning) gäller. */
+  dismissEdgeWidth: 24,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */
