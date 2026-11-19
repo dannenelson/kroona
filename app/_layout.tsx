@@ -7,6 +7,7 @@ import {
   productScreenOptions,
   tabsScreenOptions,
 } from '../components/product/productTransition';
+import { installReduceMotionSync } from '../lib/lightboxStore';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
@@ -62,6 +63,7 @@ function AppShell() {
   const { scheme, colors } = useTheme();
   // Tröskel för distansbaserad stängning av Produktdetalj (patchat bibliotek).
   useEffect(() => installDismissThresholds(), []);
+  useEffect(() => installReduceMotionSync(), []);
   // Navigationens tema följer vårt tema (spik brief 16): native-stackens
   // container får sin bakgrund härifrån och syns bakom en skärm som krymper
   // (zoom-stängning). Utan detta syntes standardtemats ljusa grå.

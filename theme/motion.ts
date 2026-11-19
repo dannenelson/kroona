@@ -78,8 +78,19 @@ export const motion = {
    *  ingen zoom från heron. Swipe ned följer fingret och tonar ut. */
   lightboxFade: {
     open: { duration: 240 },
-    close: { duration: 200 },
+    /** Stängning (brief 23): längre än öppningen och ease-out (easeOutQuad som
+     *  bezier), så att den börjar i fingrets fart och landar mjukt. */
+    close: { duration: 320 },
+    closeEasing: [0.25, 0.46, 0.45, 0.94] as const,
     fromScale: 0.96,
+    /** Opacitet vid stängning/drag = 1 − (1 − p)^k: ligger kvar längre och landar
+     *  mjukt i slutet. Backdropen har högre k: den lämnar långsammare än bilden, så
+     *  att det aldrig blinkar ljust. Öppningen är linjär som förut. */
+    closeOpacityCurve: 1.5,
+    closeBackdropCurve: 2,
+    /** Efter släpp i swipe glider bilden vidare i dragriktningen, högst denna
+     *  andel av skärmen, i stället för att stanna tvärt. */
+    releaseDrift: 0.12,
   },
   /** Bläddring i lightboxen: släpp med minst denna fart (px/s) byter bild även under halva bredden. */
   pageFlickVelocity: 500,
