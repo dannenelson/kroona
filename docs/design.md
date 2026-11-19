@@ -190,6 +190,14 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Toast:** glasruta längst ner, glider in (fjäder) och ut, visas 2,2 s. Reduce motion: direkt.
 - **Avvikelser från referensen (egna):** sidmarginal 16 (referens 20) · typstorlekar närmast token (märke 13 mot 15, namn 26 mot 25, pris 20 mot 22, rubriker 20 mot 19) · Liknande-korten visar också namn och betyg (ProductCard M) · toppens toning växlar vid en tröskel i stället för kontinuerligt.
 
+## 8c. Rörelse: hierarki ✅ (godkänd på enhet 2026-11-19)
+- **Princip:** man tar sig visuellt ner och upp i hierarkin. Går man djupare zoomar bilden från källelementet (kortbilden) till detaljvyn, och informationen under tonas in sist. Tillbaka är samma rörelse baklänges, till exakt det kort man öppnade från. Flikbyten har ingen zoom.
+- **Stängning:** swipe ned överst i innehållet följer fingret (hela skärmen, telefonens hörnradie via `radius.screenDynamicIsland`/`screenNotch`) och går att avbryta genom att dra upp. Stänger vid släpp efter ca 20–25 % av skärmhöjden i lugnt tempo (`motion.dismissVelocityImpact` = 1,0; biblioteket stänger när förflyttning + hastighet × impact > 0,5). Kantswipe från vänster i en 24 px remsa (`motion.dismissEdgeWidth`). Högersvep mitt på skärmen stänger inte. Scroll har normal studs; gesten tar bara över överst (`Transition.ScrollView`).
+- **Djup:** bara ETT steg bakom syns (föregående skärm, dämpad och skalad). Skärmar med två eller fler ovanför döljs (`withDepthVisibility`, explicit opacitet 0/1 per djup).
+- **Rätt kort:** varje ProductCard har ett unikt boundary-id per instans (`produktId_instansnyckel`; avgränsare `_` eftersom `:` tolkas som grupp:id) som skickas som route-param `b`, så att zoomen går från/till rätt kort även när samma produkt finns på flera ställen. Kort med egen `onPress` har ingen zoom.
+- **Teknik:** roten använder react-native-screen-transitions v4.2.0 (BlankStack via Expo Router-adaptern, ren JS, fungerar i Expo Go). Expo Routers `Link.AppleZoom` + egen gest (brief 16–17) övergavs: inkonsekvent överlämning, föregående sida syntes inte, kantswipe försvann. Nya skärmar med hierarkirörelse behöver egna options i `components/product/productTransition.ts` (eller en generell variant).
+- **Känd begränsning:** håller man stilla innan släpp krävs ca 50 % drag. Går bara att ändra genom att patcha biblioteket.
+
 ## 9. Komponentkontrakt
 Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (`sm`/`md`/`lg`, default `md`), **states** (default, pressed, disabled, loading, selected), och en **`style`-prop som slås ihop sist** (anroparen justerar layout, aldrig identitet). Innehåll går via `children`, inte via fler props.
 

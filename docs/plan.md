@@ -1,6 +1,6 @@
 # Kroona — Plan
 
-*En sida. Svarar på "vad jobbar vi med nu, och vad kommer sen". Uppdateras när något ändras, aldrig med nya idéer (de går till `idebank`). Senast: 2026-11-18.*
+*En sida. Svarar på "vad jobbar vi med nu, och vad kommer sen". Uppdateras när något ändras, aldrig med nya idéer (de går till `idebank`). Senast: 2026-11-19.*
 
 ## Mål för Fas 0 (bekräftat 2026-11-17)
 Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-minuters genomgång av hela köpresan: **Hem → Produktdetalj → Samling → Sparat**, plus Hitta och Flöde.
@@ -45,7 +45,8 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
     - Ikonstil (hörn, linjevikt), glas och kanter i ljust läge, scrim, kortens form.
     - Referenser: Apple, Pinterest, Spotify.
 2. **Datamodell i koden** (brief 12, `docs/briefs/12-datamodell.md`): Produkt / Återförsäljare / Erbjudande (koden speglar troligen den gamla modellen). Lägg in "följbar" för återförsäljare, samling och område.
-3. **Produktdetalj** (brief 13, `docs/briefs/13-produktdetalj.md`) (mest efterfrågade luckan), sedan **Samlingsdetalj**
+3. ✅ **Produktdetalj** (brief 13–18) — klar, enhetstest godkänt 2026-11-19. Hierarkirörelsen (zoom från kortet, stängning med swipe ned/kantswipe, ett steg bakom) är en del av den, se design.md §8c.
+3b. **Nästa:** lightbox på hero (egen brief, återanvänder zoomen), sedan **Samlingsdetalj**.
 4. **Sparat** med egna samlingar och följda (AsyncStorage)
 5. **Hem** (hyllor) i ny design, sedan **Flöde** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning
@@ -70,6 +71,13 @@ Supabase-projekt och schema (collections, collection_items, follows) · konton �
 - [x] Pillens funktion: byter innehåll överst på Hem. Text-flikar filtrerar i listor (2026-11-18)
 - [ ] Ljust foto-glas ser fel ut över mörka bilder i ljust tema (Daniel, 2026-11-18). Pausat, tweakas visuellt senare. Idéer: lägre alfa med mörk tint, eller tunn scrim bakom glaset.
 - [x] Vågig toppkant: avskriven 2026-11-19 (Daniel). iOS-blur klipps hårt av mask och gav en synlig kant trots tre försök (brief 08, 10, 11). Rak EdgeFade gäller. Kvar att städa: vågkoden i EdgeFade/theme och växlarna på dev-sidan.
+- [ ] Sidan bakom syns ett steg (godkänt 2026-11-19). Kantswipe: inget att ändra på utseendet.
+- [ ] Rensa vågkant-koden och dev-växlarna (EdgeFade, `theme/glass.ts`, dev-sidan).
+- [ ] Ersätt iOS native top edge effect på flikskärmarna (`scrollEdgeEffects.top: 'hidden'`) med egen EdgeFade.
+- [ ] Tokens `success`/`warning`/`successSubtle`: används bara av Hitta, CardShowcase och ClusterCard. Städas med dem.
+- [ ] Initialkrock "AV" (Ateljé Väst / Andra Varvet).
+- [ ] Ljust foto-glas över mörk bild bedöms på enhet.
+- [ ] Looken A i Claude Design saknar Produktdetalj-avvikelserna (design.md §8b).
 - [ ] Hitta: hur ser dialog med urval och jämförelse ut? (designfråga när Hitta är på tur)
 - [ ] Ska ia-karta och wireframes justeras till de nya flikrollerna?
 

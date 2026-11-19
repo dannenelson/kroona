@@ -43,6 +43,7 @@ Hem är det som är relevant nu, Flöde är det man följer.
 - **Nytt (Köp hos):** sorterbart, default pris.
 - **Hållbarhet** informerar och dömer aldrig. Data visas neutralt.
 - **Tillbaka-knappen** går alltid till skärmen man kom från.
+- **Navigation till detaljvyer** (Produkt, Samling, Partner): öppnas med zoom från källelementet och stängs med swipe ned, kantswipe eller tillbaka-knappen till föregående skärm. Alla produktkort öppnar Produktdetalj, och man kommer alltid tillbaka till exakt den plats man kom från (se design.md §8c).
 - **Egna samlingar** byggs i Fas 0 med lokal lagring (AsyncStorage).
 - **Område** = kategori eller stil med kurerat innehåll (t.ex. Hemmakontor, Skandinavisk stil).
 - **Följa** (varumärke, företag, område, samling) byggs i Fas 0 lokalt, med några förvalda följda i demot. Konton och följa användare är Fas 1+.

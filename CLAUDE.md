@@ -23,6 +23,11 @@ Kroona är en svensk e-handelsupptäcktsapp (mode + heminredning). Vi bygger **F
 - Delad komponent först när den används på 2+ skärmar och har en tydlig roll.
 - **Koden har ännu gamla värden** (`#0f0f0e`, Google Sans Flex i `constants/`). Migreringen till `theme/` är ett eget steg i planen. Gör den inte på eget initiativ.
 
+## Navigation och felsökning
+- Roten är react-native-screen-transitions `BlankStack`, inte Expo Routers native stack. Nya detaljskärmar behöver egna transition-options (se `components/product/productTransition.ts`). Reanimated 4 är installerat (krävs av biblioteket).
+- Tillfällig felsökningskod (autotryck, loggning) får aldrig committas.
+- Döda aldrig Daniels Expo-server (ingen `pkill -f 'expo start'`). Kör egna tester på en egen port och stäng bara din egen process.
+
 ## Scope — bygg INTE i Fas 0
 Backend-databas, riktig tracking/attribution, provisionslogik, återförsäljardashboard, aktiva push-notiser. Hör de till Fas 1+? Flagga och stanna.
 
