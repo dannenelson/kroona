@@ -4,7 +4,7 @@
 // kom från. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
 import { useEffect, useMemo, useRef } from 'react';
-import { Animated, Image, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -129,19 +129,18 @@ export default function ProductScreen() {
           useNativeDriver: true,
         })}
       >
-        {/* Spik (brief 16): heron är målet för zoom-övergången från kortet. */}
-        {/* Platt stil på barnet till <Link.AppleZoomTarget>, som till <Link asChild>.
-            Explicita pixelmått: AppleZoomTarget lägger en native omslagsvy med
-            display: 'contents', och procentmått inuti den blev 0 (ingen hero syntes). */}
-        <Link.AppleZoomTarget>
-          <View style={StyleSheet.flatten([styles.hero, { width, height: heroHeight }])}>
+        {/* Zoom-målet (spik brief 16) är bilden själv, inte vyn runt den: med en
+            View som målets barn ritades inte bilden i den (laddad och med rätt
+            mått men osynlig). Heron-vyn ger platshållarfärgen runt. */}
+        <View style={[styles.hero, { width, height: heroHeight }]}>
+          <Link.AppleZoomTarget>
             <Image
               source={{ uri: product.imageUrl }}
               style={{ width, height: heroHeight }}
               resizeMode="cover"
             />
-          </View>
-        </Link.AppleZoomTarget>
+          </Link.AppleZoomTarget>
+        </View>
 
         <Animated.View style={{ opacity: reveal }}>
           <View style={styles.info}>

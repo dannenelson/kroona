@@ -1,4 +1,5 @@
-import { Stack } from 'expo-router';
+import { useMemo } from 'react';
+import { Stack, ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
@@ -52,7 +53,16 @@ function FontLoading() {
 
 function AppShell() {
   const { scheme, colors } = useTheme();
+  // Navigationens tema följer vårt tema (spik brief 16): native-stackens
+  // container får sin bakgrund härifrån och syns bakom en skärm som krymper
+  // (zoom-stängning). Utan detta syntes standardtemats ljusa grå.
+  const navigationTheme = useMemo(() => {
+    const base = scheme === 'dark' ? DarkTheme : DefaultTheme;
+    return { ...base, colors: { ...base.colors, background: colors.bg, card: colors.bg } };
+  }, [scheme, colors.bg]);
   return (
+    <NavigationThemeProvider value={navigationTheme}>
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
     <SavedProductsProvider>
       <FollowedCollectionsProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
@@ -65,5 +75,7 @@ function AppShell() {
         </ContextMenuProvider>
       </FollowedCollectionsProvider>
     </SavedProductsProvider>
+    </View>
+    </NavigationThemeProvider>
   );
 }
