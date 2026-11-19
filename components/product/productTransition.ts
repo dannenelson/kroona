@@ -16,14 +16,26 @@ const STACK_DEPTH_EPSILON = 0.001;
  * Bara ETT steg bakom ska synas (grid → A → B: när B dras syns A, inte gridden
  * i A:s kanter). stackProgress summerar progress från toppen ned till och med
  * skärmen själv, så djupet (antal skärmar ovanför) är stackProgress − 1.
- * Returnerar ett dolt innehåll för skärmar med två eller fler ovanför, annars
- * null. Den i fokus (djup 0) och den närmast under (djup 1) påverkas aldrig.
+ * Sätter alltid innehållets opacitet: 0 för skärmar med två eller fler ovanför,
+ * annars 1 (zoomens egen opacitet behålls om den finns). Den i fokus (djup 0) och den närmast under (djup 1) påverkas aldrig.
  * Bakom A syns då rotens solida temabakgrund (colors.bg i app/_layout).
  */
-export function hideWhenDeep(stackProgress: number): TransitionInterpolatedStyle | null {
+export function withDepthVisibility(
+  style: TransitionInterpolatedStyle,
+  stackProgress: number,
+): TransitionInterpolatedStyle {
   'worklet';
   const depth = stackProgress - 1;
-  return depth > 1 + STACK_DEPTH_EPSILON ? { content: { style: { opacity: 0 } } } : null;
+  // Alltid explicit opacitet: en skärm som varit dold (djup 2) måste få
+  // opacitet 1 igen när den åter är på djup 0 eller 1, annars ligger 0 kvar.
+  if (depth > 1 + STACK_DEPTH_EPSILON) return { content: { style: { opacity: 0 } } };
+  const content = style.content as Record<string, unknown> | undefined;
+  if (!content) return { ...style, content: { style: { opacity: 1 } } };
+  if ('style' in content || 'props' in content) {
+    const inner = (content.style ?? {}) as Record<string, unknown>;
+    return { ...style, content: { ...content, style: { opacity: 1, ...inner } } };
+  }
+  return { ...style, content: { opacity: 1, ...content } };
 }
 
 /** Flikarna (gridden): som idag, men dolda när två eller fler skärmar ligger ovanför. */
@@ -31,7 +43,7 @@ export const tabsScreenOptions: BlankStackNavigationOptions = {
   inactiveBehavior: 'pause',
   screenStyleInterpolator: ({ stackProgress }) => {
     'worklet';
-    return hideWhenDeep(stackProgress) ?? {};
+    return withDepthVisibility({}, stackProgress);
   },
 };
 
@@ -51,13 +63,14 @@ export const productScreenOptions: BlankStackNavigationOptions = {
   ],
   screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
     'worklet';
-    const hidden = hideWhenDeep(stackProgress);
-    if (hidden) return hidden;
     const id = (active.route.params as { id?: string } | undefined)?.id;
-    if (!id) return {};
-    return bounds({ id, group: PRODUCT_BOUNDARY_GROUP }).navigation.zoom({
-      borderRadius: screenCornerRadius(insets.top),
-    });
+    if (!id) return withDepthVisibility({}, stackProgress);
+    return withDepthVisibility(
+      bounds({ id, group: PRODUCT_BOUNDARY_GROUP }).navigation.zoom({
+        borderRadius: screenCornerRadius(insets.top),
+      }),
+      stackProgress,
+    );
   },
   transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
 };
