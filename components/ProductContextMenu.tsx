@@ -19,7 +19,7 @@ import {
   type ImageSourcePropType,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
-import * as Haptics from 'expo-haptics';
+import { haptic } from '../utils/haptic';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, edgeBlur, typography, spacing, radius, motion, iconSize } from '../theme';
 import { useReduceMotion } from '../hooks/useReduceMotion';
@@ -195,7 +195,7 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
       if (state.highlighted === i) return;
       state.highlighted = i;
       setHighlighted(i);
-      if (i !== null) Haptics.selectionAsync();
+      if (i !== null) haptic.selection();
     },
     [state],
   );
@@ -247,7 +247,7 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
     (i: number) => {
       const item = state.request?.items[i];
       if (!item) return;
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      haptic.success();
       item.onPress?.();
       close();
     },
@@ -265,7 +265,7 @@ export function ContextMenuProvider({ children }: { children: ReactNode }) {
       setRequest(req);
       // Samma batch som kopian monteras: originalet döljs i samma frame.
       req.setOriginalHidden(true);
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      haptic.light();
       progress.setValue(0);
       backdrop.setValue(0);
       Animated.timing(backdrop, {

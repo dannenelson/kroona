@@ -2,6 +2,7 @@ import { Animated, Pressable, StyleSheet, Text, View, type StyleProp, type ViewS
 import { useTheme, typography, spacing, radius, motion, touchTarget } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
 import { usePressAnimation } from '../hooks/usePressAnimation';
+import { haptic } from '../utils/haptic';
 
 type Props = {
   children: string;
@@ -77,7 +78,10 @@ export default function Pill({
       accessibilityRole="button"
       accessibilityState={{ selected, disabled }}
       disabled={disabled}
-      onPress={onPress}
+      onPress={() => {
+        haptic.light();
+        onPress?.();
+      }}
       hitSlop={{ top: HIT, bottom: HIT }}
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}

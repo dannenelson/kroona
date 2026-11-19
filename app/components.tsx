@@ -19,6 +19,8 @@ import ArchiveIcon from '../assets/icons/ArchiveIcon';
 import NewChatIcon from '../assets/icons/NewChatIcon';
 import BookmarkIcon from '../assets/icons/BookmarkIcon';
 import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
+import HeartIcon from '../assets/icons/HeartIcon';
+import HeartIconFilled from '../assets/icons/HeartIcon_filled';
 
 const [P1, P2, P3] = PRODUCTS;
 // Ljusaste och mörkaste produktfotot (uppmätt medelluminans 0,69 resp. 0,45),
@@ -48,6 +50,9 @@ export default function ComponentsScreen() {
   const [tab, setTab] = useState<Tab>('Alla');
   const [pressTab, setPressTab] = useState<(typeof PRESS_TABS)[number]>('Alla');
   const [topSaved, setTopSaved] = useState(false);
+  // Tryckbara vald-exempel: se fylld ikon och "pop" vid markering (brief 09).
+  const [demoSaved, setDemoSaved] = useState(false);
+  const [demoLiked, setDemoLiked] = useState(false);
   const [fadeBlur, setFadeBlur] = useState(true);
   // Test av toppkantens nedre gräns (brief 10). Standard rak.
   const [fadeWave, setFadeWave] = useState(false);
@@ -86,6 +91,25 @@ export default function ComponentsScreen() {
         </Section>
 
         <Section title="1 · IconButton (glas)">
+          <Caption>Vald = fylld ikon. Tryck för att markera (pop + lätt haptik), tryck igen för att avmarkera.</Caption>
+          <View style={styles.pressRow}>
+            <IconButton
+              tone="plain"
+              icon={BookmarkIcon}
+              selectedIcon={BookmarkIconFilled}
+              accessibilityLabel="Spara"
+              selected={demoSaved}
+              onPress={() => setDemoSaved((v) => !v)}
+            />
+            <IconButton
+              tone="plain"
+              icon={HeartIcon}
+              selectedIcon={HeartIconFilled}
+              accessibilityLabel="Gilla"
+              selected={demoLiked}
+              onPress={() => setDemoLiked((v) => !v)}
+            />
+          </View>
           {PHOTOS.map((photo) => (
             <View key={photo.label} style={styles.photoBlock}>
               <Caption>Över {photo.label}</Caption>
@@ -152,6 +176,7 @@ export default function ComponentsScreen() {
         <Section title="3 · TextTabs" bleed>
           <Caption inset>Scrollar horisontellt · Inaktiv: Dekor</Caption>
           <TextTabs items={TABS} selected={tab} onSelect={setTab} disabledItems={['Dekor']} />
+          <Caption inset>Byt flik: text och understrykning tonar, selection-haptik.</Caption>
         </Section>
 
         <Section title="4 · ProductCard">

@@ -15,7 +15,7 @@ Komponenternas former (korttaxonomi, SectionHeader, TopBar, TextTabs) ligger kva
 Källa: Claude Design "Kroona Looken A" (hela setet, mörkt och ljust). Implementerat i brief 04; tabellerna i §2–§8 nedan matchar koden.
 
 - **Ingen accentfärg.** Neutral gråskala, fotot är enda färgen. Guld `#B8965A` utgår.
-- **Vald** = inverterad text/yta (mörk pill på ljust, ljus pill på mörkt). **Nedtryckt** = djupare yta + lätt nedskalning. **Inaktiv** = 35 % opacitet.
+- **Vald** = inverterad text/yta för pillar (mörk pill på ljust, ljus pill på mörkt). **IconButton vald** = fylld ikon (outline → fylld, som iOS), yta och färg oförändrade, med kort pop vid markering (2026-11-19). **Nedtryckt** = djupare yta + lätt nedskalning. **Inaktiv** = 35 % opacitet.
 - **Hörn:** squircle (`borderCurve: 'continuous'` i RN) på alla rundningar utom cirklar och pillar.
 - **Kanter:** kort toning + gradvis blur överst (bakom statusfält/Dynamic Island, något högre än den) och underst (bakom navigationen). Nav-ikoner låga, nära hemindikatorn. Komponent `EdgeFade`.
 - **Spara:** bokmärke, via långt tryck-meny (Spara · Följ varumärke · Dela · Visa liknande) plus en Spara-knapp på Produktdetalj.
@@ -97,7 +97,7 @@ Följer temat. Tre toner i `components/Glass.tsx`: `theme` (över innehåll), `p
 
 **Opacitet (brief 06, Daniels kriterium):** lägsta fyllning som klarar text ≥ 4,5:1 och ikoner ≥ 3:1 mot de ljusaste och mörkaste produktfotona (inte helt svart/vitt), med iOS-materialets tint som extra stöd, golv 0,20 och utan att höja något. Temaglas bär ikoner (ikonkrav), foto-glas bär pillar (textkrav). Mörkt foto-glas står kvar på taket 0,34: fyllningen ensam ger 4,2:1 mot det ljusaste fotot, resten bärs av tinten och bedöms på enhet. 🟡
 
-Vald på glas är inverterad mot glaset: glasets innehållsfärg som yta, `bg` som ikon/text (mörkt tema ljus yta, ljust tema mörk yta, även på foto).
+Vald glaspill är inverterad mot glaset: glasets innehållsfärg som yta, `bg` som text (mörkt tema ljus yta, ljust tema mörk yta, även på foto). IconButton på glas visar i stället fylld ikon.
 
 **Rundning på glas:** blur-lagret, fyllningen och kanten får var sin radie, kanten är ett eget lager, och radien kläms till halva höjden. Annars klipps inte blurren av förälderns runda hörn på iOS (raka kanter). Inaktivt glas tonas inuti glaset, inte på blurrens förälder.
 
@@ -175,6 +175,9 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 | Tryck (`pressIn` / `pressOutSpring`) | in 90 ms ease-out, ut fjäder damping 14, stiffness 320, mass 0,6. Skala och ytbyte animeras med native driver. Reduce motion: bara ytbytet. Ingen haptik på vanliga tryck | ✅ |
 | Kontextmeny | spring damping 18, stiffness 260, mass 1 (in, ut utan översvängning). Kopian har originalets storlek och radie och lyfts med transform; originalet är dolt medan menyn är öppen och byts tillbaka i samma frame. Menyn växer från 0,6 och glider 12 px från kortet. Bakgrund tonar 150 / 180 ms. Reduce motion: bara toning | ✅ |
 | Haptik (meny) | lätt vid öppning, `selection` vid radbyte, `success` vid val | ✅ |
+| Haptik (komponenter) | `haptic.light()` vid tryck på IconButton och Pill, `haptic.selection()` vid flikbyte i TextTabs. Inte på kort, nav-flikar eller inaktiva element. Samlad i `utils/haptic.ts` (kan stängas av där) | ✅ |
+| Fliktoning (`tabFade`) | 160 ms: text mute → text, understrykning tonar in och växer från 0,6. Reduce motion: direkt byte | ✅ |
+| Pop (`popScale`) | IconButton vald: 1 → 1,15 (90 ms) → 1 med fjäder. Bara vid markering, inte med reduce motion | ✅ |
 | Äldre komponenter | opacity 0,8 tills de görs om | 🔵 |
 | Reduce motion | respekteras alltid | ✅ krav |
 

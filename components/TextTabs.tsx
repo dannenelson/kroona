@@ -1,6 +1,9 @@
+import { useEffect, useRef } from 'react';
 import { Animated, Pressable, ScrollView, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, typography, spacing, motion, touchTarget } from '../theme';
 import { usePressAnimation } from '../hooks/usePressAnimation';
+import { useReduceMotion } from '../hooks/useReduceMotion';
+import { haptic } from '../utils/haptic';
 
 type Props<T extends string> = {
   items: readonly T[];
@@ -19,6 +22,7 @@ const UNDERLINE = 2; // lokal linjetjocklek för understrykningen
  * horisontellt vid många. Används för filtrering i stället för pillar.
  * States enligt design.md §0: default (mute), pressed (text-färg, opacitet 0,55, animerat),
  * selected (text-färg + understrykning i text-färg), disabled (35 % opacitet).
+ * Flikbyte tonar text och understrykning (brief 09) med selection-haptik.
  */
 export default function TextTabs<T extends string>({
   items,
@@ -41,7 +45,11 @@ export default function TextTabs<T extends string>({
           label={item}
           selected={item === selected}
           disabled={disabledItems?.includes(item) ?? false}
-          onPress={() => onSelect(item)}
+          onPress={() => {
+            if (item === selected) return;
+            haptic.selection();
+            onSelect(item);
+          }}
         />
       ))}
     </ScrollView>
@@ -49,8 +57,9 @@ export default function TextTabs<T extends string>({
 }
 
 /**
- * En flik. Nedtryckt tonar en label i text-färg (opacitet upp till 0,55)
- * över mute-labeln, animerat (brief 06). Ingen skala på text-flikar.
+ * En flik. Mute-labeln ligger i botten; ovanpå tonar en label i text-färg in
+ * när fliken blir vald (brief 09), och upp till 0,55 när den trycks (brief 06).
+ * Understrykningen tonar in och växer från mitten. Ingen skala på texten.
  */
 function Tab({
   label,
@@ -69,6 +78,20 @@ function Tab({
     inputRange: [0, 1],
     outputRange: [0, motion.pressedTextOpacity],
   });
+  const reduceMotion = useReduceMotion();
+  const active = useRef(new Animated.Value(selected ? 1 : 0)).current;
+  useEffect(() => {
+    const to = selected ? 1 : 0;
+    if (reduceMotion) {
+      active.setValue(to);
+      return;
+    }
+    Animated.timing(active, { toValue: to, duration: motion.tabFade, useNativeDriver: true }).start();
+  }, [selected, reduceMotion, active]);
+  const underlineScale = active.interpolate({
+    inputRange: [0, 1],
+    outputRange: [motion.tabUnderlineFrom, 1],
+  });
   return (
     <Pressable
       accessibilityRole="tab"
@@ -80,7 +103,7 @@ function Tab({
       style={[styles.tab, disabled && styles.disabled]}
     >
       <View>
-        <Text style={[styles.label, selected && styles.labelActive]}>{label}</Text>
+        <Text style={styles.label}>{label}</Text>
         {!selected && (
           <Animated.Text
             style={[styles.label, styles.labelActive, styles.overlay, { opacity: pressedOpacity }]}
@@ -88,8 +111,13 @@ function Tab({
             {label}
           </Animated.Text>
         )}
+        <Animated.Text style={[styles.label, styles.labelActive, styles.overlay, { opacity: active }]}>
+          {label}
+        </Animated.Text>
       </View>
-      {selected && <View style={styles.underline} />}
+      <Animated.View
+        style={[styles.underline, { opacity: active, transform: [{ scaleX: underlineScale }] }]}
+      />
     </Pressable>
   );
 }

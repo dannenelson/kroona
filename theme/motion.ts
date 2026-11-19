@@ -24,6 +24,14 @@ export const motion = {
   pressIn: 90,
   /** Släpp: lätt fjäder tillbaka. */
   pressOutSpring: { damping: 14, stiffness: 320, mass: 0.6 },
+  /** Text-flikar: tonar text och understrykning vid flikbyte (ms). */
+  tabFade: 160,
+  /** Understrykningen växer från mitten från denna bredd. */
+  tabUnderlineFrom: 0.6,
+  /** IconButton vald: ikonen "poppar" 1 → popScale → 1 (bara vid markering). */
+  popScale: 1.15,
+  popIn: 90,
+  popSpring: { damping: 10, stiffness: 300, mass: 0.6 },
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */
