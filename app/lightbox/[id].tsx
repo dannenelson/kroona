@@ -11,7 +11,7 @@
 //   vertikalt nedåt lämnas till bibliotekets stängningsgest, och drag från
 //   vänsterkanten lämnas till kantswipen.
 // - Dubbeltryck växlar 1x ↔ 2,5x. Släpp under 1x fjädrar tillbaka.
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -35,7 +35,14 @@ import Transition from 'react-native-screen-transitions';
 import { motion, overlay, spacing } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import { getProductImages } from '../../lib/catalog';
-import { lightboxGestureLock, lightboxIndex, notifyLightboxIndex } from '../../lib/lightboxStore';
+import {
+  getCachedImageSize,
+  lightboxGestureLock,
+  lightboxIndex,
+  lightboxTargetIndex,
+  prefetchImageSizes,
+  type ImageSize,
+} from '../../lib/lightboxStore';
 import { LIGHTBOX_BOUNDARY_GROUP, lightboxBoundaryId } from '../../components/product/productTransition';
 import PagerDots from '../../components/PagerDots';
 import IconButton from '../../components/IconButton';
@@ -45,7 +52,9 @@ import CloseIcon from '../../assets/icons/CloseIcon';
 const ZOOM_EPSILON = 0.01;
 
 export default function LightboxScreen() {
-  const { id, hero } = useLocalSearchParams<{ id: string; hero?: string }>();
+  const params = useLocalSearchParams<{ id: string; hero?: string; index?: string }>();
+  const { id, hero } = params;
+  const startIndex = Number(params.index ?? 0) || 0;
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width, height } = useWindowDimensions();
@@ -55,10 +64,20 @@ export default function LightboxScreen() {
   const lastIndex = Math.max(0, images.length - 1);
 
   // Bildernas riktiga proportion: zoomens mål är bildens contain-rektangel.
-  const [sizes, setSizes] = useState<Record<string, { w: number; h: number }>>({});
+  // Storlekarna är hämtade i förväg av heron (lib/lightboxStore), så målet är
+  // rätt redan vid första mätningen. Saknas en storlek hämtas den här.
+  const [sizes, setSizes] = useState<Record<string, ImageSize>>(() => {
+    const known: Record<string, ImageSize> = {};
+    images.forEach((uri) => {
+      const s = getCachedImageSize(uri);
+      if (s) known[uri] = s;
+    });
+    return known;
+  });
   useEffect(() => {
-    images.forEach((uri) =>
-      Image.getSize(uri, (w, h) => setSizes((prev) => (prev[uri] ? prev : { ...prev, [uri]: { w, h } }))),
+    prefetchImageSizes(
+      images.filter((uri) => !sizes[uri]),
+      (uri, s) => setSizes((prev) => (prev[uri] ? prev : { ...prev, [uri]: s })),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
@@ -70,7 +89,11 @@ export default function LightboxScreen() {
   };
 
   // Pager: förflyttning i px (negativ åt höger), index i den delade storen.
-  const pageX = useSharedValue(-lightboxIndex.value * width);
+  // Bara den aktuella bilden är zoommål (brief 21): flera mål i samma grupp
+  // tävlar om gruppens aktiva id, och mål utanför skärmen håller övergången
+  // tills biblioteket ger upp (ca 320 ms), så att öppningen "dyker upp".
+  const [current, setCurrent] = useState(startIndex);
+  const pageX = useSharedValue(-startIndex * width);
   const position = useDerivedValue(() => -pageX.value / Math.max(1, width));
 
   // Zoom för den bild som visas.
@@ -80,6 +103,30 @@ export default function LightboxScreen() {
   const ty = useSharedValue(0);
   const panStart = useSharedValue({ x: 0, y: 0, tx: 0, ty: 0 });
   const zoomed = useDerivedValue(() => scale.value > 1 + ZOOM_EPSILON);
+
+  // Säkra att interpolatorns index stämmer med route-paramen från första bildrutan.
+  useLayoutEffect(() => {
+    lightboxIndex.value = startIndex;
+    lightboxTargetIndex.value = startIndex;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Efter bläddring: flytta zoomens mål först när heron har scrollat (UI-tråden,
+  // HeroPager) och den nya bildens boundary är aktiv. Två bildrutor räcker för
+  // att scroll och layout ska ha slagit igenom innan biblioteket mäter källan.
+  useEffect(() => {
+    if (lightboxTargetIndex.value === current) return;
+    let second = 0;
+    const first = requestAnimationFrame(() => {
+      second = requestAnimationFrame(() => {
+        lightboxTargetIndex.value = current;
+      });
+    });
+    return () => {
+      cancelAnimationFrame(first);
+      cancelAnimationFrame(second);
+    };
+  }, [current]);
 
   // Vid stängning/avmontering: lås upp så att Produktdetalj inte ärver låset.
   useEffect(
@@ -107,8 +154,9 @@ export default function LightboxScreen() {
     pageX.value = withSpring(-target * width, motion.spring);
     if (lightboxIndex.value !== target) {
       lightboxIndex.value = target;
-      // Heron hoppar till samma bild, så att stängningen landar rätt.
-      scheduleOnRN(notifyLightboxIndex, target);
+      // Heron hoppar till samma bild (HeroPager, UI-tråden) och målet flyttas,
+      // så att stängningen landar rätt.
+      scheduleOnRN(setCurrent, target);
     }
   };
 
@@ -219,6 +267,7 @@ export default function LightboxScreen() {
               <Transition.Boundary
                 id={hero ? lightboxBoundaryId(hero, index) : `${id}_${index}`}
                 group={LIGHTBOX_BOUNDARY_GROUP}
+                enabled={index === current}
                 style={fitted(uri)}
               >
                 <ZoomLayer index={index} scale={scale} tx={tx} ty={ty}>

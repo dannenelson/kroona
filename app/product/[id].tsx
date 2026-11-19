@@ -153,10 +153,12 @@ export default function ProductScreen() {
   const back = () => router.back();
   const heroBoundaryId = b ?? id;
   // Valt bildindex delas via lib/lightboxStore (sätts av HeroPager vid tryck).
-  const openLightbox = () =>
+  // Index skickas både som route-param (lightboxens första rendering) och som
+  // shared value (interpolatorn), se HeroPager.
+  const openLightbox = (index: number) =>
     router.push({
       pathname: '/lightbox/[id]',
-      params: { id, hero: heroBoundaryId },
+      params: { id, hero: heroBoundaryId, index: String(index) },
     });
   const onOffer = (offer: Offer) => {
     const name = getRetailer(offer.retailerId)?.name ?? 'återförsäljaren';

@@ -6,7 +6,7 @@ import type { TransitionInterpolatedStyle } from 'react-native-screen-transition
 import type { BlankStackNavigationOptions } from 'react-native-screen-transitions/expo-router';
 import { scheduleOnUI } from 'react-native-worklets';
 import { motion, radius, spacing } from '../../theme';
-import { lightboxGestureLock, lightboxIndex } from '../../lib/lightboxStore';
+import { lightboxGestureLock, lightboxTargetIndex } from '../../lib/lightboxStore';
 
 /** Grupp för produktbilder: kort (källa) och hero (mål) delar `id` = produkt-id. */
 export const PRODUCT_BOUNDARY_GROUP = 'product';
@@ -131,7 +131,7 @@ export const lightboxScreenOptions: BlankStackNavigationOptions = {
     if (!hero) {
       return { ...withDepthVisibility({}, stackProgress), options: { gestureEnabled } };
     }
-    const id = `lb_${hero}_${lightboxIndex.value}`;
+    const id = `lb_${hero}_${lightboxTargetIndex.value}`;
     return {
       ...withDepthVisibility(
         bounds({ id, group: LIGHTBOX_BOUNDARY_GROUP }).navigation.zoom({

@@ -5,7 +5,7 @@ import Reanimated, {
   useAnimatedStyle,
   type SharedValue,
 } from 'react-native-reanimated';
-import { overlay, pagerDots, radius } from '../theme';
+import { overlay, pagerDots, photoShadows, radius } from '../theme';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 
 type Props = {
@@ -13,6 +13,8 @@ type Props = {
   /** Sidposition som flyttal (0 = första sidan, 1,5 = mitt emellan andra och tredje). */
   position: SharedValue<number>;
   style?: StyleProp<ViewStyle>;
+  /** Direkt på foto utan bakgrund (heron): högre opacitet på inaktiva och mjuk skugga. */
+  onPhoto?: boolean;
 };
 
 /**
@@ -22,28 +24,29 @@ type Props = {
  * man drar. Minska rörelse: punkterna byter direkt vid närmaste sida.
  * Återanvändbar (lightbox nu, hero senare).
  */
-export default function PagerDots({ count, position, style }: Props) {
+export default function PagerDots({ count, position, style, onPhoto = false }: Props) {
   if (count < 2) return null;
   return (
     <View style={[styles.row, style]} pointerEvents="none">
       {Array.from({ length: count }, (_, i) => (
-        <Dot key={i} index={i} position={position} />
+        <Dot key={i} index={i} position={position} onPhoto={onPhoto} />
       ))}
     </View>
   );
 }
 
-function Dot({ index, position }: { index: number; position: SharedValue<number> }) {
+function Dot({ index, position, onPhoto }: { index: number; position: SharedValue<number>; onPhoto: boolean }) {
   const reduceMotion = useReduceMotion();
+  const inactive = onPhoto ? pagerDots.inactiveOpacityOnPhoto : pagerDots.inactiveOpacity;
   const dotStyle = useAnimatedStyle(() => {
     const p = reduceMotion ? Math.round(position.value) : position.value;
     const distance = Math.abs(p - index);
     return {
       width: interpolate(distance, [0, 1], [pagerDots.activeLength, pagerDots.size], Extrapolation.CLAMP),
-      opacity: interpolate(distance, [0, 1], [1, pagerDots.inactiveOpacity], Extrapolation.CLAMP),
+      opacity: interpolate(distance, [0, 1], [1, inactive], Extrapolation.CLAMP),
     };
   });
-  return <Reanimated.View style={[styles.dot, dotStyle]} />;
+  return <Reanimated.View style={[styles.dot, onPhoto && styles.dotOnPhoto, dotStyle]} />;
 }
 
 const styles = StyleSheet.create({
@@ -57,5 +60,8 @@ const styles = StyleSheet.create({
     height: pagerDots.size,
     borderRadius: radius.full,
     backgroundColor: overlay.onPhoto,
+  },
+  dotOnPhoto: {
+    boxShadow: photoShadows.pagerDot,
   },
 });

@@ -1,12 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { Image, StyleSheet, View } from 'react-native';
-import Reanimated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
+import Reanimated, {
+  scrollTo,
+  useAnimatedReaction,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useSharedValue,
+} from 'react-native-reanimated';
 import Transition from 'react-native-screen-transitions';
-import { radius, spacing } from '../../theme';
-import Glass from '../Glass';
+import { spacing } from '../../theme';
 import PagerDots from '../PagerDots';
 import { LIGHTBOX_BOUNDARY_GROUP, lightboxBoundaryId } from './productTransition';
-import { lightboxIndex, subscribeLightboxIndex } from '../../lib/lightboxStore';
+import { lightboxHero, lightboxIndex, lightboxTargetIndex, prefetchImageSizes } from '../../lib/lightboxStore';
 
 type Props = {
   images: string[];
@@ -20,7 +25,7 @@ type Props = {
 
 /**
  * Heron som bildbläddrare (brief 20). Fler än en bild: horisontell pager med
- * PagerDots nedtill i en mörk glaspill (läsbar mot ljusa och mörka foton). En
+ * PagerDots nedtill direkt på fotot (mjuk skugga, läsbar mot ljusa och mörka foton). En
  * bild: bara bilden. Varje bild är en egen boundary (lb_<heroId>_<index>) så
  * att lightboxen öppnas från och stängs till rätt bild. Transition.ScrollView
  * gör att biblioteket vet pagerns läge: kantswipe stänger på första bilden,
@@ -28,19 +33,30 @@ type Props = {
  */
 export default function HeroPager({ images, heroBoundaryId, width, height, onOpen }: Props) {
   const position = useSharedValue(0);
-  const scrollRef = useRef<Reanimated.ScrollView>(null);
+  const scrollRef = useAnimatedRef<Reanimated.ScrollView>();
 
   const onScroll = useAnimatedScrollHandler((e) => {
     position.value = e.contentOffset.x / Math.max(1, width);
   });
 
-  // Rätt bild tillbaka: lightboxen meddelar sitt index, heron hoppar dit utan animation.
-  useEffect(
-    () =>
-      subscribeLightboxIndex((index) => {
-        scrollRef.current?.scrollTo({ x: index * width, animated: false });
-      }),
-    [width],
+  // Lightboxens zoommål kräver bildernas storlek redan när den öppnas (brief 21).
+  const imagesKey = images.join('|');
+  useEffect(() => {
+    prefetchImageSizes(images);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imagesKey]);
+
+  // Rätt bild tillbaka (brief 21): när man bläddrar i lightboxen hoppar heron
+  // till samma bild utan animation, på UI-tråden i samma ögonblick som indexet
+  // ändras. Då står heron rätt innan biblioteket mäter källan för stängningen.
+  // Bara den hero som öppnade lightboxen (andra detaljvyer i stacken rörs inte).
+  useAnimatedReaction(
+    () => lightboxIndex.value,
+    (index, previous) => {
+      if (index === previous || lightboxHero.value !== heroBoundaryId) return;
+      scrollTo(scrollRef, index * width, 0, false);
+    },
+    [heroBoundaryId, width],
   );
 
   const page = (uri: string, index: number) => (
@@ -49,7 +65,9 @@ export default function HeroPager({ images, heroBoundaryId, width, height, onOpe
       id={lightboxBoundaryId(heroBoundaryId, index)}
       group={LIGHTBOX_BOUNDARY_GROUP}
       onPress={() => {
+        lightboxHero.value = heroBoundaryId;
         lightboxIndex.value = index;
+        lightboxTargetIndex.value = index;
         onOpen(index);
       }}
       accessibilityRole="imagebutton"
@@ -74,9 +92,7 @@ export default function HeroPager({ images, heroBoundaryId, width, height, onOpe
         {images.map(page)}
       </Transition.ScrollView>
       <View pointerEvents="none" style={styles.dotsRow}>
-        <Glass tone="dark" style={styles.dotsPill}>
-          <PagerDots count={images.length} position={position} />
-        </Glass>
+        <PagerDots count={images.length} position={position} onPhoto />
       </View>
     </View>
   );
@@ -89,10 +105,5 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: spacing.md,
     alignItems: 'center',
-  },
-  dotsPill: {
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs + spacing.xs / 2,
   },
 });

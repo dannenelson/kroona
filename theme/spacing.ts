@@ -20,4 +20,6 @@ export const pagerDots = {
   activeLength: 18,
   gap: 6,
   inactiveOpacity: 0.4,
+  /** Direkt på foto (heron, brief 21): högre, eftersom ingen bakgrund ligger bakom. */
+  inactiveOpacityOnPhoto: 0.55,
 } as const;

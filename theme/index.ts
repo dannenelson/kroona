@@ -3,7 +3,7 @@ export { darkColors, lightColors, overlay, edgeFadeStops, withAlpha, type ColorR
 export { fonts, typography, letterSpacing } from './typography';
 export { spacing, touchTarget, iconSize, pagerDots } from './spacing';
 export { radius } from './radius';
-export { darkShadows, lightShadows, type Shadows } from './shadows';
+export { darkShadows, lightShadows, photoShadows, type Shadows } from './shadows';
 export { motion } from './motion';
 export { darkGlass, lightGlass, darkPhotoGlass, lightPhotoGlass, edgeBlur, type Glass, type GlassTint } from './glass';
 export { ThemeProvider, useTheme, buildTheme, type Theme, type ColorScheme } from './ThemeProvider';

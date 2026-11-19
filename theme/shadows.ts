@@ -24,3 +24,9 @@ export const lightShadows: Shadows = {
   menu: '0 20px 50px rgba(0,0,0,0.25)',
   glassButton: '0 2px 8px rgba(21,23,27,0.14)',
 };
+
+/** Skuggor för element direkt på foto, samma i båda teman (fotot bestämmer bakgrunden). */
+export const photoShadows = {
+  /** Mjuk mörk ring runt PagerDots på heron (brief 21): läsbar mot ljusa och mörka foton. */
+  pagerDot: '0 0 3px rgba(0,0,0,0.45)',
+} as const;
