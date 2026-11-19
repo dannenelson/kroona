@@ -1,5 +1,5 @@
 import { useState, type ComponentType, type ReactElement } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
+import { StyleSheet, View, useWindowDimensions, type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedViewClass from '@react-native-masked-view/masked-view';
@@ -58,7 +58,9 @@ export default function EdgeFade({
   blurHeight,
   style,
 }: Props) {
-  const [width, setWidth] = useState(0);
+  // Startbredd från fönstret, så att inget behöver vänta på onLayout (brief 17).
+  const windowWidth = useWindowDimensions().width;
+  const [width, setWidth] = useState(windowWidth);
   const { colors, scheme } = useTheme();
   const insets = useSafeAreaInsets();
   const isTop = position === 'top';
@@ -123,7 +125,10 @@ export default function EdgeFade({
     <View
       pointerEvents="none"
       // Bredden mäts alltid, så att växling till vågig ritar direkt.
-      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+      onLayout={(e) => {
+        const w = e.nativeEvent.layout.width;
+        if (w !== width) setWidth(w);
+      }}
       style={[styles.root, isTop ? styles.top : styles.bottom, { height: h }, style]}
     >
       {blurHeight !== undefined && blurHeight < h ? (

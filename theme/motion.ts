@@ -44,7 +44,6 @@ export const motion = {
   dismissVelocity: 900,
   dismissScale: 0.92,
   dismissSpring: { damping: 20, stiffness: 220, mass: 1 },
-  dismissHandoff: 300,
   /** Remsa vid vänsterkanten där iOS egen kantswipe (zoom-stängning) gäller. */
   dismissEdgeWidth: 24,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */

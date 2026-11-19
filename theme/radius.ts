@@ -14,6 +14,10 @@ export const radius = {
   collection: 18,
   /** Chattbubbla. */
   bubble: 20,
+  /** Skärmens egen hörnradie (inget officiellt API): iPhone med Dynamic Island
+   *  ca 55, med notch ca 44. Används när en hel skärm dras (spik brief 17). */
+  screenDynamicIsland: 55,
+  screenNotch: 44,
   /** Pillar och cirkelknappar. */
   full: 999,
 } as const;

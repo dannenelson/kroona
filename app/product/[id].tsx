@@ -12,7 +12,6 @@ import Reanimated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 import { scheduleOnRN } from 'react-native-worklets';
 import {
@@ -21,7 +20,7 @@ import {
   useNativeGesture,
   usePanGesture,
 } from 'react-native-gesture-handler';
-import { Link, useLocalSearchParams, useRouter, usePreventZoomTransitionDismissal } from 'expo-router';
+import { Link, Stack, useLocalSearchParams, useRouter, usePreventZoomTransitionDismissal } from 'expo-router';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur, motion } from '../../theme';
@@ -51,6 +50,13 @@ import type { Offer } from '../../types/catalog';
 const HERO_ASPECT = 4 / 5;
 const SIMILAR_WIDTH = 140;
 const SIMILAR_IMAGE_HEIGHT = 176;
+
+// iOS tillbakagest bara i kantremsan (spik brief 17). Konstant objekt: ett nytt
+// objekt per render får Stack.Screen att anropa setOptions i en oändlig loop.
+const SCREEN_OPTIONS = {
+  fullScreenGestureEnabled: false,
+  gestureResponseDistance: { end: motion.dismissEdgeWidth },
+};
 
 const STOCK_LABEL: Record<Offer['stock'], string> = {
   in_stock: 'I lager',
@@ -124,10 +130,9 @@ export default function ProductScreen() {
         dragY.value > motion.dismissDistance || e.velocityY > motion.dismissVelocity;
       if (shouldClose) {
         closing.value = true;
-        // Överlämning: native zoomen tar skärmen som den är, medan vårt drag
-        // fjädrar tillbaka inuti den krympande vyn.
+        // Överlämning: vårt drag står kvar (försvinner när skärmen avmonteras),
+        // så native zoomen börjar från draget läge i stället för helskärm.
         scheduleOnRN(close);
-        dragY.value = withTiming(0, { duration: motion.dismissHandoff });
       } else {
         dragY.value = withSpring(0, motion.dismissSpring);
       }
@@ -143,10 +148,15 @@ export default function ProductScreen() {
     ),
   }));
 
+  // Telefonens egen hörnradie under dragningen (ingen annan rundning ska synas),
+  // uppskattad från safe area: Dynamic Island ger större inset än notch.
+  const screenRadius =
+    insets.top >= radius.screenNotch + spacing.sm ? radius.screenDynamicIsland : radius.screenNotch;
   const dismissStyle = useAnimatedStyle(() => {
     const p = interpolate(dragY.value, [0, motion.dismissDistance * 2], [0, 1], Extrapolation.CLAMP);
     return {
-      borderRadius: interpolate(p, [0, 0.25], [0, radius.card], Extrapolation.CLAMP),
+      // Rundningen kommer direkt vid dragets början (inom några px).
+      borderRadius: interpolate(dragY.value, [0, spacing.xs], [0, screenRadius], Extrapolation.CLAMP),
       transform: [
         { translateY: dragY.value },
         { scale: interpolate(p, [0, 1], [1, motion.dismissScale]) },
@@ -213,6 +223,10 @@ export default function ProductScreen() {
   return (
     <GestureDetector gesture={dismissGesture}>
       <Reanimated.View style={[styles.container, styles.dismissable, dismissStyle]}>
+        {/* iOS tillbakagest bara i kantremsan: annars stänger iOS 26:s
+            helskärms-tillbakagest (interactiveContentPopGestureRecognizer)
+            vid högersvep mitt på skärmen. */}
+        <Stack.Screen options={SCREEN_OPTIONS} />
         <GestureDetector gesture={scrollGesture}>
           <Reanimated.ScrollView
             showsVerticalScrollIndicator={false}
