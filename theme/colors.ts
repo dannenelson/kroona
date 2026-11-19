@@ -114,6 +114,9 @@ export const overlay = {
 // Kantblurens toning mot bakgrunden (EdgeFade). Alfa på bg vid stoppen.
 export const edgeFadeStops = {
   top: { alphas: [0.8, 0.5, 0], locations: [0, 0.45, 1] },
+  /** Vågig toppkant (brief 11): glesare toning så den inte känns som ett lock
+   *  över ljusa foton. Vit statusfälttext över helt vitt foto i mörkt tema: ca 4,7:1. */
+  topWave: { alphas: [0.6, 0.3, 0], locations: [0, 0.45, 1] },
   bottom: { alphas: [0.96, 0.8, 0], locations: [0, 0.45, 1] },
 } as const;
 

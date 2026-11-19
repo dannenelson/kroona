@@ -62,7 +62,10 @@ export default function EdgeFade({
   const start = isTop ? { x: 0, y: 0 } : { x: 0, y: 1 };
   const end = isTop ? { x: 0, y: 1 } : { x: 0, y: 0 };
 
-  const fade = isTop ? edgeFadeStops.top : edgeFadeStops.bottom;
+  // Vågig form gäller bara toningen överst (inte blurren). Rak är oförändrad.
+  const wave = shape === 'wave' && isTop;
+
+  const fade = wave ? edgeFadeStops.topWave : isTop ? edgeFadeStops.top : edgeFadeStops.bottom;
   const fadeColors =
     variant === 'photo' && isTop
       ? (overlay.photoFade as Colors)
@@ -70,10 +73,10 @@ export default function EdgeFade({
   const fadeLocations =
     variant === 'photo' && isTop ? undefined : ([...fade.locations] as Stops);
 
-  // Vågig form maskar hela lagret (blur + toning). Bara överst; rak är oförändrad.
-  const wave = shape === 'wave' && isTop;
-
-  const layers = (
+  // Blur-lagren är alltid de raka, mjukt maskade lagren (samma som Rak).
+  // En mask på en förälder till BlurView (UIVisualEffectView) klipper blurren
+  // med en hård kant (brief 11), så den vågiga masken läggs bara på toningen.
+  const blurLayers = (
     <>
       {blur &&
         edgeBlur.layers.map((layer) => (
@@ -98,14 +101,16 @@ export default function EdgeFade({
             />
           </MaskedView>
         ))}
-      <LinearGradient
-        colors={fadeColors}
-        locations={fadeLocations}
-        start={start}
-        end={end}
-        style={StyleSheet.absoluteFill}
-      />
     </>
+  );
+  const fadeLayer = (
+    <LinearGradient
+      colors={fadeColors}
+      locations={fadeLocations}
+      start={start}
+      end={end}
+      style={StyleSheet.absoluteFill}
+    />
   );
 
   return (
@@ -115,17 +120,18 @@ export default function EdgeFade({
       onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
       style={[styles.root, isTop ? styles.top : styles.bottom, { height: h }, style]}
     >
+      {blurLayers}
       {wave ? (
         width > 0 && (
           <MaskedView
             style={StyleSheet.absoluteFill}
             maskElement={<OrganicMask width={width} height={h} />}
           >
-            {layers}
+            {fadeLayer}
           </MaskedView>
         )
       ) : (
-        layers
+        fadeLayer
       )}
     </View>
   );
