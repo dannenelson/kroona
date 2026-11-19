@@ -48,6 +48,24 @@ Hem är det som är relevant nu, Flöde är det man följer.
 - **Följa** (varumärke, företag, område, samling) byggs i Fas 0 lokalt, med några förvalda följda i demot. Konton och följa användare är Fas 1+.
 - **Personalisering:** Kroona minns lokalt vad man söker och jämför. Riktig personalisering över tid är Fas 1+.
 
+## Datamodell (Fas 0, konkret) — brief 12
+Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
+
+| Typ | Fält | Fil |
+|---|---|---|
+| **Produkt** (`CatalogProduct`) | id, brand, name, imageUrl (kanonisk), aspectRatio, featured, sustainabilityScore, `isNewArrival` (märket "Nyhet", inte skick), category, style, gender/ageGroup (kläder), type (möbler), `facts` (material, madeIn, certification, valfria). **Inget pris, inget skick.** | `data/products.ts` (`CATALOG`), `newProducts.ts`, `catalogTopup.ts` |
+| **Återförsäljare** (`Retailer`) | id, `kind: 'retailer'`, name, retailerType (`brand` · `store` · `secondhand`), brandName (för brand), description, values, presence (online, stores[]), initial, defaultFollowed | `data/retailers.ts` |
+| **Erbjudande** (`Offer`) | id, productId, retailerId, price, **condition** (`new` · `used`), conditionNote och **pricing** (`fixed` = "Fast pris", `auction` = "Auktion, bud från") för begagnat, stock (`in_stock` · `few_left` · `out_of_stock`), shipping (text), url (dummy) | `data/offers.ts` |
+| **Område** (`Area`) | id, `kind: 'area'`, name, description, filter (category, styles[], types[]), defaultFollowed | `data/areas.ts` |
+| **Samling** (`Collection`) | som förut + `kind: 'collection'`, defaultFollowed | `data/collections.ts` |
+| **Följbart** (`FollowTarget`) | `{ kind: 'retailer' \| 'collection' \| 'area', id }`. Bara data, logiken byggs senare. | `types/catalog.ts` |
+
+**Dummydata:** 56 produkter, 42 återförsäljare (35 varumärken med riktiga namn men bara demotext, 4 påhittade butiker, 3 påhittade andrahandstjänster), 142 erbjudanden (99 nya, 43 begagnade). 31 produkter finns begagnade; 5 finns bara begagnade. Begagnat är alltid billigare än nytt. Fem områden: Hemmakontor och Mjukt hem är förvalda följda. Förvalda följda varumärken: J.Lindeberg, Filippa K.
+
+**Bakåtkompatibilitet:** `PRODUCTS` (kortformatet `Product` i `types/product.ts`) härleds med `toCardProduct` (`lib/cardProduct.ts`): `price` = lägsta nya pris, annars lägsta begagnade · `isUsed` = inga nya erbjudanden (bara begagnat) · `isNew` = `isNewArrival` · `material` = `facts.material`. Befintliga komponenter och skärmar läser samma fält som förut och är oförändrade.
+
+**Urvalsfunktioner** (`lib/catalog.ts`, rena, data som standardargument): `getOffers(productId, { condition, sort })` · `getNewOffers(productId, sort)` · `getUsedOffersByService(productId)` (grupperat per tjänst, fast prissortering) · `getLowestPrice(productId, condition?)` · `hasUsedOffer(productId)` · `getRetailer(id)` · `getProductsForRetailer(id)` · `getProductsForCollection(collection)` · `getProductsForArea(area)` · `getSimilarProducts(productId, limit)` (samma kategori, poäng för stil och möbeltyp).
+
 ## Faser
 | Fas | Innehåll |
 |---|---|

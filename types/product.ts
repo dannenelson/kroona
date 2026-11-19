@@ -21,27 +21,20 @@ export type FurnitureType =
   | 'textil'
   | 'dekor';
 
-export interface Product {
-  id: string;
-  brand: string;
-  name: string;
+import type { CatalogProduct } from './catalog';
+
+/**
+ * Kortformatet som befintliga komponenter och skärmar läser (brief 12):
+ * den kanoniska produkten plus fält som härleds från erbjudandena.
+ * Byggs av `toCardProduct` i lib/cardProduct.ts, inte för hand.
+ */
+export interface Product extends CatalogProduct {
+  /** Lägsta nya pris, annars lägsta begagnade. */
   price: number;
-  imageUrl: string;
-  sustainabilityScore: number;
+  /** Märket "Nyhet" (= isNewArrival). */
   isNew?: boolean;
+  /** Bara begagnat: produkten har inga nya erbjudanden. */
   isUsed?: boolean;
-  featured?: boolean;
-  aspectRatio?: number;
-
-  // Tillagt aug 2026 — stödjer Hittas matchningsläge (se spec v1.5, avsnitt 3)
-  category: ProductCategory;
-  style: ProductStyle;
-
-  // Endast relevant för category: 'kläder'
-  gender?: ClothingGender;
-  ageGroup?: ClothingAgeGroup;
-
-  // Endast relevant för category: 'möbler'
-  type?: FurnitureType;
+  /** Bakåtkompatibelt: samma som facts.material. */
   material?: string;
 }

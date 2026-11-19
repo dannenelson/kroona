@@ -1,5 +1,5 @@
-import { PRODUCTS } from './products';
-import { Product, ProductStyle } from '../types/product';
+import type { Product, ProductStyle } from '../types/product';
+import { getProductsForCollection } from '../lib/catalog';
 
 export type CollectionFilter =
   | { type: 'brand'; value: string }
@@ -7,6 +7,10 @@ export type CollectionFilter =
 
 export interface Collection {
   id: string;
+  /** Följbar (brief 12): kind + id. */
+  kind: 'collection';
+  /** Förvald följd i demot (bara data, logiken byggs senare). */
+  defaultFollowed?: boolean;
   name: string;
   tag: string;
   imageUrl: string;
@@ -16,6 +20,8 @@ export interface Collection {
 export const COLLECTIONS: Collection[] = [
   {
     id: '1',
+    kind: 'collection',
+    defaultFollowed: true,
     name: 'J.Lindeberg',
     tag: 'Varumärke',
     imageUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400',
@@ -23,6 +29,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: '4',
+    kind: 'collection',
     name: 'Filippa K',
     tag: 'Varumärke',
     imageUrl: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400',
@@ -30,6 +37,8 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: '2',
+    kind: 'collection',
+    defaultFollowed: true,
     name: 'Skandinavisk stil',
     tag: 'Tema',
     imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400',
@@ -37,6 +46,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: '3',
+    kind: 'collection',
     name: 'Urban stil',
     tag: 'Tema',
     imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400',
@@ -44,11 +54,10 @@ export const COLLECTIONS: Collection[] = [
   },
 ];
 
+// Flyttad till lib/catalog.ts (brief 12). Behålls här som samma API, så att
+// befintliga anrop fungerar oförändrade.
 export function getCollectionProducts(collection: Collection): Product[] {
-  const { filter } = collection;
-  return filter.type === 'brand'
-    ? PRODUCTS.filter((p) => p.brand === filter.value)
-    : PRODUCTS.filter((p) => p.style === filter.value);
+  return getProductsForCollection(collection);
 }
 
 // Hur många av en samlings produkter som är märkta isNew. Produktmodellen
