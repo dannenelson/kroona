@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
 import { BlankStack } from 'react-native-screen-transitions/expo-router';
-import { productScreenOptions } from '../components/product/productTransition';
+import { productScreenOptions, tabsScreenOptions } from '../components/product/productTransition';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
@@ -77,7 +77,7 @@ function AppShell() {
                 Produktdetalj dras. Flikarna (skärm 1) behåller sin senaste bild
                 ('pause') så att de syns bakom. */}
             <BlankStack>
-              <BlankStack.Screen name="(tabs)" options={{ inactiveBehavior: 'pause' }} />
+              <BlankStack.Screen name="(tabs)" options={tabsScreenOptions} />
               <BlankStack.Screen name="product/[id]" options={productScreenOptions} />
             </BlankStack>
           </ToastProvider>
