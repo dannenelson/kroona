@@ -130,10 +130,16 @@ export default function ProductScreen() {
         })}
       >
         {/* Spik (brief 16): heron är målet för zoom-övergången från kortet. */}
-        {/* Platt stil på barnet till <Link.AppleZoomTarget>, som till <Link asChild>. */}
+        {/* Platt stil på barnet till <Link.AppleZoomTarget>, som till <Link asChild>.
+            Explicita pixelmått: AppleZoomTarget lägger en native omslagsvy med
+            display: 'contents', och procentmått inuti den blev 0 (ingen hero syntes). */}
         <Link.AppleZoomTarget>
-          <View style={StyleSheet.flatten([styles.hero, { height: heroHeight }])}>
-            <Image source={{ uri: product.imageUrl }} style={styles.heroImage} resizeMode="cover" />
+          <View style={StyleSheet.flatten([styles.hero, { width, height: heroHeight }])}>
+            <Image
+              source={{ uri: product.imageUrl }}
+              style={{ width, height: heroHeight }}
+              resizeMode="cover"
+            />
           </View>
         </Link.AppleZoomTarget>
 
@@ -267,12 +273,7 @@ const useStyles = makeStyles((t) => ({
     paddingHorizontal: spacing.screenMargin,
   },
   hero: {
-    width: '100%',
     backgroundColor: t.colors.placeholder,
-  },
-  heroImage: {
-    width: '100%',
-    height: '100%',
   },
   info: {
     paddingHorizontal: spacing.screenMargin,
