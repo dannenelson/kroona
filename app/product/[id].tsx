@@ -8,7 +8,7 @@ import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 're
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { setStatusBarStyle, StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, typography, spacing, radius, touchTarget, edgeBlur } from '../../theme';
+import { makeStyles, useTheme, typography, spacing, radius, touchTarget } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import {
   getLowestPrice,
@@ -57,7 +57,9 @@ export default function ProductScreen() {
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = heroHeight - insets.top - barHeight;
   const scrollY = useRef(new Animated.Value(0)).current;
+  // Bara för statusfältet (kan inte tonas): byter vid halva toppens toning.
   const [scrolled, setScrolled] = useState(false);
+  const statusSwitchAt = threshold - spacing.xl / 2;
 
   // Statusfältet: ljust över foto, temats när nedscrollad. Återställs när man lämnar.
   const themeBar = scheme === 'dark' ? 'light' : 'dark';
@@ -104,11 +106,14 @@ export default function ProductScreen() {
       : []),
   ];
 
-  const titleOpacity = scrollY.interpolate({
+  // En gemensam övergång för toppen (brief 14): toningen och titeln följer
+  // scrollen över samma sträcka, ingen tröskel som byter läge.
+  const topProgress = scrollY.interpolate({
     inputRange: [threshold - spacing.xl, threshold],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   });
+  const titleOpacity = topProgress;
 
   return (
     <View style={styles.container}>
@@ -120,7 +125,7 @@ export default function ProductScreen() {
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: true,
           listener: (e: { nativeEvent: { contentOffset: { y: number } } }) => {
-            const next = e.nativeEvent.contentOffset.y > threshold;
+            const next = e.nativeEvent.contentOffset.y > statusSwitchAt;
             if (next !== scrolled) setScrolled(next);
           },
         })}
@@ -218,11 +223,12 @@ export default function ProductScreen() {
         )}
       </Animated.ScrollView>
 
-      {/* Toppen: toning och glasknappar över foto, eller nedscrollad med titel. */}
+      {/* Toppen: en enda kant med konstant höjd. Foto- och tematoningen tonas
+          mot varandra med scrollen; blurren är konstant. */}
       <EdgeFade
         position="top"
-        variant={scrolled ? 'theme' : 'photo'}
-        height={scrolled ? insets.top + barHeight + spacing.lg : insets.top + edgeBlur.topExtra}
+        height={insets.top + barHeight + spacing.lg}
+        fadeProgress={topProgress}
       />
       <View style={[styles.topChrome, { paddingTop: insets.top }]} pointerEvents="box-none">
         <Animated.Text
@@ -231,8 +237,9 @@ export default function ProductScreen() {
         >
           {product.name}
         </Animated.Text>
+        {/* En glaston hela vägen: photo och theme skiljer sig bara lite (brief 14). */}
         <TopBar
-          tone={scrolled ? 'theme' : 'photo'}
+          tone="photo"
           left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }}
           right={[{ icon: ShareIcon, accessibilityLabel: 'Dela', onPress: () => {} }]}
         />

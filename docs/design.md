@@ -183,7 +183,7 @@ Ljust tema (`boxShadow`-strängar) 🔵: `card` `0 1px 2px rgba(20,24,29,.06)` �
 
 ## 8b. Produktdetalj (brief 13)
 Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, FactList, OfferRow) och den delade `Toast`.
-- **Topp:** över hero glas på foto + mörk foto-toning; nedscrollad (hero förbi toppbaren) temats glas, rak `EdgeFade` (safe area + 44 + 2 × 8 + 16) och produktnamnet centrerat, som tonar in. Glas och toning växlar vid tröskeln, namnet tonar.
+- **Topp (brief 14):** en enda `EdgeFade` med konstant höjd (safe area + 44 + 2 × 8 + 16). Foto-toningen tonas över i tema-toningen med scrollen (samma sträcka som titeln, `spacing.xl`); blur-lagren är konstanta. Glaset har en ton (`photo`) hela vägen. Statusfältet byter vid halva toningen. Toppkanten på detaljvyer är alltså en komponent som tonas med scroll, inget lägesbyte.
 - **Hero** 4:5 full bredd. **Märke** `label`/mute, **namn** `title1`. **Pris** "Från X kr" i `price` med `title2`-storlek, "kr" i `label`. **Spara** 44 hög pill på `surfaceRaised`, fylld ikon + "Sparad" när sparad.
 - **Listor:** grupperade (radie `card`, `surface`, `sep`-linjer), faktarader minst 44, erbjudanderader minst 64 med initialcirkel 36, namn `body` 500, detalj `label` 400 mute, pris `body` 600, lager `caption`. Tryck tonar raden till `pressed`.
 - **Liknande:** horisontell rad med ProductCard M, 140 bred, bild 176.

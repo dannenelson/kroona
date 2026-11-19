@@ -1,5 +1,5 @@
 import { useState, type ComponentType, type ReactElement } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
+import { Animated, StyleSheet, View, type StyleProp, type ViewProps, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaskedViewClass from '@react-native-masked-view/masked-view';
@@ -25,6 +25,13 @@ type Props = {
   blur?: boolean;
   /** Toppkantens nedre gräns. 'wave' = organisk (test, brief 10), bara position="top". */
   shape?: 'straight' | 'wave';
+  /**
+   * Detaljvyer (brief 14): tonar mellan foto-toning (0) och tema-toning (1)
+   * med scroll, i en och samma kant. Bara toningslagren tonas; blur-lagren
+   * är konstanta (opacitet på en förälder till BlurView bryter blurren).
+   * Utan prop: oförändrat beteende enligt `variant`.
+   */
+  fadeProgress?: Animated.AnimatedInterpolation<number>;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -50,6 +57,7 @@ export default function EdgeFade({
   variant = 'theme',
   blur = true,
   shape = 'straight',
+  fadeProgress,
   style,
 }: Props) {
   const [width, setWidth] = useState(0);
@@ -121,7 +129,34 @@ export default function EdgeFade({
       style={[styles.root, isTop ? styles.top : styles.bottom, { height: h }, style]}
     >
       {blurLayers}
-      {wave ? (
+      {fadeProgress && isTop ? (
+        <>
+          <Animated.View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                opacity: fadeProgress.interpolate({ inputRange: [0, 1], outputRange: [1, 0] }),
+              },
+            ]}
+          >
+            <LinearGradient
+              colors={overlay.photoFade as Colors}
+              start={start}
+              end={end}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+          <Animated.View style={[StyleSheet.absoluteFill, { opacity: fadeProgress }]}>
+            <LinearGradient
+              colors={edgeFadeStops.top.alphas.map((a) => withAlpha(colors.bg, a)) as Colors}
+              locations={[...edgeFadeStops.top.locations] as Stops}
+              start={start}
+              end={end}
+              style={StyleSheet.absoluteFill}
+            />
+          </Animated.View>
+        </>
+      ) : wave ? (
         width > 0 && (
           <MaskedView
             style={StyleSheet.absoluteFill}
