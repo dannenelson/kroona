@@ -13,3 +13,11 @@ export const spacing = {
 
 export const touchTarget = 44;
 export const iconSize = { md: 20, lg: 24 } as const;
+
+/** Sidindikator (PagerDots, brief 19): cirkel 6, aktiv punkt 18 lång, avstånd 6. */
+export const pagerDots = {
+  size: 6,
+  activeLength: 18,
+  gap: 6,
+  inactiveOpacity: 0.4,
+} as const;

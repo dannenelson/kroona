@@ -94,6 +94,8 @@ export const lightColors: ColorRoles = {
 // Innehåll på foto är alltid vitt (onPhoto).
 export const overlay = {
   onPhoto: raw.white,
+  /** Lightboxens bakgrund: alltid mörk, oavsett tema (brief 19). */
+  lightboxBg: raw.ink900,
   onPhotoSecondary: raw.grey300,
   scrimSoft: 'rgba(14,16,20,0.6)',
   // TODO(design): scrimen slutar i solid rgba(14,16,20,1). I ljust tema

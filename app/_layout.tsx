@@ -3,6 +3,7 @@ import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } fro
 import { BlankStack } from 'react-native-screen-transitions/expo-router';
 import {
   installDismissThresholds,
+  lightboxScreenOptions,
   productScreenOptions,
   tabsScreenOptions,
 } from '../components/product/productTransition';
@@ -85,6 +86,7 @@ function AppShell() {
             <BlankStack>
               <BlankStack.Screen name="(tabs)" options={tabsScreenOptions} />
               <BlankStack.Screen name="product/[id]" options={productScreenOptions} />
+              <BlankStack.Screen name="lightbox/[id]" options={lightboxScreenOptions} />
             </BlankStack>
           </ToastProvider>
         </ContextMenuProvider>

@@ -28,6 +28,8 @@ export interface CatalogProduct {
   sustainabilityScore: number;
   /** Märket "Nyhet": nytillkommen i katalogen. Inte skick (det ligger på Erbjudandet). */
   isNewArrival?: boolean;
+  /** Fler bilder utöver `imageUrl` (lightboxen, brief 19). */
+  images?: string[];
   category: ProductCategory;
   style: ProductStyle;
   // Bara kläder

@@ -52,6 +52,11 @@ export function getUsedOffersByService(
 }
 
 /** Lägsta pris för en produkt, valfritt per skick. `undefined` om inget erbjudande finns. */
+/** Alla bilder för en produkt: kanonisk bild först, sedan eventuella extra. */
+export function getProductImages(product: { imageUrl: string; images?: string[] }): string[] {
+  return [product.imageUrl, ...(product.images ?? [])];
+}
+
 export function getLowestPrice(
   productId: string,
   condition?: OfferCondition,

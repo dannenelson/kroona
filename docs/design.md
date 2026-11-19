@@ -198,6 +198,12 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Teknik:** roten använder react-native-screen-transitions v4.2.0 (BlankStack via Expo Router-adaptern, ren JS, fungerar i Expo Go). Expo Routers `Link.AppleZoom` + egen gest (brief 16–17) övergavs: inkonsekvent överlämning, föregående sida syntes inte, kantswipe försvann. Nya skärmar med hierarkirörelse behöver egna options i `components/product/productTransition.ts` (eller en generell variant).
 - **Känd begränsning:** håller man stilla innan släpp krävs ca 50 % drag. Går bara att ändra genom att patcha biblioteket.
 
+## 8d. Lightbox och PagerDots (brief 19)
+- **Lightbox** (`app/lightbox/[id].tsx`): tryck på heron öppnar produktens bilder i helskärm, i riktig proportion (`contain`), på mörk bakgrund oavsett tema (`overlay.lightboxBg`) med ljust statusfält. Samma hierarkirörelse som §8c, ett steg djupare: bilden zoomar från heron (egen boundary `lb_<heroId>`, grupp `lightbox`), stängs med swipe ned, kantswipe eller kryss (IconButton i glas-ton `dark`). Detaljvyn bakom dämpas hårdare (`motion.lightboxBackdropOpacity` 0,85).
+- **Zoom:** nyp 1–4x, pan när inzoomad, dubbeltryck 1x ↔ 2,5x, fjädrar tillbaka under 1x (`motion.lightbox*`). Inzoomad bild stänger av paging och swipe ned.
+- **Flera bilder:** paging i sidled. `getProductImages()` = `imageUrl` + valfria `images`.
+- **PagerDots** (`components/PagerDots.tsx`): 6 px cirklar, aktiv 18 px pill, inaktiva 40 % (`pagerDots` i `theme/spacing.ts`), längd och opacitet följer scroll-positionen. Minska rörelse: byter direkt. Återanvändbar (hero senare).
+
 ## 9. Komponentkontrakt
 Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (`sm`/`md`/`lg`, default `md`), **states** (default, pressed, disabled, loading, selected), och en **`style`-prop som slås ihop sist** (anroparen justerar layout, aldrig identitet). Innehåll går via `children`, inte via fler props.
 

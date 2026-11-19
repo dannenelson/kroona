@@ -1,14 +1,15 @@
 import { useState, type ReactNode } from 'react';
 import { View, StyleSheet, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { BlurView } from 'expo-blur';
-import { useTheme, motion, type Glass as GlassToken } from '../theme';
+import { useTheme, motion, darkPhotoGlass, type Glass as GlassToken } from '../theme';
 
 /**
  * 'theme': temats glas, över innehåll som scrollar under (t.ex. nedscrollad toppbar).
  * 'photo': glas direkt på foto. Följer temat (ljust glas i ljust tema).
+ * 'dark': alltid mörkt glas med ljust innehåll, t.ex. över lightboxens mörka bakgrund.
  * 'plain': över ren yta. I ljust tema blir det surface + line utan blur.
  */
-export type GlassTone = 'theme' | 'photo' | 'plain';
+export type GlassTone = 'theme' | 'photo' | 'plain' | 'dark';
 
 type Props = {
   tone?: GlassTone;
@@ -24,6 +25,7 @@ type ResolvedGlass = GlassToken & { blurred: boolean };
 export function useGlass(tone: GlassTone = 'theme'): ResolvedGlass {
   const { glass, photoGlass, colors, scheme } = useTheme();
   if (tone === 'photo') return { ...photoGlass, blurred: true };
+  if (tone === 'dark') return { ...darkPhotoGlass, blurred: true };
   // TODO(design): ljust glas över ren ljus yta syns knappt (öppen designfråga).
   // Tills vidare: surface + line, utan blur.
   if (tone === 'plain' && scheme === 'light') {

@@ -18,7 +18,11 @@ import { scheduleOnRN } from 'react-native-worklets';
 import { useGestureDebug } from '../../utils/devGestureDebug'; // TEMP-DEBUG-GEST
 import Transition, { useScreenAnimation } from 'react-native-screen-transitions';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { PRODUCT_BOUNDARY_GROUP } from '../../components/product/productTransition';
+import {
+  LIGHTBOX_BOUNDARY_GROUP,
+  PRODUCT_BOUNDARY_GROUP,
+  lightboxBoundaryId,
+} from '../../components/product/productTransition';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur, motion } from '../../theme';
@@ -149,6 +153,12 @@ export default function ProductScreen() {
   }, [product]);
 
   const back = () => router.back();
+  const heroBoundaryId = b ?? id;
+  const openLightbox = () =>
+    router.push({
+      pathname: '/lightbox/[id]',
+      params: { id, lb: lightboxBoundaryId(heroBoundaryId) },
+    });
   const onOffer = (offer: Offer) => {
     const name = getRetailer(offer.retailerId)?.name ?? 'återförsäljaren';
     haptic.light();
@@ -194,15 +204,26 @@ export default function ProductScreen() {
       >
         {/* Heron är målet för zoomen från kortet (samma id och grupp som kortets bild). */}
         <Transition.Boundary
-          id={b ?? product.id}
+          id={heroBoundaryId}
           group={PRODUCT_BOUNDARY_GROUP}
           style={[styles.hero, { width, height: heroHeight }]}
         >
-          <Image
-            source={{ uri: product.imageUrl }}
-            style={{ width, height: heroHeight }}
-            resizeMode="cover"
-          />
+          {/* Tryck på bildytan öppnar lightboxen (brief 19). Egen boundary (lb_…)
+              så att den inte krockar med kortets zoom till heron. Knapparna
+              ovanpå ligger i en egen yta och öppnar den inte. */}
+          <Transition.Boundary
+            id={lightboxBoundaryId(heroBoundaryId)}
+            group={LIGHTBOX_BOUNDARY_GROUP}
+            onPress={openLightbox}
+            accessibilityRole="imagebutton"
+            accessibilityLabel="Visa bilden i helskärm"
+          >
+            <Image
+              source={{ uri: product.imageUrl }}
+              style={{ width, height: heroHeight }}
+              resizeMode="cover"
+            />
+          </Transition.Boundary>
         </Transition.Boundary>
 
         <Reanimated.View style={revealStyle}>

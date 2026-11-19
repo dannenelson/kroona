@@ -103,3 +103,36 @@ export const productScreenOptions: BlankStackNavigationOptions = {
   },
   transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
 };
+
+/** Grupp för lightboxen: heron (källa) och lightboxbilden (mål), id `lb_${heroBoundaryId}`. */
+export const LIGHTBOX_BOUNDARY_GROUP = 'lightbox';
+
+/** Lightbox-id för en hero: eget id så att det inte krockar med kortets zoom till heron. */
+export function lightboxBoundaryId(heroBoundaryId: string): string {
+  return `lb_${heroBoundaryId}`;
+}
+
+/**
+ * Lightboxen (brief 19): samma hierarkirörelse som kort → detalj, ett steg
+ * djupare. Bilden zoomar från heron, stängs med swipe ned, kantswipe eller
+ * kryss. Detaljvyn bakom dämpas hårdare (lightboxen är mörk). Swipe ned stängs
+ * av från skärmen själv medan bilden är inzoomad (drag panorerar då).
+ */
+export const lightboxScreenOptions: BlankStackNavigationOptions = {
+  ...productScreenOptions,
+  screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
+    'worklet';
+    const params = active.route.params as { lb?: string } | undefined;
+    const id = params?.lb;
+    if (!id) return withDepthVisibility({}, stackProgress);
+    return withDepthVisibility(
+      bounds({ id, group: LIGHTBOX_BOUNDARY_GROUP }).navigation.zoom({
+        borderRadius: screenCornerRadius(insets.top),
+        backgroundScale: motion.zoomBackgroundScale,
+        backdropOpacity: motion.lightboxBackdropOpacity,
+      }),
+      stackProgress,
+    );
+  },
+};
+

@@ -68,6 +68,12 @@ export const motion = {
   zoomBackdropOpacity: 0.65,
   /** Remsa vid vänsterkanten där kantswipe stänger Produktdetalj. */
   dismissEdgeWidth: 24,
+  /** Lightbox (brief 19): nypzoom 1–4x, dubbeltryck växlar 1x ↔ 2,5x,
+   *  bilden fjädrar tillbaka till 1x under 1x. Bakgrunden (detaljvyn) dämpas
+   *  hårdare än vid kort → detalj, eftersom lightboxen är mörk. */
+  lightboxMaxZoom: 4,
+  lightboxDoubleTapZoom: 2.5,
+  lightboxBackdropOpacity: 0.85,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
   /** Långt tryck öppnar kontextmenyn. */

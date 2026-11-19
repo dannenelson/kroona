@@ -13,6 +13,12 @@ export const CATALOG: CatalogProduct[] = [
     brand: 'J.Lindeberg',
     name: 'Slim Merino Crewneck',
     imageUrl: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400',
+    // DUMMYBILDER (Fas 0, brief 19): andra produkters bilder som stand-ins.
+    images: [
+      'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400',
+      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400',
+      'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=400',
+    ],
     sustainabilityScore: 4.2,
     isNewArrival: true,
     aspectRatio: 3 / 4,
@@ -24,6 +30,11 @@ export const CATALOG: CatalogProduct[] = [
     brand: 'Filippa K',
     name: 'Relaxed Wool Blazer',
     imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400',
+    // DUMMYBILDER (Fas 0, brief 19): andra produkters bilder som stand-ins.
+    images: [
+      'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400',
+      'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=400',
+    ],
     sustainabilityScore: 4.6,
     aspectRatio: 4 / 5,
     category: 'kläder',
@@ -34,6 +45,13 @@ export const CATALOG: CatalogProduct[] = [
     brand: 'Weekday',
     name: 'Oversized Denim Jacket',
     imageUrl: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=400',
+    // DUMMYBILDER (Fas 0, brief 19): andra produkters bilder som stand-ins.
+    images: [
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400',
+      'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=400',
+      'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400',
+      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400',
+    ],
     sustainabilityScore: 3.1,
     aspectRatio: 1 / 1,
     category: 'kläder',
