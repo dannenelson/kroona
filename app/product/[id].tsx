@@ -3,7 +3,7 @@
 // ovanför flikarna, så tab-baren syns inte och tillbaka går till skärmen man
 // kom från. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
@@ -56,6 +56,10 @@ export default function ProductScreen() {
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = heroHeight - insets.top - barHeight;
   const scrollY = useRef(new Animated.Value(0)).current;
+  // Spik (brief 16): iOS zoom-stängning (swipe ned) tävlar med scrollvyns studs.
+  // Överst studsar scrollvyn därför inte, så ett drag nedåt går direkt till
+  // stängningen och följer fingret. Längre ned studsar den som vanligt.
+  const [atTop, setAtTop] = useState(true);
 
   // Spik (brief 16): informationen under heron tonas in när bilden hunnit
   // landa från zoom-övergången. Fördröjningen är en uppskattning.
@@ -124,9 +128,16 @@ export default function ProductScreen() {
       <Animated.ScrollView
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
+        // Exakt 0 överst (ingen automatisk inset), och ingen studs där.
+        contentInsetAdjustmentBehavior="never"
+        bounces={!atTop}
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
         onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: scrollY } } }], {
           useNativeDriver: true,
+          listener: (e: { nativeEvent: { contentOffset: { y: number } } }) => {
+            const top = e.nativeEvent.contentOffset.y <= spacing.sm;
+            if (top !== atTop) setAtTop(top);
+          },
         })}
       >
         {/* Zoom-målet (spik brief 16) är bilden själv, inte vyn runt den: med en
