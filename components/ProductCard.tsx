@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, type ComponentRef } from 'react';
 import { Link } from 'expo-router';
-import { Animated, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
+import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { usePressAnimation } from '../hooks/usePressAnimation';
@@ -181,12 +181,13 @@ export default function ProductCard({
         const { width, height } = e.nativeEvent.layout;
         imageSize.current = { width, height };
       }}
-      style={[
+      // Platt stil: barn till <Link.AppleZoom> (Slot) får inte en stil-array.
+      style={StyleSheet.flatten([
         styles.imageContainer,
         isSmall && styles.imageContainerSmall,
         fixedHeight ? { height: fixedHeight } : { aspectRatio: aspectRatio ?? 3 / 4 },
         imageHidden && styles.hidden,
-      ]}
+      ])}
     >
       <Image source={imageSource} style={styles.image} resizeMode="cover" />
       {renderBadge()}
@@ -207,12 +208,13 @@ export default function ProductCard({
         onPress={navigates ? undefined : onPress}
         onPressIn={press.onPressIn}
         onPressOut={onPressOut}
-        style={[
+        // Platt stil: barn till <Link asChild> (Slot) får inte en stil-array.
+        style={StyleSheet.flatten([
           styles.card,
           featured && styles.cardFeatured,
           disabled && styles.disabled,
           containerStyle,
-        ]}
+        ])}
       >
         <Animated.View style={press.scaleStyle}>
           {/* Spik (brief 16): bilden är källan för zoom-övergången till heron. */}

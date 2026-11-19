@@ -4,7 +4,7 @@
 // kom från. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
 import { useEffect, useMemo, useRef } from 'react';
-import { Animated, Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Image, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { Link, useLocalSearchParams, useRouter } from 'expo-router';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -130,8 +130,9 @@ export default function ProductScreen() {
         })}
       >
         {/* Spik (brief 16): heron är målet för zoom-övergången från kortet. */}
+        {/* Platt stil på barnet till <Link.AppleZoomTarget>, som till <Link asChild>. */}
         <Link.AppleZoomTarget>
-          <View style={[styles.hero, { height: heroHeight }]}>
+          <View style={StyleSheet.flatten([styles.hero, { height: heroHeight }])}>
             <Image source={{ uri: product.imageUrl }} style={styles.heroImage} resizeMode="cover" />
           </View>
         </Link.AppleZoomTarget>
