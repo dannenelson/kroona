@@ -1,5 +1,7 @@
 import { useMemo, useRef, useState, type ComponentRef } from 'react';
-import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
+import Transition from 'react-native-screen-transitions';
+import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
 import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
@@ -80,9 +82,11 @@ export default function ProductCard({
   const saved = isSaved(id);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
-  // Standard: öppna Produktdetalj via Link med zoom-övergång (brief 13, spik
-  // brief 16). Skickar anroparen egen onPress används den, utan Link och zoom.
+  // Standard: öppna Produktdetalj, där kortets bild zoomar till heron (brief 13,
+  // spik brief 18). Skickar anroparen egen onPress används den, utan zoom.
   const navigates = onPress === undefined;
+  const router = useRouter();
+  const handlePress = onPress ?? (() => router.push(`/product/${id}`));
   // Samma source-objekt för originalet och menyns kopia (samma bildcache).
   const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
 
@@ -181,7 +185,6 @@ export default function ProductCard({
         const { width, height } = e.nativeEvent.layout;
         imageSize.current = { width, height };
       }}
-      // Platt stil: barn till <Link.AppleZoom> (Slot) får inte en stil-array.
       style={StyleSheet.flatten([
         styles.imageContainer,
         isSmall && styles.imageContainerSmall,
@@ -204,11 +207,9 @@ export default function ProductCard({
         accessibilityHint={menu ? 'Håll in för fler val' : undefined}
         accessibilityState={{ disabled }}
         disabled={disabled}
-        // Navigerande kort får onPress av Link (asChild).
-        onPress={navigates ? undefined : onPress}
+        onPress={handlePress}
         onPressIn={press.onPressIn}
         onPressOut={onPressOut}
-        // Platt stil: barn till <Link asChild> (Slot) får inte en stil-array.
         style={StyleSheet.flatten([
           styles.card,
           featured && styles.cardFeatured,
@@ -217,8 +218,14 @@ export default function ProductCard({
         ])}
       >
         <Animated.View style={press.scaleStyle}>
-          {/* Spik (brief 16): bilden är källan för zoom-övergången till heron. */}
-          {navigates ? <Link.AppleZoom>{imageBlock}</Link.AppleZoom> : imageBlock}
+          {/* Spik (brief 18): bilden är källan för zoomen till Produktdetaljs hero. */}
+          {navigates ? (
+            <Transition.Boundary id={id} group={PRODUCT_BOUNDARY_GROUP}>
+              {imageBlock}
+            </Transition.Boundary>
+          ) : (
+            imageBlock
+          )}
 
           {!isSmall && (
             <View style={styles.info}>
@@ -258,13 +265,7 @@ export default function ProductCard({
 
   return (
     <GestureDetector gesture={longPress}>
-      {navigates ? (
-        <Link href={`/product/${id}`} asChild>
-          {card}
-        </Link>
-      ) : (
-        card
-      )}
+      {card}
     </GestureDetector>
   );
 }

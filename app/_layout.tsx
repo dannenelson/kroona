@@ -1,5 +1,7 @@
 import { useMemo } from 'react';
-import { Stack, ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
+import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
+import { BlankStack } from 'react-native-screen-transitions/expo-router';
+import { productScreenOptions } from '../components/product/productTransition';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import {
@@ -70,7 +72,14 @@ function AppShell() {
         <ContextMenuProvider>
           {/* Tillfälliga bekräftelser (toast) ovanför alla skärmar. */}
           <ToastProvider>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }} />
+            {/* Spik (brief 18): blank stack från react-native-screen-transitions.
+                Skärmarna är JS-vyer, så föregående skärm finns kvar bakom när
+                Produktdetalj dras. Flikarna (skärm 1) behåller sin senaste bild
+                ('pause') så att de syns bakom. */}
+            <BlankStack>
+              <BlankStack.Screen name="(tabs)" options={{ inactiveBehavior: 'pause' }} />
+              <BlankStack.Screen name="product/[id]" options={productScreenOptions} />
+            </BlankStack>
           </ToastProvider>
         </ContextMenuProvider>
       </FollowedCollectionsProvider>

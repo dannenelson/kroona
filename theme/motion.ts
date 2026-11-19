@@ -35,16 +35,15 @@ export const motion = {
   /** Toast: hur länge den syns (ms) och hur långt den glider in (px). */
   toastDuration: 2200,
   toastSlide: 24,
-  /** Produktdetalj (spik brief 16): informationen tonas in efter att bilden landat. */
-  detailRevealDelay: 280,
-  detailRevealDuration: 250,
-  /** Egen stängningsgest på Produktdetalj (spik brief 17). */
-  dismissSlop: 8,
-  dismissDistance: 120,
-  dismissVelocity: 900,
-  dismissScale: 0.92,
-  dismissSpring: { damping: 20, stiffness: 220, mass: 1 },
-  /** Remsa vid vänsterkanten där iOS egen kantswipe (zoom-stängning) gäller. */
+  /** Produktdetalj: informationen tonas in under övergångens sista del (progress 0,75 → 1). */
+  detailRevealFrom: 0.75,
+  /** Hierarkirörelsen (spik brief 18): zoomens fjädrar, bibliotekets
+   *  Specs.Zoom-värden (öppna lugnt, stäng med kort efterfjädring). */
+  zoomSpec: {
+    open: { stiffness: 1000, damping: 500, mass: 3, overshootClamping: false },
+    close: { stiffness: 1100, damping: 98, mass: 3, overshootClamping: false },
+  },
+  /** Remsa vid vänsterkanten där kantswipe stänger Produktdetalj. */
   dismissEdgeWidth: 24,
   /** Äldre tryck-feedback för komponenter som inte gjorts om än. */
   pressedOpacity: 0.8,
