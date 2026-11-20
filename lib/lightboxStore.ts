@@ -1,12 +1,15 @@
 // Delat tillstånd mellan heron på Produktdetalj och lightboxen (brief 20).
 // Shared values (UI-tråden) så att gesterna och herons scroll kan läsa dem
 // utan JS-rundtur och utan att hela skärmen renderas om. Heron hoppar till
-// den bild man lämnade i lightboxen (brief 20, 22).
+// den bild man lämnade i lightboxen, när lightboxen stängs (brief 20, 27).
 import { AccessibilityInfo } from 'react-native';
 import { makeMutable } from 'react-native-reanimated';
 
-/** Index för bilden som visas/ska visas (hero ↔ lightbox). */
+/** Index för bilden som visas i lightboxen. */
 export const lightboxIndex = makeMutable(0);
+/** Bilden heron ska visa. Följer `lightboxIndex` först när lightboxen börjar
+ *  stängas, så att inget rör sig bakom den medan den är öppen (brief 27). */
+export const lightboxHeroIndex = makeMutable(0);
 /** Id för den hero som öppnade lightboxen (bara den följer indexet). */
 export const lightboxHero = makeMutable('');
 /** 1 när lightboxbilden är inzoomad eller nyps: då är bibliotekets kantswipe av. */

@@ -7,7 +7,13 @@ import type { BlankStackNavigationOptions } from 'react-native-screen-transition
 import { scheduleOnUI } from 'react-native-worklets';
 import { Easing, ReduceMotion, interpolate } from 'react-native-reanimated';
 import { motion, overlay, radius, spacing } from '../../theme';
-import { lightboxBackdrop, lightboxGestureLock, reduceMotionShared } from '../../lib/lightboxStore';
+import {
+  lightboxBackdrop,
+  lightboxGestureLock,
+  lightboxHeroIndex,
+  lightboxIndex,
+  reduceMotionShared,
+} from '../../lib/lightboxStore';
 
 /** Grupp för produktbilder: kort (källa) och hero (mål) delar `id` = produkt-id. */
 export const PRODUCT_BOUNDARY_GROUP = 'product';
@@ -130,6 +136,8 @@ export const lightboxScreenOptions: BlankStackNavigationOptions = {
     const p = Math.min(1, Math.max(0, current.progress));
     // Öppning linjär; stängning med kurva (backdropen lämnar sist). Båda är 1 vid p = 1.
     const closing = current.entering !== 1;
+    // Lightboxen lämnar (kryss, kantswipe): heron byter nu till bilden man lämnade.
+    if (closing && p < 1) lightboxHeroIndex.value = lightboxIndex.value;
     const opacity = closing ? 1 - Math.pow(1 - p, fade.closeOpacityCurve) : p;
     const backdrop = closing ? 1 - Math.pow(1 - p, fade.closeBackdropCurve) : p;
     return {

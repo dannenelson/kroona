@@ -10,7 +10,7 @@ import Transition from 'react-native-screen-transitions';
 import { Pressable } from 'react-native-gesture-handler';
 import { spacing } from '../../theme';
 import PagerDots from '../PagerDots';
-import { lightboxHero, lightboxIndex } from '../../lib/lightboxStore';
+import { lightboxHero, lightboxHeroIndex, lightboxIndex } from '../../lib/lightboxStore';
 
 type Props = {
   images: string[];
@@ -38,16 +38,14 @@ export default function HeroPager({ images, heroKey, width, height, onOpen }: Pr
     position.value = e.contentOffset.x / Math.max(1, width);
   });
 
-  // Rätt bild tillbaka: när man bläddrar i lightboxen hoppar heron till samma
-  // bild utan animation (UI-tråden), så att man landar på den bild man lämnade.
-  // Bara den hero som öppnade lightboxen (andra detaljvyer i stacken rörs inte).
+  // Rätt bild tillbaka: när lightboxen börjar stängas hoppar heron till den bild
+  // man lämnade, utan animation (UI-tråden). Bara den hero som öppnade lightboxen.
   useAnimatedReaction(
-    () => lightboxIndex.value,
+    () => lightboxHeroIndex.value,
     (index, previous) => {
       if (index === previous || lightboxHero.value !== heroKey) return;
       scrollTo(scrollRef, index * width, 0, false);
     },
-    [heroKey, width],
   );
 
   const page = (uri: string, index: number) => (
@@ -56,6 +54,7 @@ export default function HeroPager({ images, heroKey, width, height, onOpen }: Pr
       onPress={() => {
         lightboxHero.value = heroKey;
         lightboxIndex.value = index;
+        lightboxHeroIndex.value = index;
         onOpen(index);
       }}
       accessibilityRole="imagebutton"

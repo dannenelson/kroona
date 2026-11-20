@@ -45,6 +45,7 @@ import { getProductImages } from '../../lib/catalog';
 import {
   lightboxBackdrop,
   lightboxGestureLock,
+  lightboxHeroIndex,
   lightboxIndex,
   reduceMotionShared,
 } from '../../lib/lightboxStore';
@@ -138,10 +139,7 @@ export default function LightboxScreen() {
     'worklet';
     const target = Math.min(lastIndex, Math.max(0, index));
     pageX.value = withSpring(-target * width, motion.spring);
-    if (lightboxIndex.value !== target) {
-      lightboxIndex.value = target;
-      // Heron hoppar till samma bild (HeroPager, UI-tråden).
-    }
+    lightboxIndex.value = target;
   };
 
   const pinch = usePinchGesture({
@@ -239,6 +237,8 @@ export default function LightboxScreen() {
       if (imageOpacity.value < 1) return; // utfart pågår: stängs strax
       if (ended === DISMISS && r.ok && (Math.abs(r.ty) > d.distance * height || Math.abs(r.vy) > d.velocity)) {
         // Fortsätt ut med släppfarten (minst `velocity`) och tona bort; sedan stäng.
+        // Heron byter till bilden man lämnade redan nu, medan bakgrunden är mörk.
+        lightboxHeroIndex.value = lightboxIndex.value;
         const t = { duration: d.flyOutDuration };
         if (!reduceMotionShared.value) {
           const vy = Math.sign(r.ty) * Math.max(Math.abs(r.vy), d.velocity);

@@ -72,9 +72,9 @@ export const motion = {
    *  bilden fjädrar tillbaka till 1x under 1x. */
   lightboxMaxZoom: 4,
   lightboxDoubleTapZoom: 2.5,
-  /** Lightboxens sammanlagda mörkhet över detaljvyn (brief 26): ett enda lager,
-   *  så att detaljvyn skymtar men bilden är tydligt i fokus. */
-  lightboxBackdropOpacity: 0.88,
+  /** Lightboxens sammanlagda mörkhet över detaljvyn (brief 26–27): ett enda
+   *  lager, man ska bara ana detaljvyn bakom. */
+  lightboxBackdropOpacity: 0.94,
   /** Lightboxens öppning/stängning (brief 22): ren fade med mycket lätt skala,
    *  ingen zoom från heron. Swipe ned följer fingret och tonar ut. */
   lightboxFade: {
