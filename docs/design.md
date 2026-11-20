@@ -169,7 +169,7 @@ Glasknappar (IconButton på glas, TopBar-kapseln) har subtil skugga `glassButton
 | `fast` / `base` / `slow` | 150 / 250 / 400 ms | 🔵 |
 | Easing | `cubic-bezier(0.2, 0, 0, 1)` | 🔵 |
 | Spring (gester, sheets) | damping 20, stiffness 220, mass 1 | 🔵 |
-| Nedtryckt | `pressed`-yta + skala 0,96 (navigation 0,92). Text-flik: opacitet 0,55. Produktkort: i pixlar, `1 − pressInsetPx (7) / bredd`, klämt till 0,96–0,985 | ✅ |
+| Nedtryckt | `pressed`-yta + skala 0,96 (navigation 0,92). Text-flik: opacitet 0,55. Kort (produkt-, samlings-, varumärkes- och profilkort, en implementation: `hooks/useCardPress`, brief 31): ingen opacitet, bara krympning i pixlar, `1 − pressInsetPx (4) / bredd`, klämt till `pressScaleMin`–`pressScaleMax` (0,975–0,99) | ✅ |
 | Inaktiv | opacitet 0,35 | ✅ |
 | Långt tryck | 450 ms, lyft skala 1,04 (S och M) och 1,02 (L), alltid större än originalet; ryms den inte flyttas den inåt, krymps aldrig | ✅ |
 | Tryck (`pressIn` / `pressOutSpring`) | in 90 ms ease-out, ut fjäder damping 14, stiffness 320, mass 0,6. Skala och ytbyte animeras med native driver. Reduce motion: bara ytbytet. Ingen haptik på vanliga tryck | ✅ |

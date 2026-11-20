@@ -5,7 +5,7 @@ import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
 import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
-import { usePressAnimation } from '../hooks/usePressAnimation';
+import { useCardPress } from '../hooks/useCardPress';
 import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
@@ -97,19 +97,10 @@ export default function ProductCard({
   // Samma source-objekt för originalet och menyns kopia (samma bildcache).
   const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
 
-  // Tryck i pixlar (brief 07): ungefär lika många pixlar på alla kortstorlekar.
-  const [cardWidth, setCardWidth] = useState(0);
-  const pressScale = cardWidth
-    ? Math.min(
-        Math.max(1 - motion.pressInsetPx / cardWidth, motion.pressScaleMin),
-        motion.pressScaleMax,
-      )
-    : motion.pressScaleMin;
-  const press = usePressAnimation(pressScale);
+  // Kortens tryckrespons, delad med samlingskorten (hooks/useCardPress).
+  const press = useCardPress();
   // Bildytans storlek ur layout (utan transform), för menyns kopia.
   const imageSize = useRef({ width: 0, height: 0 });
-  // Sant medan menyn är öppen: då startar ingen pressOut-fjäder på kortet.
-  const menuOpenRef = useRef(false);
   // Medan menyn är öppen syns bara den lyfta kopian, inte originalbilden.
   const [imageHidden, setImageHidden] = useState(false);
 
@@ -137,7 +128,7 @@ export default function ProductCard({
   };
 
   const setOriginalHidden = (hidden: boolean) => {
-    if (!hidden) menuOpenRef.current = false;
+    if (!hidden) press.menuClosed();
     setImageHidden(hidden);
   };
 
@@ -153,8 +144,7 @@ export default function ProductCard({
   const openMenu = () => {
     // Kortet går direkt till skala 1 (ingen fjäder), så kopian börjar och
     // slutar i exakt originalstorlek.
-    menuOpenRef.current = true;
-    press.reset();
+    press.liftForMenu();
     measureImage((anchor) =>
       contextMenu.open({
         anchor,
@@ -167,10 +157,6 @@ export default function ProductCard({
         setOriginalHidden,
       }),
     );
-  };
-
-  const onPressOut = () => {
-    if (!menuOpenRef.current) press.onPressOut();
   };
 
   // Långt tryck som övergår i drag (brief 05): gesten stannar på kortet så att
@@ -208,7 +194,7 @@ export default function ProductCard({
       <Pressable
         ref={cardRef}
         collapsable={false}
-        onLayout={(e: LayoutChangeEvent) => setCardWidth(e.nativeEvent.layout.width)}
+        onLayout={press.onLayout}
         accessibilityRole="button"
         accessibilityLabel={`${brand} ${name}`}
         accessibilityHint={menu ? 'Håll in för fler val' : undefined}
@@ -216,7 +202,7 @@ export default function ProductCard({
         disabled={disabled}
         onPress={handlePress}
         onPressIn={press.onPressIn}
-        onPressOut={onPressOut}
+        onPressOut={press.onPressOut}
         style={StyleSheet.flatten([
           styles.card,
           featured && styles.cardFeatured,

@@ -1,11 +1,12 @@
 import { useId, useMemo, useRef, useState, type ComponentRef } from 'react';
-import { Text, TouchableOpacity, View, StyleSheet, ImageBackground } from 'react-native';
+import { Animated, Text, Pressable, View, StyleSheet, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius, motion } from '../theme';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
+import { useCardPress } from '../hooks/useCardPress';
 import { useContextMenu, type AnchorRect, type ContextMenuItem } from './ProductContextMenu';
 import { useToast } from './Toast';
 import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from './product/productTransition';
@@ -53,6 +54,12 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
   const imageRef = useRef<ComponentRef<typeof View>>(null);
   const [imageHidden, setImageHidden] = useState(false);
+  // Samma tryckrespons som produktkorten (krympning, ingen opacitet).
+  const press = useCardPress();
+  const setOriginalHidden = (hidden: boolean) => {
+    if (!hidden) press.menuClosed();
+    setImageHidden(hidden);
+  };
 
   // Följ använder samma toggle som den borttagna +/✓-knappen. Dela är en
   // platshållare i Fas 0 (ingen delning byggd).
@@ -94,7 +101,8 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
     activateAfterLongPress: motion.longPressMs,
     runOnJS: true,
     disableReanimated: true,
-    onActivate: () =>
+    onActivate: () => {
+      press.liftForMenu();
       measureImage((anchor) =>
         contextMenu.open({
           anchor,
@@ -104,22 +112,26 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
           renderOverlay: renderCaption,
           items: menuItems,
           measure: measureImage,
-          setOriginalHidden: setImageHidden,
+          setOriginalHidden,
         }),
-      ),
+      );
+    },
     onUpdate: (e) => contextMenu.move(e.absoluteX, e.absoluteY),
     onDeactivate: () => contextMenu.release(),
   });
 
   return (
     <GestureDetector gesture={longPress}>
-      <TouchableOpacity
-        style={styles.card}
+      <Pressable
+        onLayout={press.onLayout}
         onPress={open}
+        onPressIn={press.onPressIn}
+        onPressOut={press.onPressOut}
         accessibilityRole="button"
         accessibilityLabel={name}
         accessibilityHint="Håll in för fler val"
       >
+        <Animated.View style={[styles.card, press.scaleStyle]}>
         <Transition.Boundary
           id={boundaryId}
           group={partnerId ? PARTNER_BOUNDARY_GROUP : COLLECTION_BOUNDARY_GROUP}
@@ -131,7 +143,8 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
             </ImageBackground>
           </View>
         </Transition.Boundary>
-      </TouchableOpacity>
+        </Animated.View>
+      </Pressable>
     </GestureDetector>
   );
 }

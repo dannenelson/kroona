@@ -1,5 +1,6 @@
 import { useId } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Animated, View, Text, Pressable, StyleSheet } from 'react-native';
+import { useCardPress } from '../hooks/useCardPress';
 import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { PARTNER_BOUNDARY_GROUP } from './product/productTransition';
@@ -21,6 +22,8 @@ type Props = {
 export default function ProfileCard({ name, initial, partnerId }: Props) {
   const styles = useStyles();
   const router = useRouter();
+  // Samma tryckrespons som produktkorten (krympning, ingen opacitet).
+  const press = useCardPress();
   const boundaryId = `${partnerId}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const circle = (
     <View style={styles.circle}>
@@ -28,20 +31,25 @@ export default function ProfileCard({ name, initial, partnerId }: Props) {
     </View>
   );
   return (
-    <TouchableOpacity
+    <Pressable
       style={styles.wrapper}
       disabled={!partnerId}
+      onLayout={press.onLayout}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
       onPress={() => partnerId && router.push({ pathname: '/partner/[id]', params: { id: partnerId, b: boundaryId } })}
     >
-      {partnerId ? (
-        <Transition.Boundary id={boundaryId} group={PARTNER_BOUNDARY_GROUP}>
-          {circle}
-        </Transition.Boundary>
-      ) : (
-        circle
-      )}
-      <Text style={styles.name} numberOfLines={1}>{name}</Text>
-    </TouchableOpacity>
+      <Animated.View style={press.scaleStyle}>
+        {partnerId ? (
+          <Transition.Boundary id={boundaryId} group={PARTNER_BOUNDARY_GROUP}>
+            {circle}
+          </Transition.Boundary>
+        ) : (
+          circle
+        )}
+        <Text style={styles.name} numberOfLines={1}>{name}</Text>
+      </Animated.View>
+    </Pressable>
   );
 }
 
