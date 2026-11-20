@@ -6,4 +6,4 @@
   - Swipe-stängning: vid beslutet om utfart.
 - I simulatorn: bläddring till bild 3 i lightboxen lämnade heron på bild 1 medan lightboxen var öppen, och efter stängning visade heron bild 3. tsc och iOS-export är gröna, och ingen debug-rest finns kvar.
 - **Avvägning, kantswipe:** heron byter redan när draget börjar, eftersom drag och stängning inte går att skilja i progress. Avbryts kantswipen har heron ändå bytt till den bild som visas. Bakgrunden är då nästan täckande, och heron står på rätt bild.
-- Kod: +18/−10 rader. Herons `useAnimatedReaction` har inte längre beroende-arrayen, så Reanimated-varningen från brief 24 är borta. `goToPage` är förenklad.
+- Kod: +26/−16 rader (ingen nettominskning; den nya shared value-variabeln och synkroniseringen vid stängning tillkommer). Herons `useAnimatedReaction` har inte längre beroende-arrayen, så Reanimated-varningen från brief 24 är borta. `goToPage` är förenklad.
