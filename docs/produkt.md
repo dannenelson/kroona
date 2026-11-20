@@ -32,7 +32,7 @@ Göra köpresan enklare och roligare för alla konsumenter, oavsett intresse ell
 | **Hem** | Samlingspunkt, som Spotify: kompakt hälsningshero, sedan hyllor med kort (samlingar, varumärken, områden, rekommendationer). Inga produkter i grid. Tryck öppnar ett eget läge. |
 | **Flöde** | Uppdateringar från det man följer: varumärken, företag, områden, samlingar. |
 | **Hitta** | Dialog som hjälper att bolla och få ett urval, plus jämförelse. Valen (pris, hållbarhet m.m.) är en del av dialogen. Inline produktkort. |
-| **Sparat** | Det man sparat och följer, där man hanterar det. Egna samlingar, "Gilla" alltid först. |
+| **Sparat** | Det man sparat och följer, där man hanterar det. Segment Samlingar \| Följer. "Alla sparade" alltid först, sedan egna samlingar. |
 
 **Detaljvyer:** Produktdetalj, Samlingsdetalj, Partnerdetalj (varumärke/företag). Profildetalj (andra användare) väntar, eftersom man följer varumärken och inte personer. Masonry-grid (Pinterest-känsla) bor i detaljvyerna, inte på en flik.
 Hem är det som är relevant nu, Flöde är det man följer.
@@ -60,6 +60,8 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 | **Område** (`Area`) | id, `kind: 'area'`, name, description, filter (category, styles[], types[]), defaultFollowed | `data/areas.ts` |
 | **Samling** (`Collection`) | som förut + `kind: 'collection'`, defaultFollowed, **`curator: { kind: 'kroona' \| 'retailer' \| 'user'; id? }`** (brief 29), filter `brand` · `style` · `products` (utvalda id:n) | `data/collections.ts` (`COLLECTIONS` = Hem/Flöde, `RETAILER_COLLECTIONS` = varumärkens kollektioner, `ALL_COLLECTIONS`) |
 | **Följbart** (`FollowTarget`) | `{ kind: 'retailer' \| 'collection' \| 'area', id }`. Bara data, logiken byggs senare. | `types/catalog.ts` |
+
+**Alla sparade och egna samlingar (Daniel, 2026-11-20, brief 32):** namnet är *samling* genomgående. Instagram-modellen: spara lägger produkten i systemsamlingen **"Alla sparade"** (ersätter "Gilla"; kan inte raderas eller döpas om, alltid först; data = `SavedProductsContext`). **Egna samlingar** (`UserCollection { id, name, visibility: 'private' | 'public', productIds, createdAt }`, `types/catalog.ts`, lagras i AsyncStorage via `UserCollectionsContext`) är delmängder: en produkt i en egen samling finns alltid också i Alla sparade (`addProductToCollection`). Kurator `{ kind: 'user', id: 'me' }` visas som "Av dig". Omslag = mosaik av de fyra första produkterna.
 
 **Samling ↔ varumärke (Daniel, 2026-11-20, brief 29):** en samling är en kuraterad produktuppsättning med en kurator: Kroona (teman, editorial som Spotify-spellistor), ett varumärke (kollektioner) eller en användare (egna samlingar, senare). Ett varumärke är en egen entitet (`Retailer`, `brand`) med en egen sida, Partnerdetalj, som bär varumärkets kollektioner och alla dess produkter. Att varumärken skapar samlingar själva är Fas 1+; i Fas 0 är kollektionerna dummydata (`RETAILER_COLLECTIONS`, 2 vardera för J.Lindeberg och Filippa K). Varumärkes-filtersamlingarna J.Lindeberg och Filippa K i `COLLECTIONS` finns kvar tills Hem/Flöde omarbetas (Flöde, personalisering och följ-lagringen bygger på dem); kort för dem öppnar Partnerdetalj, och följ av varumärket använder deras id som nyckel (`getRetailerFollowKey`).
 

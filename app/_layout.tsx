@@ -26,6 +26,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme, type ColorScheme } from '../theme';
 import { SavedProductsProvider } from '../context/SavedProductsContext';
 import { FollowedCollectionsProvider } from '../context/FollowedCollectionsContext';
+import { UserCollectionsProvider } from '../context/UserCollectionsContext';
 import { ContextMenuProvider } from '../components/ProductContextMenu';
 import { ToastProvider } from '../components/Toast';
 
@@ -77,6 +78,7 @@ function AppShell() {
     <NavigationThemeProvider value={navigationTheme}>
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
     <SavedProductsProvider>
+      <UserCollectionsProvider>
       <FollowedCollectionsProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         {/* Kontextmenyn ritas ovanför alla skärmar (ingen Modal, se ProductContextMenu). */}
@@ -97,6 +99,7 @@ function AppShell() {
           </ToastProvider>
         </ContextMenuProvider>
       </FollowedCollectionsProvider>
+      </UserCollectionsProvider>
     </SavedProductsProvider>
     </View>
     </NavigationThemeProvider>

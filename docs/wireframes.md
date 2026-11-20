@@ -107,14 +107,16 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 
 ---
 
-## 8. Sparat — 🟡 Utökat med följda
+## 8. Sparat — ✅ Del 1 byggd (brief 32)
 **Roll:** det man sparat och följer, där man hanterar det.
 
-1. Header — "Sparat" + ny samling
-2. Samlingar (2 kolumner): **"Gilla"** alltid först och kan inte raderas eller döpas om. Övriga: namn, privat/publik, antal produkter. "Ny samling" sist.
-3. **Följer** (nytt): varumärken, företag, områden och samlingar man följer, med möjlighet att sluta följa. Layout öppen (egen sektion eller eget segment).
+1. Header — "Sparat" + "Ny samling"
+2. Segment (text-flikar) överst: **Samlingar | Följer** (beslutat 2026-11-20)
+3. **Samlingar** (2 kolumner): **"Alla sparade"** (ersätter "Gilla", Instagram-modellen: ett tryck på spara lägger produkten här) alltid först, kan inte raderas eller döpas om. Egna samlingar är delmängder av den: mosaikomslag av de fyra första produkterna, namn, antal produkter, Privat/Publik. "Ny samling" sist (lager med namn + Privat/Publik).
+4. **Följer:** varumärken och samlingar man följer, samma kort som på Hem; långt tryck ger Sluta följa. Tom-vy om inget följs.
+5. **Del 2 (ej byggt):** spara i samling från produkt, redigera/döp om/radera, flytta produkter, eget omslag.
 
-Att öppna en samling leder till Samlingsdetalj (Dela/redigera-läge). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
+Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat/Publik, ingen Följ; Dela/redigera kommer i del 2). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
 
 ---
 

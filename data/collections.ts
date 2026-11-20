@@ -1,5 +1,5 @@
 import type { Product, ProductStyle } from '../types/product';
-import { getProductsForCollection } from '../lib/catalog';
+import { getProductsForCollection, getProductsForRetailer } from '../lib/catalog';
 import { RETAILERS } from './retailers';
 
 export type CollectionFilter =
@@ -128,6 +128,14 @@ export function getRetailerIdForBrandCollection(collection: Collection): string 
   const { filter } = collection;
   if (filter.type !== 'brand') return undefined;
   return RETAILERS.find((r) => r.retailerType === 'brand' && r.brandName === filter.value)?.id;
+}
+
+/**
+ * Varumärkets omslagsbild: `Retailer` har ingen egen bild, så varumärkes-
+ * samlingens bild används om den finns, annars första produktens.
+ */
+export function getRetailerCoverImage(retailerId: string): string | undefined {
+  return getBrandFilterCollection(retailerId)?.imageUrl ?? getProductsForRetailer(retailerId)[0]?.imageUrl;
 }
 
 /**

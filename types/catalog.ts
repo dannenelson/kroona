@@ -99,3 +99,14 @@ export interface Area {
 
 /** Något som kan följas. Bara data i Fas 0-steget, logiken byggs senare. */
 export type FollowTarget = { kind: 'retailer' | 'collection' | 'area'; id: string };
+
+/** Användarens egen samling (brief 32), lagras lokalt (AsyncStorage) i Fas 0.
+ *  Kurator `{ kind: 'user', id: 'me' }` ("Av dig"). En delmängd av "Alla sparade". */
+export interface UserCollection {
+  id: string;
+  name: string;
+  visibility: 'private' | 'public';
+  productIds: string[];
+  /** ISO-tid. */
+  createdAt: string;
+}

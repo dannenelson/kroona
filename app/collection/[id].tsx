@@ -1,7 +1,8 @@
 // Samlingsdetalj (brief 28, wireframes.md §2): innehållet i en kuraterad
 // samling (data/collections.ts: Kroona-teman och varumärkens kollektioner).
-// Nås från temakorten på Hem (CollectionRow) och Samlingar-hyllan på
-// Partnerdetalj. Ligger i rotens stack som Produktdetalj, med samma hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
+// Nås från temakorten på Hem (CollectionRow), Samlingar-hyllan på
+// Partnerdetalj och Sparat ("Alla sparade" med id `saved` och egna samlingar,
+// brief 32). Ligger i rotens stack som Produktdetalj, med samma hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
 // kantswipe stänger (collectionScreenOptions i components/product/productTransition.ts).
 import { useMemo, useState } from 'react';
 import { Image, Pressable, Text, View, useWindowDimensions } from 'react-native';
@@ -20,6 +21,10 @@ import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay
 import { ALL_COLLECTIONS, getCollectionProducts } from '../../data/collections';
 import { getRetailer } from '../../lib/catalog';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
+import { useSavedProducts } from '../../context/SavedProductsContext';
+import { ALL_SAVED_ID, ALL_SAVED_NAME, useUserCollections } from '../../context/UserCollectionsContext';
+import { PRODUCTS } from '../../data/products';
+import CollectionMosaic from '../../components/CollectionMosaic';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { COLLECTION_BOUNDARY_GROUP } from '../../components/product/productTransition';
 import TopBar from '../../components/TopBar';
@@ -29,6 +34,7 @@ import ProductGrid from '../../components/ProductGrid';
 import Pill from '../../components/Pill';
 import BackIcon from '../../assets/icons/BackIcon';
 import type { Product } from '../../types/product';
+import type { Retailer } from '../../types/catalog';
 
 // Lokalt layoutmått: cover i samma proportion som Produktdetaljens hero (4:5).
 const COVER_ASPECT = 4 / 5;
@@ -37,6 +43,24 @@ const NEW = 'Nytt';
 const CATEGORY_LABEL: Record<Product['category'], string> = { kläder: 'Kläder', möbler: 'Möbler' };
 
 type Filter = { label: string; match: (p: Product) => boolean };
+
+/** Det skärmen visar, oavsett om samlingen är kuraterad, egen eller "Alla sparade". */
+type CollectionView = {
+  id: string;
+  name: string;
+  products: Product[];
+  /** Kuraterade samlingar har en bild; egna och "Alla sparade" visar mosaik. */
+  imageUrl?: string;
+  curatorName: string;
+  curatorRetailer?: Retailer;
+  /** Andra metadataraden efter antal produkter (tag, eller Privat/Publik). */
+  detail: string;
+  /** Bara kuraterade samlingar kan följas (egna har ingen Följ-knapp). */
+  followable: boolean;
+  byBrand: boolean;
+  emptyTitle: string;
+  emptyHint: string;
+};
 
 /**
  * Flikar härledda ur datan (design.md §11), aldrig tomma: Alla, kategori om
@@ -65,13 +89,60 @@ export default function CollectionScreen() {
   const { width } = useWindowDimensions();
   const styles = useStyles();
   const { isFollowed, toggleFollowed } = useFollowedCollections();
+  const { savedProducts } = useSavedProducts();
+  const { getUserCollection } = useUserCollections();
+  const userCollection = getUserCollection(id);
 
-  const collection = ALL_COLLECTIONS.find((c) => c.id === id);
-  const products = useMemo(() => (collection ? getCollectionProducts(collection) : []), [collection]);
-  const filters = useMemo(
-    () => buildFilters(products, collection?.filter.type === 'brand'),
-    [products, collection],
-  );
+  // "Alla sparade" (id `saved`), en egen samling, eller en kuraterad (brief 32).
+  const collection = useMemo<CollectionView | undefined>(() => {
+    if (id === ALL_SAVED_ID) {
+      return {
+        id,
+        name: ALL_SAVED_NAME,
+        products: savedProducts,
+        curatorName: 'dig',
+        detail: 'Privat',
+        followable: false,
+        byBrand: false,
+        emptyTitle: 'Inga sparade produkter än',
+        emptyHint: 'Tryck på hjärtat på en produkt för att spara den här.',
+      };
+    }
+    if (userCollection) {
+      return {
+        id,
+        name: userCollection.name,
+        products: userCollection.productIds
+          .map((pid) => PRODUCTS.find((p) => p.id === pid))
+          .filter((p): p is Product => !!p),
+        curatorName: 'dig',
+        detail: userCollection.visibility === 'public' ? 'Publik' : 'Privat',
+        followable: false,
+        byBrand: false,
+        emptyTitle: 'Samlingen är tom',
+        emptyHint: 'Produkter du lägger här visas i den här samlingen.',
+      };
+    }
+    const c = ALL_COLLECTIONS.find((x) => x.id === id);
+    if (!c) return undefined;
+    // Kurator (brief 29): Kroona eller ett varumärke; varumärket öppnar Partnerdetalj.
+    const curatorRetailer = c.curator.kind === 'retailer' && c.curator.id ? getRetailer(c.curator.id) : undefined;
+    return {
+      id,
+      name: c.name,
+      products: getCollectionProducts(c),
+      imageUrl: c.imageUrl,
+      curatorName: curatorRetailer?.name ?? 'Kroona',
+      curatorRetailer,
+      detail: c.tag,
+      followable: true,
+      byBrand: c.filter.type === 'brand',
+      emptyTitle: 'Samlingen är tom',
+      emptyHint: '',
+    };
+  }, [id, savedProducts, userCollection]);
+  const products = useMemo(() => collection?.products ?? [], [collection]);
+  const filters = useMemo(() => buildFilters(products, !!collection?.byBrand), [products, collection]);
   const [selected, setSelected] = useState(ALL);
   const active = filters.find((f) => f.label === selected) ?? filters[0];
   const visible = useMemo(() => products.filter(active.match), [products, active]);
@@ -114,10 +185,7 @@ export default function CollectionScreen() {
   }
 
   const followed = isFollowed(collection.id);
-  // Kurator (brief 29): Kroona eller ett varumärke; varumärket öppnar Partnerdetalj.
-  const curatorRetailer =
-    collection.curator.kind === 'retailer' && collection.curator.id ? getRetailer(collection.curator.id) : undefined;
-  const curatorName = curatorRetailer?.name ?? 'Kroona';
+  const { curatorRetailer, curatorName } = collection;
 
   return (
     <View style={styles.container}>
@@ -136,7 +204,14 @@ export default function CollectionScreen() {
           group={COLLECTION_BOUNDARY_GROUP}
           style={[styles.cover, { width, height: coverHeight }]}
         >
-          <Image source={{ uri: collection.imageUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
+          {collection.imageUrl ? (
+            <Image source={{ uri: collection.imageUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
+          ) : (
+            <CollectionMosaic
+              images={products.slice(0, 4).map((p) => p.imageUrl)}
+              style={{ width, height: coverHeight }}
+            />
+          )}
           <LinearGradient
             colors={overlay.scrimStops.colors}
             locations={overlay.scrimStops.locations}
@@ -164,12 +239,14 @@ export default function CollectionScreen() {
                 </Text>
               </Pressable>
               <Text style={styles.meta} numberOfLines={1}>
-                {products.length} produkter · {collection.tag}
+                {products.length} produkter · {collection.detail}
               </Text>
             </View>
-            <Pill variant="filled" selected={followed} onPress={() => toggleFollowed(collection.id)}>
-              {followed ? 'Följer' : 'Följ'}
-            </Pill>
+            {collection.followable && (
+              <Pill variant="filled" selected={followed} onPress={() => toggleFollowed(collection.id)}>
+                {followed ? 'Följer' : 'Följ'}
+              </Pill>
+            )}
           </View>
 
           {filters.length > 1 && (
@@ -181,9 +258,16 @@ export default function CollectionScreen() {
             />
           )}
 
-          <View style={styles.grid}>
-            <ProductGrid products={visible} compact />
-          </View>
+          {products.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>{collection.emptyTitle}</Text>
+              {collection.emptyHint ? <Text style={styles.emptyHint}>{collection.emptyHint}</Text> : null}
+            </View>
+          ) : (
+            <View style={styles.grid}>
+              <ProductGrid products={visible} compact />
+            </View>
+          )}
         </Reanimated.View>
       </Transition.ScrollView>
 
@@ -264,6 +348,22 @@ const useStyles = makeStyles((t) => ({
   },
   grid: {
     paddingHorizontal: spacing.screenMargin,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingHorizontal: spacing.screenMargin,
+    paddingTop: spacing.xxl,
+    gap: spacing.sm,
+  },
+  emptyTitle: {
+    ...typography.body,
+    color: t.colors.textPrimary,
+    textAlign: 'center',
+  },
+  emptyHint: {
+    ...typography.label,
+    color: t.colors.textSecondary,
+    textAlign: 'center',
   },
   topChrome: {
     position: 'absolute',

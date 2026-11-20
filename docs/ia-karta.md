@@ -18,12 +18,12 @@
 | **Hem** | Samlingspunkt, som Spotify: hälsningshero, sedan hyllor med kort (samlingar, varumärken, områden, rekommendationer). Inga produkter i grid. | Samling-, Partner- och Produktdetalj, Hitta | 🚧 Gammal struktur byggd, ska göras om till hyllor |
 | **Flöde** | Uppdateringar från det man följer (varumärken, företag, områden, samlingar) | Produktdetalj, Partner- och Samlingsdetalj | 🚧 Grundversion byggd med gammal roll (blandat upptäcktsflöde), ska omarbetas |
 | **Hitta** | Dialog som hjälper att bolla och få ett urval, plus jämförelse. Valen (pris, hållbarhet m.m.) är en del av dialogen. | Produktdetalj | ✅ Byggd. Kvar: produktkort länkar till Produktdetalj |
-| **Sparat** | Det man sparat och följer. Egna samlingar, "Gilla" alltid först, hantera följda. | Samlingsdetalj, Partnerdetalj | 🚧 Gilla-listan byggd, samlingar och följda ej |
+| **Sparat** | Det man sparat och följer. Segment Samlingar \| Följer. "Alla sparade" alltid först, egna samlingar, Ny samling. | Samlingsdetalj, Partnerdetalj | ✅ Del 1 byggd (brief 32). Del 2 (spara i samling, redigera) ej. |
 | **Produktdetalj** | Fördjupning: hållbarhet, begagnat och nytt, liknande produkter, spara. Nav för stegen Jämför och Köp. | Från alla produktkort | ⬜ Wireframe klar (wireframes.md avsnitt 1) |
-| **Samlingsdetalj** | Innehåll i en stil-/temasamling eller egen samling, med masonry-grid. Följ/Avfölj, eller Dela/redigera för egna. | Från samlingskort, Sparat | ✅ Byggd för kuraterade samlingar (brief 28, `app/collection/[id].tsx`). Kurator: Kroona (teman) eller varumärke (kollektioner), brief 29. Egna samlingar ej. |
+| **Samlingsdetalj** | Innehåll i en stil-/temasamling eller egen samling, med masonry-grid. Följ/Avfölj, eller Dela/redigera för egna. | Från samlingskort, Sparat | ✅ Byggd för kuraterade samlingar (brief 28, `app/collection/[id].tsx`). Kurator: Kroona (teman) eller varumärke (kollektioner), brief 29. Egna samlingar och "Alla sparade" ("Av dig", ingen Följ), brief 32. |
 | **Partnerdetalj** | Varumärkes-/återförsäljarprofil: värdegrund, geografisk närvaro, produktgrid. Följ/Avfölj. | Från varumärkeskort (Hem: Du följer, Fler varumärken) och kuratorraden i Samlingsdetalj | ✅ Byggd för varumärken (brief 29, `app/partner/[id].tsx`) med Samlingar-hylla. Butiker/andrahand ej. |
 | **Följa (lokalt)** | Följ varumärke, företag, område eller samling. Lagras lokalt, några förvalda i demot. | Flöde, Sparat | ⬜ Ny 2026-11-18 |
-| **Egna samlingar** | Skapa/döpa/privat-publik/flytta produkter mellan samlingar | Sparat, Samlingsdetalj | ⬜ Lokal AsyncStorage-modell (spec avsnitt 3) |
+| **Egna samlingar** | Skapa/döpa/privat-publik/flytta produkter mellan samlingar | Sparat, Samlingsdetalj | 🚧 Skapa (namn, Privat/Publik) byggt, AsyncStorage (`UserCollectionsContext`, brief 32). Döpa om/radera/flytta i del 2. |
 | **Onboarding** (5 steg) | Smakinsamling | Hem (första körning) | ⬜ Medvetet parkerad |
 
 ## Fas 1 — Första återförsäljaren + konto

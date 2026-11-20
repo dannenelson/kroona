@@ -27,14 +27,19 @@ type Props = {
   variant: 'brand' | 'style';
   /** Varumärke (brief 29): kortet öppnar Partnerdetalj i stället för Samlingsdetalj. */
   partnerId?: string;
+  /** Bredd i grid (Sparat › Följer); höjden följer kortets proportion. Standard 150 × 310. */
+  width?: number;
 };
+
+const CARD_WIDTH = 150;
+const CARD_HEIGHT = 310;
 
 /**
  * Samlings-/varumärkeskort. Tryck öppnar Samlings- eller Partnerdetalj (zoom
  * från bilden). Långt tryck öppnar samma kontextmeny som produktkorten
  * (brief 30): Följ/Sluta följa, Öppna, Dela. Ingen synlig följ-indikator på kortet.
  */
-export default function PartnerCard({ id, name, tag, itemCount, imageUrl, variant, partnerId }: Props) {
+export default function PartnerCard({ id, name, tag, itemCount, imageUrl, variant, partnerId, width = CARD_WIDTH }: Props) {
   const { isFollowed, toggleFollowed } = useFollowedCollections();
   const followed = isFollowed(id);
   const styles = useStyles();
@@ -131,7 +136,7 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
         accessibilityLabel={name}
         accessibilityHint="Håll in för fler val"
       >
-        <Animated.View style={[styles.card, press.scaleStyle]}>
+        <Animated.View style={[styles.card, { width, height: (width * CARD_HEIGHT) / CARD_WIDTH }, press.scaleStyle]}>
         <Transition.Boundary
           id={boundaryId}
           group={partnerId ? PARTNER_BOUNDARY_GROUP : COLLECTION_BOUNDARY_GROUP}
@@ -153,8 +158,6 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
 // används fasta overlay-färger (onPhoto), identiska i båda teman.
 const useStyles = makeStyles((t) => ({
   card: {
-    width: 150,
-    height: 310,
     // Samlingskort: radius.collection (design.md §0), samma som menyns kopia.
     borderRadius: radius.collection,
     borderCurve: 'continuous',

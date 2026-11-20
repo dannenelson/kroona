@@ -19,7 +19,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay } from '../../theme';
 import { getProductsForRetailer, getRetailer } from '../../lib/catalog';
 import {
-  getBrandFilterCollection,
+  getRetailerCoverImage,
   getCollectionProducts,
   getRetailerCollections,
   getRetailerFollowKey,
@@ -50,9 +50,8 @@ export default function PartnerScreen() {
   const retailer = getRetailer(id);
   const products = useMemo(() => (retailer ? getProductsForRetailer(retailer.id) : []), [retailer]);
   const collections = useMemo(() => (retailer ? getRetailerCollections(retailer.id) : []), [retailer]);
-  // Retailer har ingen egen bild: covern är varumärkessamlingens bild om den
-  // finns, annars första produktens (befintlig data, inget påhittat).
-  const coverUrl = retailer ? (getBrandFilterCollection(retailer.id)?.imageUrl ?? products[0]?.imageUrl) : undefined;
+  // Retailer har ingen egen bild (se getRetailerCoverImage).
+  const coverUrl = retailer ? getRetailerCoverImage(retailer.id) : undefined;
 
   const coverHeight = width / COVER_ASPECT;
   const barHeight = touchTarget + spacing.sm * 2;

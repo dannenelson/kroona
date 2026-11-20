@@ -219,6 +219,13 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Innehåll:** cover 4:5 med namnet (covern = varumärkessamlingens bild, annars första produktens; `Retailer` har ingen egen bild) · antal produkter + Följ · Om varumärket · Finns (e-handel/butiker, hoppas över om tomt) · Samlingar (hylla med PartnerCard, öppnar Samlingsdetalj med zoom) · Alla produkter (masonry).
 - **Samlingsdetalj** fick kuratorraden "Av Kroona" / "Av <varumärke>" (varumärket öppnar Partnerdetalj).
 
+## 8g. Sparat (brief 32)
+- **Header** "Sparat" + Pill "Ny samling"; **segment** Samlingar | Följer som text-flikar (§11).
+- **Samlingskort (egna):** kvadratiskt mosaikomslag (`CollectionMosaic`: 1 fyller, 2 sida vid sida, 3 = en stor + två små, 4 = 2 × 2, tunna skarvar; tom = `placeholder`-yta), radie `radius.collection`, namn (`body`) och "N produkter · Privat/Publik" (`micro`). Samma tryckrespons (`useCardPress`) och zoom till Samlingsdetalj. Ingen kontextmeny än (redigera/radera kommer i del 2). "Ny samling"-kortet: samma kvadrat i `surface` med ett +.
+- **Följer:** samma PartnerCard som på Hem i 2 kolumner (proportion 150 × 310), kontextmenyns Sluta följa.
+- **Ny samling:** lager från botten (inbyggd `Modal`, glider upp; Minska rörelse: tonar) över `scrim`, yta `surfaceRaised`, toppradie `radius.lifted`; namnfält (`surface`, `radius.control`, 44 hög), Privat | Publik som text-flikar, Avbryt/Skapa.
+- **Samlingsdetalj för egna och Alla sparade:** mosaiken som cover (4:5), "Av dig", "N produkter · Privat/Publik", ingen Följ, tom-vy.
+
 ## 9. Komponentkontrakt
 Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (`sm`/`md`/`lg`, default `md`), **states** (default, pressed, disabled, loading, selected), och en **`style`-prop som slås ihop sist** (anroparen justerar layout, aldrig identitet). Innehåll går via `children`, inte via fler props.
 
