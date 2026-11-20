@@ -98,7 +98,7 @@ export interface Area {
 }
 
 /** Något som kan följas. Bara data i Fas 0-steget, logiken byggs senare. */
-export type FollowTarget = { kind: 'retailer' | 'collection' | 'area'; id: string };
+export type FollowTarget = { kind: 'retailer' | 'collection' | 'area' | 'person'; id: string };
 
 /** Användarens egen samling (brief 32), lagras lokalt (AsyncStorage) i Fas 0.
  *  Kurator `{ kind: 'user', id: 'me' }` ("Av dig"). En delmängd av "Alla sparade". */
@@ -109,4 +109,18 @@ export interface UserCollection {
   productIds: string[];
   /** ISO-tid. */
   createdAt: string;
+}
+
+/** En person man kan följa (brief 37). Fas 0: dummydata, inga konton. */
+export interface Person {
+  id: string;
+  kind: 'person';
+  name: string;
+  /** Utan @. */
+  handle: string;
+  bio: string;
+  /** Initial(er) som avatar tills riktiga bilder finns. */
+  initial: string;
+  /** Antal följare (dummy). */
+  followers: number;
 }

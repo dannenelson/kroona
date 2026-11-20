@@ -18,8 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay } from '../../theme';
-import { ALL_COLLECTIONS, getCollectionProducts } from '../../data/collections';
-import { getRetailer } from '../../lib/catalog';
+import { ALL_COLLECTIONS, getCollectionProducts, getCurator } from '../../data/collections';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
 import { useSavedProducts } from '../../context/SavedProductsContext';
 import { ALL_SAVED_ID, ALL_SAVED_NAME, useUserCollections } from '../../context/UserCollectionsContext';
@@ -34,7 +33,6 @@ import ProductGrid from '../../components/ProductGrid';
 import Pill from '../../components/Pill';
 import BackIcon from '../../assets/icons/BackIcon';
 import type { Product } from '../../types/product';
-import type { Retailer } from '../../types/catalog';
 
 // Lokalt layoutmått: cover i samma proportion som Produktdetaljens hero (4:5).
 const COVER_ASPECT = 4 / 5;
@@ -52,7 +50,8 @@ type CollectionView = {
   /** Kuraterade samlingar har en bild; egna och "Gillade produkter" visar mosaik. */
   imageUrl?: string;
   curatorName: string;
-  curatorRetailer?: Retailer;
+  /** Kuratorns sida: Partnerdetalj (varumärke) eller profil (person). */
+  curatorHref?: { pathname: '/partner/[id]' | '/profile/[id]'; id: string };
   /** Andra metadataraden efter antal produkter (tag, eller Privat/Publik). */
   detail: string;
   /** Bara kuraterade samlingar kan följas (egna har ingen Följ-knapp). */
@@ -125,15 +124,19 @@ export default function CollectionScreen() {
     }
     const c = ALL_COLLECTIONS.find((x) => x.id === id);
     if (!c) return undefined;
-    // Kurator (brief 29): Kroona eller ett varumärke; varumärket öppnar Partnerdetalj.
-    const curatorRetailer = c.curator.kind === 'retailer' && c.curator.id ? getRetailer(c.curator.id) : undefined;
+    // Kurator (brief 29, 37): Kroona, ett varumärke (→ Partnerdetalj) eller en person (→ profil).
+    const curator = getCurator(c);
     return {
       id,
       name: c.name,
       products: getCollectionProducts(c),
       imageUrl: c.imageUrl,
-      curatorName: curatorRetailer?.name ?? 'Kroona',
-      curatorRetailer,
+      curatorName: curator.name,
+      curatorHref: curator.retailerId
+        ? { pathname: '/partner/[id]', id: curator.retailerId }
+        : curator.personId
+          ? { pathname: '/profile/[id]', id: curator.personId }
+          : undefined,
       detail: c.tag,
       followable: true,
       byBrand: c.filter.type === 'brand',
@@ -185,7 +188,7 @@ export default function CollectionScreen() {
   }
 
   const followed = isFollowed(collection.id);
-  const { curatorRetailer, curatorName } = collection;
+  const { curatorHref, curatorName } = collection;
 
   return (
     <View style={styles.container}>
@@ -228,13 +231,13 @@ export default function CollectionScreen() {
           <View style={styles.metaRow}>
             <View style={styles.metaText}>
               <Pressable
-                disabled={!curatorRetailer}
-                accessibilityRole={curatorRetailer ? 'link' : 'text'}
+                disabled={!curatorHref}
+                accessibilityRole={curatorHref ? 'link' : 'text'}
                 onPress={() =>
-                  curatorRetailer && router.push({ pathname: '/partner/[id]', params: { id: curatorRetailer.id } })
+                  curatorHref && router.push({ pathname: curatorHref.pathname, params: { id: curatorHref.id } })
                 }
               >
-                <Text style={[styles.curator, curatorRetailer && styles.curatorLink]} numberOfLines={1}>
+                <Text style={[styles.curator, curatorHref && styles.curatorLink]} numberOfLines={1}>
                   Av {curatorName}
                 </Text>
               </Pressable>

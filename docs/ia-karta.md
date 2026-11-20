@@ -4,7 +4,7 @@
 
 **Statuskoder:** ✅ Byggd · 🚧 Delvis byggd · ⬜ Ej byggd
 
-*Uppdaterat 2026-11-18 — flikarnas roller ändrade (se produkt.md): **Hem** = hyllor med kort, **Flöde** = uppdateringar från det man följer, **Hitta** = dialog, urval och jämförelse, **Sparat** = det man sparat och följer. Masonry-grid flyttar in i detaljvyerna. Följa (varumärke, företag, område, samling) byggs lokalt i Fas 0. Profildetalj (andra användare) flyttad till Fas 1+. Se även `Resan` (journey × flikar).*
+*Uppdaterat 2026-11-18 — flikarnas roller ändrade (se produkt.md): **Hem** = hyllor med kort, **Flöde** = uppdateringar från det man följer, **Hitta** = dialog, urval och jämförelse, **Sparat** = det man sparat och följer. Masonry-grid flyttar in i detaljvyerna. Följa (varumärke, företag, område, samling och — sedan brief 37 — person) byggs lokalt i Fas 0. Profildetalj för personer finns som dummy i Fas 0; social funktion är Fas 1+. Se även `Resan` (journey × flikar).*
 *Tidigare: 2026-08-21 — detaljvyerna wireframade, Egna samlingar flyttad till Fas 0.*
 
 **Område** = kategori eller stil med kurerat innehåll (t.ex. "Hemmakontor", "Skandinavisk stil").
@@ -22,6 +22,7 @@
 | **Produktdetalj** | Fördjupning: hållbarhet, begagnat och nytt, liknande produkter, spara. Nav för stegen Jämför och Köp. | Från alla produktkort | ⬜ Wireframe klar (wireframes.md avsnitt 1) |
 | **Samlingsdetalj** | Innehåll i en stil-/temasamling eller egen samling, med masonry-grid. Följ/Avfölj, eller Dela/redigera för egna. | Från samlingskort, Sparat | ✅ Byggd för kuraterade samlingar (brief 28, `app/collection/[id].tsx`). Kurator: Kroona (teman) eller varumärke (kollektioner), brief 29. Egna samlingar och "Gillade produkter" ("Av dig", ingen Följ), brief 32/35. |
 | **Partnerdetalj** | Varumärkes-/återförsäljarprofil: värdegrund, geografisk närvaro, produktgrid. Följ/Avfölj. | Från varumärkeskort (Hem: Du följer, Fler varumärken) och kuratorraden i Samlingsdetalj | ✅ Byggd för varumärken (brief 29, `app/partner/[id].tsx`) med Samlingar-hylla. Butiker/andrahand ej. |
+| **Profildetalj** | En person: avatar, namn, @handle, följare, bio, Följ, hyllan Samlingar (personens publika samlingar). | Från Följer (Personer), kuratorraden i Samlingsdetalj, ProfileCard | ✅ Fas 0 dummy (brief 37, `app/profile/[id].tsx`). Social funktion Fas 1+. |
 | **Följa (lokalt)** | Följ varumärke, företag, område eller samling. Lagras lokalt, några förvalda i demot. | Flöde, Sparat | ⬜ Ny 2026-11-18 |
 | **Egna samlingar** | Skapa/döpa/privat-publik/flytta produkter mellan samlingar | Sparat, Samlingsdetalj | 🚧 Skapa (namn, Privat/Publik) byggt, AsyncStorage (`UserCollectionsContext`, brief 32). Döpa om/radera/flytta i del 2. |
 | **Onboarding** (5 steg) | Smakinsamling | Hem (första körning) | ⬜ Medvetet parkerad |
@@ -31,7 +32,7 @@
 | Skärm/funktion | Syfte | Status |
 |---|---|---|
 | Konto/inloggning | Krävs för cross-device, click_id-koppling | ⬜ |
-| Profildetalj och följa andra användare | Kräver att andra konton existerar | ⬜ Flyttad hit 2026-11-18 |
+| Riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) | Kräver att andra konton existerar | ⬜ Fas 1+. Att följa personer och Profildetalj finns som dummy i Fas 0 (brief 37). |
 | Riktig personalisering | Kroona lär sig av vad man söker och jämför, användaren kan se och rensa | ⬜ Fas 0 har bara lokal dummy |
 | Chatthistorik/arkiv (Hitta) | Spara, lista, återuppta konversationer | ⬜ |
 | Riktiga publika samlings-URL:er | Delning utan app | ⬜ |

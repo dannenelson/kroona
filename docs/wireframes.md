@@ -60,11 +60,18 @@ Innehållet kan vara heterogent, så filtrering ska vara generell. Här bor **ma
 
 ---
 
-## 4. Profildetalj (identitet) — ⏸ Parkerad, Fas 1+
-Man följer varumärken, företag, områden och samlingar, inte andra användare. Profildetalj för personer väntar tills konton finns. Varumärkesidentitet täcks av Partnerdetalj.
+## 4. Profildetalj (person) — ✅ Fas 0 dummy (brief 37)
+**Beslut 2026-11-20 (Daniel):** personer går att följa. I Fas 0 med dummypersoner och lokal följ-lagring; riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) är Fas 1+.
 
-**Bevarad wireframe (gäller när konton finns):** nås från ProfileCard. Visar profilens samlingar, inte produkter direkt (Profil → Samlingar → Produkter, Pinterest-mönster). Avatar och namn · antal samlingar och följare · Följ-knapp · kort bio · grid av samlingar som länkar till Samlings- eller Partnerdetalj. Öppet: hur varumärkes- och användaridentitet skiljs åt i samma mall.
+**Nås från:** Följer → Personer i Sparat, kuratorraden "Av <person>" i Samlingsdetalj, ProfileCard (med person). Personernas samlingar syns under "Populära samlingar" på Hem.
 
+1. Avatar (96, initialer), zoommål från raden/kortet
+2. Namn, @handle, "N följare · M samlingar"
+3. Kort bio
+4. Följ/Följer
+5. Hylla "Samlingar" (personens publika samlingar → Samlingsdetalj)
+
+Varumärkesidentitet täcks av Partnerdetalj.
 ---
 
 ## 5. Hem — 🟡 Ny roll, behöver wireframas om
@@ -115,10 +122,10 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 3. **Mina samlingar:**
    - **"Gillade produkter"** som egen specialrad överst: *inte* en samling. Hjärtat sparar dit, och en produkt kan vara både gillad och i en samling.
    - Egna samlingar som **rader** (standard) eller **kort** (växlare). Mosaikomslag av de fyra första produkterna, namn, antal, Privat/Publik.
-4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Samlingar**, **Områden**, **Personer** (Fas 1+, kräver konton).
+4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Personer** (brief 37, dummy), **Samlingar**, **Områden**.
 5. Bekräftelser via Snackbar ("<produkt> sparades i <samling> · Visa").
 
-**Byggt (brief 35):** allt ovan utom Personer (Fas 1+) och Områden (ingen följ-lagring för områden än, sektionen döljs). Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Långt tryck: Öppna/Dela (egna), Öppna/Sluta följa (Följer). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). Spara i samling från produkt: se §8b (brief 36). **Ej byggt:** redigera/döp om/radera, ta bort produkt ur samling (i samlingsvyn), eget omslag, Personer.
+**Byggt (brief 35, Personer brief 37):** allt ovan utom Områden (ingen följ-lagring för områden än, sektionen döljs). Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Långt tryck: Öppna/Dela (egna), Öppna/Sluta följa (Följer). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). Spara i samling från produkt: se §8b (brief 36). **Ej byggt:** redigera/döp om/radera, ta bort produkt ur samling (i samlingsvyn), eget omslag.
 
 Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat/Publik, ingen Följ; Dela/redigera kommer i del 2). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
 

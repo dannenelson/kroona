@@ -6,6 +6,7 @@ import {
   installDismissThresholds,
   lightboxScreenOptions,
   partnerScreenOptions,
+  profileScreenOptions,
   productScreenOptions,
   tabsScreenOptions,
 } from '../components/product/productTransition';
@@ -27,6 +28,7 @@ import { ThemeProvider, useTheme, type ColorScheme } from '../theme';
 import { SavedProductsProvider } from '../context/SavedProductsContext';
 import { FollowedCollectionsProvider } from '../context/FollowedCollectionsContext';
 import { UserCollectionsProvider } from '../context/UserCollectionsContext';
+import { FollowedPeopleProvider } from '../context/FollowedPeopleContext';
 import { ContextMenuProvider } from '../components/ProductContextMenu';
 import { SnackbarProvider } from '../components/Snackbar';
 import { SheetProvider } from '../components/Sheet';
@@ -81,6 +83,7 @@ function AppShell() {
     <SavedProductsProvider>
       <UserCollectionsProvider>
       <FollowedCollectionsProvider>
+      <FollowedPeopleProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         {/* Kontextmenyn ritas ovanför alla skärmar (ingen Modal, se ProductContextMenu). */}
         <ContextMenuProvider>
@@ -97,11 +100,13 @@ function AppShell() {
               <BlankStack.Screen name="product/[id]" options={productScreenOptions} />
               <BlankStack.Screen name="collection/[id]" options={collectionScreenOptions} />
               <BlankStack.Screen name="partner/[id]" options={partnerScreenOptions} />
+              <BlankStack.Screen name="profile/[id]" options={profileScreenOptions} />
               <BlankStack.Screen name="lightbox/[id]" options={lightboxScreenOptions} />
             </BlankStack>
           </SheetProvider>
           </SnackbarProvider>
         </ContextMenuProvider>
+      </FollowedPeopleProvider>
       </FollowedCollectionsProvider>
       </UserCollectionsProvider>
     </SavedProductsProvider>

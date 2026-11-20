@@ -34,7 +34,7 @@ Göra köpresan enklare och roligare för alla konsumenter, oavsett intresse ell
 | **Hitta** | Dialog som hjälper att bolla och få ett urval, plus jämförelse. Valen (pris, hållbarhet m.m.) är en del av dialogen. Inline produktkort. |
 | **Sparat** | Det man sparat och följer, där man hanterar det. Flikar Mina samlingar \| Följer. "Gillade produkter" (hjärtat) först, sedan egna samlingar. |
 
-**Detaljvyer:** Produktdetalj, Samlingsdetalj, Partnerdetalj (varumärke/företag). Profildetalj (andra användare) väntar, eftersom man följer varumärken och inte personer. Masonry-grid (Pinterest-känsla) bor i detaljvyerna, inte på en flik.
+**Detaljvyer:** Produktdetalj, Samlingsdetalj, Partnerdetalj (varumärke/företag) och Profildetalj (personer). **Personer går att följa** (Daniel, 2026-11-20, brief 37): i Fas 0 som dummydata med lokal följ-lagring; riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) är Fas 1+. Masonry-grid (Pinterest-känsla) bor i detaljvyerna, inte på en flik.
 Hem är det som är relevant nu, Flöde är det man följer.
 
 ## Låsta beslut
@@ -59,7 +59,8 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 | **Erbjudande** (`Offer`) | id, productId, retailerId, price, **condition** (`new` · `used`), conditionNote och **pricing** (`fixed` = "Fast pris", `auction` = "Auktion, bud från") för begagnat, stock (`in_stock` · `few_left` · `out_of_stock`), shipping (text), url (dummy) | `data/offers.ts` |
 | **Område** (`Area`) | id, `kind: 'area'`, name, description, filter (category, styles[], types[]), defaultFollowed | `data/areas.ts` |
 | **Samling** (`Collection`) | som förut + `kind: 'collection'`, defaultFollowed, **`curator: { kind: 'kroona' \| 'retailer' \| 'user'; id? }`** (brief 29), filter `brand` · `style` · `products` (utvalda id:n) | `data/collections.ts` (`COLLECTIONS` = Hem/Flöde, `RETAILER_COLLECTIONS` = varumärkens kollektioner, `ALL_COLLECTIONS`) |
-| **Följbart** (`FollowTarget`) | `{ kind: 'retailer' \| 'collection' \| 'area', id }`. Bara data, logiken byggs senare. | `types/catalog.ts` |
+| **Följbart** (`FollowTarget`) | `{ kind: 'retailer' \| 'collection' \| 'area' \| 'person', id }`. Följ-lagring: samlingar/varumärken i `FollowedCollectionsContext`, personer i `FollowedPeopleContext` (egen nyckel, tom från start). Områden saknar ännu lagring. | `types/catalog.ts` |
+| **Person** (`Person`, brief 37) | id, `kind: 'person'`, name, handle, bio, initial, followers (dummy). Kurerar samlingar via `curator: { kind: 'user', id }` (`PEOPLE_COLLECTIONS`). DUMMYDATA. | `data/people.ts`, `data/collections.ts` |
 
 **Gillade produkter och egna samlingar (Daniel, 2026-11-20, brief 32, ändrat i brief 35):** namnet är *samling* genomgående. **"Gillade produkter"** (hjärtat, data = `SavedProductsContext`, route `/collection/saved`) är **inte en samling** utan en egen specialrad överst i Sparat. **Egna samlingar** (`UserCollection { id, name, visibility: 'private' | 'public', productIds, createdAt }`, `types/catalog.ts`, lagras i AsyncStorage via `UserCollectionsContext`) är **oberoende** av Gillade produkter: en produkt kan vara både gillad och i samlingar (invarianten från brief 32 är borttagen). Kurator `{ kind: 'user', id: 'me' }` visas som "Av dig". Omslag = mosaik av de fyra första produkterna.
 

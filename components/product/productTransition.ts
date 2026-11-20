@@ -127,6 +127,10 @@ export const productScreenOptions = hierarchyScreenOptions(PRODUCT_BOUNDARY_GROU
 export const collectionScreenOptions = hierarchyScreenOptions(COLLECTION_BOUNDARY_GROUP);
 export const partnerScreenOptions = hierarchyScreenOptions(PARTNER_BOUNDARY_GROUP);
 
+/** Grupp för personer: avatar i rad/kort (källa) och profilvyns avatar (mål), brief 37. */
+export const PROFILE_BOUNDARY_GROUP = 'profile';
+export const profileScreenOptions = hierarchyScreenOptions(PROFILE_BOUNDARY_GROUP);
+
 const lightboxCloseEasing = Easing.bezierFn(...motion.lightboxFade.closeEasing);
 
 /**

@@ -51,7 +51,7 @@ För att länka till senaste chattar (Hitta) eller in till specifika kategorier.
 3 överlappande bokstavsavatarer (guld/sustainGreen/sustainAmber-bakgrund, mörk text — inte fotobaserade cirklar, dummy-nivån matchar CollectionCards kuratoravatar) på färgad platta, titel + relaterad-lista under. Visas alltid ensam, egen sektion. **Byggd men INTE monterad på Hem än** — finns bara i `CardShowcase.tsx`.
 
 ### ProfileCard — ✅ Implementerad
-76×76 cirkel, guld-initial i mitten, namn under. Används i `DiscoverBrandsRow` ("Fler varumärken i din stil") — ersatte den ursprungliga PartnerCard-stilen där, eftersom destinationen är en varumärkes-*identitet* (profilsida) snarare än en produktförhandsvisning. **Ingen profilsida finns byggd än att länka till** — `onPress` är avsiktligt inte kopplad.
+76×76 cirkel, initial i mitten, namn under. Används i `DiscoverBrandsRow` ("Fler varumärken i din stil"). Med `partnerId` öppnar den Partnerdetalj (brief 29), med `personId` profilvyn (brief 37) och har då kontextmenyn Följ/Sluta följa · Öppna. **Avatar** (`components/Avatar.tsx`, brief 37): rund initial-avatar i `surfaceRaised`, delad av listrader (48) och profilvyn (96, `profileAvatar`).
 
 ### AskBar — ✅ Implementerad, ej i taxonomin ursprungligen
 "Fråga Kroona"-textfält, ingen SectionHeader ovanför (medvetet diskret). Riktig navigation: skickar frågan till Hitta som en ny konversation (inte fejkad). Sitter direkt under text-flikarna (TextTabs) på Hem.

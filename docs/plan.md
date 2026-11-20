@@ -53,7 +53,8 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 3f. ✅ **Sheet, Button och Snackbar + Skapa samling** (brief 33) — byggd 2026-11-20.
 3g. ✅ **Sparat-omstrukturering** (brief 35) — byggd 2026-11-20.
 3h. ✅ **Lägg till i samling** (brief 36) — byggd 2026-11-20.
-3i. **Nästa:** redigera/döp om/radera samling och ta bort produkt ur samling (samlingsvyn).
+3i. ✅ **Personer i Följer + Profildetalj** (brief 37, dummy) — byggd 2026-11-20.
+3j. **Nästa:** redigera/döp om/radera samling och ta bort produkt ur samling (samlingsvyn).
 4. **Sparat** med egna samlingar och följda (AsyncStorage)
 5. **Hem** (hyllor) i ny design, sedan **Flöde** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning

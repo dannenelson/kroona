@@ -1,6 +1,7 @@
 import type { Product, ProductStyle } from '../types/product';
 import { getProductsForCollection, getProductsForRetailer } from '../lib/catalog';
 import { RETAILERS } from './retailers';
+import { getPerson } from './people';
 
 export type CollectionFilter =
   | { type: 'brand'; value: string }
@@ -109,8 +110,73 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
 ];
 
+// Personers publika samlingar (brief 37), visas på profilvyn och under
+// "Populära samlingar" på Hem. DUMMYDATA (Fas 0): påhittade personer och urval.
+export const PEOPLE_COLLECTIONS: Collection[] = [
+  {
+    id: 'pc-maja-ull',
+    kind: 'collection',
+    name: 'Vinterlook i ull',
+    tag: 'Samling',
+    imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400',
+    filter: { type: 'products', ids: ['2', '8', '27', '53', '55', '1'] },
+    curator: { kind: 'user', id: 'p-maja' },
+  },
+  {
+    id: 'pc-maja-fynd',
+    kind: 'collection',
+    name: 'Bästa begagnade fynden',
+    tag: 'Samling',
+    imageUrl: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400',
+    filter: { type: 'products', ids: ['3', '4', '6', '9', '12'] },
+    curator: { kind: 'user', id: 'p-maja' },
+  },
+  {
+    id: 'pc-oskar-hem',
+    kind: 'collection',
+    name: 'Litet hem, smart förvaring',
+    tag: 'Samling',
+    imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400',
+    filter: { type: 'products', ids: ['10', '11', '13', '14', '15'] },
+    curator: { kind: 'user', id: 'p-oskar' },
+  },
+  {
+    id: 'pc-sara-urban',
+    kind: 'collection',
+    name: 'Urban på budget',
+    tag: 'Samling',
+    imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400',
+    filter: { type: 'products', ids: ['5', '7', '16', '17', '18'] },
+    curator: { kind: 'user', id: 'p-sara' },
+  },
+];
+
 /** Alla samlingar som kan öppnas i Samlingsdetalj. */
-export const ALL_COLLECTIONS: Collection[] = [...COLLECTIONS, ...RETAILER_COLLECTIONS];
+export const ALL_COLLECTIONS: Collection[] = [...COLLECTIONS, ...RETAILER_COLLECTIONS, ...PEOPLE_COLLECTIONS];
+
+/**
+ * Kuratorn som visas i "Av …" (brief 29, 37): Kroona, varumärkets namn eller
+ * personens namn, med id för att kunna öppna Partnerdetalj respektive profil.
+ */
+export function getCurator(
+  collection: Collection,
+): { name: string; retailerId?: string; personId?: string } {
+  const { curator } = collection;
+  if (curator.kind === 'retailer' && curator.id) {
+    const r = RETAILERS.find((x) => x.id === curator.id);
+    if (r) return { name: r.name, retailerId: r.id };
+  }
+  if (curator.kind === 'user' && curator.id) {
+    const p = getPerson(curator.id);
+    if (p) return { name: p.name, personId: p.id };
+  }
+  return { name: 'Kroona' };
+}
+
+/** En persons publika samlingar (hyllan "Samlingar" på profilvyn). */
+export function getPersonCollections(personId: string): Collection[] {
+  return PEOPLE_COLLECTIONS.filter((c) => c.curator.kind === 'user' && c.curator.id === personId);
+}
 
 /** Ett varumärkes egna kollektioner (hyllan "Samlingar" på Partnerdetalj). */
 export function getRetailerCollections(retailerId: string): Collection[] {

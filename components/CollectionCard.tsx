@@ -1,4 +1,8 @@
+import { useId } from 'react';
 import { Animated, View, Text, Pressable, StyleSheet, Image } from 'react-native';
+import { useRouter } from 'expo-router';
+import Transition from 'react-native-screen-transitions';
+import { COLLECTION_BOUNDARY_GROUP } from './product/productTransition';
 import { useCardPress } from '../hooks/useCardPress';
 import { makeStyles, typography, fonts, spacing, radius } from '../theme';
 
@@ -11,15 +15,17 @@ type Props = {
   itemCount: number;
   updatedLabel: string;
   images: [string, string, string];
+  /** Öppnar Samlingsdetalj med zoom (brief 37: personers samlingar). */
+  collectionId?: string;
 };
 
-export default function CollectionCard({ title, curatorInitial, itemCount, updatedLabel, images }: Props) {
+export default function CollectionCard({ title, curatorInitial, itemCount, updatedLabel, images, collectionId }: Props) {
   const styles = useStyles();
+  const router = useRouter();
   // Samma tryckrespons som produktkorten (krympning, ingen opacitet).
   const press = useCardPress();
-  return (
-    <Pressable onLayout={press.onLayout} onPressIn={press.onPressIn} onPressOut={press.onPressOut}>
-    <Animated.View style={[styles.wrapper, press.scaleStyle]}>
+  const boundaryId = `${collectionId}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const imagesBlock = (
       <View style={styles.imagesContainer}>
         <Image source={{ uri: images[0] }} style={styles.imageLarge} />
         <View style={styles.imagesSmall}>
@@ -32,6 +38,27 @@ export default function CollectionCard({ title, curatorInitial, itemCount, updat
           <Text style={styles.avatarText}>{curatorInitial}</Text>
         </View>
       </View>
+  );
+  return (
+    <Pressable
+      disabled={!collectionId}
+      onLayout={press.onLayout}
+      onPressIn={press.onPressIn}
+      onPressOut={press.onPressOut}
+      onPress={() =>
+        collectionId && router.push({ pathname: '/collection/[id]', params: { id: collectionId, b: boundaryId } })
+      }
+      accessibilityRole={collectionId ? 'button' : undefined}
+      accessibilityLabel={title}
+    >
+    <Animated.View style={[styles.wrapper, press.scaleStyle]}>
+      {collectionId ? (
+        <Transition.Boundary id={boundaryId} group={COLLECTION_BOUNDARY_GROUP}>
+          {imagesBlock}
+        </Transition.Boundary>
+      ) : (
+        imagesBlock
+      )}
       <View style={styles.content}>
         <Text style={styles.title} numberOfLines={1}>{title}</Text>
         <Text style={styles.meta} numberOfLines={1}>{itemCount} objekt · {updatedLabel}</Text>

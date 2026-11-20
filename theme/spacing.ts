@@ -34,6 +34,9 @@ export const listRow = {
   compactThumb: 48,
 } as const;
 
+/** Avatar på profilvyn (brief 37). Rader använder `listRow.compactThumb` (48). */
+export const profileAvatar = 96;
+
 /** Vy-växlare (segmentkontroll med ikoner, brief 35): knapp 38 × 30, inre luft 3. */
 export const segmented = {
   itemWidth: 38,

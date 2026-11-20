@@ -4,9 +4,9 @@
 // - Mina samlingar: "Gillade produkter" (specialrad, INTE en samling; hjärtat
 //   sparar dit), avdelare, sedan egna samlingar. Rader (standard) eller kort,
 //   valet sparas lokalt. Långt tryck: Öppna, Dela.
-// - Följer: sektioner Varumärken och Samlingar som rader, max 3 med "Visa alla"
-//   (expanderar på plats). Långt tryck: Öppna, Sluta följa. Områden döljs (ingen
-//   följ-lagring för områden än), Personer är Fas 1+.
+// - Följer: sektioner Varumärken, Personer (brief 37) och Samlingar som rader,
+//   max 3 med "Visa alla" (expanderar på plats). Långt tryck: Öppna, Sluta
+//   följa. Områden döljs (ingen följ-lagring för områden än).
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
@@ -15,20 +15,28 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, fonts, spacing, radius, listRow, iconSize } from '../../theme';
 import { useSavedProducts } from '../../context/SavedProductsContext';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
+import { useFollowedPeople } from '../../context/FollowedPeopleContext';
+import { getPerson } from '../../data/people';
 import { ALL_SAVED_ID, ALL_SAVED_NAME, useUserCollections } from '../../context/UserCollectionsContext';
 import { PRODUCTS } from '../../data/products';
 import {
   ALL_COLLECTIONS,
   getCollectionProducts,
+  getCurator,
   getRetailerCollections,
   getRetailerFollowKey,
   getRetailerIdForBrandCollection,
   type Collection,
 } from '../../data/collections';
 import { getProductsForRetailer, getRetailer } from '../../lib/catalog';
-import type { Retailer, UserCollection } from '../../types/catalog';
+import type { Person, Retailer, UserCollection } from '../../types/catalog';
 import { TAB_BAR_HEIGHT } from '../../components/CustomTabBar';
-import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from '../../components/product/productTransition';
+import {
+  COLLECTION_BOUNDARY_GROUP,
+  PARTNER_BOUNDARY_GROUP,
+  PROFILE_BOUNDARY_GROUP,
+} from '../../components/product/productTransition';
+import Avatar from '../../components/Avatar';
 import TextTabs from '../../components/TextTabs';
 import IconButton from '../../components/IconButton';
 import Button from '../../components/Button';
@@ -264,6 +272,11 @@ function FollowingTab() {
   const styles = useStyles();
   const router = useRouter();
   const { followedCollectionIds, toggleFollowed } = useFollowedCollections();
+  const { followedPeopleIds, toggleFollowPerson } = useFollowedPeople();
+  const people = useMemo(
+    () => followedPeopleIds.map(getPerson).filter((p): p is Person => !!p),
+    [followedPeopleIds],
+  );
 
   // Varumärken: följda direkt (återförsäljar-id) eller via sin varumärkessamling.
   // Samlingar: teman och kollektioner (inte varumärkens filtersamlingar).
@@ -283,7 +296,7 @@ function FollowingTab() {
     return { brands: [...brandMap.values()], collections: cols };
   }, [followedCollectionIds]);
 
-  if (brands.length === 0 && collections.length === 0) {
+  if (brands.length === 0 && people.length === 0 && collections.length === 0) {
     return (
       <View style={styles.empty}>
         <Text style={styles.emptyText}>Det du följer samlas här.</Text>
@@ -314,10 +327,15 @@ function FollowingTab() {
         }}
       />
       <Section
+        title="Personer"
+        items={people}
+        render={(p) => <PersonRow key={p.id} person={p} onUnfollow={() => toggleFollowPerson(p.id)} />}
+      />
+      <Section
         title="Samlingar"
         items={collections}
         render={(c) => {
-          const curator = c.curator.kind === 'retailer' && c.curator.id ? getRetailer(c.curator.id)?.name : undefined;
+          const curator = getCurator(c).name;
           const images = getCollectionProducts(c)
             .slice(0, 4)
             .map((p) => p.imageUrl);
@@ -326,7 +344,7 @@ function FollowingTab() {
               key={c.id}
               id={c.id}
               title={c.name}
-              subtitle={`Av ${curator ?? 'Kroona'}`}
+              subtitle={`Av ${curator}`}
               images={images}
               compact
               menuItems={[
@@ -370,7 +388,6 @@ function Section<T>({ title, items, render }: { title: string; items: T[]; rende
 
 /** Varumärke som rad: rund avatar 48 (initialer), zoom till Partnerdetalj. */
 function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subtitle: string; onUnfollow: () => void }) {
-  const styles = useStyles();
   const router = useRouter();
   const b = `${retailer.id}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const size = listRow.compactThumb;
@@ -379,11 +396,7 @@ function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subt
       title={retailer.name}
       subtitle={subtitle}
       compact
-      thumb={
-        <View style={[styles.avatar, { width: size, height: size }]}>
-          <Text style={styles.avatarText}>{retailer.initial}</Text>
-        </View>
-      }
+      thumb={<Avatar initial={retailer.initial} size={size} />}
       thumbRadius={size / 2}
       boundary={{ id: b, group: PARTNER_BOUNDARY_GROUP }}
       onPress={() => router.push({ pathname: '/partner/[id]', params: { id: retailer.id, b } })}
@@ -392,6 +405,32 @@ function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subt
           label: 'Öppna',
           icon: ChevronIcon,
           onPress: () => router.push({ pathname: '/partner/[id]', params: { id: retailer.id } }),
+        },
+        { label: 'Sluta följa', icon: FollowIcon, onPress: onUnfollow },
+      ]}
+    />
+  );
+}
+
+/** Person som rad (brief 37): rund avatar 48, "@handle", zoom till profilvyn. */
+function PersonRow({ person, onUnfollow }: { person: Person; onUnfollow: () => void }) {
+  const router = useRouter();
+  const b = `${person.id}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
+  const size = listRow.compactThumb;
+  return (
+    <ListRow
+      title={person.name}
+      subtitle={`@${person.handle}`}
+      compact
+      thumb={<Avatar initial={person.initial} size={size} />}
+      thumbRadius={size / 2}
+      boundary={{ id: b, group: PROFILE_BOUNDARY_GROUP }}
+      onPress={() => router.push({ pathname: '/profile/[id]', params: { id: person.id, b } })}
+      menuItems={[
+        {
+          label: 'Öppna',
+          icon: ChevronIcon,
+          onPress: () => router.push({ pathname: '/profile/[id]', params: { id: person.id } }),
         },
         { label: 'Sluta följa', icon: FollowIcon, onPress: onUnfollow },
       ]}
@@ -455,17 +494,6 @@ const useStyles = makeStyles((t) => ({
   },
   thumbMosaic: {
     borderCurve: 'continuous',
-  },
-  avatar: {
-    borderRadius: radius.full,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: t.colors.surfaceRaised,
-  },
-  avatarText: {
-    ...typography.body,
-    fontFamily: fonts.ui600,
-    color: t.colors.textPrimary,
   },
   section: {
     paddingTop: spacing.lg,
