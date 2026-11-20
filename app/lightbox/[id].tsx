@@ -1,16 +1,17 @@
-// Lightbox (brief 19–22): produktens bilder i helskärm och riktig proportion.
-// Öppnas på den bild som visas i heron och ligger ovanpå Produktdetalj i
-// rotens BlankStack. Öppning/stängning är en ren fade (lightboxScreenOptions i
-// components/product/productTransition.ts), ingen zoom från heron.
+// Lightbox (brief 19–24): produktens bilder i helskärm och riktig proportion,
+// ovanpå Produktdetalj i rotens BlankStack. Kryss och kantswipe stänger med fade
+// (lightboxScreenOptions i components/product/productTransition.ts).
 //
-// Gestarbitrering (brief 20), helt på UI-tråden med shared values:
-// - Två fingrar → nyp (1–4x), alltid. Låset `lightboxGestureLock` sätts redan
-//   när andra fingret landar, så bibliotekets stängningsgest stängs av i samma
-//   bildruta (interpolatorn returnerar `options.gestureEnabled`).
-// - Inzoomad: ett finger panorerar bilden (inom ramen); paging och stängning av.
-// - Inte inzoomad: ett finger i sidled bläddrar (egen pager, inte ScrollView),
-//   vertikalt nedåt lämnas till bibliotekets stängningsgest, och drag från
-//   vänsterkanten lämnas till kantswipen.
+// Gester, helt på UI-tråden med shared values:
+// - Två fingrar → nyp (1–4x). `lightboxGestureLock` stänger av bibliotekets
+//   kantswipe när andra fingret landar och så länge bilden är inzoomad.
+// - Inzoomad: ett finger panorerar bilden (inom ramen); ingen stängning.
+// - Inte inzoomad: i sidled bläddrar (egen pager); drag från vänsterkanten
+//   lämnas till kantswipen; upp/ned är swipe-stängning som i Apple Foto: bara
+//   den aktiva bilden följer fingret och krymper svagt, bakgrunden tonas med
+//   avståndet, kryss/punkter/grannbilder tonas bort. Släpp över tröskel: bilden
+//   fortsätter ut med släppfarten och tonar bort, sedan router.back(). Annars
+//   fjädrar den tillbaka.
 // - Dubbeltryck växlar 1x ↔ 2,5x. Släpp under 1x fjädrar tillbaka.
 import { useEffect, useLayoutEffect } from 'react';
 import { Image, StyleSheet, View, useWindowDimensions } from 'react-native';
@@ -18,11 +19,17 @@ import { StatusBar } from 'expo-status-bar';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, {
+  Extrapolation,
+  interpolate,
+  useAnimatedReaction,
   useAnimatedStyle,
   useDerivedValue,
   useSharedValue,
   withSpring,
+  withTiming,
+  type SharedValue,
 } from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import {
   GestureDetector,
   GestureStateManager,
@@ -35,8 +42,10 @@ import { motion, overlay, spacing } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import { getProductImages } from '../../lib/catalog';
 import {
+  lightboxBackdrop,
   lightboxGestureLock,
   lightboxIndex,
+  reduceMotionShared,
 } from '../../lib/lightboxStore';
 import PagerDots from '../../components/PagerDots';
 import IconButton from '../../components/IconButton';
@@ -69,9 +78,31 @@ export default function LightboxScreen() {
   const panStart = useSharedValue({ x: 0, y: 0, tx: 0, ty: 0 });
   const zoomed = useDerivedValue(() => scale.value > 1 + ZOOM_EPSILON);
 
+  // Swipe-stängning: den aktiva bildens förflyttning, dess opacitet (utfart)
+  // och synligheten för kryss, punkter och grannbilder.
+  const dismissing = useSharedValue(false);
+  const dragX = useSharedValue(0);
+  const dragY = useSharedValue(0);
+  const imageOpacity = useSharedValue(1);
+  const chrome = useSharedValue(1);
+  const d = motion.lightboxDismiss;
+  const fadeDistance = d.fadeDistance * height;
+  // Bakgrunden (egen + bibliotekets backdrop) följer avståndet och utfartens toning.
+  const backdrop = useDerivedValue(
+    () => interpolate(Math.abs(dragY.value), [0, fadeDistance], [1, 0], Extrapolation.CLAMP) * imageOpacity.value,
+  );
+  useAnimatedReaction(
+    () => backdrop.value,
+    (v) => {
+      lightboxBackdrop.value = v;
+    },
+  );
+  const close = () => router.back();
+
   // Indexet följer route-paramen från första bildrutan.
   useLayoutEffect(() => {
     lightboxIndex.value = startIndex;
+    lightboxBackdrop.value = 1;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -79,6 +110,7 @@ export default function LightboxScreen() {
   useEffect(
     () => () => {
       lightboxGestureLock.value = 0;
+      lightboxBackdrop.value = 1;
     },
     [],
   );
@@ -154,18 +186,25 @@ export default function LightboxScreen() {
       const dx = t.absoluteX - panStart.value.x;
       const dy = t.absoluteY - panStart.value.y;
       if (Math.max(Math.abs(dx), Math.abs(dy)) < motion.dismissActivationDistance) return;
-      const fromEdge = panStart.value.x <= motion.dismissEdgeWidth && dx > 0;
-      if (Math.abs(dx) > Math.abs(dy) && !fromEdge) {
-        GestureStateManager.activate(e.handlerTag); // bläddra
-      } else {
-        GestureStateManager.fail(e.handlerTag); // stängning eller kantswipe
+      const horizontal = Math.abs(dx) > Math.abs(dy);
+      if (horizontal && panStart.value.x <= motion.dismissEdgeWidth && dx > 0) {
+        GestureStateManager.fail(e.handlerTag); // kantswipe (biblioteket)
+        return;
       }
+      dismissing.value = !horizontal;
+      if (!horizontal) chrome.value = withTiming(0, { duration: motion.duration.fast });
+      GestureStateManager.activate(e.handlerTag); // bläddra eller swipe-stängning
     },
     onUpdate: (e) => {
       'worklet';
       if (zoomed.value) {
         tx.value = panStart.value.tx + e.translationX;
         ty.value = panStart.value.ty + e.translationY;
+        return;
+      }
+      if (dismissing.value) {
+        dragX.value = e.translationX;
+        dragY.value = e.translationY;
         return;
       }
       pageX.value = -lightboxIndex.value * width + e.translationX;
@@ -175,6 +214,28 @@ export default function LightboxScreen() {
       if (zoomed.value) {
         tx.value = withSpring(clampPan(tx.value, width, scale.value), motion.spring);
         ty.value = withSpring(clampPan(ty.value, height, scale.value), motion.spring);
+        return;
+      }
+      if (dismissing.value) {
+        dismissing.value = false;
+        const passed =
+          Math.abs(e.translationY) > d.distance * height || Math.abs(e.velocityY) > d.velocity;
+        if (!passed) {
+          dragX.value = withSpring(0, motion.spring);
+          dragY.value = withSpring(0, motion.spring);
+          chrome.value = withTiming(1, { duration: motion.duration.fast });
+          return;
+        }
+        // Fortsätt ut med släppfarten (minst `velocity`) och tona bort; sedan stäng.
+        const t = { duration: d.flyOutDuration };
+        if (!reduceMotionShared.value) {
+          const vy = Math.sign(e.translationY) * Math.max(Math.abs(e.velocityY), d.velocity);
+          dragX.value = withTiming(dragX.value + (e.velocityX * t.duration) / 1000, t);
+          dragY.value = withTiming(dragY.value + (vy * t.duration) / 1000, t);
+        }
+        imageOpacity.value = withTiming(0, t, (finished) => {
+          if (finished) scheduleOnRN(close);
+        });
         return;
       }
       const swiped =
@@ -200,15 +261,25 @@ export default function LightboxScreen() {
   const gesture = useSimultaneousGestures(pinch, pan, doubleTap);
 
   const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: pageX.value }] }));
+  const backgroundStyle = useAnimatedStyle(() => ({ opacity: lightboxBackdrop.value }));
+  const chromeStyle = useAnimatedStyle(() => ({ opacity: chrome.value }));
+  // Den aktiva bilden: zoom plus swipe-stängningens förflyttning, svag nedskalning och utfart.
+  const dragScale = useDerivedValue(() =>
+    reduceMotionShared.value
+      ? 1
+      : interpolate(Math.abs(dragY.value), [0, fadeDistance], [1, d.minScale], Extrapolation.CLAMP),
+  );
+  const view = { scale, tx, ty, dragX, dragY, dragScale, imageOpacity, chrome };
 
   return (
     <View style={styles.container}>
+      <Reanimated.View style={[StyleSheet.absoluteFill, styles.background, backgroundStyle]} />
       <StatusBar style="light" />
       <GestureDetector gesture={gesture}>
         <Reanimated.View style={[styles.row, { width: width * images.length, height }, rowStyle]}>
           {images.map((uri, index) => (
             <View key={uri + index} style={[styles.page, { width, height }]}>
-              <ZoomLayer index={index} scale={scale} tx={tx} ty={ty}>
+              <ZoomLayer index={index} view={view}>
                 <Image source={{ uri }} style={{ width, height }} resizeMode="contain" />
               </ZoomLayer>
             </View>
@@ -216,40 +287,32 @@ export default function LightboxScreen() {
         </Reanimated.View>
       </GestureDetector>
 
-      <View style={[styles.close, { top: insets.top + spacing.sm }]}>
-        <IconButton tone="dark" icon={CloseIcon} accessibilityLabel="Stäng bild" onPress={() => router.back()} />
-      </View>
+      <Reanimated.View style={[styles.close, { top: insets.top + spacing.sm }, chromeStyle]}>
+        <IconButton tone="dark" icon={CloseIcon} accessibilityLabel="Stäng bild" onPress={close} />
+      </Reanimated.View>
 
-      <PagerDots
-        count={images.length}
-        position={position}
-        style={[styles.dots, { bottom: insets.bottom + spacing.lg }]}
-      />
+      <Reanimated.View style={[styles.dots, { bottom: insets.bottom + spacing.lg }, chromeStyle]}>
+        <PagerDots count={images.length} position={position} />
+      </Reanimated.View>
     </View>
   );
 }
 
-/** Zoomtransform bara på den bild som visas; övriga bilder ligger orörda. */
-function ZoomLayer({
-  index,
-  scale,
-  tx,
-  ty,
-  children,
-}: {
-  index: number;
-  scale: { value: number };
-  tx: { value: number };
-  ty: { value: number };
-  children: React.ReactNode;
-}) {
+type ViewValues = Record<
+  'scale' | 'tx' | 'ty' | 'dragX' | 'dragY' | 'dragScale' | 'imageOpacity' | 'chrome',
+  SharedValue<number>
+>;
+
+/** Zoom och swipe-stängning bara på den bild som visas; grannbilderna tonas bort under draget. */
+function ZoomLayer({ index, view: v, children }: { index: number; view: ViewValues; children: React.ReactNode }) {
   const style = useAnimatedStyle(() => {
-    const current = lightboxIndex.value === index;
+    const active = lightboxIndex.value === index;
     return {
+      opacity: active ? v.imageOpacity.value : v.chrome.value,
       transform: [
-        { translateX: current ? tx.value : 0 },
-        { translateY: current ? ty.value : 0 },
-        { scale: current ? scale.value : 1 },
+        { translateX: active ? v.tx.value + v.dragX.value : 0 },
+        { translateY: active ? v.ty.value + v.dragY.value : 0 },
+        { scale: active ? v.scale.value * v.dragScale.value : 1 },
       ],
     };
   });
@@ -259,6 +322,8 @@ function ZoomLayer({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  background: {
     backgroundColor: overlay.lightboxBg,
   },
   row: {

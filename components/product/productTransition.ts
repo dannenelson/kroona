@@ -7,7 +7,7 @@ import type { BlankStackNavigationOptions } from 'react-native-screen-transition
 import { scheduleOnUI } from 'react-native-worklets';
 import { Easing, ReduceMotion, interpolate } from 'react-native-reanimated';
 import { motion, overlay, radius, spacing } from '../../theme';
-import { lightboxGestureLock, lightboxReleaseProgress, reduceMotionShared } from '../../lib/lightboxStore';
+import { lightboxBackdrop, lightboxGestureLock, reduceMotionShared } from '../../lib/lightboxStore';
 
 /** Grupp för produktbilder: kort (källa) och hero (mål) delar `id` = produkt-id. */
 export const PRODUCT_BOUNDARY_GROUP = 'product';
@@ -109,73 +109,49 @@ export const productScreenOptions: BlankStackNavigationOptions = {
 const lightboxCloseEasing = Easing.bezierFn(...motion.lightboxFade.closeEasing);
 
 /**
- * Lightboxen (brief 22–23): ren fade i stället för zoom från heron. Öppning
- * tonar in linjärt (opacitet 0 → 1, skala `fromScale` → 1) över mörk backdrop;
- * detaljvyn bakom skalas lätt. Stängning (kryss, swipe ned, kantswipe) är längre
- * med ease-out, opacitet med kurva och backdrop som lämnar långsammare än
- * bilden. Vid drag följer lightboxen fingret; efter släpp glider den vidare i
- * dragriktningen i stället för att stanna tvärt. Minska rörelse: bara opacitet
- * (ingen skala eller glidning, inte heller på detaljvyn). Stängningsgesten stängs
- * av per bildruta på UI-tråden när bilden är inzoomad eller nyps.
+ * Lightboxen (brief 22–24): öppning och stängning via kryss eller kantswipe är
+ * en fade (opacitet, lätt skala) över mörk backdrop; detaljvyn bakom skalas
+ * lätt. Swipe ned/upp är lightboxens egen gest (app/lightbox), så biblioteket
+ * har bara kantswipen, som stängs av när bilden är inzoomad eller nyps.
+ * `lightboxBackdrop` tonar backdropen under den egna gesten. Minska rörelse:
+ * bara opacitet.
  */
 export const lightboxScreenOptions: BlankStackNavigationOptions = {
   gestureEnabled: true,
-  gestureDirection: productScreenOptions.gestureDirection,
+  gestureDirection: { gesture: 'horizontal', area: motion.dismissEdgeWidth },
   gestureVelocityImpact: motion.dismissVelocityImpact,
-  screenStyleInterpolator: ({ focused, current, progress, stackProgress, layouts }) => {
+  screenStyleInterpolator: ({ focused, current, progress, stackProgress }) => {
     'worklet';
-    const gestureEnabled = lightboxGestureLock.value === 0;
     const reduce = reduceMotionShared.value;
     if (!focused) {
-      // Detaljvyn bakom: lätt inzoomad medan lightboxen är öppen (inte med Minska rörelse).
       const scale = reduce ? 1 : interpolate(progress, [1, 2], [1, motion.zoomBackgroundScale], 'clamp');
       return withDepthVisibility({ content: { style: { transform: [{ scale }] } } }, stackProgress);
     }
     const fade = motion.lightboxFade;
     const p = Math.min(1, Math.max(0, current.progress));
-    // Öppning linjär (oförändrad); drag och stängning med kurva. Båda är 1 vid p = 1,
-    // så bytet mellan dem hoppar inte.
-    const curved = current.entering !== 1;
-    const contentOpacity = curved ? 1 - Math.pow(1 - p, fade.closeOpacityCurve) : p;
-    const backdropOpacity =
-      motion.lightboxBackdropOpacity * (curved ? 1 - Math.pow(1 - p, fade.closeBackdropCurve) : p);
-
-    // Handoff = live drag medan man drar, ögonblicksbild från släppet under stängningen.
-    const drag = current.gesture.handoff;
-    let tx = drag.x;
-    let ty = drag.y;
-    if (current.gesture.dismissing === 1) {
-      if (lightboxReleaseProgress.value < 0) lightboxReleaseProgress.value = p;
-      if (!reduce) {
-        // Glid vidare från släppunkten (0 vid släpp, så inget hopp) i dragets riktning.
-        const travel = Math.max(0, lightboxReleaseProgress.value - p) * fade.releaseDrift;
-        if (Math.abs(drag.x) > Math.abs(drag.y)) {
-          tx += Math.sign(drag.x) * travel * layouts.screen.width;
-        } else {
-          ty += Math.sign(drag.y) * travel * layouts.screen.height;
-        }
-      }
-    } else if (lightboxReleaseProgress.value >= 0) {
-      lightboxReleaseProgress.value = -1;
-    }
-
-    const scale = reduce ? 1 : interpolate(p, [0, 1], [fade.fromScale, 1], 'clamp');
+    // Öppning linjär; stängning med kurva (backdropen lämnar sist). Båda är 1 vid p = 1.
+    const closing = current.entering !== 1;
+    const opacity = closing ? 1 - Math.pow(1 - p, fade.closeOpacityCurve) : p;
+    const backdrop = closing ? 1 - Math.pow(1 - p, fade.closeBackdropCurve) : p;
     return {
       ...withDepthVisibility(
         {
           backdrop: {
-            style: { backgroundColor: overlay.lightboxBg, opacity: backdropOpacity },
+            style: {
+              backgroundColor: overlay.lightboxBg,
+              opacity: motion.lightboxBackdropOpacity * backdrop * lightboxBackdrop.value,
+            },
           },
           content: {
             style: {
-              opacity: contentOpacity,
-              transform: [{ translateX: tx }, { translateY: ty }, { scale }],
+              opacity,
+              transform: [{ scale: reduce ? 1 : interpolate(p, [0, 1], [fade.fromScale, 1], 'clamp') }],
             },
           },
         },
         stackProgress,
       ),
-      options: { gestureEnabled },
+      options: { gestureEnabled: lightboxGestureLock.value === 0 },
     };
   },
   // Faden körs även med Minska rörelse (bara opacitet då), annars skulle den hoppa.

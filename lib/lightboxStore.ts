@@ -9,10 +9,10 @@ import { makeMutable } from 'react-native-reanimated';
 export const lightboxIndex = makeMutable(0);
 /** Id för den hero som öppnade lightboxen (bara den följer indexet). */
 export const lightboxHero = makeMutable('');
-/** 1 när lightboxbilden är inzoomad eller nyps: då är stängningsgesten av. */
+/** 1 när lightboxbilden är inzoomad eller nyps: då är bibliotekets kantswipe av. */
 export const lightboxGestureLock = makeMutable(0);
-/** Progress när en swipe släpptes för stängning (-1 = ingen pågående), för bildens glidning efter släpp. */
-export const lightboxReleaseProgress = makeMutable(-1);
+/** Bakgrundens synlighet (1 = full) under lightboxens egen swipe-stängning. */
+export const lightboxBackdrop = makeMutable(1);
 
 /** "Minska rörelse" som shared value, så att övergångarnas interpolatorer kan läsa den (UI-tråden). */
 export const reduceMotionShared = makeMutable(false);

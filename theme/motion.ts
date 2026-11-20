@@ -88,9 +88,19 @@ export const motion = {
      *  att det aldrig blinkar ljust. Öppningen är linjär som förut. */
     closeOpacityCurve: 1.5,
     closeBackdropCurve: 2,
-    /** Efter släpp i swipe glider bilden vidare i dragriktningen, högst denna
-     *  andel av skärmen, i stället för att stanna tvärt. */
-    releaseDrift: 0.12,
+  },
+  /** Swipe ned/upp i lightboxen (brief 24, egen gest, som Apple Foto): bara den
+   *  aktiva bilden följer fingret och krymper svagt; bakgrunden tonas med avståndet. */
+  lightboxDismiss: {
+    /** Stäng vid släpp efter denna andel av skärmhöjden … */
+    distance: 0.12,
+    /** … eller med minst denna fart (px/s). Också lägsta utfart efter släpp. */
+    velocity: 800,
+    /** Bakgrunden är borta (och bilden minst) vid denna andel av skärmhöjden. */
+    fadeDistance: 0.4,
+    minScale: 0.85,
+    /** Utfarten efter släpp (bilden fortsätter och tonar bort), ms. */
+    flyOutDuration: 220,
   },
   /** Bläddring i lightboxen: släpp med minst denna fart (px/s) byter bild även under halva bredden. */
   pageFlickVelocity: 500,
