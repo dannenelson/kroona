@@ -6,7 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius } from '../theme';
 
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
-import { COLLECTION_BOUNDARY_GROUP } from './product/productTransition';
+import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from './product/productTransition';
 
 const FOLLOW_SIZE = 28;
 
@@ -21,21 +21,31 @@ type Props = {
   // Kortets form (hög rektangel, 150×310) är alltid densamma — inga cirklar
   // längre, se data/collections.ts.
   variant: 'brand' | 'style';
+  /** Varumärke (brief 29): kortet öppnar Partnerdetalj i stället för Samlingsdetalj. */
+  partnerId?: string;
 };
 
-export default function PartnerCard({ id, name, tag, itemCount, imageUrl, variant }: Props) {
+export default function PartnerCard({ id, name, tag, itemCount, imageUrl, variant, partnerId }: Props) {
   const { isFollowed, toggleFollowed } = useFollowedCollections();
   const followed = isFollowed(id);
   const styles = useStyles();
   const router = useRouter();
   // Unikt boundary-id per kortinstans (samma mönster som ProductCard), så att
-  // zoomen till Samlingsdetalj går från/till exakt det här kortet (brief 28).
-  const boundaryId = `${id}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
-  const open = () => router.push({ pathname: '/collection/[id]', params: { id, b: boundaryId } });
+  // zoomen till Samlings-/Partnerdetalj går från/till exakt det här kortet.
+  const instanceKey = useId().replace(/[^a-zA-Z0-9]/g, '');
+  const boundaryId = `${partnerId ?? id}_${instanceKey}`;
+  const open = () =>
+    partnerId
+      ? router.push({ pathname: '/partner/[id]', params: { id: partnerId, b: boundaryId } })
+      : router.push({ pathname: '/collection/[id]', params: { id, b: boundaryId } });
 
   return (
     <TouchableOpacity style={styles.card} onPress={open} accessibilityRole="button" accessibilityLabel={name}>
-      <Transition.Boundary id={boundaryId} group={COLLECTION_BOUNDARY_GROUP} style={styles.image}>
+      <Transition.Boundary
+        id={boundaryId}
+        group={partnerId ? PARTNER_BOUNDARY_GROUP : COLLECTION_BOUNDARY_GROUP}
+        style={styles.image}
+      >
       <ImageBackground
         source={{ uri: imageUrl }}
         style={styles.image}

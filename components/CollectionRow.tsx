@@ -2,9 +2,15 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import PartnerCard from './PartnerCard';
 import SectionTitle from './SectionTitle';
 import { spacing } from '../theme';
-import { COLLECTIONS, getCollectionProducts, getCollectionNewCount } from '../data/collections';
+import {
+  COLLECTIONS,
+  getCollectionProducts,
+  getCollectionNewCount,
+  getRetailerIdForBrandCollection,
+} from '../data/collections';
 
-// Tryck på ett kort öppnar Samlingsdetalj (app/collection/[id], brief 28).
+// Tryck på ett kort öppnar Samlingsdetalj (teman, brief 28) eller
+// Partnerdetalj (varumärken, brief 29).
 export default function CollectionsRow() {
   // Sortera på flest nytillkomna (isNew) produkter först — se
   // getCollectionNewCount i data/collections.ts för varför det är den bästa
@@ -30,7 +36,8 @@ export default function CollectionsRow() {
             tag={collection.tag}
             imageUrl={collection.imageUrl}
             itemCount={getCollectionProducts(collection).length}
-            variant={collection.filter.type}
+            variant={collection.filter.type === 'brand' ? 'brand' : 'style'}
+            partnerId={getRetailerIdForBrandCollection(collection)}
           />
         ))}
       </ScrollView>

@@ -21,7 +21,7 @@ export function getKnownSignals(
 ): MixSignal[] {
   const followedSignals: MixSignal[] = COLLECTIONS.filter((c) =>
     followedCollectionIds.includes(c.id)
-  ).map((c) => c.filter);
+  ).flatMap((c) => (c.filter.type === 'products' ? [] : [c.filter]));
   const savedBrandSignals: MixSignal[] = savedProducts.map((p) => ({ type: 'brand', value: p.brand }));
   const savedStyleSignals: MixSignal[] = savedProducts.map((p) => ({ type: 'style', value: p.style }));
 

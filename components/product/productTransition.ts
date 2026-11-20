@@ -1,4 +1,4 @@
-// Hierarkirörelsen för Produkt- och Samlingsdetalj (brief 18, 28), med
+// Hierarkirörelsen för Produkt-, Samlings- och Partnerdetalj (brief 18, 28, 29), med
 // react-native-screen-transitions: kortets bild zoomar till heron/covern, och
 // stängning (drag nedåt överst eller kantswipe) går tillbaka till kortet.
 // Föregående skärm syns bakom (blank stack, JS-skärmar).
@@ -120,8 +120,12 @@ export function hierarchyScreenOptions(group: string): BlankStackNavigationOptio
   };
 }
 
+/** Grupp för varumärken: varumärkeskort (källa) och Partnerdetaljens cover (mål), brief 29. */
+export const PARTNER_BOUNDARY_GROUP = 'partner';
+
 export const productScreenOptions = hierarchyScreenOptions(PRODUCT_BOUNDARY_GROUP);
 export const collectionScreenOptions = hierarchyScreenOptions(COLLECTION_BOUNDARY_GROUP);
+export const partnerScreenOptions = hierarchyScreenOptions(PARTNER_BOUNDARY_GROUP);
 
 const lightboxCloseEasing = Easing.bezierFn(...motion.lightboxFade.closeEasing);
 

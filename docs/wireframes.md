@@ -38,7 +38,7 @@ Innehållet kan vara heterogent, så filtrering ska vara generell. Här bor **ma
 
 1. Cover-bild, namn överlagt
 2. Kort beskrivning (valfri)
-3. Metadata: antal produkter, kurator (Kroona eller användare), privat/publik för egna
+3. Metadata: kurator ("Av Kroona", "Av <varumärke>" som öppnar Partnerdetalj, eller användare), antal produkter, tag; privat/publik för egna
 4. Åtgärdsknapp
 5. Filterrad, generisk facettering. Stil (pill eller text-flik) är **öppen**, se plan.md.
 6. Produktgrid — masonry, återanvänder ProductCard
@@ -53,7 +53,10 @@ Innehållet kan vara heterogent, så filtrering ska vara generell. Här bor **ma
 3. "Om varumärket": beskrivning och värdegrund
 4. Geografisk närvaro: e-handel, eller fysiska butiker och var
 5. Antal produkter
-6. Produktgrid — masonry
+6. **Samlingar:** hylla med varumärkets egna kollektioner (kort som öppnar Samlingsdetalj)
+7. Produktgrid — masonry
+
+**Byggd (brief 29):** `app/partner/[id].tsx`, bara `brand`. Ordning i appen: cover med namn · antal produkter + Följ · Om varumärket (beskrivning, värdegrund) · Finns (e-handel, butiker) · Samlingar · Alla produkter.
 
 ---
 

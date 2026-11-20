@@ -5,6 +5,7 @@ import {
   collectionScreenOptions,
   installDismissThresholds,
   lightboxScreenOptions,
+  partnerScreenOptions,
   productScreenOptions,
   tabsScreenOptions,
 } from '../components/product/productTransition';
@@ -90,6 +91,7 @@ function AppShell() {
               <BlankStack.Screen name="(tabs)" options={tabsScreenOptions} />
               <BlankStack.Screen name="product/[id]" options={productScreenOptions} />
               <BlankStack.Screen name="collection/[id]" options={collectionScreenOptions} />
+              <BlankStack.Screen name="partner/[id]" options={partnerScreenOptions} />
               <BlankStack.Screen name="lightbox/[id]" options={lightboxScreenOptions} />
             </BlankStack>
           </ToastProvider>

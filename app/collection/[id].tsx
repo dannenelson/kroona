@@ -1,10 +1,10 @@
 // Samlingsdetalj (brief 28, wireframes.md §2): innehållet i en kuraterad
-// samling (data/collections.ts, varumärke eller tema). Nås från samlingskorten
-// på Hem (CollectionRow). Ligger i rotens stack som Produktdetalj, med samma
-// hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
+// samling (data/collections.ts: Kroona-teman och varumärkens kollektioner).
+// Nås från temakorten på Hem (CollectionRow) och Samlingar-hyllan på
+// Partnerdetalj. Ligger i rotens stack som Produktdetalj, med samma hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
 // kantswipe stänger (collectionScreenOptions i components/product/productTransition.ts).
 import { useMemo, useState } from 'react';
-import { Image, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, Text, View, useWindowDimensions } from 'react-native';
 import Reanimated, {
   Extrapolation,
   interpolate,
@@ -17,7 +17,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay } from '../../theme';
-import { COLLECTIONS, getCollectionProducts } from '../../data/collections';
+import { ALL_COLLECTIONS, getCollectionProducts } from '../../data/collections';
+import { getRetailer } from '../../lib/catalog';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { COLLECTION_BOUNDARY_GROUP } from '../../components/product/productTransition';
@@ -31,7 +32,6 @@ import type { Product } from '../../types/product';
 
 // Lokalt layoutmått: cover i samma proportion som Produktdetaljens hero (4:5).
 const COVER_ASPECT = 4 / 5;
-const CURATOR = 'Kroona';
 const ALL = 'Alla';
 const NEW = 'Nytt';
 const CATEGORY_LABEL: Record<Product['category'], string> = { kläder: 'Kläder', möbler: 'Möbler' };
@@ -66,7 +66,7 @@ export default function CollectionScreen() {
   const styles = useStyles();
   const { isFollowed, toggleFollowed } = useFollowedCollections();
 
-  const collection = COLLECTIONS.find((c) => c.id === id);
+  const collection = ALL_COLLECTIONS.find((c) => c.id === id);
   const products = useMemo(() => (collection ? getCollectionProducts(collection) : []), [collection]);
   const filters = useMemo(
     () => buildFilters(products, collection?.filter.type === 'brand'),
@@ -114,6 +114,10 @@ export default function CollectionScreen() {
   }
 
   const followed = isFollowed(collection.id);
+  // Kurator (brief 29): Kroona eller ett varumärke; varumärket öppnar Partnerdetalj.
+  const curatorRetailer =
+    collection.curator.kind === 'retailer' && collection.curator.id ? getRetailer(collection.curator.id) : undefined;
+  const curatorName = curatorRetailer?.name ?? 'Kroona';
 
   return (
     <View style={styles.container}>
@@ -147,9 +151,22 @@ export default function CollectionScreen() {
         <Reanimated.View style={[styles.body, revealStyle]}>
           {/* Metadata och åtgärd. Beskrivning saknas i datan (Collection har ingen), så den hoppas över. */}
           <View style={styles.metaRow}>
-            <Text style={styles.meta} numberOfLines={1}>
-              {products.length} produkter · {CURATOR} · {collection.tag}
-            </Text>
+            <View style={styles.metaText}>
+              <Pressable
+                disabled={!curatorRetailer}
+                accessibilityRole={curatorRetailer ? 'link' : 'text'}
+                onPress={() =>
+                  curatorRetailer && router.push({ pathname: '/partner/[id]', params: { id: curatorRetailer.id } })
+                }
+              >
+                <Text style={[styles.curator, curatorRetailer && styles.curatorLink]} numberOfLines={1}>
+                  Av {curatorName}
+                </Text>
+              </Pressable>
+              <Text style={styles.meta} numberOfLines={1}>
+                {products.length} produkter · {collection.tag}
+              </Text>
+            </View>
             <Pill variant="filled" selected={followed} onPress={() => toggleFollowed(collection.id)}>
               {followed ? 'Följer' : 'Följ'}
             </Pill>
@@ -227,10 +244,20 @@ const useStyles = makeStyles((t) => ({
     gap: spacing.md,
     paddingHorizontal: spacing.screenMargin,
   },
+  metaText: {
+    flexShrink: 1,
+    gap: spacing.xs,
+  },
+  curator: {
+    ...typography.label,
+    color: t.colors.textSecondary,
+  },
+  curatorLink: {
+    color: t.colors.textPrimary,
+  },
   meta: {
     ...typography.label,
     color: t.colors.textSecondary,
-    flexShrink: 1,
   },
   tabs: {
     flexGrow: 0,

@@ -99,12 +99,13 @@ export function getProductsForRetailer(
   return products.filter((p) => ids.has(p.id));
 }
 
-/** Produkter i en samling (varumärke eller stil). */
+/** Produkter i en samling (varumärke, stil eller utvalda produkter). */
 export function getProductsForCollection(
   collection: Collection,
   products: readonly Product[] = PRODUCTS,
 ): Product[] {
   const { filter } = collection;
+  if (filter.type === 'products') return products.filter((p) => filter.ids.includes(p.id));
   return filter.type === 'brand'
     ? products.filter((p) => p.brand === filter.value)
     : products.filter((p) => p.style === filter.value);

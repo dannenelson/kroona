@@ -20,8 +20,8 @@
 | **Hitta** | Dialog som hjälper att bolla och få ett urval, plus jämförelse. Valen (pris, hållbarhet m.m.) är en del av dialogen. | Produktdetalj | ✅ Byggd. Kvar: produktkort länkar till Produktdetalj |
 | **Sparat** | Det man sparat och följer. Egna samlingar, "Gilla" alltid först, hantera följda. | Samlingsdetalj, Partnerdetalj | 🚧 Gilla-listan byggd, samlingar och följda ej |
 | **Produktdetalj** | Fördjupning: hållbarhet, begagnat och nytt, liknande produkter, spara. Nav för stegen Jämför och Köp. | Från alla produktkort | ⬜ Wireframe klar (wireframes.md avsnitt 1) |
-| **Samlingsdetalj** | Innehåll i en stil-/temasamling eller egen samling, med masonry-grid. Följ/Avfölj, eller Dela/redigera för egna. | Från samlingskort, Sparat | ✅ Byggd för kuraterade samlingar (brief 28, `app/collection/[id].tsx`). Egna samlingar ej. |
-| **Partnerdetalj** | Varumärkes-/återförsäljarprofil: värdegrund, geografisk närvaro, produktgrid. Följ/Avfölj. | Från PartnerCard | ⬜ Wireframe klar (avsnitt 3) |
+| **Samlingsdetalj** | Innehåll i en stil-/temasamling eller egen samling, med masonry-grid. Följ/Avfölj, eller Dela/redigera för egna. | Från samlingskort, Sparat | ✅ Byggd för kuraterade samlingar (brief 28, `app/collection/[id].tsx`). Kurator: Kroona (teman) eller varumärke (kollektioner), brief 29. Egna samlingar ej. |
+| **Partnerdetalj** | Varumärkes-/återförsäljarprofil: värdegrund, geografisk närvaro, produktgrid. Följ/Avfölj. | Från varumärkeskort (Hem: Du följer, Fler varumärken) och kuratorraden i Samlingsdetalj | ✅ Byggd för varumärken (brief 29, `app/partner/[id].tsx`) med Samlingar-hylla. Butiker/andrahand ej. |
 | **Följa (lokalt)** | Följ varumärke, företag, område eller samling. Lagras lokalt, några förvalda i demot. | Flöde, Sparat | ⬜ Ny 2026-11-18 |
 | **Egna samlingar** | Skapa/döpa/privat-publik/flytta produkter mellan samlingar | Sparat, Samlingsdetalj | ⬜ Lokal AsyncStorage-modell (spec avsnitt 3) |
 | **Onboarding** (5 steg) | Smakinsamling | Hem (första körning) | ⬜ Medvetet parkerad |

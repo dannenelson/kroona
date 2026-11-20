@@ -1,9 +1,16 @@
 import type { Product, ProductStyle } from '../types/product';
 import { getProductsForCollection } from '../lib/catalog';
+import { RETAILERS } from './retailers';
 
 export type CollectionFilter =
   | { type: 'brand'; value: string }
-  | { type: 'style'; value: ProductStyle };
+  | { type: 'style'; value: ProductStyle }
+  /** Utvalda produkter (varumärkens kollektioner, brief 29). */
+  | { type: 'products'; ids: string[] };
+
+/** Vem som kuraterat samlingen (brief 29): Kroona (teman), ett varumärke
+ *  (kollektioner) eller en användare (egna samlingar, byggs senare). */
+export type CollectionCurator = { kind: 'kroona' | 'retailer' | 'user'; id?: string };
 
 export interface Collection {
   id: string;
@@ -15,6 +22,7 @@ export interface Collection {
   tag: string;
   imageUrl: string;
   filter: CollectionFilter;
+  curator: CollectionCurator;
 }
 
 export const COLLECTIONS: Collection[] = [
@@ -26,6 +34,7 @@ export const COLLECTIONS: Collection[] = [
     tag: 'Varumärke',
     imageUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400',
     filter: { type: 'brand', value: 'J.Lindeberg' },
+    curator: { kind: 'retailer', id: 'brand-j-lindeberg' },
   },
   {
     id: '4',
@@ -34,6 +43,7 @@ export const COLLECTIONS: Collection[] = [
     tag: 'Varumärke',
     imageUrl: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400',
     filter: { type: 'brand', value: 'Filippa K' },
+    curator: { kind: 'retailer', id: 'brand-filippa-k' },
   },
   {
     id: '2',
@@ -43,6 +53,7 @@ export const COLLECTIONS: Collection[] = [
     tag: 'Tema',
     imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400',
     filter: { type: 'style', value: 'Skandinavisk' },
+    curator: { kind: 'kroona' },
   },
   {
     id: '3',
@@ -51,8 +62,82 @@ export const COLLECTIONS: Collection[] = [
     tag: 'Tema',
     imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400',
     filter: { type: 'style', value: 'Urban' },
+    curator: { kind: 'kroona' },
   },
 ];
+
+// Varumärkenas egna kollektioner (brief 29), visas på Partnerdetalj.
+// DUMMYDATA (Fas 0): namn, bild och urval är påhittade för att visa pilot-
+// partners; i Fas 1+ skapar varumärkena dem själva. Ligger utanför COLLECTIONS
+// så att Hem, Flöde och följ-standarden är oförändrade.
+export const RETAILER_COLLECTIONS: Collection[] = [
+  {
+    id: 'jl-golf',
+    kind: 'collection',
+    name: 'Golf och rörelse',
+    tag: 'Kollektion',
+    imageUrl: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400',
+    filter: { type: 'products', ids: ['5', '7', '47', '48', '50'] },
+    curator: { kind: 'retailer', id: 'brand-j-lindeberg' },
+  },
+  {
+    id: 'jl-merino',
+    kind: 'collection',
+    name: 'Merino och skjortor',
+    tag: 'Kollektion',
+    imageUrl: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400',
+    filter: { type: 'products', ids: ['1', '49', '51'] },
+    curator: { kind: 'retailer', id: 'brand-j-lindeberg' },
+  },
+  {
+    id: 'fk-ull',
+    kind: 'collection',
+    name: 'Ull och stickat',
+    tag: 'Kollektion',
+    imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400',
+    filter: { type: 'products', ids: ['2', '8', '27', '53', '55'] },
+    curator: { kind: 'retailer', id: 'brand-filippa-k' },
+  },
+  {
+    id: 'fk-basplagg',
+    kind: 'collection',
+    name: 'Basplagg',
+    tag: 'Kollektion',
+    imageUrl: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400',
+    filter: { type: 'products', ids: ['52', '54', '56'] },
+    curator: { kind: 'retailer', id: 'brand-filippa-k' },
+  },
+];
+
+/** Alla samlingar som kan öppnas i Samlingsdetalj. */
+export const ALL_COLLECTIONS: Collection[] = [...COLLECTIONS, ...RETAILER_COLLECTIONS];
+
+/** Ett varumärkes egna kollektioner (hyllan "Samlingar" på Partnerdetalj). */
+export function getRetailerCollections(retailerId: string): Collection[] {
+  return RETAILER_COLLECTIONS.filter((c) => c.curator.kind === 'retailer' && c.curator.id === retailerId);
+}
+
+/** Varumärkets äldre filtersamling i COLLECTIONS (t.ex. J.Lindeberg), om den finns. */
+export function getBrandFilterCollection(retailerId: string): Collection | undefined {
+  const brand = RETAILERS.find((r) => r.id === retailerId)?.brandName;
+  return COLLECTIONS.find((c) => c.filter.type === 'brand' && c.filter.value === brand);
+}
+
+/** Återförsäljaren bakom en varumärkessamling (för att öppna Partnerdetalj). */
+export function getRetailerIdForBrandCollection(collection: Collection): string | undefined {
+  const { filter } = collection;
+  if (filter.type !== 'brand') return undefined;
+  return RETAILERS.find((r) => r.retailerType === 'brand' && r.brandName === filter.value)?.id;
+}
+
+/**
+ * Nyckeln i följ-lagringen för ett varumärke (följ-målet `{ kind: 'retailer' }`).
+ * Finns varumärkets äldre filtersamling används dess id, så att Partnerdetalj,
+ * "Du följer" och Flöde visar samma läge; annars återförsäljarens id.
+ */
+export function getRetailerFollowKey(retailerId: string): string {
+  return getBrandFilterCollection(retailerId)?.id ?? retailerId;
+}
 
 // Flyttad till lib/catalog.ts (brief 12). Behålls här som samma API, så att
 // befintliga anrop fungerar oförändrade.

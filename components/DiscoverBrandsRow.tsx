@@ -3,6 +3,7 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { spacing } from '../theme';
 import { COLLECTIONS } from '../data/collections';
 import { PRODUCTS } from '../data/products';
+import { RETAILERS } from '../data/retailers';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import SectionTitle from './SectionTitle';
 import ProfileCard from './ProfileCard';
@@ -67,11 +68,13 @@ export default function DiscoverBrandsRow() {
         contentContainerStyle={styles.scroll}
       >
         {tiles.map((tile) => (
-          // Inte länkat till någon toggle/följ-mekanism — det här är inte en
-          // riktig Collection (FollowedCollectionsContext känner bara till
-          // id:na i COLLECTIONS). ProfileCard länkar konceptuellt till en
-          // profilsida (se ProfileCard.tsx) som inte finns i Fas 0.
-          <ProfileCard key={tile.brand} name={tile.brand} initial={tile.brand[0].toUpperCase()} />
+          // Tryck öppnar varumärkets Partnerdetalj (brief 29).
+          <ProfileCard
+            key={tile.brand}
+            name={tile.brand}
+            initial={tile.brand[0].toUpperCase()}
+            partnerId={RETAILERS.find((r) => r.retailerType === 'brand' && r.brandName === tile.brand)?.id}
+          />
         ))}
       </ScrollView>
     </View>
