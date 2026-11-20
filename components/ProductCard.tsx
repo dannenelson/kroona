@@ -10,8 +10,8 @@ import { useToggleSaved } from '../hooks/useToggleSaved';
 import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
-import BookmarkIcon from '../assets/icons/BookmarkIcon';
-import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
+import HeartIcon from '../assets/icons/HeartIcon';
+import HeartIconFilled from '../assets/icons/HeartIcon_filled';
 import BookmarkPlusIcon from '../assets/icons/BookmarkPlusIcon';
 import { useOpenAddToCollection } from './saved/AddToCollectionStep';
 import FollowIcon from '../assets/icons/FollowIcon';
@@ -116,8 +116,8 @@ export default function ProductCard({
   // Visa liknande har ingen logik i Fas 0-steget, de stänger bara menyn.
   const menuItems: ContextMenuItem[] = [
     {
-      label: saved ? 'Sparad' : 'Spara',
-      icon: saved ? BookmarkIconFilled : BookmarkIcon,
+      label: saved ? 'Gillad' : 'Gilla',
+      icon: saved ? HeartIconFilled : HeartIcon,
       onPress: () => toggleSaved(id),
     },
     { label: 'Spara i samling', icon: BookmarkPlusIcon, onPress: () => openAddToCollection(id) },

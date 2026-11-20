@@ -19,8 +19,9 @@ type Props = {
   position: 'top' | 'bottom';
   /** Höjd i px. Default: topp = safe area + 14 (≈ 68), botten = 128. */
   height?: number;
-  /** 'theme' tonar mot bg, 'photo' tonar mörkt över foto (bara topp). */
-  variant?: 'theme' | 'photo';
+  /** 'theme' tonar mot bg, 'photo' tonar mörkt över foto (bara topp), 'clear' =
+   *  bara blur, ingen färgtoning (t.ex. i Sheet, där bakgrunden är genomskinlig). */
+  variant?: 'theme' | 'photo' | 'clear';
   /** Stäng av blur-lagren (bara toning), för prestandajämförelse. */
   blur?: boolean;
   /** Toppkantens nedre gräns. 'wave' = organisk (test, brief 10), bara position="top". */
@@ -139,7 +140,7 @@ export default function EdgeFade({
       ) : (
         blurLayers
       )}
-      {wave ? (
+      {variant === 'clear' ? null : wave ? (
         width > 0 && (
           <MaskedView
             style={StyleSheet.absoluteFill}

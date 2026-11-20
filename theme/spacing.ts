@@ -24,6 +24,8 @@ export const control = {
   fieldHeight: 56,
   /** Val-cirkel i listor (tom ring / fylld med bock), brief 36. */
   checkSize: 28,
+  /** Sheet: höjd där innehållet tonas ut ovanför den sticky CTA-ytan (brief 38). */
+  sheetFadeHeight: 48,
 } as const;
 
 /** Listrader (brief 35): samlingsrad 76 hög med 56-thumb, följ-rad 64 med 48. */

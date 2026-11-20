@@ -133,7 +133,7 @@ Alla detaljvyer (Produktdetalj, CollectionCard-/PartnerCard-/ProfileCard-detalj)
 - **Höger slot:** alltid kontext-specifika åtgärder, 0–2 ikoner. Innehållet varierar per skärm men positionen och stilen gör det inte.
 
 **Exempel på höger-slot-innehåll per skärm:**
-- Produktdetalj: spara (bokmärke). Spara finns också i menyn vid långt tryck på kort (Spara · Följ varumärke · Dela · Visa liknande); korten har ingen egen Spara-knapp.
+- Produktdetalj: Gilla (hjärta) och Spara i samling (bokmärke-plus), brief 38. Båda finns också i menyn vid långt tryck på kort (Gilla · Spara i samling · Följ varumärke · Dela · Visa liknande); korten har ingen egen knapp.
 - Hitta: Arkiv + Ny chatt
 - Sparat (tab-rot, inget tillbaka-behov): Ny samling
 - CollectionCard-/PartnerCard-/ProfileCard-detalj: Följ/Avfölj (följda) ELLER Dela/redigera (egna samlingar, se wireframes.md avsnitt 2)

@@ -17,7 +17,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 1. Hero-bild — produktens kanoniska bild
 2. Varumärke + produktnamn
 3. Hållbarhetsindex — fullt utfällt, oförändrat oavsett erbjudande
-4. Spara-knapp, primär position
+4. Gilla-knapp (hjärta), primär position, + Spara i samling (bokmärke-plus) bredvid
 5. **"Finns begagnad hos"** — begagnat-erbjudanden, visas FÖRE nytt. Rad: tjänst, prisläge ("Fast pris: X kr" eller "Auktion, bud från X kr"), länk ut.
 6. **"Köp hos"** — nytt-erbjudanden: AF-namn, pris, lager, geografi. Sortering, default pris. Påverkar aldrig begagnat-listan.
 7. Liknande produkter — horisontell rad
@@ -132,14 +132,14 @@ Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat
 ---
 
 ## 8b. Lägg till i samling (Sheet-steg) — ✅ Byggd (brief 36, skiss "SheetLaggTill")
-**Nås från:** knappen bokmärke-plus bredvid Spara på Produktdetalj och menyvalet "Spara i samling" i produktkortets kontextmeny. Spara-knappen (snabbspar → Gillade produkter) är oförändrad.
+**Nås från:** knappen bokmärke-plus bredvid Gilla på Produktdetalj och menyvalet "Spara i samling" i produktkortets kontextmeny. Gilla (hjärta, snabbspar → Gillade produkter) är skilt från detta.
 
 1. Header: titel "Lägg till i samling", X till höger
 2. Produktchip: bild 40, namn, varumärke
 3. Sökfält "Sök samlingar" (filtrerar egna samlingar på namn)
 4. Lista: egna samlingar som rader (mosaik 48, namn, "N produkter" + "· redan tillagd"), val-cirkel till höger (tom ring / fylld med bock). Tryck växlar direkt, lagret står kvar.
-5. CTA centrerad nederst: "+ Skapa ny samling" → steget Skapa samling; Spara skapar samlingen och lägger produkten i den, lagret stängs.
-6. Tomt läge: "Du har inga samlingar än." + CTA.
+5. Sticky CTA nederst (listan skrollar bakom och tonas ut): **Klar** (primär, stänger) och **+ Skapa ny samling** (sekundär) → steget Skapa samling; Spara där skapar samlingen och lägger produkten i den, lagret stängs. Ryms de inte på en rad: staplade, Klar överst.
+6. Tomt läge: "Du har inga samlingar än." + "Skapa ny samling" som primär (ingen Klar).
 
 Vid stängning, om produkten lagts till: snackbar "<produkt> sparades i <samling> · Visa" (→ samlingen) eller "… i N samlingar · Visa" (→ Sparat). Bara borttagningar: ingen snackbar. Swipe ned stänger inte (listan skrollar).
 

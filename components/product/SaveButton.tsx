@@ -5,12 +5,12 @@ import { useSavedProducts } from '../../context/SavedProductsContext';
 import { usePressAnimation } from '../../hooks/usePressAnimation';
 import { usePop } from '../../hooks/usePop';
 import { haptic } from '../../utils/haptic';
-import BookmarkIcon from '../../assets/icons/BookmarkIcon';
-import BookmarkIconFilled from '../../assets/icons/BookmarkIcon_filled';
+import HeartIcon from '../../assets/icons/HeartIcon';
+import HeartIconFilled from '../../assets/icons/HeartIcon_filled';
 
 /**
- * Spara-knappen på Produktdetalj (brief 13). Bara här tills den behövs på
- * fler ställen. Sparad = fylld bokmärkesikon och texten "Sparad"; ytan
+ * Gilla-knappen på Produktdetalj (brief 13, hjärta sedan brief 38): snabbspar
+ * till Gillade produkter. Gillad = fyllt hjärta och texten "Gillad"; ytan
  * inverteras inte (beslutad avvikelse från designen). Pop vid sparande,
  * lätt haptik, animerad press. Använder befintliga SavedProductsContext.
  */
@@ -22,13 +22,13 @@ export default function SaveButton({ productId }: { productId: string }) {
   const saved = isSaved(productId);
   const press = usePressAnimation(motion.pressedScale);
   const pop = usePop(saved);
-  const Icon = saved ? BookmarkIconFilled : BookmarkIcon;
+  const Icon = saved ? HeartIconFilled : HeartIcon;
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: saved }}
-      accessibilityLabel={saved ? 'Sparad, tryck för att ta bort' : 'Spara'}
+      accessibilityLabel={saved ? 'Gillad, tryck för att ta bort' : 'Gilla'}
       onPress={() => {
         haptic.light();
         toggleSaved(productId);
@@ -43,7 +43,7 @@ export default function SaveButton({ productId }: { productId: string }) {
         <Animated.View style={{ transform: [{ scale: pop }] }}>
           <Icon color={colors.textPrimary} size={iconSize.md} />
         </Animated.View>
-        <Text style={styles.label}>{saved ? 'Sparad' : 'Spara'}</Text>
+        <Text style={styles.label}>{saved ? 'Gillad' : 'Gilla'}</Text>
       </Animated.View>
     </Pressable>
   );

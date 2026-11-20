@@ -52,7 +52,8 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
 
   const createCollection = (name: string, visibility: UserCollection['visibility']) => {
     // Avgränsare `_`, inte `:` (används i boundary-id:n, se ProductCard).
-    const id = `uc_${Date.now().toString(36)}`;
+    // Tid + slumpdel, så att två samlingar skapade i samma millisekund inte krockar.
+    const id = `uc_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
     setCollections((prev) => [
       ...prev,
       { id, name: name.trim(), visibility, productIds: [], createdAt: new Date().toISOString() },

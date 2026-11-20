@@ -21,10 +21,13 @@ import {
   type ReactNode,
 } from 'react';
 import { Animated, BackHandler, Keyboard, KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import MaskedViewClass from '@react-native-masked-view/masked-view';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
-import { makeStyles, useTheme, typography, spacing, motion, edgeBlur, touchTarget, snackbar } from '../theme';
+import { makeStyles, useTheme, typography, spacing, motion, edgeBlur, touchTarget, snackbar, control } from '../theme';
+import EdgeFade from './EdgeFade';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import IconButton from './IconButton';
 import CloseIcon from '../assets/icons/CloseIcon';
@@ -52,6 +55,23 @@ type SheetApi = {
 };
 
 const SheetContext = createContext<SheetApi | null>(null);
+
+// Paketets klasstyper passar inte React 19:s JSX-typer (som i EdgeFade).
+const MaskedView = MaskedViewClass as unknown as React.ComponentType<
+  React.ComponentProps<typeof View> & { maskElement: React.ReactElement }
+>;
+
+/** Höjden som den sticky CTA-ytan (plus toningen) täcker längst ned (brief 38). */
+const SheetFooterInsetContext = createContext(0);
+
+/**
+ * Bottenmarginal för skrollande innehåll i ett steg: lägg den som
+ * `paddingBottom` i listans `contentContainerStyle`, så att sista raden kan
+ * skrollas fri från CTA:n.
+ */
+export function useSheetFooterInset() {
+  return useContext(SheetFooterInsetContext);
+}
 
 export function useSheet(): SheetApi {
   const ctx = useContext(SheetContext);
@@ -246,15 +266,48 @@ export function SheetProvider({ children }: { children: ReactNode }) {
 export function SheetContent({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const [footerHeight, setFooterHeight] = useState(0);
+  const fade = control.sheetFadeHeight;
+  // Sticky CTA (brief 38): innehållet skrollar bakom CTA-ytan och tonas ut mot
+  // botten med en alfamask (ingen färg, så den genomskinliga slöjan syns
+  // igenom), och blurras bakom CTA:n som kantblurren (EdgeFade 'clear').
+  const inset = footer ? footerHeight + fade : 0;
   return (
-    <View style={styles.flex}>
-      <View style={styles.body}>{children}</View>
-      {footer ? (
-        <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, snackbar.bottomOffset) }]}>
-          {footer}
-        </View>
-      ) : null}
-    </View>
+    <SheetFooterInsetContext.Provider value={inset}>
+      <View style={styles.flex}>
+        {footer ? (
+          <MaskedView
+            style={styles.flex}
+            maskElement={
+              <View style={styles.flex}>
+                <View style={[styles.flex, styles.maskSolid]} />
+                <LinearGradient
+                  colors={edgeBlur.maskColors}
+                  locations={[0, 0.5, 1]}
+                  style={{ height: fade }}
+                />
+                <View style={{ height: footerHeight }} />
+              </View>
+            }
+          >
+            <View style={styles.body}>{children}</View>
+          </MaskedView>
+        ) : (
+          <View style={styles.body}>{children}</View>
+        )}
+        {footer ? (
+          <>
+            <EdgeFade position="bottom" variant="clear" height={inset} />
+            <View
+              onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
+              style={[styles.footer, { paddingBottom: Math.max(insets.bottom, snackbar.bottomOffset) }]}
+            >
+              {footer}
+            </View>
+          </>
+        ) : null}
+      </View>
+    </SheetFooterInsetContext.Provider>
   );
 }
 
@@ -290,7 +343,15 @@ const useStyles = makeStyles((t) => ({
     paddingTop: spacing.xxl,
   },
   footer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     paddingTop: spacing.lg,
+    paddingHorizontal: spacing.screenMargin,
+  },
+  maskSolid: {
+    backgroundColor: edgeBlur.maskColors[0],
   },
 }));

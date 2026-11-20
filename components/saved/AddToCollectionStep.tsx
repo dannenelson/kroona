@@ -1,16 +1,17 @@
 // "Lägg till i samling" (brief 36, skiss SheetLaggTill): Sheet-steg från
 // produktvyn och produktmenyn. Produktchip, sök bland egna samlingar och en
 // lista där varje rad växlar direkt (lägger till/tar bort, lagret står kvar).
-// "Skapa ny samling" pushar Skapa samling; Spara där skapar samlingen och
-// lägger produkten i den. När lagret stängs visas en sammanfattande snackbar
-// om produkten lagts till någonstans (bara borttagningar: ingen).
+// "Klar" (primär) stänger; "Skapa ny samling" (sekundär) pushar Skapa samling,
+// där Spara skapar samlingen och lägger produkten i den. När lagret stängs
+// visas en sammanfattande snackbar om produkten lagts till någonstans (bara
+// borttagningar: ingen). Listan skrollar bakom den sticky CTA-ytan (brief 38).
 import { useMemo, useState } from 'react';
 import { Image, ScrollView, Text, TextInput, View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { makeStyles, typography, fonts, spacing, radius, control, listRow, snackbar as snackbarTokens, iconSize } from '../../theme';
 import { useUserCollections } from '../../context/UserCollectionsContext';
 import { PRODUCTS } from '../../data/products';
-import { SheetContent, useSheet, type SheetStep } from '../Sheet';
+import { SheetContent, useSheet, useSheetFooterInset, type SheetStep } from '../Sheet';
 import { useSnackbar } from '../Snackbar';
 import Button from '../Button';
 import ListRow from '../ListRow';
@@ -67,6 +68,7 @@ export function useOpenAddToCollection() {
 function AddToCollectionStep({ productId, session }: { productId: string; session: Session }) {
   const styles = useStyles();
   const sheet = useSheet();
+  const footerInset = useSheetFooterInset();
   const { userCollections, addProductToCollection, removeProductFromCollection } = useUserCollections();
   const [query, setQuery] = useState('');
   const product = PRODUCTS.find((p) => p.id === productId);
@@ -95,14 +97,25 @@ function AddToCollectionStep({ productId, session }: { productId: string; sessio
       }),
     );
 
+  // Klar är primär och stänger (snackbaren visas vid stängning); Skapa ny
+  // samling sekundär. Ryms de inte på en rad staplas de centrerat, Klar överst
+  // (row-reverse + wrap). Utan samlingar: bara Skapa ny samling, primär.
+  const hasCollections = userCollections.length > 0;
+  const footer = hasCollections ? (
+    <View style={styles.actions}>
+      <Button onPress={sheet.close}>Klar</Button>
+      <Button variant="secondary" icon={PlusIcon} onPress={createNew}>
+        Skapa ny samling
+      </Button>
+    </View>
+  ) : (
+    <Button icon={PlusIcon} onPress={createNew}>
+      Skapa ny samling
+    </Button>
+  );
+
   return (
-    <SheetContent
-      footer={
-        <Button icon={PlusIcon} onPress={createNew}>
-          Skapa ny samling
-        </Button>
-      }
-    >
+    <SheetContent footer={footer}>
       {product ? (
         <View style={styles.chip}>
           <Image source={{ uri: product.imageUrl }} style={styles.chipThumb} />
@@ -117,7 +130,7 @@ function AddToCollectionStep({ productId, session }: { productId: string; sessio
         </View>
       ) : null}
 
-      {userCollections.length === 0 ? (
+      {!hasCollections ? (
         <Text style={styles.empty}>Du har inga samlingar än.</Text>
       ) : (
         <>
@@ -133,7 +146,12 @@ function AddToCollectionStep({ productId, session }: { productId: string; sessio
               style={styles.searchInput}
             />
           </View>
-          <ScrollView style={styles.list} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <ScrollView
+            style={styles.list}
+            contentContainerStyle={{ paddingBottom: footerInset }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
             {visible.map((c) => {
               const added = c.productIds.includes(productId);
               const images = c.productIds
@@ -172,6 +190,12 @@ function AddToCollectionStep({ productId, session }: { productId: string; sessio
 }
 
 const useStyles = makeStyles((t) => ({
+  actions: {
+    flexDirection: 'row-reverse',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
