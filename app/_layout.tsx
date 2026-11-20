@@ -2,6 +2,7 @@ import { useEffect, useMemo } from 'react';
 import { ThemeProvider as NavigationThemeProvider, DarkTheme, DefaultTheme } from 'expo-router';
 import { BlankStack } from 'react-native-screen-transitions/expo-router';
 import {
+  collectionScreenOptions,
   installDismissThresholds,
   lightboxScreenOptions,
   productScreenOptions,
@@ -88,6 +89,7 @@ function AppShell() {
             <BlankStack>
               <BlankStack.Screen name="(tabs)" options={tabsScreenOptions} />
               <BlankStack.Screen name="product/[id]" options={productScreenOptions} />
+              <BlankStack.Screen name="collection/[id]" options={collectionScreenOptions} />
               <BlankStack.Screen name="lightbox/[id]" options={lightboxScreenOptions} />
             </BlankStack>
           </ToastProvider>

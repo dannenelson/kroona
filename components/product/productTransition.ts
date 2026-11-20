@@ -1,5 +1,5 @@
-// Hierarkirörelsen för Produktdetalj (spik brief 18), med
-// react-native-screen-transitions: kortets bild zoomar till heron, och
+// Hierarkirörelsen för Produkt- och Samlingsdetalj (brief 18, 28), med
+// react-native-screen-transitions: kortets bild zoomar till heron/covern, och
 // stängning (drag nedåt överst eller kantswipe) går tillbaka till kortet.
 // Föregående skärm syns bakom (blank stack, JS-skärmar).
 import type { TransitionInterpolatedStyle } from 'react-native-screen-transitions';
@@ -84,33 +84,44 @@ function screenCornerRadius(insetTop: number): number {
   return insetTop >= radius.screenNotch + spacing.sm ? radius.screenDynamicIsland : radius.screenNotch;
 }
 
-export const productScreenOptions: BlankStackNavigationOptions = {
-  gestureEnabled: true,
-  // Drag nedåt (tas bara över överst i innehållet via Transition.ScrollView)
-  // och kantswipe från vänster. Högersvep mitt på skärmen stänger inte.
-  gestureDirection: [
-    'vertical',
-    { gesture: 'horizontal', area: motion.dismissEdgeWidth },
-  ],
-  // Hur mycket släpphastigheten väger in i stängningsbeslutet (se motion.ts).
-  gestureVelocityImpact: motion.dismissVelocityImpact,
-  screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
-    'worklet';
-    // Kortinstansens boundary-id (param `b`), annars produkt-id (t.ex. djuplänk).
-    const params = active.route.params as { id?: string; b?: string } | undefined;
-    const id = params?.b ?? params?.id;
-    if (!id) return withDepthVisibility({}, stackProgress);
-    return withDepthVisibility(
-      bounds({ id, group: PRODUCT_BOUNDARY_GROUP }).navigation.zoom({
-        borderRadius: screenCornerRadius(insets.top),
-        backgroundScale: motion.zoomBackgroundScale,
-        backdropOpacity: motion.zoomBackdropOpacity,
-      }),
-      stackProgress,
-    );
-  },
-  transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
-};
+/** Grupp för samlingsbilder: samlingskort (källa) och cover (mål), brief 28. */
+export const COLLECTION_BOUNDARY_GROUP = 'collection';
+
+/**
+ * Hierarkirörelsen (design.md §8c) för en detaljskärm: bilden zoomar från
+ * kortinstansen (route-param `b`, annars `id`) till skärmens boundary i samma
+ * grupp; drag nedåt överst och kantswipe stänger. Delas av Produkt- och
+ * Samlingsdetalj, bara gruppen skiljer.
+ */
+export function hierarchyScreenOptions(group: string): BlankStackNavigationOptions {
+  return {
+    gestureEnabled: true,
+    // Drag nedåt (tas bara över överst i innehållet via Transition.ScrollView)
+    // och kantswipe från vänster. Högersvep mitt på skärmen stänger inte.
+    gestureDirection: ['vertical', { gesture: 'horizontal', area: motion.dismissEdgeWidth }],
+    // Hur mycket släpphastigheten väger in i stängningsbeslutet (se motion.ts).
+    gestureVelocityImpact: motion.dismissVelocityImpact,
+    screenStyleInterpolator: ({ bounds, active, insets, stackProgress }) => {
+      'worklet';
+      // Kortinstansens boundary-id (param `b`), annars skärmens id (t.ex. djuplänk).
+      const params = active.route.params as { id?: string; b?: string } | undefined;
+      const id = params?.b ?? params?.id;
+      if (!id) return withDepthVisibility({}, stackProgress);
+      return withDepthVisibility(
+        bounds({ id, group }).navigation.zoom({
+          borderRadius: screenCornerRadius(insets.top),
+          backgroundScale: motion.zoomBackgroundScale,
+          backdropOpacity: motion.zoomBackdropOpacity,
+        }),
+        stackProgress,
+      );
+    },
+    transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
+  };
+}
+
+export const productScreenOptions = hierarchyScreenOptions(PRODUCT_BOUNDARY_GROUP);
+export const collectionScreenOptions = hierarchyScreenOptions(COLLECTION_BOUNDARY_GROUP);
 
 const lightboxCloseEasing = Easing.bezierFn(...motion.lightboxFade.closeEasing);
 

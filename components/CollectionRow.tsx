@@ -4,8 +4,7 @@ import SectionTitle from './SectionTitle';
 import { spacing } from '../theme';
 import { COLLECTIONS, getCollectionProducts, getCollectionNewCount } from '../data/collections';
 
-// Ingen samlings-detaljvy finns eller byggs här — korten navigerar
-// fortfarande ingenstans, precis som idag.
+// Tryck på ett kort öppnar Samlingsdetalj (app/collection/[id], brief 28).
 export default function CollectionsRow() {
   // Sortera på flest nytillkomna (isNew) produkter först — se
   // getCollectionNewCount i data/collections.ts för varför det är den bästa

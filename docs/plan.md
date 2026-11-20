@@ -22,7 +22,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | Flöde | ✅ | ⬜ | 🟡 Grundversion (`feed.tsx`, ProductGrid) |
 | Hitta | ✅ | ⬜ | ✅ Fungerande chatt mot Claude API. Saknar länk till Produktdetalj, arkiv/ny chatt och tal. |
 | Sparat | ✅ | ⬜ | 🟡 Platt "gilla"-lista. Inga egna samlingar. |
-| Produktdetalj, Samling, Partner, Profil | ✅ | ⬜ | ⬜ Inga routes finns |
+| Produktdetalj, Samling, Partner, Profil | ✅ | ⬜ | 🟡 Produktdetalj (+ lightbox) och Samlingsdetalj byggda. Partner och Profil saknas. |
 | Onboarding | parkerad | — | — |
 
 **Fynd**
@@ -47,7 +47,8 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 2. **Datamodell i koden** (brief 12, `docs/briefs/12-datamodell.md`): Produkt / Återförsäljare / Erbjudande (koden speglar troligen den gamla modellen). Lägg in "följbar" för återförsäljare, samling och område.
 3. ✅ **Produktdetalj** (brief 13–18) — klar, enhetstest godkänt 2026-11-19. Hierarkirörelsen (zoom från kortet, stängning med swipe ned/kantswipe, ett steg bakom) är en del av den, se design.md §8c.
 3b. ✅ **Lightbox** på hero (brief 19) — klar i kod 2026-11-19, enhetstest av gester återstår.
-3c. **Nästa:** **Samlingsdetalj**.
+3c. ✅ **Samlingsdetalj** (brief 28) — byggd 2026-11-20, gester och zoom kräver enhetstest.
+3d. **Nästa:** se nedan (Sparat, Partnerdetalj).
 4. **Sparat** med egna samlingar och följda (AsyncStorage)
 5. **Hem** (hyllor) i ny design, sedan **Flöde** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning
