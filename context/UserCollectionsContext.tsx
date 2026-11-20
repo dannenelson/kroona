@@ -1,25 +1,24 @@
 // Egna samlingar (brief 32), samma mönster som SavedProductsContext och
 // FollowedCollectionsContext: state i minnet, AsyncStorage som lagring.
-// "Alla sparade" är SavedProductsContext (systemsamling, alltid först), och
-// egna samlingar är delmängder av den (se addProductToCollection).
+// "Gillade produkter" (SavedProductsContext, hjärtat) är INTE en samling
+// (brief 35): en produkt kan vara både gillad och i samlingar, oberoende.
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserCollection } from '../types/catalog';
-import { useSavedProducts } from './SavedProductsContext';
 
 const STORAGE_KEY = '@kroona/userCollections';
 
-/** Id för systemsamlingen "Alla sparade" i routes (`/collection/saved`). */
+/** Id för "Gillade produkter" i routes (`/collection/saved`, samma vy som samlingar). */
 export const ALL_SAVED_ID = 'saved';
-export const ALL_SAVED_NAME = 'Alla sparade';
+export const ALL_SAVED_NAME = 'Gillade produkter';
 
 type UserCollectionsContextValue = {
   userCollections: UserCollection[];
   getUserCollection: (id: string) => UserCollection | undefined;
   /** Skapar en tom samling och returnerar dess id. */
   createCollection: (name: string, visibility: UserCollection['visibility']) => string;
-  /** Lägger till en produkt i en egen samling och säkerställer att den också
-   *  finns i "Alla sparade" (invarianten). Används från del 2 (spara i samling). */
+  /** Lägger till en produkt i en egen samling (oberoende av Gillade produkter).
+   *  Används från "Lägg till i samling" (senare brief). */
   addProductToCollection: (collectionId: string, productId: string) => void;
 };
 
@@ -28,7 +27,6 @@ const UserCollectionsContext = createContext<UserCollectionsContextValue | null>
 export function UserCollectionsProvider({ children }: { children: React.ReactNode }) {
   const [collections, setCollections] = useState<UserCollection[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
-  const { isSaved, toggleSaved } = useSavedProducts();
 
   useEffect(() => {
     (async () => {
@@ -61,7 +59,6 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
   };
 
   const addProductToCollection = (collectionId: string, productId: string) => {
-    if (!isSaved(productId)) toggleSaved(productId);
     setCollections((prev) =>
       prev.map((c) =>
         c.id === collectionId && !c.productIds.includes(productId)

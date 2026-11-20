@@ -107,7 +107,7 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 
 ---
 
-## 8. Sparat — 🟡 Ny struktur godkänd 2026-11-20 (skiss "Kroona Sparat – ny struktur"), byggs i nästa brief
+## 8. Sparat — ✅ Ny struktur byggd (brief 35, skiss "Kroona Sparat – ny struktur", godkänd 2026-11-20)
 **Roll:** det man sparat och följer, där man hanterar det.
 
 1. Header — "Sparat" + **"+"** uppe till höger (öppnar Sheet: Skapa samling). Ersätter "Ny samling"-kortet.
@@ -118,7 +118,7 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Samlingar**, **Områden**, **Personer** (Fas 1+, kräver konton).
 5. Bekräftelser via Snackbar ("<produkt> sparades i <samling> · Visa").
 
-**Byggt idag (brief 32–33):** segmenten Samlingar | Följer, "Alla sparade" + egna samlingar som kort i 2 kolumner, "+" i headern och Skapa samling som Sheet med Snackbar. **Ej byggt:** omstruktureringen ovan, spara i samling från produkt (Sheet-steget "Lägg till i samling": sökfält + lista + Skapa ny samling), redigera/döp om/radera, eget omslag.
+**Byggt (brief 35):** allt ovan utom Personer (Fas 1+) och Områden (ingen följ-lagring för områden än, sektionen döljs). Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Långt tryck: Öppna/Dela (egna), Öppna/Sluta följa (Följer). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). **Ej byggt:** spara i samling från produkt (Sheet-steget "Lägg till i samling"), redigera/döp om/radera, ta bort produkt ur samling, eget omslag, Personer.
 
 Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat/Publik, ingen Följ; Dela/redigera kommer i del 2). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
 

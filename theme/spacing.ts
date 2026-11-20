@@ -12,7 +12,7 @@ export const spacing = {
 } as const;
 
 export const touchTarget = 44;
-export const iconSize = { md: 20, lg: 24 } as const;
+export const iconSize = { xs: 12, sm: 18, md: 20, lg: 24 } as const;
 
 /** Knappar (brief 33): aldrig fullbredd, pill som följer innehållet.
  *  CTA minst 56 hög; kompakt (t.ex. snackbarens åtgärd) 36. Fält 56 höga. */
@@ -22,6 +22,22 @@ export const control = {
   compactHeight: 36,
   compactPaddingX: 16,
   fieldHeight: 56,
+} as const;
+
+/** Listrader (brief 35): samlingsrad 76 hög med 56-thumb, följ-rad 64 med 48. */
+export const listRow = {
+  height: 76,
+  thumb: 56,
+  compactHeight: 64,
+  compactThumb: 48,
+} as const;
+
+/** Vy-växlare (segmentkontroll med ikoner, brief 35): knapp 38 × 30, inre luft 3. */
+export const segmented = {
+  itemWidth: 38,
+  itemHeight: 30,
+  padding: 3,
+  gap: 2,
 } as const;
 
 /** Snackbar (brief 33): bredd följer innehållet upp till maxWidth, miniatyr 40,

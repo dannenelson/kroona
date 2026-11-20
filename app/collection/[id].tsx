@@ -1,7 +1,7 @@
 // Samlingsdetalj (brief 28, wireframes.md §2): innehållet i en kuraterad
 // samling (data/collections.ts: Kroona-teman och varumärkens kollektioner).
 // Nås från temakorten på Hem (CollectionRow), Samlingar-hyllan på
-// Partnerdetalj och Sparat ("Alla sparade" med id `saved` och egna samlingar,
+// Partnerdetalj och Sparat ("Gillade produkter" med id `saved` och egna samlingar,
 // brief 32). Ligger i rotens stack som Produktdetalj, med samma hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
 // kantswipe stänger (collectionScreenOptions i components/product/productTransition.ts).
 import { useMemo, useState } from 'react';
@@ -44,12 +44,12 @@ const CATEGORY_LABEL: Record<Product['category'], string> = { kläder: 'Kläder'
 
 type Filter = { label: string; match: (p: Product) => boolean };
 
-/** Det skärmen visar, oavsett om samlingen är kuraterad, egen eller "Alla sparade". */
+/** Det skärmen visar, oavsett om samlingen är kuraterad, egen eller "Gillade produkter". */
 type CollectionView = {
   id: string;
   name: string;
   products: Product[];
-  /** Kuraterade samlingar har en bild; egna och "Alla sparade" visar mosaik. */
+  /** Kuraterade samlingar har en bild; egna och "Gillade produkter" visar mosaik. */
   imageUrl?: string;
   curatorName: string;
   curatorRetailer?: Retailer;
@@ -93,7 +93,7 @@ export default function CollectionScreen() {
   const { getUserCollection } = useUserCollections();
   const userCollection = getUserCollection(id);
 
-  // "Alla sparade" (id `saved`), en egen samling, eller en kuraterad (brief 32).
+  // "Gillade produkter" (id `saved`, ingen samling men samma vy), en egen samling eller en kuraterad.
   const collection = useMemo<CollectionView | undefined>(() => {
     if (id === ALL_SAVED_ID) {
       return {
@@ -104,7 +104,7 @@ export default function CollectionScreen() {
         detail: 'Privat',
         followable: false,
         byBrand: false,
-        emptyTitle: 'Inga sparade produkter än',
+        emptyTitle: 'Inga gillade produkter än',
         emptyHint: 'Tryck på hjärtat på en produkt för att spara den här.',
       };
     }

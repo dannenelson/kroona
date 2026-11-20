@@ -21,7 +21,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | Hem | ✅ | 🚧 | 🟡 Gammal stil: tio sektioner, filter utan logik. Ingen hälsningshero eller glas. |
 | Flöde | ✅ | ⬜ | 🟡 Grundversion (`feed.tsx`, ProductGrid) |
 | Hitta | ✅ | ⬜ | ✅ Fungerande chatt mot Claude API. Saknar länk till Produktdetalj, arkiv/ny chatt och tal. |
-| Sparat | ✅ | ⬜ | 🟡 Del 1 byggd (brief 32): Samlingar \| Följer, Alla sparade, egna samlingar, Ny samling. Del 2 (spara i samling, redigera) kvar. |
+| Sparat | ✅ | ⬜ | 🟡 Ny struktur byggd (brief 35): Mina samlingar \| Följer, Gillade produkter, rader/kort, Följer i sektioner. Lägg till i samling och redigera kvar. |
 | Produktdetalj, Samling, Partner, Profil | ✅ | ⬜ | 🟡 Produkt- (+ lightbox), Samlings- och Partnerdetalj byggda. Profil parkerad. |
 | Onboarding | parkerad | — | — |
 
@@ -51,7 +51,8 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 3d. ✅ **Partnerdetalj + kurator på samlingar** (brief 29) — byggd 2026-11-20, gester kräver enhetstest.
 3e. ✅ **Sparat del 1** (brief 32) — byggd 2026-11-20.
 3f. ✅ **Sheet, Button och Snackbar + Skapa samling** (brief 33) — byggd 2026-11-20.
-3g. **Nästa:** Sparat-omstruktureringen enligt godkänd skiss (wireframes.md §8), sedan spara i samling från produkt och redigera/döp om/radera.
+3g. ✅ **Sparat-omstrukturering** (brief 35) — byggd 2026-11-20.
+3h. **Nästa:** "Lägg till i samling" från produkt (Sheet-steg), sedan redigera/döp om/radera samling och ta bort produkt ur samling.
 4. **Sparat** med egna samlingar och följda (AsyncStorage)
 5. **Hem** (hyllor) i ny design, sedan **Flöde** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning

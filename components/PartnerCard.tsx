@@ -1,13 +1,14 @@
-import { useId, useMemo, useRef, useState, type ComponentRef } from 'react';
+import { useId, useMemo } from 'react';
 import { Animated, Text, Pressable, View, StyleSheet, ImageBackground } from 'react-native';
 import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { LinearGradient } from 'expo-linear-gradient';
-import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
-import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius, motion } from '../theme';
+import { GestureDetector } from 'react-native-gesture-handler';
+import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius } from '../theme';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import { useCardPress } from '../hooks/useCardPress';
-import { useContextMenu, type AnchorRect, type ContextMenuItem } from './ProductContextMenu';
+import { type ContextMenuItem } from './ProductContextMenu';
+import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import { useSnackbar } from './Snackbar';
 import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from './product/productTransition';
 import FollowIcon from '../assets/icons/FollowIcon';
@@ -45,7 +46,6 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   const styles = useStyles();
   const router = useRouter();
   const snackbar = useSnackbar();
-  const contextMenu = useContextMenu();
   // Unikt boundary-id per kortinstans (samma mönster som ProductCard), så att
   // zoomen till Samlings-/Partnerdetalj går från/till exakt det här kortet.
   const instanceKey = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -57,14 +57,8 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
 
   // Samma source-objekt för kortet och menyns lyfta kopia (samma bildcache).
   const imageSource = useMemo(() => ({ uri: imageUrl }), [imageUrl]);
-  const imageRef = useRef<ComponentRef<typeof View>>(null);
-  const [imageHidden, setImageHidden] = useState(false);
   // Samma tryckrespons som produktkorten (krympning, ingen opacitet).
   const press = useCardPress();
-  const setOriginalHidden = (hidden: boolean) => {
-    if (!hidden) press.menuClosed();
-    setImageHidden(hidden);
-  };
 
   // Följ använder samma toggle som den borttagna +/✓-knappen. Dela är en
   // platshållare i Fas 0 (ingen delning byggd).
@@ -73,10 +67,6 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
     { label: 'Öppna', icon: ChevronIcon, onPress: open },
     { label: 'Dela', icon: ShareIcon, onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
   ];
-
-  const measureImage = (done: (rect: AnchorRect) => void) => {
-    imageRef.current?.measureInWindow((x, y, width, height) => done({ x, y, width, height }));
-  };
 
   // Namn och antal följer med den lyfta kopian (samma innehåll som på kortet).
   const renderCaption = () => (
@@ -100,33 +90,18 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
     </LinearGradient>
   );
 
-  // Långt tryck som övergår i drag, samma gest som produktkorten (brief 05):
-  // när den aktiveras avbryts kortets tryck, så att kortet inte öppnas.
-  const longPress = usePanGesture({
-    activateAfterLongPress: motion.longPressMs,
-    runOnJS: true,
-    disableReanimated: true,
-    onActivate: () => {
-      press.liftForMenu();
-      measureImage((anchor) =>
-        contextMenu.open({
-          anchor,
-          imageSource,
-          imageRadius: radius.collection,
-          liftScale: motion.liftScale,
-          renderOverlay: renderCaption,
-          items: menuItems,
-          measure: measureImage,
-          setOriginalHidden,
-        }),
-      );
-    },
-    onUpdate: (e) => contextMenu.move(e.absoluteX, e.absoluteY),
-    onDeactivate: () => contextMenu.release(),
+  // Långt tryck som övergår i drag, samma gest som produktkorten (brief 05),
+  // via den delade hooken: när den aktiveras avbryts kortets tryck.
+  const menu = useLongPressMenu({
+    items: menuItems,
+    imageUri: imageUrl,
+    radius: radius.collection,
+    renderOverlay: renderCaption,
+    press,
   });
 
   return (
-    <GestureDetector gesture={longPress}>
+    <GestureDetector gesture={menu.gesture}>
       <Pressable
         onLayout={press.onLayout}
         onPress={open}
@@ -142,7 +117,7 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
           group={partnerId ? PARTNER_BOUNDARY_GROUP : COLLECTION_BOUNDARY_GROUP}
           style={styles.image}
         >
-          <View ref={imageRef} collapsable={false} style={[styles.image, imageHidden && styles.hidden]}>
+          <View ref={menu.ref} collapsable={false} style={[styles.image, menu.hidden && styles.hidden]}>
             <ImageBackground source={imageSource} style={styles.image}>
               {renderCaption()}
             </ImageBackground>

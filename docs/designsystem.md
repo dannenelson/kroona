@@ -181,6 +181,11 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 - **Snackbar** (`components/Snackbar.tsx`): enda bekräftelsekomponenten (ersatte Toast). Text, valfri miniatyr och åtgärd.
 - Detaljer och tokens: `design.md` §8h.
 
+## 13. ListRow och vy-växlare (tillagt 2026-11-20, brief 35)
+- **ListRow** (`components/ListRow.tsx`): thumb till vänster (bild, mosaik eller avatar), titel 15/500 och undertext `label` med valfri liten ikon (t.ex. lås). Standard 76 hög med 56-thumb, kompakt 64 med 48-thumb (`listRow` i `theme/spacing.ts`). Tryck = `pressed`-yta (rader krymper inte). Valfri zoom från thumben (`boundary`) och kontextmeny vid långt tryck (thumben lyfts).
+- **Vy-växlare** (`components/SegmentedIcons.tsx`): segmentkontroll med ikoner (rader/kort), pill-bakgrund `surface`, aktivt segment `surfaceRaised` i text-färg, övriga mute, 38 × 30 per segment (`segmented`). Byter direkt med selection-haptik.
+- **Kontextmeny via hook:** `hooks/useLongPressMenu` delas av PartnerCard, samlingskort och listrader (en implementation).
+
 ## Öppna frågor — sammanfattat
 
 1. `#ccc8c0` (ProductCard-pris) — ny färgtoken eller konsolidera till `textSecondary`?

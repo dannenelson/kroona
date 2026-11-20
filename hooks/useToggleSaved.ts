@@ -5,8 +5,8 @@ import { useSnackbar } from '../components/Snackbar';
 import { PRODUCTS } from '../data/products';
 
 /**
- * Spara/ta bort en produkt i "Alla sparade" med bekräftelse (brief 33): när
- * produkten sparas visas en snackbar "<produkt> sparades i Alla sparade · Visa".
+ * Gilla/ta bort en produkt i "Gillade produkter" med bekräftelse (brief 33, 35):
+ * när produkten sparas visas en snackbar "<produkt> sparades i Gillade produkter · Visa".
  * Används av produktkortets kontextmeny och Spara-knappen på Produktdetalj.
  */
 export function useToggleSaved() {
