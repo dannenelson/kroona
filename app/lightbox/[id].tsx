@@ -20,6 +20,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Reanimated, {
   Extrapolation,
+  cancelAnimation,
   interpolate,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -53,6 +54,11 @@ import CloseIcon from '../../assets/icons/CloseIcon';
 
 // Marginal så att en nästan-1x-zoom räknas som utzoomad.
 const ZOOM_EPSILON = 0.01;
+// Pan-gestens läge, låst vid aktivering.
+const NONE = 0;
+const PAGE = 1;
+const DISMISS = 2;
+const ZOOM_PAN = 3;
 
 export default function LightboxScreen() {
   const params = useLocalSearchParams<{ id: string; index?: string }>();
@@ -75,12 +81,13 @@ export default function LightboxScreen() {
   const startScale = useSharedValue(1);
   const tx = useSharedValue(0);
   const ty = useSharedValue(0);
-  const panStart = useSharedValue({ x: 0, y: 0, tx: 0, ty: 0 });
+  const panStart = useSharedValue({ x: 0, y: 0, tx: 0, ty: 0, px: 0 });
   const zoomed = useDerivedValue(() => scale.value > 1 + ZOOM_EPSILON);
 
   // Swipe-stängning: den aktiva bildens förflyttning, dess opacitet (utfart)
-  // och synligheten för kryss, punkter och grannbilder.
-  const dismissing = useSharedValue(false);
+  // och synligheten för kryss, punkter och grannbilder. `mode` = pan-gestens läge.
+  const mode = useSharedValue(NONE);
+  const release = useSharedValue({ ty: 0, vx: 0, vy: 0, ok: false });
   const dragX = useSharedValue(0);
   const dragY = useSharedValue(0);
   const imageOpacity = useSharedValue(1);
@@ -163,14 +170,24 @@ export default function LightboxScreen() {
     },
   });
 
+  // Pan: läget låses vid aktivering (inte vid slutet: ett nyp kan ha zoomat
+  // bilden innan gesten avslutas). All snäppning och återställning sker i
+  // onFinalize, som alltid körs (även vid avbrott eller utan aktivering), utifrån
+  // faktisk position, så att inget kan bli kvar mitt emellan.
   const pan = usePanGesture({
     maxPointers: 1,
     manualActivation: true,
     onTouchesDown: (e) => {
       'worklet';
       const t = e.allTouches[0];
-      if (!t) return;
-      panStart.value = { x: t.absoluteX, y: t.absoluteY, tx: tx.value, ty: ty.value };
+      if (!t || e.numberOfTouches > 1 || imageOpacity.value < 1) return;
+      // Fånga pågående fjädrar så att ett nytt drag fortsätter där bilden är.
+      cancelAnimation(pageX);
+      cancelAnimation(dragX);
+      cancelAnimation(dragY);
+      mode.value = NONE;
+      release.value = { ty: 0, vx: 0, vy: 0, ok: false };
+      panStart.value = { x: t.absoluteX, y: t.absoluteY, tx: tx.value, ty: ty.value, px: pageX.value };
     },
     onTouchesMove: (e) => {
       'worklet';
@@ -179,7 +196,9 @@ export default function LightboxScreen() {
         GestureStateManager.fail(e.handlerTag);
         return;
       }
+      if (mode.value !== NONE) return;
       if (zoomed.value) {
+        mode.value = ZOOM_PAN;
         GestureStateManager.activate(e.handlerTag);
         return;
       }
@@ -191,46 +210,39 @@ export default function LightboxScreen() {
         GestureStateManager.fail(e.handlerTag); // kantswipe (biblioteket)
         return;
       }
-      dismissing.value = !horizontal;
+      mode.value = horizontal ? PAGE : DISMISS;
       if (!horizontal) chrome.value = withTiming(0, { duration: motion.duration.fast });
-      GestureStateManager.activate(e.handlerTag); // bläddra eller swipe-stängning
+      GestureStateManager.activate(e.handlerTag);
     },
     onUpdate: (e) => {
       'worklet';
-      if (zoomed.value) {
+      if (mode.value === ZOOM_PAN) {
         tx.value = panStart.value.tx + e.translationX;
         ty.value = panStart.value.ty + e.translationY;
-        return;
-      }
-      if (dismissing.value) {
+      } else if (mode.value === DISMISS) {
         dragX.value = e.translationX;
         dragY.value = e.translationY;
-        return;
+      } else if (mode.value === PAGE) {
+        pageX.value = panStart.value.px + e.translationX;
       }
-      pageX.value = -lightboxIndex.value * width + e.translationX;
     },
+    // Släppvärden (bara aktiverade gester får dem); besluten tas i onFinalize.
     onDeactivate: (e) => {
       'worklet';
-      if (zoomed.value) {
-        tx.value = withSpring(clampPan(tx.value, width, scale.value), motion.spring);
-        ty.value = withSpring(clampPan(ty.value, height, scale.value), motion.spring);
-        return;
-      }
-      if (dismissing.value) {
-        dismissing.value = false;
-        const passed =
-          Math.abs(e.translationY) > d.distance * height || Math.abs(e.velocityY) > d.velocity;
-        if (!passed) {
-          dragX.value = withSpring(0, motion.spring);
-          dragY.value = withSpring(0, motion.spring);
-          chrome.value = withTiming(1, { duration: motion.duration.fast });
-          return;
-        }
+      release.value = { ty: e.translationY, vx: e.velocityX, vy: e.velocityY, ok: !e.canceled };
+    },
+    onFinalize: () => {
+      'worklet';
+      const ended = mode.value;
+      const r = release.value;
+      mode.value = NONE;
+      if (imageOpacity.value < 1) return; // utfart pågår: stängs strax
+      if (ended === DISMISS && r.ok && (Math.abs(r.ty) > d.distance * height || Math.abs(r.vy) > d.velocity)) {
         // Fortsätt ut med släppfarten (minst `velocity`) och tona bort; sedan stäng.
         const t = { duration: d.flyOutDuration };
         if (!reduceMotionShared.value) {
-          const vy = Math.sign(e.translationY) * Math.max(Math.abs(e.velocityY), d.velocity);
-          dragX.value = withTiming(dragX.value + (e.velocityX * t.duration) / 1000, t);
+          const vy = Math.sign(r.ty) * Math.max(Math.abs(r.vy), d.velocity);
+          dragX.value = withTiming(dragX.value + (r.vx * t.duration) / 1000, t);
           dragY.value = withTiming(dragY.value + (vy * t.duration) / 1000, t);
         }
         imageOpacity.value = withTiming(0, t, (finished) => {
@@ -238,10 +250,17 @@ export default function LightboxScreen() {
         });
         return;
       }
-      const swiped =
-        Math.abs(e.translationX) > width / 2 || Math.abs(e.velocityX) > motion.pageFlickVelocity;
-      const direction = e.translationX < 0 ? 1 : -1;
-      goToPage(swiped ? lightboxIndex.value + direction : lightboxIndex.value);
+      // Allt annat landar exakt: bilden i centrum, chrome synlig, pagern på en hel sida.
+      dragX.value = withSpring(0, motion.spring);
+      dragY.value = withSpring(0, motion.spring);
+      chrome.value = withTiming(1, { duration: motion.duration.fast });
+      if (zoomed.value) {
+        tx.value = withSpring(clampPan(tx.value, width, scale.value), motion.spring);
+        ty.value = withSpring(clampPan(ty.value, height, scale.value), motion.spring);
+      }
+      const p = -pageX.value / Math.max(1, width);
+      const flick = ended === PAGE && r.ok && Math.abs(r.vx) > motion.pageFlickVelocity;
+      goToPage(flick ? (r.vx < 0 ? Math.floor(p) + 1 : Math.ceil(p) - 1) : Math.round(p));
     },
   });
 
