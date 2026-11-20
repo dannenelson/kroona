@@ -6,6 +6,7 @@ import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEv
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { useCardPress } from '../hooks/useCardPress';
+import { useToggleSaved } from '../hooks/useToggleSaved';
 import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
@@ -78,7 +79,8 @@ export default function ProductCard({
 }: Props) {
   const { colors } = useTheme();
   const styles = useStyles();
-  const { isSaved, toggleSaved } = useSavedProducts();
+  const { isSaved } = useSavedProducts();
+  const toggleSaved = useToggleSaved();
   const saved = isSaved(id);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();

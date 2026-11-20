@@ -28,7 +28,8 @@ import { SavedProductsProvider } from '../context/SavedProductsContext';
 import { FollowedCollectionsProvider } from '../context/FollowedCollectionsContext';
 import { UserCollectionsProvider } from '../context/UserCollectionsContext';
 import { ContextMenuProvider } from '../components/ProductContextMenu';
-import { ToastProvider } from '../components/Toast';
+import { SnackbarProvider } from '../components/Snackbar';
+import { SheetProvider } from '../components/Sheet';
 
 // Aktivt tema. Byt till 'light' här för att testa ljust tema (ingen UI för
 // det än).
@@ -83,8 +84,10 @@ function AppShell() {
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         {/* Kontextmenyn ritas ovanför alla skärmar (ingen Modal, se ProductContextMenu). */}
         <ContextMenuProvider>
-          {/* Tillfälliga bekräftelser (toast) ovanför alla skärmar. */}
-          <ToastProvider>
+          {/* Bekräftelser (snackbar, brief 33) ovanför alla skärmar och lager. */}
+          <SnackbarProvider>
+          {/* Helskärmslager för miniflöden (Sheet, brief 33). */}
+          <SheetProvider>
             {/* Spik (brief 18): blank stack från react-native-screen-transitions.
                 Skärmarna är JS-vyer, så föregående skärm finns kvar bakom när
                 Produktdetalj dras. Flikarna (skärm 1) behåller sin senaste bild
@@ -96,7 +99,8 @@ function AppShell() {
               <BlankStack.Screen name="partner/[id]" options={partnerScreenOptions} />
               <BlankStack.Screen name="lightbox/[id]" options={lightboxScreenOptions} />
             </BlankStack>
-          </ToastProvider>
+          </SheetProvider>
+          </SnackbarProvider>
         </ContextMenuProvider>
       </FollowedCollectionsProvider>
       </UserCollectionsProvider>

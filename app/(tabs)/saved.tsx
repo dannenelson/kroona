@@ -22,10 +22,12 @@ import {
 import { getProductsForRetailer, getRetailer } from '../../lib/catalog';
 import { TAB_BAR_HEIGHT } from '../../components/CustomTabBar';
 import TextTabs from '../../components/TextTabs';
-import Pill from '../../components/Pill';
 import PartnerCard from '../../components/PartnerCard';
 import UserCollectionCard from '../../components/saved/UserCollectionCard';
-import NewCollectionSheet from '../../components/saved/NewCollectionSheet';
+import IconButton from '../../components/IconButton';
+import PlusIcon from '../../assets/icons/PlusIcon';
+import { useSheet } from '../../components/Sheet';
+import { createCollectionStep } from '../../components/saved/CreateCollectionStep';
 
 const SEGMENTS = ['Samlingar', 'Följer'] as const;
 const VISIBILITY_LABEL = { private: 'Privat', public: 'Publik' } as const;
@@ -46,10 +48,11 @@ export default function SavedScreen() {
   const { width } = useWindowDimensions();
   const styles = useStyles();
   const { savedProducts } = useSavedProducts();
-  const { userCollections, createCollection } = useUserCollections();
+  const { userCollections } = useUserCollections();
+  const sheet = useSheet();
+  const openCreate = () => sheet.open(createCollectionStep);
   const { followedCollectionIds } = useFollowedCollections();
   const [segment, setSegment] = useState<(typeof SEGMENTS)[number]>('Samlingar');
-  const [sheetOpen, setSheetOpen] = useState(false);
 
   const cardWidth = (width - spacing.screenMargin * 2 - spacing.gutter) / 2;
 
@@ -106,9 +109,7 @@ export default function SavedScreen() {
       >
         <View style={styles.header}>
           <Text style={styles.title}>Sparat</Text>
-          <Pill variant="filled" onPress={() => setSheetOpen(true)}>
-            Ny samling
-          </Pill>
+          <IconButton tone="theme" icon={PlusIcon} accessibilityLabel="Ny samling" onPress={openCreate} />
         </View>
         <TextTabs items={SEGMENTS} selected={segment} onSelect={setSegment} style={styles.tabs} />
 
@@ -132,7 +133,7 @@ export default function SavedScreen() {
                 width={cardWidth}
               />
             ))}
-            <NewCollectionCard width={cardWidth} onPress={() => setSheetOpen(true)} />
+            <NewCollectionCard width={cardWidth} onPress={openCreate} />
           </View>
         ) : followed.length === 0 ? (
           <View style={styles.emptyState}>
@@ -147,12 +148,6 @@ export default function SavedScreen() {
           </View>
         )}
       </ScrollView>
-
-      <NewCollectionSheet
-        visible={sheetOpen}
-        onClose={() => setSheetOpen(false)}
-        onCreate={(name, visibility) => createCollection(name, visibility)}
-      />
     </View>
   );
 }

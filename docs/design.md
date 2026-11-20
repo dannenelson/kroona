@@ -105,7 +105,7 @@ Vald glaspill är inverterad mot glaset: glasets innehållsfärg som yta, `bg` s
 
 **Kantblur (`EdgeFade`):** max 8 px i tre lager (20 / 50 / 100 %), vart och ett med gradientmask (maskstopp 0–20→55 %, 0–40→80 %, 0–60→100 %), plus toning mot `bg`: topp alfa .80 / .50 / 0, botten .96 / .80 / 0. Höjd topp = safe area + 14 (≈ 68), botten 128. Kräver `@react-native-masked-view/masked-view`.
 
-**Kontextmeny (långt tryck):** lager ovanför appen (ingen Modal), gest från kortet med dra-för-att-välja. Bakgrund lätt blur (intensity 30, ca hälften av referensens 18) + `scrim`, lyft kort skala 1,04 med radie 16 och skugga `lift`, meny 250 bred, rader 46, `menu`-yta med blur 40 (intensity 90) och `glassLine`-kant. **Gäller även samlings-/varumärkeskort** (`PartnerCard`, brief 30): menyval Följ/Sluta följa (befintlig följ-lagring) · Öppna · Dela (platshållare, toast i Fas 0). Kopian är kortets bild med namn/antal och radie `radius.collection` (18, samma som kortet). Följ-knappen (+/✓) på korten är borttagen; ingen synlig följ-indikator på kortet, läget syns i menyn och på detaljsidan.
+**Kontextmeny (långt tryck):** lager ovanför appen (ingen Modal), gest från kortet med dra-för-att-välja. Bakgrund lätt blur (intensity 30, ca hälften av referensens 18) + `scrim`, lyft kort skala 1,04 med radie 16 och skugga `lift`, meny 250 bred, rader 46, `menu`-yta med blur 40 (intensity 90) och `glassLine`-kant. **Gäller även samlings-/varumärkeskort** (`PartnerCard`, brief 30): menyval Följ/Sluta följa (befintlig följ-lagring) · Öppna · Dela (platshållare, snackbar i Fas 0). Kopian är kortets bild med namn/antal och radie `radius.collection` (18, samma som kortet). Följ-knappen (+/✓) på korten är borttagen; ingen synlig följ-indikator på kortet, läget syns i menyn och på detaljsidan.
 
 ## 4. Typografi
 Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex är en tillfällig grund (beslut 2026-11-17) och kan bytas senare genom att ändra typografitokens, utan att komponenter berörs. Statiska vikter, ett fontfamilj-namn per vikt (inga variabla axlar i RN).
@@ -182,12 +182,12 @@ Glasknappar (IconButton på glas, TopBar-kapseln) har subtil skugga `glassButton
 | Reduce motion | respekteras alltid | ✅ krav |
 
 ## 8b. Produktdetalj (brief 13)
-Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, FactList, OfferRow) och den delade `Toast`.
+Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, FactList, OfferRow) och den delade `Snackbar` (brief 33, ersatte `Toast`).
 - **Topp (brief 15):** en enda `EdgeFade` i temats toning hela vägen (ljus i ljust tema, även över hero; ingen foto-toning). Toningen är safe area + 44 + 2 × 8 + 16 hög och täcker titelraden; blurzonen är kort, safe area + `edgeBlur.topExtra` (≈ 68). Statusfältet följer temat, inget byte vid scroll. Glaset har en ton (`photo`). Titeln tonar in med scroll.
 - **Hero** 4:5 full bredd. **Märke** `label`/mute, **namn** `title1`. **Pris** "Från X kr" i `price` med `title2`-storlek, "kr" i `label`. **Spara** 44 hög pill på `surfaceRaised`, fylld ikon + "Sparad" när sparad.
 - **Listor:** grupperade (radie `card`, `surface`, `sep`-linjer), faktarader minst 44, erbjudanderader minst 64 med initialcirkel 36, namn `body` 500, detalj `label` 400 mute, pris `body` 600, lager `caption`. Tryck tonar raden till `pressed`.
 - **Liknande:** horisontell rad med ProductCard M, 140 bred, bild 176.
-- **Toast:** glasruta längst ner, glider in (fjäder) och ut, visas 2,2 s. Reduce motion: direkt.
+- **Snackbar** (ersatte toasten, brief 33): se §8h.
 - **Avvikelser från referensen (egna):** sidmarginal 16 (referens 20) · typstorlekar närmast token (märke 13 mot 15, namn 26 mot 25, pris 20 mot 22, rubriker 20 mot 19) · Liknande-korten visar också namn och betyg (ProductCard M) · toppens toning växlar vid en tröskel i stället för kontinuerligt.
 
 ## 8c. Rörelse: hierarki ✅ (godkänd på enhet 2026-11-19)
@@ -220,11 +220,18 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Samlingsdetalj** fick kuratorraden "Av Kroona" / "Av <varumärke>" (varumärket öppnar Partnerdetalj).
 
 ## 8g. Sparat (brief 32)
-- **Header** "Sparat" + Pill "Ny samling"; **segment** Samlingar | Följer som text-flikar (§11).
+- **Header** "Sparat" + glasknapp "+" (brief 33, öppnar Sheet: Skapa samling); **segment** Samlingar | Följer som text-flikar (§11).
 - **Samlingskort (egna):** kvadratiskt mosaikomslag (`CollectionMosaic`: 1 fyller, 2 sida vid sida, 3 = en stor + två små, 4 = 2 × 2, tunna skarvar; tom = `placeholder`-yta), radie `radius.collection`, namn (`body`) och "N produkter · Privat/Publik" (`micro`). Samma tryckrespons (`useCardPress`) och zoom till Samlingsdetalj. Ingen kontextmeny än (redigera/radera kommer i del 2). "Ny samling"-kortet: samma kvadrat i `surface` med ett +.
 - **Följer:** samma PartnerCard som på Hem i 2 kolumner (proportion 150 × 310), kontextmenyns Sluta följa.
-- **Ny samling:** lager från botten (inbyggd `Modal`, glider upp; Minska rörelse: tonar) över `scrim`, yta `surfaceRaised`, toppradie `radius.lifted`; namnfält (`surface`, `radius.control`, 44 hög), Privat | Publik som text-flikar, Avbryt/Skapa.
+- **Ny samling:** Sheet-steget "Skapa samling" (§8h): fält "Namn på samlingen" (autofokus, max 40), raden "Håll samlingen privat" (på som standard) med hjälptext, CTA "Spara". Därefter snackbar "<namn> skapades · Visa".
 - **Samlingsdetalj för egna och Alla sparade:** mosaiken som cover (4:5), "Av dig", "N produkter · Privat/Publik", ingen Följ, tom-vy.
+
+## 8h. Sheet, Button och Snackbar (brief 33, godkänt 2026-11-20)
+- **Knappar är aldrig fullbreddsrader** (utom i listor). CTA = `Button` (`components/Button.tsx`): pill som följer sitt innehåll, centrerad, minst `control.ctaHeight` 56 hög, `headline` (17/600), sidmarginal `control.ctaPaddingX`. **primary** = ljus yta (`textPrimary`, text i `bg`), **secondary** = tonad yta (`pressed`). Kompakt storlek (`control.compactHeight` 36) för t.ex. snackbarens åtgärd. Tryckrespons som korten (`useCardPress`), lätt haptik, inaktiv = `disabledOpacity`.
+- **Sheet** (`components/Sheet.tsx`, `useSheet()`): helskärmslager på rotnivå, ingen RN Modal. Blur (`edgeBlur.menuBackdropIntensity`) + `scrim` som kontextmenyn, så att skärmen under skymtar. Mini-stack `open/push/pop/close`; header med glasknapp 44 (X i första steget, chevron tillbaka i senare) och centrerad titel (`headline`). Innehåll via `<SheetContent footer={<Button/>}>`: CTA centrerad nederst (40 px eller safe area) och ovanför tangentbordet. Öppna/stäng: tonar och stiger `motion.sheet.rise` (`open` 280 / `close` 220 ms); stegbyte tonar och glider `stepShift` (220 ms); Minska rörelse: bara tonning. Stängs med X, Androids bakåt och swipe nedåt (`motion.sheet.dismissDistance`); steg med skrollande lista sätter `swipeToClose: false`.
+- **Fält** i sheets: `control.fieldHeight` 56, `radius.card`, `surface`, kant 1,5 i `border` (fokus: `textSecondary`), etikett `label` ovanför. **Toggle-rad:** `surface`, `radius.card`, titel 15/500 + hjälptext `label`, systemets Switch (spår `textPrimary` på, `pressed` av).
+- **Snackbar** (`components/Snackbar.tsx`, `useSnackbar().show({ text, thumbUri?, action? })`): ersätter toasts och bekräftelseskärmar. Radie `radius.bubble` (20), blur i `menu`-ton med glaskant och skugga `menu`, bredd följer innehållet (max `snackbar.maxWidth` 350), miniatyr 40 (`radius.tile`), text 15/500, åtgärd som kompakt secondary-Button. Centrerad, ovanför flikfältet när det syns, annars `snackbar.bottomOffset` 40 från botten. En i taget, ca 4 s (`motion.snackbar.duration`), svep nedåt döljer, haptik `success`. Glider in med fjäder; Minska rörelse: tonning. `accessibilityRole="alert"` + live region.
+- **Används för:** spara (kontextmeny och Spara-knappen: "<produkt> sparades i Alla sparade · Visa"), skapa samling, Dela-platshållare, erbjudanderadens "Du skulle nu gå till …".
 
 ## 9. Komponentkontrakt
 Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (`sm`/`md`/`lg`, default `md`), **states** (default, pressed, disabled, loading, selected), och en **`style`-prop som slås ihop sist** (anroparen justerar layout, aldrig identitet). Innehåll går via `children`, inte via fler props.

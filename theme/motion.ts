@@ -32,9 +32,13 @@ export const motion = {
   popScale: 1.15,
   popIn: 90,
   popSpring: { damping: 10, stiffness: 300, mass: 0.6 },
-  /** Toast: hur länge den syns (ms) och hur långt den glider in (px). */
-  toastDuration: 2200,
-  toastSlide: 24,
+  /** Snackbar (brief 33, ersätter toast): hur länge den syns (ms), hur långt den
+   *  glider in (px) och hur långt den måste svepas nedåt för att försvinna. */
+  snackbar: { duration: 4000, slide: 24, dismissDistance: 24 },
+  /** Sheet (brief 33): helskärmslager med miniflöden. In/ut (ms), hur långt
+   *  innehållet stiger in (px), byte mellan steg (ms, px) och hur långt en
+   *  swipe nedåt måste gå för att stänga (px). Minska rörelse: bara tonning. */
+  sheet: { open: 280, close: 220, rise: 24, step: 220, stepShift: 24, dismissDistance: 120 },
   /** Produktdetalj: informationen tonas in under övergångens sista del (progress 0,75 → 1). */
   detailRevealFrom: 0.75,
   /** Hierarkirörelsen (spik brief 18): zoomens fjädrar, bibliotekets

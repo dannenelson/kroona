@@ -1,3 +1,4 @@
+import { useToggleSaved } from '../../hooks/useToggleSaved';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, motion, touchTarget, iconSize } from '../../theme';
 import { useSavedProducts } from '../../context/SavedProductsContext';
@@ -16,7 +17,8 @@ import BookmarkIconFilled from '../../assets/icons/BookmarkIcon_filled';
 export default function SaveButton({ productId }: { productId: string }) {
   const { colors } = useTheme();
   const styles = useStyles();
-  const { isSaved, toggleSaved } = useSavedProducts();
+  const { isSaved } = useSavedProducts();
+  const toggleSaved = useToggleSaved();
   const saved = isSaved(productId);
   const press = usePressAnimation(motion.pressedScale);
   const pop = usePop(saved);

@@ -174,6 +174,13 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 - Kundbetyg: `★ 4,8 (312)`
 - Hållbarhetsbetyg: löv-ikon + värde, t.ex. `🍃 4,2`
 
+## 12. Button, Sheet och Snackbar (tillagt 2026-11-20, brief 33)
+- **Regel:** knappar är aldrig fullbreddsrader (utom rader i listor). CTA är en pill som följer sitt innehåll, centrerad, minst 56 hög, 17/600. Primär = ljus yta, sekundär = tonad yta. Gäller hela appen framöver.
+- **Button** (`components/Button.tsx`): `variant` primary/secondary, `size` cta (≥ 56) / compact (36), `disabled`, valfri `icon`. Tryckrespons som korten.
+- **Sheet** (`components/Sheet.tsx`): helskärmslager för miniflöden (flera steg med tillbaka), blur + scrim som kontextmenyn. Steg = `{ title, render, swipeToClose? }`.
+- **Snackbar** (`components/Snackbar.tsx`): enda bekräftelsekomponenten (ersatte Toast). Text, valfri miniatyr och åtgärd.
+- Detaljer och tokens: `design.md` §8h.
+
 ## Öppna frågor — sammanfattat
 
 1. `#ccc8c0` (ProductCard-pris) — ny färgtoken eller konsolidera till `textSecondary`?

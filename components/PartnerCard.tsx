@@ -8,7 +8,7 @@ import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius,
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import { useCardPress } from '../hooks/useCardPress';
 import { useContextMenu, type AnchorRect, type ContextMenuItem } from './ProductContextMenu';
-import { useToast } from './Toast';
+import { useSnackbar } from './Snackbar';
 import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from './product/productTransition';
 import FollowIcon from '../assets/icons/FollowIcon';
 import ChevronIcon from '../assets/icons/ChevronIcon';
@@ -44,7 +44,7 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   const followed = isFollowed(id);
   const styles = useStyles();
   const router = useRouter();
-  const toast = useToast();
+  const snackbar = useSnackbar();
   const contextMenu = useContextMenu();
   // Unikt boundary-id per kortinstans (samma mönster som ProductCard), så att
   // zoomen till Samlings-/Partnerdetalj går från/till exakt det här kortet.
@@ -71,7 +71,7 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   const menuItems: ContextMenuItem[] = [
     { label: followed ? 'Sluta följa' : 'Följ', icon: FollowIcon, onPress: () => toggleFollowed(id) },
     { label: 'Öppna', icon: ChevronIcon, onPress: open },
-    { label: 'Dela', icon: ShareIcon, onPress: () => toast.show('Delning kommer senare') },
+    { label: 'Dela', icon: ShareIcon, onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
   ];
 
   const measureImage = (done: (rect: AnchorRect) => void) => {

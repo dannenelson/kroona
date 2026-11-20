@@ -107,14 +107,18 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 
 ---
 
-## 8. Sparat — ✅ Del 1 byggd (brief 32)
+## 8. Sparat — 🟡 Ny struktur godkänd 2026-11-20 (skiss "Kroona Sparat – ny struktur"), byggs i nästa brief
 **Roll:** det man sparat och följer, där man hanterar det.
 
-1. Header — "Sparat" + "Ny samling"
-2. Segment (text-flikar) överst: **Samlingar | Följer** (beslutat 2026-11-20)
-3. **Samlingar** (2 kolumner): **"Alla sparade"** (ersätter "Gilla", Instagram-modellen: ett tryck på spara lägger produkten här) alltid först, kan inte raderas eller döpas om. Egna samlingar är delmängder av den: mosaikomslag av de fyra första produkterna, namn, antal produkter, Privat/Publik. "Ny samling" sist (lager med namn + Privat/Publik).
-4. **Följer:** varumärken och samlingar man följer, samma kort som på Hem; långt tryck ger Sluta följa. Tom-vy om inget följs.
-5. **Del 2 (ej byggt):** spara i samling från produkt, redigera/döp om/radera, flytta produkter, eget omslag.
+1. Header — "Sparat" + **"+"** uppe till höger (öppnar Sheet: Skapa samling). Ersätter "Ny samling"-kortet.
+2. Flikar överst: **Mina samlingar | Följer**.
+3. **Mina samlingar:**
+   - **"Gillade produkter"** som egen specialrad överst: *inte* en samling. Hjärtat sparar dit, och en produkt kan vara både gillad och i en samling.
+   - Egna samlingar som **rader** (standard) eller **kort** (växlare). Mosaikomslag av de fyra första produkterna, namn, antal, Privat/Publik.
+4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Samlingar**, **Områden**, **Personer** (Fas 1+, kräver konton).
+5. Bekräftelser via Snackbar ("<produkt> sparades i <samling> · Visa").
+
+**Byggt idag (brief 32–33):** segmenten Samlingar | Följer, "Alla sparade" + egna samlingar som kort i 2 kolumner, "+" i headern och Skapa samling som Sheet med Snackbar. **Ej byggt:** omstruktureringen ovan, spara i samling från produkt (Sheet-steget "Lägg till i samling": sökfält + lista + Skapa ny samling), redigera/döp om/radera, eget omslag.
 
 Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat/Publik, ingen Följ; Dela/redigera kommer i del 2). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
 

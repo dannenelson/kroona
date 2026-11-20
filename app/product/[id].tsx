@@ -34,7 +34,7 @@ import {
 } from '../../lib/catalog';
 import { formatPrice, formatScore } from '../../utils/format';
 import { haptic } from '../../utils/haptic';
-import { useToast } from '../../components/Toast';
+import { useSnackbar } from '../../components/Snackbar';
 import TopBar from '../../components/TopBar';
 import EdgeFade from '../../components/EdgeFade';
 import SectionTitle from '../../components/SectionTitle';
@@ -64,7 +64,7 @@ export default function ProductScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = useStyles();
-  const toast = useToast();
+  const snackbar = useSnackbar();
 
   const product = PRODUCTS.find((p) => p.id === id);
   const heroHeight = width / HERO_ASPECT;
@@ -163,7 +163,7 @@ export default function ProductScreen() {
     const name = getRetailer(offer.retailerId)?.name ?? 'återförsäljaren';
     haptic.light();
     // Fas 0: ingen utlänk eller tracking, bara en bekräftelse.
-    toast.show(`Du skulle nu gå till ${name}`);
+    snackbar.show({ text: `Du skulle nu gå till ${name}` });
   };
 
   if (!product || !data) {

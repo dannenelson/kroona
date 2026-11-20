@@ -50,7 +50,8 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 3c. ✅ **Samlingsdetalj** (brief 28) — byggd 2026-11-20, gester och zoom kräver enhetstest.
 3d. ✅ **Partnerdetalj + kurator på samlingar** (brief 29) — byggd 2026-11-20, gester kräver enhetstest.
 3e. ✅ **Sparat del 1** (brief 32) — byggd 2026-11-20.
-3f. **Nästa:** Sparat del 2 (spara i samling från produkt, redigera/döp om/radera).
+3f. ✅ **Sheet, Button och Snackbar + Skapa samling** (brief 33) — byggd 2026-11-20.
+3g. **Nästa:** Sparat-omstruktureringen enligt godkänd skiss (wireframes.md §8), sedan spara i samling från produkt och redigera/döp om/radera.
 4. **Sparat** med egna samlingar och följda (AsyncStorage)
 5. **Hem** (hyllor) i ny design, sedan **Flöde** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning
