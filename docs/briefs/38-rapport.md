@@ -21,7 +21,7 @@ tsc och iOS-export är gröna.
 **Rättat utanför de tre punkterna:** egna samlingars id var bara tidsstämpel, så två samlingar skapade i samma millisekund fick samma id (upptäckt i testet). Id:t har nu ett slumpsuffix. Simulatorns testsamlingar rensades.
 
 **Flaggas:**
-- Följ på en samling som skapats av en person kopplas idag till samlingen, inte personen. Daniel noterade detta, och det tas i UX-genomgången.
+- Följ på samlingar skapade av en person (enligt briefen kopplas det till personen, inte samlingen): orört, eftersom det tas i UX-genomgången. I koden växlar Följ-knappen i Samlingsdetalj samlingens id i `FollowedCollectionsContext`. Om upplevelsen ändå känns kopplad till personen kan det bero på att kuratorraden "Av <person>" leder till profilen.
 - Utvecklarsidan (`app/components.tsx`) visar fortfarande bokmärkesikoner som exempel.
 
 **Spegla i Claude Project:** hjärta = Gilla (snabbspar, "Gilla"/"Gillad", snackbar "<produkt> gillades"), bokmärke-plus = Spara i samling. Lägg till i samling har Klar som primär och Skapa ny samling som sekundär. Sheet har sticky CTA med utskrollande, tonat innehåll.
