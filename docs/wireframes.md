@@ -118,9 +118,23 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Samlingar**, **Områden**, **Personer** (Fas 1+, kräver konton).
 5. Bekräftelser via Snackbar ("<produkt> sparades i <samling> · Visa").
 
-**Byggt (brief 35):** allt ovan utom Personer (Fas 1+) och Områden (ingen följ-lagring för områden än, sektionen döljs). Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Långt tryck: Öppna/Dela (egna), Öppna/Sluta följa (Följer). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). **Ej byggt:** spara i samling från produkt (Sheet-steget "Lägg till i samling"), redigera/döp om/radera, ta bort produkt ur samling, eget omslag, Personer.
+**Byggt (brief 35):** allt ovan utom Personer (Fas 1+) och Områden (ingen följ-lagring för områden än, sektionen döljs). Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Långt tryck: Öppna/Dela (egna), Öppna/Sluta följa (Följer). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). Spara i samling från produkt: se §8b (brief 36). **Ej byggt:** redigera/döp om/radera, ta bort produkt ur samling (i samlingsvyn), eget omslag, Personer.
 
 Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat/Publik, ingen Följ; Dela/redigera kommer i del 2). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
+
+---
+
+## 8b. Lägg till i samling (Sheet-steg) — ✅ Byggd (brief 36, skiss "SheetLaggTill")
+**Nås från:** knappen bokmärke-plus bredvid Spara på Produktdetalj och menyvalet "Spara i samling" i produktkortets kontextmeny. Spara-knappen (snabbspar → Gillade produkter) är oförändrad.
+
+1. Header: titel "Lägg till i samling", X till höger
+2. Produktchip: bild 40, namn, varumärke
+3. Sökfält "Sök samlingar" (filtrerar egna samlingar på namn)
+4. Lista: egna samlingar som rader (mosaik 48, namn, "N produkter" + "· redan tillagd"), val-cirkel till höger (tom ring / fylld med bock). Tryck växlar direkt, lagret står kvar.
+5. CTA centrerad nederst: "+ Skapa ny samling" → steget Skapa samling; Spara skapar samlingen och lägger produkten i den, lagret stängs.
+6. Tomt läge: "Du har inga samlingar än." + CTA.
+
+Vid stängning, om produkten lagts till: snackbar "<produkt> sparades i <samling> · Visa" (→ samlingen) eller "… i N samlingar · Visa" (→ Sparat). Bara borttagningar: ingen snackbar. Swipe ned stänger inte (listan skrollar).
 
 ---
 

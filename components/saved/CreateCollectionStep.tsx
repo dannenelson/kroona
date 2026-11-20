@@ -16,11 +16,20 @@ export const createCollectionStep: SheetStep = {
 };
 
 /**
+ * Samma steg i ett flöde (brief 36): efter Spara anropas `onSaved` med den nya
+ * samlingen (t.ex. för att lägga produkten i den) i stället för den egna
+ * snackbaren; lagret stängs som vanligt.
+ */
+export function makeCreateCollectionStep(onSaved: (id: string, name: string) => void): SheetStep {
+  return { title: 'Skapa samling', render: () => <CreateCollectionStep onSaved={onSaved} /> };
+}
+
+/**
  * Namn (autofokus, max 40 tecken) och "Håll samlingen privat" (på som
  * standard). Spara skapar samlingen, stänger lagret och visar en snackbar
  * "<namn> skapades · Visa".
  */
-function CreateCollectionStep() {
+function CreateCollectionStep({ onSaved }: { onSaved?: (id: string, name: string) => void }) {
   const styles = useStyles();
   const router = useRouter();
   const sheet = useSheet();
@@ -34,6 +43,11 @@ function CreateCollectionStep() {
   const save = () => {
     if (!trimmed) return;
     const id = createCollection(trimmed, isPrivate ? 'private' : 'public');
+    if (onSaved) {
+      onSaved(id, trimmed);
+      sheet.close();
+      return;
+    }
     sheet.close();
     snackbar.show({
       text: `${trimmed} skapades`,

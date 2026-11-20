@@ -186,6 +186,10 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 - **Vy-växlare** (`components/SegmentedIcons.tsx`): segmentkontroll med ikoner (rader/kort), pill-bakgrund `surface`, aktivt segment `surfaceRaised` i text-färg, övriga mute, 38 × 30 per segment (`segmented`). Byter direkt med selection-haptik.
 - **Kontextmeny via hook:** `hooks/useLongPressMenu` delas av PartnerCard, samlingskort och listrader (en implementation).
 
+## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
+- Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.
+- Steget sätter `swipeToClose: false` (listan skrollar) och kan ha `onClose` för en sammanfattande snackbar när lagret stängs.
+
 ## Öppna frågor — sammanfattat
 
 1. `#ccc8c0` (ProductCard-pris) — ny färgtoken eller konsolidera till `textSecondary`?

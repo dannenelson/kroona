@@ -20,6 +20,8 @@ type UserCollectionsContextValue = {
   /** Lägger till en produkt i en egen samling (oberoende av Gillade produkter).
    *  Används från "Lägg till i samling" (senare brief). */
   addProductToCollection: (collectionId: string, productId: string) => void;
+  /** Tar bort en produkt ur en egen samling (Lägg till i samling, brief 36). */
+  removeProductFromCollection: (collectionId: string, productId: string) => void;
 };
 
 const UserCollectionsContext = createContext<UserCollectionsContextValue | null>(null);
@@ -68,11 +70,25 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
     );
   };
 
+  const removeProductFromCollection = (collectionId: string, productId: string) => {
+    setCollections((prev) =>
+      prev.map((c) =>
+        c.id === collectionId ? { ...c, productIds: c.productIds.filter((id) => id !== productId) } : c,
+      ),
+    );
+  };
+
   const getUserCollection = (id: string) => collections.find((c) => c.id === id);
 
   return (
     <UserCollectionsContext.Provider
-      value={{ userCollections: collections, getUserCollection, createCollection, addProductToCollection }}
+      value={{
+        userCollections: collections,
+        getUserCollection,
+        createCollection,
+        addProductToCollection,
+        removeProductFromCollection,
+      }}
     >
       {children}
     </UserCollectionsContext.Provider>

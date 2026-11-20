@@ -12,6 +12,8 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import BookmarkIcon from '../assets/icons/BookmarkIcon';
 import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
+import BookmarkPlusIcon from '../assets/icons/BookmarkPlusIcon';
+import { useOpenAddToCollection } from './saved/AddToCollectionStep';
 import FollowIcon from '../assets/icons/FollowIcon';
 import ShareIcon from '../assets/icons/ShareIcon';
 import SimilarIcon from '../assets/icons/SimilarIcon';
@@ -81,6 +83,7 @@ export default function ProductCard({
   const styles = useStyles();
   const { isSaved } = useSavedProducts();
   const toggleSaved = useToggleSaved();
+  const openAddToCollection = useOpenAddToCollection();
   const saved = isSaved(id);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
@@ -117,6 +120,7 @@ export default function ProductCard({
       icon: saved ? BookmarkIconFilled : BookmarkIcon,
       onPress: () => toggleSaved(id),
     },
+    { label: 'Spara i samling', icon: BookmarkPlusIcon, onPress: () => openAddToCollection(id) },
     { label: 'Följ varumärke', icon: FollowIcon },
     { label: 'Dela', icon: ShareIcon },
     { label: 'Visa liknande', icon: SimilarIcon },

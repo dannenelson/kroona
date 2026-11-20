@@ -40,6 +40,7 @@ import EdgeFade from '../../components/EdgeFade';
 import SectionTitle from '../../components/SectionTitle';
 import ProductCard from '../../components/ProductCard';
 import SaveButton from '../../components/product/SaveButton';
+import AddToCollectionButton from '../../components/product/AddToCollectionButton';
 import { FactList, type Fact } from '../../components/product/FactList';
 import OfferRow from '../../components/product/OfferRow';
 import BackIcon from '../../assets/icons/BackIcon';
@@ -234,7 +235,10 @@ export default function ProductScreen() {
                 )}
                 {data.lowestIsUsed && <Text style={styles.usedTag}>Begagnat</Text>}
               </View>
-              <SaveButton productId={product.id} />
+              <View style={styles.saveActions}>
+                <SaveButton productId={product.id} />
+                <AddToCollectionButton productId={product.id} />
+              </View>
             </View>
           </View>
 
@@ -387,6 +391,11 @@ const useStyles = makeStyles((t) => ({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
+  },
+  saveActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
   priceBlock: {
     flexDirection: 'row',

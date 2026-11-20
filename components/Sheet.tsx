@@ -37,6 +37,8 @@ export type SheetStep = {
   render: () => ReactNode;
   /** Swipe nedåt stänger lagret (standard). Av för steg med skrollande lista. */
   swipeToClose?: boolean;
+  /** Anropas när lagret stängs (X, swipe, bakåt eller `close()`), för alla steg i stacken. */
+  onClose?: () => void;
 };
 
 type SheetApi = {
@@ -63,9 +65,11 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
   const reduceMotion = useReduceMotion();
   const [steps, setSteps] = useState<SheetStep[]>([]);
-  // Aktuellt djup för pop (anrop från äldre closures ska inte läsa ett gammalt värde).
+  // Aktuell stack för pop och close (anrop från äldre closures ska inte läsa gamla värden).
   const depth = useRef(0);
   depth.current = steps.length;
+  const stackRef = useRef<SheetStep[]>([]);
+  stackRef.current = steps;
   // Riktning för senaste stegbytet: 1 = framåt (push), -1 = bakåt (pop).
   const [direction, setDirection] = useState<1 | -1>(1);
   const shown = useRef(new Animated.Value(0)).current;
@@ -98,6 +102,7 @@ export function SheetProvider({ children }: { children: ReactNode }) {
 
   const close = useCallback(() => {
     Keyboard.dismiss();
+    stackRef.current.forEach((s) => s.onClose?.());
     Animated.timing(shown, { toValue: 0, duration: motion.sheet.close, useNativeDriver: true }).start(
       ({ finished }) => {
         if (!finished) return;

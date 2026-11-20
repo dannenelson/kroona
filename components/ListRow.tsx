@@ -24,7 +24,11 @@ type Props = {
   /** Kontextmeny vid långt tryck; thumben lyfts. */
   menuItems?: ContextMenuItem[];
   menuImageUri?: string;
+  /** Element längst till höger (t.ex. val-cirkel). */
+  trailing?: ReactNode;
   accessibilityLabel?: string;
+  /** T.ex. { checked } för valbara rader. */
+  accessibilityState?: { checked?: boolean; selected?: boolean };
 };
 
 /**
@@ -43,7 +47,9 @@ export default function ListRow({
   boundary,
   menuItems = [],
   menuImageUri,
+  trailing,
   accessibilityLabel,
+  accessibilityState,
 }: Props) {
   const styles = useStyles();
   const menu = useLongPressMenu({
@@ -65,6 +71,7 @@ export default function ListRow({
         accessibilityRole="button"
         accessibilityLabel={accessibilityLabel ?? [title, subtitle].filter(Boolean).join(', ')}
         accessibilityHint={menuItems.length ? 'Håll in för fler val' : undefined}
+        accessibilityState={accessibilityState}
         style={({ pressed }) => [
           styles.row,
           { height: compact ? listRow.compactHeight : listRow.height },
@@ -91,6 +98,7 @@ export default function ListRow({
             </View>
           ) : null}
         </View>
+        {trailing}
       </Pressable>
     </GestureDetector>
   );

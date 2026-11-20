@@ -22,6 +22,8 @@ export const control = {
   compactHeight: 36,
   compactPaddingX: 16,
   fieldHeight: 56,
+  /** Val-cirkel i listor (tom ring / fylld med bock), brief 36. */
+  checkSize: 28,
 } as const;
 
 /** Listrader (brief 35): samlingsrad 76 hög med 56-thumb, följ-rad 64 med 48. */
