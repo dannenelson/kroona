@@ -1,0 +1,5 @@
+# Rapport brief 34: Finjustering av Sheet
+
+- Bakgrunden är mörkare via en ny färgroll `colors.sheetScrim`: mörkt tema `rgba(8,9,11,0.72)` (var `scrim` 0,40), ljust tema en ljus slöja (paper50, 0,80) så att mörk text och fält förblir läsbara. Blur är kvar. Token ligger i `theme/colors.ts`, inte i `motion.ts`, eftersom det är en färg. Namnfältet har placeholdern "Min samling" (`textTertiary`), och Spara är fortfarande inaktiv när fältet är tomt.
+- X ligger alltid till höger och stänger hela flödet. Tillbaka-chevronen ligger till vänster i senare steg. Båda sidorna är 44 breda, så titeln står still. Verifierat i simulatorn (steg 1, push till steg 2, pop tillbaka), tsc och iOS-export är gröna, och ingen debug-rest finns kvar. `docs/design.md` §8h är uppdaterad.
+- **Rättat utanför de tre punkterna (fel från brief 33):** ett pushat steg var osynligt, eftersom det nymonterade stegets vy aldrig kopplades till den native-drivna animationen. Stegbytet startar nu efter monteringen och körs med JS-driver. `pop` läser dessutom aktuellt djup via en ref, så att ett anrop från en äldre closure inte stänger hela lagret.

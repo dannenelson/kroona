@@ -56,6 +56,8 @@ function CreateCollectionStep() {
         value={name}
         onChangeText={setName}
         maxLength={MAX_NAME}
+        placeholder="Min samling"
+        placeholderTextColor={styles.placeholder.color}
         autoFocus
         returnKeyType="done"
         onSubmitEditing={save}
@@ -101,6 +103,9 @@ const useStyles = makeStyles((t) => ({
     borderColor: t.colors.border,
     backgroundColor: t.colors.surface,
     color: t.colors.textPrimary,
+  },
+  placeholder: {
+    color: t.colors.textTertiary,
   },
   inputFocused: {
     borderColor: t.colors.textSecondary,

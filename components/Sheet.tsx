@@ -63,17 +63,24 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
   const reduceMotion = useReduceMotion();
   const [steps, setSteps] = useState<SheetStep[]>([]);
+  // Aktuellt djup för pop (anrop från äldre closures ska inte läsa ett gammalt värde).
+  const depth = useRef(0);
+  depth.current = steps.length;
   // Riktning för senaste stegbytet: 1 = framåt (push), -1 = bakåt (pop).
   const [direction, setDirection] = useState<1 | -1>(1);
   const shown = useRef(new Animated.Value(0)).current;
   const drag = useRef(new Animated.Value(0)).current;
   const stepIn = useRef(new Animated.Value(1)).current;
 
+  // Stegbyte: animationen startar när det nya steget har monterats (effekten
+  // nedan) och körs med JS-driver: med native driver kopplades det nymonterade
+  // stegets vy aldrig till animationen och blev kvar osynlig (brief 34).
+  const pendingStep = useRef(false);
   const animateStep = useCallback(
     (dir: 1 | -1) => {
       setDirection(dir);
       stepIn.setValue(0);
-      Animated.timing(stepIn, { toValue: 1, duration: motion.sheet.step, useNativeDriver: true }).start();
+      pendingStep.current = true;
     },
     [stepIn],
   );
@@ -109,13 +116,19 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   );
 
   const pop = useCallback(() => {
-    if (steps.length <= 1) {
+    if (depth.current <= 1) {
       close();
       return;
     }
     setSteps((prev) => prev.slice(0, -1));
     animateStep(-1);
-  }, [animateStep, close, steps.length]);
+  }, [animateStep, close]);
+
+  useEffect(() => {
+    if (!pendingStep.current) return;
+    pendingStep.current = false;
+    Animated.timing(stepIn, { toValue: 1, duration: motion.sheet.step, useNativeDriver: false }).start();
+  }, [steps.length, stepIn]);
 
   // Androids bakåt-gest/-knapp: ett steg tillbaka, eller stäng.
   useEffect(() => {
@@ -192,16 +205,19 @@ export function SheetProvider({ children }: { children: ReactNode }) {
             >
               <KeyboardAvoidingView behavior="padding" style={styles.flex}>
                 <View style={styles.header}>
-                  <IconButton
-                    tone="theme"
-                    icon={steps.length > 1 ? BackIcon : CloseIcon}
-                    accessibilityLabel={steps.length > 1 ? 'Tillbaka' : 'Stäng'}
-                    onPress={pop}
-                  />
+                  {/* Tillbaka alltid till vänster (bara i senare steg), X alltid till
+                      höger. Lika breda sidor, så att titeln står still mellan stegen. */}
+                  <View style={styles.headerSide}>
+                    {steps.length > 1 ? (
+                      <IconButton tone="theme" icon={BackIcon} accessibilityLabel="Tillbaka" onPress={pop} />
+                    ) : null}
+                  </View>
                   <Text style={styles.title} numberOfLines={1} accessibilityRole="header">
                     {step.title}
                   </Text>
-                  <View style={styles.headerSpacer} />
+                  <View style={styles.headerSide}>
+                    <IconButton tone="theme" icon={CloseIcon} accessibilityLabel="Stäng" onPress={close} />
+                  </View>
                 </View>
                 <Animated.View
                   key={steps.length}
@@ -242,7 +258,7 @@ const useStyles = makeStyles((t) => ({
     flex: 1,
   },
   scrim: {
-    backgroundColor: t.colors.scrim,
+    backgroundColor: t.colors.sheetScrim,
   },
   content: {
     ...StyleSheet.absoluteFill,
@@ -254,7 +270,7 @@ const useStyles = makeStyles((t) => ({
     justifyContent: 'space-between',
     paddingHorizontal: spacing.screenMargin,
   },
-  headerSpacer: {
+  headerSide: {
     width: touchTarget,
   },
   title: {

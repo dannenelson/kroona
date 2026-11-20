@@ -49,6 +49,8 @@ export type ColorRoles = {
   menu: string;
   /** Dämpning bakom en lyft meny. */
   scrim: string;
+  /** Bakom Sheet (brief 34): kraftigare än `scrim`, skärmen under ska bara anas. */
+  sheetScrim: string;
   success: string;
   successSubtle: string;
   warning: string;
@@ -67,6 +69,7 @@ export const darkColors: ColorRoles = {
   textTertiary: raw.grey500,
   menu: 'rgba(44,46,52,0.80)',
   scrim: 'rgba(8,9,11,0.40)',
+  sheetScrim: 'rgba(8,9,11,0.72)',
   success: raw.green,
   successSubtle: raw.greenNight,
   warning: raw.amber,
@@ -85,6 +88,8 @@ export const lightColors: ColorRoles = {
   textTertiary: raw.slate500,
   menu: 'rgba(255,255,255,0.82)',
   scrim: 'rgba(21,23,27,0.12)',
+  // Ljust tema: ljus slöja (paper50), så att mörk text och fält förblir läsbara.
+  sheetScrim: 'rgba(245,246,248,0.80)',
   success: raw.greenDeep,
   successSubtle: raw.greenMist,
   warning: raw.amberDeep,
