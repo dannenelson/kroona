@@ -105,7 +105,7 @@ Vald glaspill är inverterad mot glaset: glasets innehållsfärg som yta, `bg` s
 
 **Kantblur (`EdgeFade`):** max 8 px i tre lager (20 / 50 / 100 %), vart och ett med gradientmask (maskstopp 0–20→55 %, 0–40→80 %, 0–60→100 %), plus toning mot `bg`: topp alfa .80 / .50 / 0, botten .96 / .80 / 0. Höjd topp = safe area + 14 (≈ 68), botten 128. Kräver `@react-native-masked-view/masked-view`.
 
-**Kontextmeny (långt tryck):** lager ovanför appen (ingen Modal), gest från kortet med dra-för-att-välja. Bakgrund lätt blur (intensity 30, ca hälften av referensens 18) + `scrim`, lyft kort skala 1,04 med radie 16 och skugga `lift`, meny 250 bred, rader 46, `menu`-yta med blur 40 (intensity 90) och `glassLine`-kant.
+**Kontextmeny (långt tryck):** lager ovanför appen (ingen Modal), gest från kortet med dra-för-att-välja. Bakgrund lätt blur (intensity 30, ca hälften av referensens 18) + `scrim`, lyft kort skala 1,04 med radie 16 och skugga `lift`, meny 250 bred, rader 46, `menu`-yta med blur 40 (intensity 90) och `glassLine`-kant. **Gäller även samlings-/varumärkeskort** (`PartnerCard`, brief 30): menyval Följ/Sluta följa (befintlig följ-lagring) · Öppna · Dela (platshållare, toast i Fas 0). Kopian är kortets bild med namn/antal och radie `radius.collection` (18, samma som kortet). Följ-knappen (+/✓) på korten är borttagen; ingen synlig följ-indikator på kortet, läget syns i menyn och på detaljsidan.
 
 ## 4. Typografi
 Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex är en tillfällig grund (beslut 2026-11-17) och kan bytas senare genom att ändra typografitokens, utan att komponenter berörs. Statiska vikter, ett fontfamilj-namn per vikt (inga variabla axlar i RN).
