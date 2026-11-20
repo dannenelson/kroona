@@ -69,11 +69,12 @@ export const motion = {
   /** Remsa vid vänsterkanten där kantswipe stänger Produktdetalj. */
   dismissEdgeWidth: 24,
   /** Lightbox (brief 19): nypzoom 1–4x, dubbeltryck växlar 1x ↔ 2,5x,
-   *  bilden fjädrar tillbaka till 1x under 1x. Bakgrunden (detaljvyn) dämpas
-   *  hårdare än vid kort → detalj, eftersom lightboxen är mörk. */
+   *  bilden fjädrar tillbaka till 1x under 1x. */
   lightboxMaxZoom: 4,
   lightboxDoubleTapZoom: 2.5,
-  lightboxBackdropOpacity: 0.85,
+  /** Lightboxens sammanlagda mörkhet över detaljvyn (brief 26): ett enda lager,
+   *  så att detaljvyn skymtar men bilden är tydligt i fokus. */
+  lightboxBackdropOpacity: 0.88,
   /** Lightboxens öppning/stängning (brief 22): ren fade med mycket lätt skala,
    *  ingen zoom från heron. Swipe ned följer fingret och tonar ut. */
   lightboxFade: {

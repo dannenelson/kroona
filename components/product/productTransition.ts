@@ -109,9 +109,10 @@ export const productScreenOptions: BlankStackNavigationOptions = {
 const lightboxCloseEasing = Easing.bezierFn(...motion.lightboxFade.closeEasing);
 
 /**
- * Lightboxen (brief 22–24): öppning och stängning via kryss eller kantswipe är
- * en fade (opacitet, lätt skala) över mörk backdrop; detaljvyn bakom skalas
- * lätt. Swipe ned/upp är lightboxens egen gest (app/lightbox), så biblioteket
+ * Lightboxen (brief 22–26): öppning och stängning via kryss eller kantswipe är
+ * en fade (opacitet, lätt skala) över en lätt genomskinlig backdrop
+ * (`motion.lightboxBackdropOpacity`, enda mörka lagret); detaljvyn bakom ligger
+ * still. Swipe ned/upp är lightboxens egen gest (app/lightbox), så biblioteket
  * har bara kantswipen, som stängs av när bilden är inzoomad eller nyps.
  * `lightboxBackdrop` tonar backdropen under den egna gesten. Minska rörelse:
  * bara opacitet.
@@ -120,13 +121,11 @@ export const lightboxScreenOptions: BlankStackNavigationOptions = {
   gestureEnabled: true,
   gestureDirection: { gesture: 'horizontal', area: motion.dismissEdgeWidth },
   gestureVelocityImpact: motion.dismissVelocityImpact,
-  screenStyleInterpolator: ({ focused, current, progress, stackProgress }) => {
+  screenStyleInterpolator: ({ focused, current, stackProgress }) => {
     'worklet';
     const reduce = reduceMotionShared.value;
-    if (!focused) {
-      const scale = reduce ? 1 : interpolate(progress, [1, 2], [1, motion.zoomBackgroundScale], 'clamp');
-      return withDepthVisibility({ content: { style: { transform: [{ scale }] } } }, stackProgress);
-    }
+    // Detaljvyn bakom ligger still (brief 26).
+    if (!focused) return withDepthVisibility({}, stackProgress);
     const fade = motion.lightboxFade;
     const p = Math.min(1, Math.max(0, current.progress));
     // Öppning linjär; stängning med kurva (backdropen lämnar sist). Båda är 1 vid p = 1.

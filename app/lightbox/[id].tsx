@@ -1,4 +1,4 @@
-// Lightbox (brief 19–24): produktens bilder i helskärm och riktig proportion,
+// Lightbox (brief 19–26): produktens bilder i helskärm och riktig proportion,
 // ovanpå Produktdetalj i rotens BlankStack. Kryss och kantswipe stänger med fade
 // (lightboxScreenOptions i components/product/productTransition.ts).
 //
@@ -39,7 +39,7 @@ import {
   useSimultaneousGestures,
   useTapGesture,
 } from 'react-native-gesture-handler';
-import { motion, overlay, spacing } from '../../theme';
+import { motion, spacing } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import { getProductImages } from '../../lib/catalog';
 import {
@@ -94,7 +94,7 @@ export default function LightboxScreen() {
   const chrome = useSharedValue(1);
   const d = motion.lightboxDismiss;
   const fadeDistance = d.fadeDistance * height;
-  // Bakgrunden (egen + bibliotekets backdrop) följer avståndet och utfartens toning.
+  // Bakgrunden (bibliotekets backdrop, enda mörka lagret) följer avståndet och utfartens toning.
   const backdrop = useDerivedValue(
     () => interpolate(Math.abs(dragY.value), [0, fadeDistance], [1, 0], Extrapolation.CLAMP) * imageOpacity.value,
   );
@@ -280,7 +280,6 @@ export default function LightboxScreen() {
   const gesture = useSimultaneousGestures(pinch, pan, doubleTap);
 
   const rowStyle = useAnimatedStyle(() => ({ transform: [{ translateX: pageX.value }] }));
-  const backgroundStyle = useAnimatedStyle(() => ({ opacity: lightboxBackdrop.value }));
   const chromeStyle = useAnimatedStyle(() => ({ opacity: chrome.value }));
   // Den aktiva bilden: zoom plus swipe-stängningens förflyttning, svag nedskalning och utfart.
   const dragScale = useDerivedValue(() =>
@@ -292,7 +291,6 @@ export default function LightboxScreen() {
 
   return (
     <View style={styles.container}>
-      <Reanimated.View style={[StyleSheet.absoluteFill, styles.background, backgroundStyle]} />
       <StatusBar style="light" />
       <GestureDetector gesture={gesture}>
         <Reanimated.View style={[styles.row, { width: width * images.length, height }, rowStyle]}>
@@ -341,9 +339,6 @@ function ZoomLayer({ index, view: v, children }: { index: number; view: ViewValu
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  background: {
-    backgroundColor: overlay.lightboxBg,
   },
   row: {
     flexDirection: 'row',
