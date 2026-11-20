@@ -138,7 +138,7 @@ Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat
 2. Produktchip: bild 40, namn, varumärke
 3. Sökfält "Sök samlingar" (filtrerar egna samlingar på namn)
 4. Lista: egna samlingar som rader (mosaik 48, namn, "N produkter" + "· redan tillagd"), val-cirkel till höger (tom ring / fylld med bock). Tryck växlar direkt, lagret står kvar.
-5. Sticky CTA nederst (listan skrollar bakom och tonas ut): **Klar** (primär, stänger) och **+ Skapa ny samling** (sekundär) → steget Skapa samling; Spara där skapar samlingen och lägger produkten i den, lagret stängs. Ryms de inte på en rad: staplade, Klar överst.
+5. Fast CTA nederst, listan skrollar bakom (och bakom chip/sök upptill) med progressiv blur: **+ Skapa ny** (sekundär) och **Klar** (primär, stänger) alltid på en rad → Skapa ny öppnar steget Skapa samling; Spara där skapar samlingen och lägger produkten i den, lagret stängs.
 6. Tomt läge: "Du har inga samlingar än." + "Skapa ny samling" som primär (ingen Klar).
 
 Vid stängning, om produkten lagts till: snackbar "<produkt> sparades i <samling> · Visa" (→ samlingen) eller "… i N samlingar · Visa" (→ Sparat). Bara borttagningar: ingen snackbar. Swipe ned stänger inte (listan skrollar).

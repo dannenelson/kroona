@@ -21,8 +21,6 @@ import {
   type ReactNode,
 } from 'react';
 import { Animated, BackHandler, Keyboard, KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import MaskedViewClass from '@react-native-masked-view/masked-view';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
@@ -56,21 +54,21 @@ type SheetApi = {
 
 const SheetContext = createContext<SheetApi | null>(null);
 
-// Paketets klasstyper passar inte React 19:s JSX-typer (som i EdgeFade).
-const MaskedView = MaskedViewClass as unknown as React.ComponentType<
-  React.ComponentProps<typeof View> & { maskElement: React.ReactElement }
->;
+/** Headerns underkant i lagret (från SheetProvider), för stegens marginaler. */
+const SheetLayoutContext = createContext(0);
 
-/** Höjden som den sticky CTA-ytan (plus toningen) täcker längst ned (brief 38). */
-const SheetFooterInsetContext = createContext(0);
+/** Marginaler för skrollande innehåll i ett steg (brief 39). */
+type SheetInsets = { top: number; bottom: number };
+const SheetInsetsContext = createContext<SheetInsets>({ top: 0, bottom: 0 });
 
 /**
- * Bottenmarginal för skrollande innehåll i ett steg: lägg den som
- * `paddingBottom` i listans `contentContainerStyle`, så att sista raden kan
- * skrollas fri från CTA:n.
+ * Marginaler för en skrollande lista i ett steg (`edgeToEdge`): lägg dem som
+ * `paddingTop`/`paddingBottom` i listans `contentContainerStyle`, så att första
+ * raden börjar under headern och de fasta elementen och sista raden kan
+ * skrollas fri från CTA:n. Listan skrollar bakom båda och blurras där.
  */
-export function useSheetFooterInset() {
-  return useContext(SheetFooterInsetContext);
+export function useSheetInsets() {
+  return useContext(SheetInsetsContext);
 }
 
 export function useSheet(): SheetApi {
@@ -185,6 +183,8 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   });
 
   const api = useMemo(() => ({ open, push, pop, close }), [open, push, pop, close]);
+  // Headerns underkant: stegens innehåll börjar (eller skrollar) under den.
+  const headerBottom = insets.top + spacing.sm + touchTarget;
 
   // Bakgrunden tonar; innehållet tonar och stiger lätt (Minska rörelse: bara tonning).
   const rise = reduceMotion
@@ -222,35 +222,38 @@ export function SheetProvider({ children }: { children: ReactNode }) {
               style={[
                 styles.content,
                 {
-                  paddingTop: insets.top + spacing.sm,
                   opacity: shown,
                   transform: [{ translateY: Animated.add(rise, drag) }],
                 },
               ]}
             >
-              <KeyboardAvoidingView behavior="padding" style={styles.flex}>
-                <View style={styles.header}>
-                  {/* Tillbaka alltid till vänster (bara i senare steg), X alltid till
-                      höger. Lika breda sidor, så att titeln står still mellan stegen. */}
-                  <View style={styles.headerSide}>
-                    {steps.length > 1 ? (
-                      <IconButton tone="theme" icon={BackIcon} accessibilityLabel="Tillbaka" onPress={pop} />
-                    ) : null}
-                  </View>
-                  <Text style={styles.title} numberOfLines={1} accessibilityRole="header">
-                    {step.title}
-                  </Text>
-                  <View style={styles.headerSide}>
-                    <IconButton tone="theme" icon={CloseIcon} accessibilityLabel="Stäng" onPress={close} />
-                  </View>
+              {/* Stegets innehåll fyller hela lagret och kan skrolla bakom headern
+                  (blurras där, se SheetContent); headern ligger ovanpå. */}
+              <SheetLayoutContext.Provider value={headerBottom}>
+                <KeyboardAvoidingView behavior="padding" style={styles.flex}>
+                  <Animated.View
+                    key={steps.length}
+                    style={[styles.flex, { opacity: stepIn, transform: [{ translateX: stepShift }] }]}
+                  >
+                    {step.render()}
+                  </Animated.View>
+                </KeyboardAvoidingView>
+              </SheetLayoutContext.Provider>
+              <View style={[styles.header, { top: insets.top + spacing.sm }]} pointerEvents="box-none">
+                {/* Tillbaka alltid till vänster (bara i senare steg), X alltid till
+                    höger. Lika breda sidor, så att titeln står still mellan stegen. */}
+                <View style={styles.headerSide}>
+                  {steps.length > 1 ? (
+                    <IconButton tone="theme" icon={BackIcon} accessibilityLabel="Tillbaka" onPress={pop} />
+                  ) : null}
                 </View>
-                <Animated.View
-                  key={steps.length}
-                  style={[styles.flex, { opacity: stepIn, transform: [{ translateX: stepShift }] }]}
-                >
-                  {step.render()}
-                </Animated.View>
-              </KeyboardAvoidingView>
+                <Text style={styles.title} numberOfLines={1} accessibilityRole="header">
+                  {step.title}
+                </Text>
+                <View style={styles.headerSide}>
+                  <IconButton tone="theme" icon={CloseIcon} accessibilityLabel="Stäng" onPress={close} />
+                </View>
+              </View>
             </Animated.View>
           </GestureDetector>
         </View>
@@ -260,54 +263,69 @@ export function SheetProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * Ett stegs layout: innehållet överst, `footer` (CTA) centrerad nederst och
- * ovanför tangentbordet (lagrets KeyboardAvoidingView skjuter upp den).
+ * Ett stegs layout (brief 33, 38, 39). Innehållet fyller lagret och går bakom
+ * headern, de fasta elementen (`header`, t.ex. produktchip + sök) och CTA-ytan
+ * (`footer`), där det blurras progressivt med kantblurren (EdgeFade, samma som
+ * skärmarnas kanter och flikfältet): suddigt närmast kanten, skarpt längre in.
+ * - Vanligt innehåll (t.ex. Skapa samling) får marginalerna automatiskt.
+ * - `edgeToEdge`: barnet är en skrollande lista som själv lägger
+ *   `useSheetInsets()` i sin `contentContainerStyle`.
+ * CTA:n ligger fast nederst och ovanför tangentbordet.
  */
-export function SheetContent({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
+export function SheetContent({
+  children,
+  header,
+  footer,
+  edgeToEdge = false,
+}: {
+  children: ReactNode;
+  header?: ReactNode;
+  footer?: ReactNode;
+  edgeToEdge?: boolean;
+}) {
   const styles = useStyles();
   const insets = useSafeAreaInsets();
+  const headerBottom = useContext(SheetLayoutContext);
+  const [fixedHeight, setFixedHeight] = useState(0);
   const [footerHeight, setFooterHeight] = useState(0);
   const fade = control.sheetFadeHeight;
-  // Sticky CTA (brief 38): innehållet skrollar bakom CTA-ytan och tonas ut mot
-  // botten med en alfamask (ingen färg, så den genomskinliga slöjan syns
-  // igenom), och blurras bakom CTA:n som kantblurren (EdgeFade 'clear').
-  const inset = footer ? footerHeight + fade : 0;
+  // Fasta element börjar en bit under headern; innehållet under dem.
+  const fixedTop = headerBottom + spacing.lg;
+  const top = header ? fixedTop + fixedHeight + spacing.md : headerBottom + spacing.xxl;
+  const bottom = footer ? footerHeight : 0;
+  const value = useMemo(() => ({ top, bottom }), [top, bottom]);
+
   return (
-    <SheetFooterInsetContext.Provider value={inset}>
+    <SheetInsetsContext.Provider value={value}>
       <View style={styles.flex}>
-        {footer ? (
-          <MaskedView
-            style={styles.flex}
-            maskElement={
-              <View style={styles.flex}>
-                <View style={[styles.flex, styles.maskSolid]} />
-                <LinearGradient
-                  colors={edgeBlur.maskColors}
-                  locations={[0, 0.5, 1]}
-                  style={{ height: fade }}
-                />
-                <View style={{ height: footerHeight }} />
-              </View>
-            }
-          >
-            <View style={styles.body}>{children}</View>
-          </MaskedView>
+        {edgeToEdge ? (
+          children
         ) : (
-          <View style={styles.body}>{children}</View>
+          <View style={[styles.body, { paddingTop: top, paddingBottom: bottom }]}>{children}</View>
         )}
+
+        {/* Progressiv blur upptill (bakom header och fasta element) och nedtill (bakom CTA). */}
+        <EdgeFade position="top" variant="clear" height={top} />
+        {footer ? <EdgeFade position="bottom" variant="clear" height={bottom + fade} /> : null}
+
+        {header ? (
+          <View
+            style={[styles.fixed, { top: fixedTop }]}
+            onLayout={(e) => setFixedHeight(e.nativeEvent.layout.height)}
+          >
+            {header}
+          </View>
+        ) : null}
         {footer ? (
-          <>
-            <EdgeFade position="bottom" variant="clear" height={inset} />
-            <View
-              onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
-              style={[styles.footer, { paddingBottom: Math.max(insets.bottom, snackbar.bottomOffset) }]}
-            >
-              {footer}
-            </View>
-          </>
+          <View
+            onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
+            style={[styles.footer, { paddingBottom: Math.max(insets.bottom, snackbar.bottomOffset) }]}
+          >
+            {footer}
+          </View>
         ) : null}
       </View>
-    </SheetFooterInsetContext.Provider>
+    </SheetInsetsContext.Provider>
   );
 }
 
@@ -322,6 +340,9 @@ const useStyles = makeStyles((t) => ({
     ...StyleSheet.absoluteFill,
   },
   header: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     height: touchTarget,
     flexDirection: 'row',
     alignItems: 'center',
@@ -340,7 +361,12 @@ const useStyles = makeStyles((t) => ({
   body: {
     flex: 1,
     paddingHorizontal: spacing.screenMargin,
-    paddingTop: spacing.xxl,
+  },
+  fixed: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    paddingHorizontal: spacing.screenMargin,
   },
   footer: {
     position: 'absolute',
@@ -351,7 +377,5 @@ const useStyles = makeStyles((t) => ({
     paddingTop: spacing.lg,
     paddingHorizontal: spacing.screenMargin,
   },
-  maskSolid: {
-    backgroundColor: edgeBlur.maskColors[0],
-  },
+
 }));

@@ -14,11 +14,12 @@ export const spacing = {
 export const touchTarget = 44;
 export const iconSize = { xs: 12, sm: 18, md: 20, lg: 24 } as const;
 
-/** Knappar (brief 33): aldrig fullbredd, pill som följer innehållet.
- *  CTA minst 56 hög; kompakt (t.ex. snackbarens åtgärd) 36. Fält 56 höga. */
+/** Knappar (brief 33, 39): aldrig fullbredd, pill som följer innehållet.
+ *  CTA minst 56 hög med sidpadding 28 (två CTA:er ryms på en rad);
+ *  kompakt (t.ex. snackbarens åtgärd) 36. Fält 56 höga. */
 export const control = {
   ctaHeight: 56,
-  ctaPaddingX: 44,
+  ctaPaddingX: 28,
   compactHeight: 36,
   compactPaddingX: 16,
   fieldHeight: 56,

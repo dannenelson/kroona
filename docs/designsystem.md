@@ -189,6 +189,7 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.
 - Steget sätter `swipeToClose: false` (listan skrollar) och kan ha `onClose` för en sammanfattande snackbar när lagret stängs.
+- **Sheet-footer och blur (brief 39):** `SheetContent` tar `header` (fasta element under titeln), `footer` (CTA) och `edgeToEdge` (barnet är en skrollande lista). Innehållet skrollar bakom header, fasta element och CTA och blurras progressivt där med `EdgeFade` (variant `clear`, bara blur). Listan hämtar marginalerna med `useSheetInsets()`. Två CTA:er i foten ligger alltid på en rad (sekundär vänster, primär höger), centrerade som grupp, `spacing.sm` emellan; knapparnas sidpadding är `control.ctaPaddingX` (28).
 
 ## Öppna frågor — sammanfattat
 

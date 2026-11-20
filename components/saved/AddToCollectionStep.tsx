@@ -1,17 +1,19 @@
 // "Lägg till i samling" (brief 36, skiss SheetLaggTill): Sheet-steg från
 // produktvyn och produktmenyn. Produktchip, sök bland egna samlingar och en
 // lista där varje rad växlar direkt (lägger till/tar bort, lagret står kvar).
-// "Klar" (primär) stänger; "Skapa ny samling" (sekundär) pushar Skapa samling,
+// "Klar" (primär) stänger; "Skapa ny" (sekundär) pushar Skapa samling,
 // där Spara skapar samlingen och lägger produkten i den. När lagret stängs
 // visas en sammanfattande snackbar om produkten lagts till någonstans (bara
-// borttagningar: ingen). Listan skrollar bakom den sticky CTA-ytan (brief 38).
+// borttagningar: ingen). Listan skrollar bakom produktchip/sök och CTA-ytan och
+// blurras där (brief 39).
 import { useMemo, useState } from 'react';
 import { Image, ScrollView, Text, TextInput, View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { makeStyles, typography, fonts, spacing, radius, control, listRow, snackbar as snackbarTokens, iconSize } from '../../theme';
 import { useUserCollections } from '../../context/UserCollectionsContext';
 import { PRODUCTS } from '../../data/products';
-import { SheetContent, useSheet, useSheetFooterInset, type SheetStep } from '../Sheet';
+import { SheetContent, useSheet, useSheetInsets, type SheetStep } from '../Sheet';
+import type { UserCollection } from '../../types/catalog';
 import { useSnackbar } from '../Snackbar';
 import Button from '../Button';
 import ListRow from '../ListRow';
@@ -68,7 +70,6 @@ export function useOpenAddToCollection() {
 function AddToCollectionStep({ productId, session }: { productId: string; session: Session }) {
   const styles = useStyles();
   const sheet = useSheet();
-  const footerInset = useSheetFooterInset();
   const { userCollections, addProductToCollection, removeProductFromCollection } = useUserCollections();
   const [query, setQuery] = useState('');
   const product = PRODUCTS.find((p) => p.id === productId);
@@ -101,12 +102,14 @@ function AddToCollectionStep({ productId, session }: { productId: string; sessio
   // samling sekundär. Ryms de inte på en rad staplas de centrerat, Klar överst
   // (row-reverse + wrap). Utan samlingar: bara Skapa ny samling, primär.
   const hasCollections = userCollections.length > 0;
+  // Klar (primär) och Skapa ny (sekundär) alltid på en rad, centrerade som grupp
+  // (brief 39). Utan samlingar: bara "Skapa ny samling", primär.
   const footer = hasCollections ? (
     <View style={styles.actions}>
-      <Button onPress={sheet.close}>Klar</Button>
       <Button variant="secondary" icon={PlusIcon} onPress={createNew}>
-        Skapa ny samling
+        Skapa ny
       </Button>
+      <Button onPress={sheet.close}>Klar</Button>
     </View>
   ) : (
     <Button icon={PlusIcon} onPress={createNew}>
@@ -114,8 +117,9 @@ function AddToCollectionStep({ productId, session }: { productId: string; sessio
     </Button>
   );
 
-  return (
-    <SheetContent footer={footer}>
+  // Fast överst: produktchip och sök. Listan skrollar bakom dem och blurras.
+  const header = (
+    <View>
       {product ? (
         <View style={styles.chip}>
           <Image source={{ uri: product.imageUrl }} style={styles.chipThumb} />
@@ -129,70 +133,94 @@ function AddToCollectionStep({ productId, session }: { productId: string; sessio
           </View>
         </View>
       ) : null}
+      {hasCollections ? (
+        <View style={styles.search}>
+          <FindIcon color={styles.searchIcon.color} size={iconSize.md} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Sök samlingar"
+            placeholderTextColor={styles.searchIcon.color}
+            returnKeyType="search"
+            accessibilityLabel="Sök samlingar"
+            style={styles.searchInput}
+          />
+        </View>
+      ) : null}
+    </View>
+  );
 
-      {!hasCollections ? (
+  if (!hasCollections) {
+    return (
+      <SheetContent header={header} footer={footer}>
         <Text style={styles.empty}>Du har inga samlingar än.</Text>
-      ) : (
-        <>
-          <View style={styles.search}>
-            <FindIcon color={styles.searchIcon.color} size={iconSize.md} />
-            <TextInput
-              value={query}
-              onChangeText={setQuery}
-              placeholder="Sök samlingar"
-              placeholderTextColor={styles.searchIcon.color}
-              returnKeyType="search"
-              accessibilityLabel="Sök samlingar"
-              style={styles.searchInput}
-            />
-          </View>
-          <ScrollView
-            style={styles.list}
-            contentContainerStyle={{ paddingBottom: footerInset }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            {visible.map((c) => {
-              const added = c.productIds.includes(productId);
-              const images = c.productIds
-                .map((id) => PRODUCTS.find((p) => p.id === id)?.imageUrl)
-                .filter((u): u is string => !!u)
-                .slice(0, 4);
-              return (
-                <ListRow
-                  key={c.id}
-                  compact
-                  title={c.name}
-                  subtitle={`${countLabel(c.productIds.length)}${added ? ' · redan tillagd' : ''}`}
-                  thumb={
-                    <CollectionMosaic
-                      images={images}
-                      style={[styles.thumb, { width: listRow.compactThumb, height: listRow.compactThumb }]}
-                    />
-                  }
-                  thumbRadius={radius.control}
-                  onPress={() => toggle(c.id, c.name, added)}
-                  accessibilityLabel={`${c.name}, ${added ? 'tillagd' : 'inte tillagd'}`}
-                  accessibilityState={{ checked: added }}
-                  trailing={
-                    <View style={[styles.check, added ? styles.checkOn : styles.checkOff]}>
-                      {added ? <CheckIcon color={styles.checkMark.color} size={iconSize.xs + spacing.xs} /> : null}
-                    </View>
-                  }
-                />
-              );
-            })}
-          </ScrollView>
-        </>
-      )}
+      </SheetContent>
+    );
+  }
+
+  return (
+    <SheetContent header={header} footer={footer} edgeToEdge>
+      <CollectionList productId={productId} collections={visible} onToggle={toggle} />
     </SheetContent>
+  );
+}
+
+/** Listan i lagret: skrollar hela höjden, med marginaler från SheetContent. */
+function CollectionList({
+  productId,
+  collections,
+  onToggle,
+}: {
+  productId: string;
+  collections: UserCollection[];
+  onToggle: (id: string, name: string, added: boolean) => void;
+}) {
+  const styles = useStyles();
+  const insets = useSheetInsets();
+  return (
+    <ScrollView
+      style={styles.list}
+      contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom }}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
+      {collections.map((c) => {
+        const added = c.productIds.includes(productId);
+        const images = c.productIds
+          .map((id) => PRODUCTS.find((p) => p.id === id)?.imageUrl)
+          .filter((u): u is string => !!u)
+          .slice(0, 4);
+        return (
+          <ListRow
+            key={c.id}
+            compact
+            title={c.name}
+            subtitle={`${countLabel(c.productIds.length)}${added ? ' · redan tillagd' : ''}`}
+            thumb={
+              <CollectionMosaic
+                images={images}
+                style={[styles.thumb, { width: listRow.compactThumb, height: listRow.compactThumb }]}
+              />
+            }
+            thumbRadius={radius.control}
+            onPress={() => onToggle(c.id, c.name, added)}
+            accessibilityLabel={`${c.name}, ${added ? 'tillagd' : 'inte tillagd'}`}
+            accessibilityState={{ checked: added }}
+            trailing={
+              <View style={[styles.check, added ? styles.checkOn : styles.checkOff]}>
+                {added ? <CheckIcon color={styles.checkMark.color} size={iconSize.xs + spacing.xs} /> : null}
+              </View>
+            }
+          />
+        );
+      })}
+    </ScrollView>
   );
 }
 
 const useStyles = makeStyles((t) => ({
   actions: {
-    flexDirection: 'row-reverse',
-    flexWrap: 'wrap',
+    flexDirection: 'row',
     justifyContent: 'center',
     gap: spacing.sm,
   },
@@ -248,9 +276,6 @@ const useStyles = makeStyles((t) => ({
   },
   list: {
     flex: 1,
-    marginTop: spacing.sm,
-    // Raderna har egen sidmarginal; listan går kant i kant med lagret.
-    marginHorizontal: -spacing.screenMargin,
   },
   thumb: {
     borderRadius: radius.control,
