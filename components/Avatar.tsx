@@ -1,10 +1,12 @@
-import { Text, View, type StyleProp, type ViewStyle } from 'react-native';
+import { Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 import { makeStyles, typography, fonts, radius } from '../theme';
 
 type Props = {
   initial: string;
   size: number;
   style?: StyleProp<ViewStyle>;
+  /** Typografi för initialerna när standardstegen inte passar (t.ex. Hem-toppen, brief 51). */
+  initialStyle?: StyleProp<TextStyle>;
 };
 
 /**
@@ -12,13 +14,13 @@ type Props = {
  * riktiga bilder finns. Yta `surfaceRaised`; texten skalar med storleken
  * (`micro` under 32, `body` för små, `title1` från 64 och uppåt).
  */
-export default function Avatar({ initial, size, style }: Props) {
+export default function Avatar({ initial, size, style, initialStyle }: Props) {
   const styles = useStyles();
   const large = size >= LARGE;
   const tiny = size < SMALL;
   return (
     <View style={[styles.circle, { width: size, height: size }, style]}>
-      <Text style={large ? styles.textLarge : tiny ? styles.textTiny : styles.text}>{initial}</Text>
+      <Text style={[large ? styles.textLarge : tiny ? styles.textTiny : styles.text, initialStyle]}>{initial}</Text>
     </View>
   );
 }

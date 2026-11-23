@@ -48,7 +48,7 @@ export const sheetCard = {
  *  Text på bilden; toning över nedre `fadeShare`, blur över nedre `blurShare`.
  *  `mix` (Skapat för dig) och `collage` (Populära samlingar) är härledda format. */
 export const editorialCard = {
-  portraitLarge: { width: 280, height: 373 },
+  portraitLarge: { width: 240, height: 320 }, // 280 × 373 före brief 51
   portraitSmall: { width: 150, height: 225 },
   landscape: { width: 320, height: 213 },
   mix: { width: 160, height: 160 },
@@ -79,9 +79,9 @@ export const editorialCard = {
  *  bredd, högst `maxHeight` hög. */
 export const logo = {
   plateShare: 0.6,
-  largeShare: 0.6,
-  smallShare: 0.75,
-  maxHeight: 36,
+  largeShare: 0.65, // brief 51 (0,6 i brief 47)
+  smallShare: 0.85, // brief 51 (0,75 i brief 47)
+  maxHeight: 72, // brief 51 (36 i brief 47)
   /** Logotypcirkeln i Partnerdetaljens huvud. */
   headerCircle: 64,
 } as const;
@@ -100,11 +100,11 @@ export const tabBar = {
   sideInset: 18,
 } as const;
 
-/** Hem-toppen (brief 46, 49): toppraden 44, avatar 32, logotyp 12 (™ visas från 40),
+/** Hem-toppen (brief 46, 49, 51): toppraden 44, avatar 40, logotyp 12 (™ visas från 40),
  *  filterpillar 36. */
 export const homeHeader = {
   rowHeight: 44,
-  avatar: 32,
+  avatar: 40, // 32 före brief 51
   logoHeight: 12,
   logoTrademarkMinHeight: 40,
   filterPillHeight: 36,

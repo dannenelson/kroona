@@ -25,7 +25,7 @@ export const typography = {
   /** Hälsningen på Hem (brief 46). */
   greeting: { fontFamily: fonts.display600, fontSize: 28, lineHeight: 32 },
   /** Redaktionella kort (brief 43): titel på bild, stor stående / liggande / liten. */
-  editorialLarge: { fontFamily: fonts.display600, fontSize: 22, lineHeight: 26 },
+  editorialLarge: { fontFamily: fonts.display600, fontSize: 20, lineHeight: 24 }, // 22/26 före brief 51
   editorialMedium: { fontFamily: fonts.display600, fontSize: 18, lineHeight: 22 },
   editorialSmall: { fontFamily: fonts.display600, fontSize: 16, lineHeight: 20 },
 } satisfies Record<string, TypeStyle>;

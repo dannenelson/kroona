@@ -27,7 +27,16 @@ export default function Header() {
         <View style={[StyleSheet.absoluteFill, styles.center]} pointerEvents="none">
           <KroonaLogo height={homeHeader.logoHeight} />
         </View>
-        <Avatar initial={DUMMY_USER.initials} size={homeHeader.avatar} />
+        {/* Avatar 40 (brief 51), träffyta 44 via hitSlop. Profilskärmen för
+            användaren finns inte än (Fas 0): trycket gör ingenting. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Profil, ${DUMMY_USER.name}`}
+          hitSlop={(touchTarget - homeHeader.avatar) / 2}
+          onPress={() => {}}
+        >
+          <Avatar initial={DUMMY_USER.initials} size={homeHeader.avatar} initialStyle={styles.initials} />
+        </Pressable>
         {/* Notisskärmen finns inte än (Fas 0): trycket gör ingenting. */}
         <Pressable
           style={styles.bell}
@@ -67,6 +76,10 @@ const useStyles = makeStyles((t) => ({
     justifyContent: 'center',
     // Ikonens kant (inte träffytans) linjerar med skärmmarginalen.
     marginRight: -(touchTarget - iconSize.lg) / 2,
+  },
+  // Initialerna skalas upp med avataren (body 15 vid 32 → headline 17 vid 40).
+  initials: {
+    ...typography.headline,
   },
   greeting: {
     ...typography.greeting,

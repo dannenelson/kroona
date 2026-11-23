@@ -140,29 +140,32 @@ export default function ComponentsScreen() {
               </View>
             ))}
           </View>
-          <View style={styles.logoGrid}>
-            <EditorialCard
-              variant="portraitLarge"
-              title="Skandinavisk stil"
-              subtitle="Av Kroona · 11 produkter"
-              imageUrl={P3.imageUrl}
-              logo={ALL_COLLECTION_LOGO_FILES[2].Logo}
-            />
-            <EditorialCard
-              variant="portraitSmall"
-              title="Begagnad mode"
-              subtitle="12 produkter"
-              imageUrl={P3.imageUrl}
-              logo={ALL_COLLECTION_LOGO_FILES[3].Logo}
-            />
-            <EditorialCard
-              variant="landscape"
-              title="Smarta hem"
-              subtitle="8 produkter"
-              imageUrl={P1.imageUrl}
-              logo={ALL_COLLECTION_LOGO_FILES[5].Logo}
-            />
-          </View>
+          {/* Alla sex samlingslogotyper på stort, litet och liggande kort (brief 51). */}
+          {ALL_COLLECTION_LOGO_FILES.map(({ name, Logo }, i) => (
+            <ScrollView key={name} horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.logoGrid}>
+              <EditorialCard
+                variant="portraitLarge"
+                title={name}
+                subtitle="Av Kroona · 6 produkter"
+                imageUrl={PRODUCTS[i % PRODUCTS.length].imageUrl}
+                logo={Logo}
+              />
+              <EditorialCard
+                variant="portraitSmall"
+                title={name}
+                subtitle="6 produkter"
+                imageUrl={PRODUCTS[(i + 6) % PRODUCTS.length].imageUrl}
+                logo={Logo}
+              />
+              <EditorialCard
+                variant="landscape"
+                title={name}
+                subtitle="6 produkter"
+                imageUrl={PRODUCTS[(i + 12) % PRODUCTS.length].imageUrl}
+                logo={Logo}
+              />
+            </ScrollView>
+          ))}
         </Section>
 
         <Section title="0 · Press (jämför)">

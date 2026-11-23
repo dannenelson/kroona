@@ -153,7 +153,7 @@ Layout sker med `gap`, aldrig `marginRight` eller `marginBottom` på enskilda ko
 | `lifted` | 16 | lyft kort i kontextmeny, flödesbilder |
 | `collection` | 18 | samlingskort, jämförelse |
 | `bubble` | 20 | chattbubbla (6 nere höger) |
-| `editorialLarge` | 24 | redaktionellt kort, stor stående (brief 43) |
+| `editorialLarge` | 22 | redaktionellt kort, stor stående (brief 43; 24 → 22 i brief 51) |
 | `editorialMedium` | 20 | redaktionellt kort, liggande och kollagekort (brief 43) |
 | `editorialSmall` | 16 | redaktionellt kort, liten stående och mixkort (brief 43) |
 | `full` | 999 | pillar (34 hög) och cirklar (glasknapp 44, sökfält 50, varumärke) |
@@ -238,13 +238,13 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 ## 8j. Korttyper och Hem (brief 43)
 - **Två sorters bildkort.** **Redaktionella kort** (samlingar, mixar, områden, fortsätt-kort, `components/EditorialCard.tsx`): **text på bilden**, med mörk toning (#0E1014, 0 → 56 % → 78 %) över nedre 58 % och **äkta blur** (ca 12 px, fyra maskade BlurView-lager à 25 % så att den byggs upp gradvis) över nedre 48 %. Små kort (liten stående, mix, kollage) har bara toning (0 → 50 → 76 % över 56 %). **Produktkort är oförändrade:** text under bilden, `radius.card` 14, pris och betyg aldrig på foto.
 - **Textregel:** stående kort har **centrerad** text, liggande **vänsterställd** (valfri statusrad ovanför titeln). Titel max 2 rader med ellipsis; undertitel 1 rad, vit 76 % (`overlay.onPhotoMuted`).
-- **Format** (`editorialCard` i `theme/spacing.ts`): stor stående 280 × 373 (3:4), radie 24, titel 22/26; liten stående 150 × 225 (2:3), radie 16, titel 16/20, undertitel 12; liggande 320 × 213 (3:2), radie 20, titel 18/22, undertitel 13. Härledda: mix 160 × 160 (2 × 2-mosaik, radie 16), kollage 200 × 267 (en bred bild över två små, glaschip med kurator överst till vänster, radie 20). **Radien skalar med storleken**, squircle.
+- **Format** (`editorialCard` i `theme/spacing.ts`): stor stående **240 × 320** (3:4), radie **22**, titel **20/24** (brief 51; tidigare 280 × 373, 24, 22/26, ca 1,5 kort syns); liten stående 150 × 225 (2:3), radie 16, titel 16/20, undertitel 12; liggande 320 × 213 (3:2), radie 20, titel 18/22, undertitel 13. Härledda: mix 160 × 160 (2 × 2-mosaik, radie 16), kollage 200 × 267 (en bred bild över två små, glaschip med kurator överst till vänster, radie 20). **Radien skalar med storleken**, squircle.
 - **Kant:** en 1 px inre linje ovanpå bilden (`colors.imageEdge`: vit 12 % mörkt, mörk 10 % ljust), aldrig dubbel kant. Utan bild: `placeholder`-yta, texten ligger kvar på toningen.
 - **Cirkel = identitet:** varumärken och personer (76 px, namn under). Aldrig cirklar för samlingar eller innehåll.
 - **Hem, ordning** (32 px mellan hyllorna, rubrik `SectionTitle`): Fortsätt där du var (liggande) · Skapat för dig (mix) · Samlingar för dig (stor stående) · Fler i din stil (cirklar) · Områden (liten stående) · Populära samlingar (kollage) · Kanske intressant för dig (produktkort). En hylla utan innehåll döljs, aldrig tom rubrik.
 
 ## 8k. Hem-topp och nedre menyn (brief 46, justerad i brief 49)
-- **Toppraden** 44 hög (`homeHeader`), skärmmarginal: avatar 32 med initialer (`DUMMY_USER` i `data/user.ts`) till vänster, **Kroona-logotypen 12 hög absolut centrerad** (18 i brief 46) (eget lager över raden, oberoende av sidoelementens bredd, ™ visas först från 40 px), notisikon 24 i en 44 × 44 träffyta till höger (ikonens kant linjerar med marginalen).
+- **Toppraden** 44 hög (`homeHeader`), skärmmarginal: avatar **40** (brief 51, förut 32) med initialer i `headline` och träffyta 44 (hitSlop) (`DUMMY_USER` i `data/user.ts`) till vänster, **Kroona-logotypen 12 hög absolut centrerad** (18 i brief 46) (eget lager över raden, oberoende av sidoelementens bredd, ™ visas först från 40 px), notisikon 24 i en 44 × 44 träffyta till höger (ikonens kant linjerar med marginalen).
 - **Hälsning** under raden: "God morgon / God eftermiddag / God kväll, Daniel" (05–11 / 12–17 / övrigt), `typography.greeting` (Familjen Grotesk 600, 28/32), `textPrimary`.
 - **Avstånd:** toppraden → hälsning 24 (8 i brief 46), hälsning → pillar 16, pillar → AskBar 16 (`gap`).
 - **Nedre menyn (brief 49, 50):** flikraden 56 hög (`tabBar.rowHeight`), **ikon 32** (`tabBar.iconSize`, en lokal siffra, synlig glyf ca 23; 24 före brief 50, `iconSize.lg` oförändrad), ikon → etikett 3, sidomarginal **18** (`tabBar.sideInset`; 28 i brief 49, 8 innan) så att de fyra flikarna (80 breda, jämnt fördelade) samlas. Etikettblockets underkant **36 från skärmkanten** med safe area nedtill (`tabBar.labelBottom`), **24** utan safe area (`tabBar.labelBottomNoInset`). Raden räknas från etiketten, så en större ikon växer uppåt: med ikon 32 ligger radens underkant 32,5 (20,5 utan safe area). Kantblurren nedtill är oförändrad (128, samma stopp). Skärmarnas nedre utrymme: `tabBarSpace(insets.bottom)` = radens avstånd + 56 + 8 (96,5 resp. 84,5 med ikon 32).
