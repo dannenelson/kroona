@@ -16,6 +16,7 @@ import { useUserCollections } from '../../context/UserCollectionsContext';
 import { ALL_SAVED_ID, ALL_SAVED_NAME } from '../../context/UserCollectionsContext';
 import { useSavedProducts } from '../../context/SavedProductsContext';
 import { PRODUCTS } from '../../data/products';
+import { sortByName } from '../../lib/sortByName';
 import { SheetContent, SheetScrollView, useSheet, useSheetInsets, type SheetStep } from '../Sheet';
 import { useSnackbar } from '../Snackbar';
 import ListRow from '../ListRow';
@@ -157,7 +158,7 @@ function SaveList({ productId, session }: { productId: string; session: Session 
         accessibilityState={{ checked: liked }}
         trailing={check(liked)}
       />
-      {userCollections.map((c) => {
+      {sortByName(userCollections, (c) => c.name).map((c) => {
         const added = c.productIds.includes(productId);
         const images = c.productIds
           .map((id) => PRODUCTS.find((p) => p.id === id)?.imageUrl)

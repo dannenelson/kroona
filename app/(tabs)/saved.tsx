@@ -19,6 +19,7 @@ import { useFollowedPeople } from '../../context/FollowedPeopleContext';
 import { getPerson } from '../../data/people';
 import { ALL_SAVED_ID, ALL_SAVED_NAME, useUserCollections } from '../../context/UserCollectionsContext';
 import { PRODUCTS } from '../../data/products';
+import { sortByName } from '../../lib/sortByName';
 import {
   ALL_COLLECTIONS,
   getCollectionProducts,
@@ -101,6 +102,8 @@ export default function SavedScreen() {
   const snackbar = useSnackbar();
   const { savedProducts } = useSavedProducts();
   const { userCollections } = useUserCollections();
+  // A–Ö i svensk ordning vid visning (brief 42); Gillade produkter ligger fast först.
+  const sortedCollections = useMemo(() => sortByName(userCollections, (c) => c.name), [userCollections]);
   const [tab, setTab] = useState<(typeof TABS)[number]>('Mina samlingar');
   const [viewMode, setViewMode] = useViewMode();
   const openCreate = () => sheet.open(createCollectionStep);
@@ -145,7 +148,7 @@ export default function SavedScreen() {
               <View>
                 <LikedRow subtitle={likedSubtitle} />
                 <View style={styles.divider} />
-                {userCollections.map((c) => (
+                {sortedCollections.map((c) => (
                   <CollectionListRow
                     key={c.id}
                     id={c.id}
@@ -167,7 +170,7 @@ export default function SavedScreen() {
                   width={cardWidth}
                   cover={<LikedTile size={cardWidth} tileRadius={radius.collection} large />}
                 />
-                {userCollections.map((c) => (
+                {sortedCollections.map((c) => (
                   <UserCollectionCard
                     key={c.id}
                     id={c.id}
@@ -274,7 +277,7 @@ function FollowingTab() {
   const { followedCollectionIds, toggleFollowed } = useFollowedCollections();
   const { followedPeopleIds, toggleFollowPerson } = useFollowedPeople();
   const people = useMemo(
-    () => followedPeopleIds.map(getPerson).filter((p): p is Person => !!p),
+    () => sortByName(followedPeopleIds.map(getPerson).filter((p): p is Person => !!p), (p) => p.name),
     [followedPeopleIds],
   );
 
@@ -293,7 +296,8 @@ function FollowingTab() {
       const r = retailerId ? getRetailer(retailerId) : undefined;
       if (r && r.retailerType === 'brand') brandMap.set(r.id, r);
     }
-    return { brands: [...brandMap.values()], collections: cols };
+    // A–Ö (brief 42); "Visa alla" visar då de tre första alfabetiskt först.
+    return { brands: sortByName([...brandMap.values()], (r) => r.name), collections: sortByName(cols, (c) => c.name) };
   }, [followedCollectionIds]);
 
   if (brands.length === 0 && people.length === 0 && collections.length === 0) {
