@@ -38,6 +38,7 @@ import {
   PROFILE_BOUNDARY_GROUP,
 } from '../../components/product/productTransition';
 import Avatar from '../../components/Avatar';
+import BrandLogo from '../../components/BrandLogo';
 import TextTabs from '../../components/TextTabs';
 import IconButton from '../../components/IconButton';
 import Button from '../../components/Button';
@@ -390,7 +391,7 @@ function Section<T>({ title, items, render }: { title: string; items: T[]; rende
   );
 }
 
-/** Varumärke som rad: rund avatar 48 (initialer), zoom till Partnerdetalj. */
+/** Varumärke som rad: rund avatar 48 (logotyp på platta, annars initialer, brief 47), zoom till Partnerdetalj. */
 function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subtitle: string; onUnfollow: () => void }) {
   const router = useRouter();
   const b = `${retailer.id}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
@@ -400,7 +401,7 @@ function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subt
       title={retailer.name}
       subtitle={subtitle}
       compact
-      thumb={<Avatar initial={retailer.initial} size={size} />}
+      thumb={<BrandLogo retailerId={retailer.id} initial={retailer.initial} size={size} />}
       thumbRadius={size / 2}
       boundary={{ id: b, group: PARTNER_BOUNDARY_GROUP }}
       onPress={() => router.push({ pathname: '/partner/[id]', params: { id: retailer.id, b } })}

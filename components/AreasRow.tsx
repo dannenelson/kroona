@@ -4,6 +4,7 @@ import { AREAS } from '../data/areas';
 import { getProductsForArea } from '../lib/catalog';
 import SectionTitle from './SectionTitle';
 import EditorialCard from './EditorialCard';
+import { COLLECTION_LOGOS } from '../data/logos';
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
 
@@ -29,6 +30,7 @@ export default function AreasRow() {
             title={area.name}
             subtitle={countLabel(products.length)}
             imageUrl={products[0]?.imageUrl}
+            logo={COLLECTION_LOGOS[area.id]}
           />
         ))}
       </ScrollView>

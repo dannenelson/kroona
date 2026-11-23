@@ -16,7 +16,8 @@ import Transition, { useScreenAnimation } from 'react-native-screen-transitions'
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay } from '../../theme';
+import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay, logo } from '../../theme';
+import BrandLogo from '../../components/BrandLogo';
 import { getProductsForRetailer, getRetailer } from '../../lib/catalog';
 import {
   getRetailerCoverImage,
@@ -120,6 +121,8 @@ export default function PartnerScreen() {
             locations={overlay.scrimStops.locations}
             style={styles.coverScrim}
           >
+            {/* Logotyp på platta ovanför namnet, om varumärket har en (brief 47). */}
+            <BrandLogo retailerId={retailer.id} size={logo.headerCircle} />
             <Text style={styles.coverName} numberOfLines={2}>
               {retailer.name}
             </Text>
@@ -224,6 +227,8 @@ const useStyles = makeStyles((t) => ({
     bottom: 0,
     height: '45%',
     justifyContent: 'flex-end',
+    alignItems: 'flex-start',
+    gap: spacing.md,
     paddingHorizontal: spacing.screenMargin,
     paddingBottom: spacing.xl,
   },

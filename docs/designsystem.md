@@ -208,6 +208,12 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
   2. Importera den: `import XSvg from '../assets/svg/icons/<namn>.svg'`.
   3. Rita `<XSvg width={size} height={size} color={colors.textPrimary} />` (eller gör en liten wrapper som `NotificationIcon` när den används på 2+ ställen).
 
+## 18. Logotyper: BrandLogo, logoPlate och samlingslogotyp (tillagt 2026-11-23, brief 47)
+- **Tillfälligt demomaterial:** `assets/dummy/logos/retailers/*.svg` och `assets/dummy/logos/collections/*.svg` (90 × 45-ram, transparent). Register i `data/logos.ts`: `RETAILER_LOGOS` (retailer-id → logotyp) och `COLLECTION_LOGOS` (samlings- eller områdes-id → logotyp). Filerna behåller sina egna färger (ingen `currentColor`).
+- **`BrandLogo`** (`components/BrandLogo.tsx`, `retailerId`, `size`, `initial`, `shape: 'circle' | 'plate'`): logotypen på en **mörk platta** `overlay.logoPlate` (ink850, samma i båda teman eftersom flera logotyper är vita) med 1 px kant `overlay.logoPlateEdge` (vit 12 %). Logotypen tar `logo.plateShare` (60 %) av bredden, proportionen bevaras. Saknas logotyp: initialavatar (`Avatar`). `hasBrandLogo(id)` för att välja.
+- **Var:** cirklar i "Fler i din stil" (`ProfileCard` 76), Partnerdetaljens huvud (cirkel `logo.headerCircle` 64 ovanför namnet), varumärkesrader i Sparat → Följer (48), och `PartnerCard` variant `brand` (platta 2:1 i stället för namnet; namnet blir tillgänglighetsetikett).
+- **Samlingslogotyp på kort:** `EditorialCard` tar `logo` (vit). Den ersätter titeln, ovanpå toningen: stående centrerad, liggande vänsterställd, bredd `logo.largeShare` 60 % (stor/liggande) / `logo.smallShare` 75 % (liten) men högst `logo.maxHeight` 36 hög. Undertiteln ligger kvar; titeln blir tillgänglighetsetikett. Används i "Samlingar för dig" och "Områden" via `COLLECTION_LOGOS`.
+
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.
 - Steget sätter `swipeToClose: false` (listan skrollar) och kan ha `onClose` för en sammanfattande snackbar när lagret stängs.

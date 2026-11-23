@@ -126,6 +126,10 @@ export const overlay = {
     ] as [string, string, ...string[]],
     locations: [0, 0.4, 0.65, 1] as [number, number, ...number[]],
   },
+  /** Platta bakom återförsäljarlogotyper (brief 47): samma mörka yta i båda
+   *  teman (ink850), eftersom flera logotyper är vita. Kant vit 12 %. */
+  logoPlate: raw.ink850,
+  logoPlateEdge: 'rgba(255,255,255,0.12)',
   /** Undertext på foto (redaktionella kort, brief 43): vit 76 %. */
   onPhotoMuted: 'rgba(255,255,255,0.76)',
   /** Toning i botten av redaktionella kort (brief 43), mörk #0E1014. */

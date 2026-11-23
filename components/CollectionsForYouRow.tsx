@@ -12,6 +12,7 @@ import {
 import { COLLECTION_BOUNDARY_GROUP } from './product/productTransition';
 import SectionTitle from './SectionTitle';
 import EditorialCard from './EditorialCard';
+import { COLLECTION_LOGOS } from '../data/logos';
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
 
@@ -47,6 +48,7 @@ function CollectionItem({ collection }: { collection: Collection }) {
       title={collection.name}
       subtitle={`Av ${getCurator(collection).name} · ${countLabel(getCollectionProducts(collection).length)}`}
       imageUrl={collection.imageUrl}
+      logo={COLLECTION_LOGOS[collection.id]}
       boundary={{ id: boundaryId, group: COLLECTION_BOUNDARY_GROUP }}
       onPress={() => router.push({ pathname: '/collection/[id]', params: { id: collection.id, b: boundaryId } })}
     />

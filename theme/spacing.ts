@@ -74,6 +74,18 @@ export const editorialCard = {
   chipAvatar: 20,
 } as const;
 
+/** Logotyper (brief 47). Återförsäljare: logotypen tar `plateShare` av plattans
+ *  bredd. Samlingar på EditorialCard: `largeShare` / `smallShare` av kortets
+ *  bredd, högst `maxHeight` hög. */
+export const logo = {
+  plateShare: 0.6,
+  largeShare: 0.6,
+  smallShare: 0.75,
+  maxHeight: 36,
+  /** Logotypcirkeln i Partnerdetaljens huvud. */
+  headerCircle: 64,
+} as const;
+
 /** Nedre menyn (brief 46, 49). Etikettblockets underkant ligger `labelBottom`
  *  (36) från skärmkanten på enheter med safe area nedtill, `labelBottomNoInset`
  *  (24) utan. Flikraden har `sideInset` (28) sidomarginal så att flikarna samlas. */

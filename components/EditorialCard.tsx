@@ -13,7 +13,9 @@ import {
   overlay,
   edgeBlur,
   editorialCard,
+  logo as logoTokens,
 } from '../theme';
+import { LOGO_ASPECT, type LogoComponent } from '../data/logos';
 
 // Paketets klasstyper passar inte React 19:s JSX-typer (samma som i EdgeFade).
 const MaskedView = MaskedViewClass as unknown as ComponentType<ViewProps & { maskElement: ReactElement }>;
@@ -33,6 +35,8 @@ type Props = {
   chip?: ReactNode;
   /** Härlett format (mix, kollage): annan storlek och radie, samma text som varianten. */
   size?: { width: number; height: number; radius: number };
+  /** Vit logotyp som ersätter titeln (brief 47); titeln blir tillgänglighetsetikett. */
+  logo?: LogoComponent;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
   boundary?: { id: string; group: string };
   onPress?: () => void;
@@ -64,6 +68,7 @@ export default function EditorialCard({
   boundary,
   onPress,
   accessibilityLabel,
+  logo: Logo,
 }: Props) {
   const styles = useStyles();
   const press = useCardPress();
@@ -123,6 +128,14 @@ export default function EditorialCard({
             {status}
           </Text>
         ) : null}
+        {Logo ? (
+          // Logotypen: ca 60 % (stor) / 75 % (liten) av kortets bredd, högst 36 hög.
+          <Logo
+            width={Math.min(width * (v.small ? logoTokens.smallShare : logoTokens.largeShare), logoTokens.maxHeight * LOGO_ASPECT)}
+            height={Math.min((width * (v.small ? logoTokens.smallShare : logoTokens.largeShare)) / LOGO_ASPECT, logoTokens.maxHeight)}
+            style={!v.centered && styles.logoStart}
+          />
+        ) : (
         <Text
           style={[
             variant === 'portraitLarge' ? styles.titleLarge : variant === 'landscape' ? styles.titleMedium : styles.titleSmall,
@@ -132,6 +145,7 @@ export default function EditorialCard({
         >
           {title}
         </Text>
+        )}
         {subtitle ? (
           <Text style={[v.small ? styles.subtitleSmall : styles.subtitle, v.centered && styles.centered]} numberOfLines={1}>
             {subtitle}
@@ -218,6 +232,9 @@ const useStyles = makeStyles((t) => ({
   },
   centered: {
     textAlign: 'center',
+  },
+  logoStart: {
+    alignSelf: 'flex-start',
   },
   status: {
     ...typography.caption,

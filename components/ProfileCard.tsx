@@ -10,6 +10,7 @@ import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import FollowIcon from '../assets/icons/FollowIcon';
 import ChevronIcon from '../assets/icons/ChevronIcon';
 import { makeStyles, typography, fonts, spacing, radius } from '../theme';
+import BrandLogo, { hasBrandLogo } from './BrandLogo';
 
 const SIZE = 76;
 
@@ -39,7 +40,10 @@ export default function ProfileCard({ name, initial, partnerId, personId }: Prop
     if (partnerId) router.push({ pathname: '/partner/[id]', params: { id: partnerId, b: boundaryId } });
     else if (personId) router.push({ pathname: '/profile/[id]', params: { id: personId, b: boundaryId } });
   };
-  const circle = (
+  // Varumärke med logotyp (brief 47): logotypen på mörk platta i stället för initialer.
+  const circle = hasBrandLogo(partnerId) ? (
+    <BrandLogo retailerId={partnerId} size={SIZE} style={styles.logoCircle} />
+  ) : (
     <View style={styles.circle}>
       <Text style={styles.initial}>{initial}</Text>
     </View>
@@ -107,6 +111,9 @@ const useStyles = makeStyles((t) => ({
     borderColor: t.colors.border,
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: spacing.sm,
+  },
+  logoCircle: {
     marginBottom: spacing.sm,
   },
   initial: {

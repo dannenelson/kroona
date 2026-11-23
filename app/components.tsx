@@ -5,7 +5,7 @@ import { useState, type ReactNode } from 'react';
 import { View, Text, ScrollView, ImageBackground, Image } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, touchTarget, iconSize } from '../theme';
+import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, touchTarget, iconSize, logo } from '../theme';
 import { PRODUCTS } from '../data/products';
 import IconButton from '../components/IconButton';
 import Pill from '../components/Pill';
@@ -15,6 +15,8 @@ import TopBar from '../components/TopBar';
 import EdgeFade from '../components/EdgeFade';
 import KroonaLogo from '../components/KroonaLogo';
 import NotificationIcon from '../components/NotificationIcon';
+import EditorialCard from '../components/EditorialCard';
+import { ALL_RETAILER_LOGO_FILES, ALL_COLLECTION_LOGO_FILES, LOGO_ASPECT } from '../data/logos';
 import { setGestureDebug, useGestureDebug } from '../utils/devGestureDebug'; // TEMP-DEBUG-GEST
 import BackIcon from '../assets/icons/BackIcon';
 import MenuIcon from '../assets/icons/MenuIcon';
@@ -109,6 +111,57 @@ export default function ComponentsScreen() {
             <NotificationIcon size={iconSize.md} />
             <NotificationIcon />
             <NotificationIcon color={colors.textSecondary} />
+          </View>
+        </Section>
+
+        <Section title="Logotyper (dummy, brief 47)">
+          <Caption>Återförsäljare på mörk platta (samma i båda teman): cirkel 76 och 48, och platta på kort.</Caption>
+          <View style={styles.logoGrid}>
+            {ALL_RETAILER_LOGO_FILES.map(({ name, Logo }) => (
+              <View key={name} style={styles.logoCell}>
+                <View style={[styles.logoPlate, styles.logoCircle76]}>
+                  <Logo width={76 * logo.plateShare} height={(76 * logo.plateShare) / LOGO_ASPECT} />
+                </View>
+                <View style={[styles.logoPlate, styles.logoCircle48]}>
+                  <Logo width={48 * logo.plateShare} height={(48 * logo.plateShare) / LOGO_ASPECT} />
+                </View>
+                <Text style={styles.caption}>{name}</Text>
+              </View>
+            ))}
+          </View>
+          <Caption>Samlingar (vita, över foto): på mörkt, på ljust foto, och på stort och litet kort.</Caption>
+          <View style={styles.logoGrid}>
+            {ALL_COLLECTION_LOGO_FILES.map(({ name, Logo }) => (
+              <View key={name} style={styles.logoCell}>
+                <ImageBackground source={PHOTOS[0].source} style={styles.logoPhoto}>
+                  <Logo width={72} height={36} />
+                </ImageBackground>
+                <Text style={styles.caption}>{name}</Text>
+              </View>
+            ))}
+          </View>
+          <View style={styles.logoGrid}>
+            <EditorialCard
+              variant="portraitLarge"
+              title="Skandinavisk stil"
+              subtitle="Av Kroona · 11 produkter"
+              imageUrl={P3.imageUrl}
+              logo={ALL_COLLECTION_LOGO_FILES[2].Logo}
+            />
+            <EditorialCard
+              variant="portraitSmall"
+              title="Begagnad mode"
+              subtitle="12 produkter"
+              imageUrl={P3.imageUrl}
+              logo={ALL_COLLECTION_LOGO_FILES[3].Logo}
+            />
+            <EditorialCard
+              variant="landscape"
+              title="Smarta hem"
+              subtitle="8 produkter"
+              imageUrl={P1.imageUrl}
+              logo={ALL_COLLECTION_LOGO_FILES[5].Logo}
+            />
           </View>
         </Section>
 
@@ -369,6 +422,40 @@ const useStyles = makeStyles((t) => ({
   },
   captionOnPhoto: {
     color: overlay.onPhoto, // på foto: fast vit i båda teman
+  },
+  // Provyta logotyper (brief 47). Lokala provmått, inte produktmått.
+  logoGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  logoCell: {
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  logoPlate: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: overlay.logoPlate,
+    borderWidth: 1,
+    borderColor: overlay.logoPlateEdge,
+    borderRadius: radius.full,
+  },
+  logoCircle76: {
+    width: 76,
+    height: 76,
+  },
+  logoCircle48: {
+    width: 48,
+    height: 48,
+  },
+  logoPhoto: {
+    width: 100,
+    height: 64,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: radius.card,
+    overflow: 'hidden',
   },
   pressRow: {
     flexDirection: 'row',

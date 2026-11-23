@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { LinearGradient } from 'expo-linear-gradient';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius } from '../theme';
+import { makeStyles, overlay, typography, fonts, letterSpacing, spacing, radius, logo } from '../theme';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import { useCardPress } from '../hooks/useCardPress';
 import { type ContextMenuItem } from './ProductContextMenu';
@@ -12,6 +12,7 @@ import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import { useSnackbar } from './Snackbar';
 import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from './product/productTransition';
 import FollowIcon from '../assets/icons/FollowIcon';
+import BrandLogo, { hasBrandLogo } from './BrandLogo';
 import ChevronIcon from '../assets/icons/ChevronIcon';
 import ShareIcon from '../assets/icons/ShareIcon';
 
@@ -79,7 +80,13 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
         // Varumärken: ingen tag-rad ("Varumärke" gav aldrig
         // differentierande värde). Namnet får istället en stor,
         // bold behandling, mer wordmark/logotyp än etikett.
-        <Text style={styles.brandName}>{name}</Text>
+        // Har varumärket en logotyp (brief 47) ersätter den namnet, på platta;
+        // namnet är kvar som tillgänglighetsetikett på kortet.
+        hasBrandLogo(partnerId) ? (
+          <BrandLogo retailerId={partnerId} size={width * logo.plateShare} shape="plate" />
+        ) : (
+          <Text style={styles.brandName}>{name}</Text>
+        )
       ) : (
         <>
           <Text style={styles.tag}>{tag}</Text>
