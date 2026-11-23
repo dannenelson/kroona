@@ -5,7 +5,7 @@ import { useState, type ReactNode } from 'react';
 import { View, Text, ScrollView, ImageBackground, Image } from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, touchTarget } from '../theme';
+import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, touchTarget, iconSize } from '../theme';
 import { PRODUCTS } from '../data/products';
 import IconButton from '../components/IconButton';
 import Pill from '../components/Pill';
@@ -13,6 +13,8 @@ import TextTabs from '../components/TextTabs';
 import ProductCard from '../components/ProductCard';
 import TopBar from '../components/TopBar';
 import EdgeFade from '../components/EdgeFade';
+import KroonaLogo from '../components/KroonaLogo';
+import NotificationIcon from '../components/NotificationIcon';
 import { setGestureDebug, useGestureDebug } from '../utils/devGestureDebug'; // TEMP-DEBUG-GEST
 import BackIcon from '../assets/icons/BackIcon';
 import MenuIcon from '../assets/icons/MenuIcon';
@@ -31,6 +33,8 @@ const PHOTOS = [
   { label: 'mörkare foto', source: { uri: P1.imageUrl } },
 ] as const;
 const DEMO_RATING = { rating: 4.8, reviewCount: 312 };
+// Provhöjder för logotypen (brief 45): toppens storlek (ca 18–20) och större.
+const LOGO_HEIGHTS = [18, 20, 28, 40] as const;
 
 const STATES = [
   { label: 'Standard' },
@@ -47,7 +51,7 @@ export default function ComponentsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const styles = useStyles();
-  const { scheme, setScheme } = useTheme();
+  const { scheme, setScheme, colors } = useTheme();
   const [tab, setTab] = useState<Tab>('Alla');
   const [pressTab, setPressTab] = useState<(typeof PRESS_TABS)[number]>('Alla');
   const [topSaved, setTopSaved] = useState(false);
@@ -90,6 +94,21 @@ export default function ComponentsScreen() {
             <Pill selected={gestureDebug} onPress={() => setGestureDebug(!gestureDebug)}>
               {gestureDebug ? 'Gestdiagnos på' : 'Gestdiagnos av'}
             </Pill>
+          </View>
+        </Section>
+
+        <Section title="SVG · Logotyp och notisikon">
+          <Caption>
+            .svg-filer i temats textfärg (currentColor). Växla tema uppe till höger. Höjd {LOGO_HEIGHTS.join(' / ')} px;
+            ™ blir oläsligt vid liten höjd.
+          </Caption>
+          {LOGO_HEIGHTS.map((h) => (
+            <KroonaLogo key={h} height={h} />
+          ))}
+          <View style={styles.pressRow}>
+            <NotificationIcon size={iconSize.md} />
+            <NotificationIcon />
+            <NotificationIcon color={colors.textSecondary} />
           </View>
         </Section>
 

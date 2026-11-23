@@ -197,6 +197,15 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 - Används av Hems hyllor: `ContinueRow`, `MixCard` (via `MixRow`), `CollectionsForYouRow`, `AreasRow`, `PopularCollectionsRow` (kollage). Cirklar i `MoreInYourStyleRow` använder `ProfileCard`.
 - **Ligger kvar men monteras inte längre på Hem:** `ContinueDialogRow`, `CollectionRow` ("Du följer"), `DiscoverBrandsRow` (logiken delas via `useDiscoverBrandTiles`), `DiscoveryMosaicCard`, `HeroRow`, `DiscoveryPreviewCard`, `CollectionCard`.
 
+## 17. SVG-filer: ikoner och logotyper (tillagt 2026-11-23, brief 45)
+- **Konvention:** nya ikoner är `.svg`-filer under `assets/svg/icons/` (24 × 24, linjeikoner med linjetjocklek 1,8, `stroke`/`fill="currentColor"`). Logotyper ligger under `assets/logos/`. De gamla TSX-ikonerna i `assets/icons/` ersätts först när de ändå ändras.
+- **Pipeline:** Metro importerar `.svg` som React-komponent (`react-native-svg-transformer`, `metro.config.js`, typer i `types/svg.d.ts`). `.svgrrc` i roten tar bort fasta `width`/`height` (`dimensions: false`), behåller `viewBox` och byter svart (`#000`, `#000000`, `black`) mot `currentColor`. Komponenten tar då `width`, `height` och `color` (färgen ger `currentColor`). Ändras `.svgrrc` måste Metro startas med `-c`.
+- **Wrappers:** `components/KroonaLogo.tsx` (`height`, bredden från proportionen 1440:238, `color` default `textPrimary`) och `components/NotificationIcon.tsx` (`size` default `iconSize.lg`, `color` default `textPrimary`). Provyta: dev-sidan `app/components.tsx`.
+- **Lägga till en ny ikon:**
+  1. Exportera 24 × 24 med linje 1,8 och spara som `assets/svg/icons/<namn>.svg` (svart eller `currentColor`, ingen `style` på roten).
+  2. Importera den: `import XSvg from '../assets/svg/icons/<namn>.svg'`.
+  3. Rita `<XSvg width={size} height={size} color={colors.textPrimary} />` (eller gör en liten wrapper som `NotificationIcon` när den används på 2+ ställen).
+
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.
 - Steget sätter `swipeToClose: false` (listan skrollar) och kan ha `onClose` för en sammanfattande snackbar när lagret stängs.

@@ -1,0 +1,23 @@
+{
+  "dimensions": false,
+  "replaceAttrValues": {
+    "#000": "currentColor",
+    "#000000": "currentColor",
+    "black": "currentColor"
+  },
+  "svgoConfig": {
+    "plugins": [
+      {
+        "name": "preset-default",
+        "params": {
+          "overrides": {
+            "inlineStyles": { "onlyMatchedOnce": false },
+            "removeViewBox": false,
+            "removeUnknownsAndDefaults": false,
+            "convertColors": false
+          }
+        }
+      }
+    ]
+  }
+}
