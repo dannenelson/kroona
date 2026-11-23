@@ -2,7 +2,7 @@
 
 *Levande dokument. Fidelity-nivå mellan ia-karta.md (vilka skärmar finns) och designsystem.md (hur komponenterna ser ut). Grovt innehåll per skärm, journey-optimerat. Statuskoder: ✅ Klar · 🟡 Provisorisk · 🚧 Pågående · ⬜ Ej påbörjad · ⏸ Parkerad. Master i repot (`docs/wireframes.md`), projektet är en spegel.*
 
-> **Uppdaterat 2026-11-18.** Flikarnas roller ändrades (se produkt.md och Resan): Hem = hyllor, Flöde = det man följer, Hitta = dialog med urval och jämförelse, Sparat = sparat och följt. Avsnitt 4 (Profil), 5 (Hem), 6 (Flöde), 7 (Hitta) och 8 (Sparat) är justerade nedan. Avsnitt 1–3 gäller oförändrade. Hem, Flöde och Sparat behöver wireframas om i detalj när de är på tur.
+> **Uppdaterat 2026-11-18.** Flikarnas roller ändrades (se produkt.md och Resan): Hem = hyllor, Följer = det man följer, Hitta = dialog med urval och jämförelse, Sparat = sparat och följt. Avsnitt 4 (Profil), 5 (Hem), 6 (Följer), 7 (Hitta) och 8 (Sparat) är justerade nedan. Avsnitt 1–3 gäller oförändrade. Hem, Följer och Sparat behöver wireframas om i detalj när de är på tur.
 
 ---
 
@@ -31,7 +31,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 ---
 
 ## 2. Samlingsdetalj (tema/stil/egen samling) — ✅ Wireframe klar
-**Nås från:** samlingskort på Hem och i Flöde, och egna samlingar i Sparat. Samma vy för båda.
+**Nås från:** samlingskort på Hem och i Följer, och egna samlingar i Sparat. Samma vy för båda.
 Innehållet kan vara heterogent, så filtrering ska vara generell. Här bor **masonry-gridden** (Pinterest-känslan).
 
 **Åtgärdsknapp:** följd samling visar Följ/Avfölj. Egen samling visar Dela + redigera/radera.
@@ -89,7 +89,7 @@ Varumärkesidentitet täcks av Partnerdetalj.
 
 ---
 
-## 6. Flöde — 🟡 Ny roll, behöver wireframas om
+## 6. Följer (tidigare Flöde) — 🟡 Ny roll, behöver wireframas om
 **Roll:** uppdateringar från det man följer: varumärken, företag, områden (kategori eller stil med kurerat innehåll) och samlingar.
 
 **Riktning:**

@@ -18,9 +18,9 @@ CPA, provision per genomförd försäljning och aldrig per klick. "Ni betalar ba
 ## Vision och UX-principer (Daniels formulering, 2026-11-18)
 Göra köpresan enklare och roligare för alla konsumenter, oavsett intresse eller kategori, från inspiration och utforskning till köp.
 
-1. **Hela resan täcks av fyra flikar** (Hem, Flöde, Hitta, Sparat). Användaren ska alltid kunna vända sig till Kroona för hjälp.
+1. **Hela resan täcks av fyra flikar** (Hem, Följer, Hitta, Sparat). Användaren ska alltid kunna vända sig till Kroona för hjälp.
 2. **Hitta det som passar just mig:** specifikationer, pris, hållbarhet, plats och cirkularitet. Information om företagen man stöttar visas transparent.
-3. **Användaren har kontrollen:** följ varumärken, företag, områden och samlingar (inte andra användare) för att styra vad som syns i Flöde.
+3. **Användaren har kontrollen:** följ varumärken, företag, områden och samlingar (inte andra användare) för att styra vad som syns i Följer.
 4. **Konsumenten betalar aldrig, och företag betalar inte för att vara med eller synas.** Provision tas bara när en försäljning gått genom tjänsten. Alla spelar efter samma regler.
 5. **Senare:** önskelistor (som GoWish) och att följa andra användare.
 6. **Innehållet ska vara relevant, bra och snyggt.** Referenser: Spotify (personlig, igenkänning) och Pinterest (upptäckt).
@@ -30,12 +30,12 @@ Göra köpresan enklare och roligare för alla konsumenter, oavsett intresse ell
 | Flik | Roll |
 |---|---|
 | **Hem** | Samlingspunkt, som Spotify: kompakt hälsningshero, sedan hyllor med kort (samlingar, varumärken, områden, rekommendationer). Inga produkter i grid. Tryck öppnar ett eget läge. |
-| **Flöde** | Uppdateringar från det man följer: varumärken, företag, områden, samlingar. |
+| **Följer** | Uppdateringar från det man följer: varumärken, företag, områden, samlingar. |
 | **Hitta** | Dialog som hjälper att bolla och få ett urval, plus jämförelse. Valen (pris, hållbarhet m.m.) är en del av dialogen. Inline produktkort. |
 | **Sparat** | Det man sparat och följer, där man hanterar det. Flikar Mina samlingar \| Följer. "Gillade produkter" (hjärtat) först, sedan egna samlingar. |
 
 **Detaljvyer:** Produktdetalj, Samlingsdetalj, Partnerdetalj (varumärke/företag) och Profildetalj (personer). **Personer går att följa** (Daniel, 2026-11-20, brief 37): i Fas 0 som dummydata med lokal följ-lagring; riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) är Fas 1+. Masonry-grid (Pinterest-känsla) bor i detaljvyerna, inte på en flik.
-Hem är det som är relevant nu, Flöde är det man följer.
+Hem är det som är relevant nu, Följer är det man följer. Fliken hette Flöde fram till brief 44 (2026-11-23); route och fil heter fortfarande `feed`.
 
 ## Låsta beslut
 - **Datamodell:** Produkt / Återförsäljare / Erbjudande. Nytt/Begagnat är en egenskap hos Erbjudandet.
@@ -58,7 +58,7 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 | **Återförsäljare** (`Retailer`) | id, `kind: 'retailer'`, name, retailerType (`brand` · `store` · `secondhand`), brandName (för brand), description, values, presence (online, stores[]), initial, defaultFollowed | `data/retailers.ts` |
 | **Erbjudande** (`Offer`) | id, productId, retailerId, price, **condition** (`new` · `used`), conditionNote och **pricing** (`fixed` = "Fast pris", `auction` = "Auktion, bud från") för begagnat, stock (`in_stock` · `few_left` · `out_of_stock`), shipping (text), url (dummy) | `data/offers.ts` |
 | **Område** (`Area`) | id, `kind: 'area'`, name, description, filter (category, styles[], types[]), defaultFollowed | `data/areas.ts` |
-| **Samling** (`Collection`) | som förut + `kind: 'collection'`, defaultFollowed, **`curator: { kind: 'kroona' \| 'retailer' \| 'user'; id? }`** (brief 29), filter `brand` · `style` · `products` (utvalda id:n) | `data/collections.ts` (`COLLECTIONS` = Hem/Flöde, `RETAILER_COLLECTIONS` = varumärkens kollektioner, `ALL_COLLECTIONS`) |
+| **Samling** (`Collection`) | som förut + `kind: 'collection'`, defaultFollowed, **`curator: { kind: 'kroona' \| 'retailer' \| 'user'; id? }`** (brief 29), filter `brand` · `style` · `products` (utvalda id:n) | `data/collections.ts` (`COLLECTIONS` = Hem/Följer, `RETAILER_COLLECTIONS` = varumärkens kollektioner, `ALL_COLLECTIONS`) |
 | **Följbart** (`FollowTarget`) | `{ kind: 'retailer' \| 'collection' \| 'area' \| 'person', id }`. Följ-lagring: samlingar/varumärken i `FollowedCollectionsContext`, personer i `FollowedPeopleContext` (egen nyckel, tom från start). Områden saknar ännu lagring. | `types/catalog.ts` |
 | **Person** (`Person`, brief 37) | id, `kind: 'person'`, name, handle, bio, initial, followers (dummy). Kurerar samlingar via `curator: { kind: 'user', id }` (`PEOPLE_COLLECTIONS`). DUMMYDATA. | `data/people.ts`, `data/collections.ts` |
 
@@ -70,7 +70,7 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 
 **Hem (brief 43):** hyllor med redaktionella kort (text på bilden; stående centrerad, liggande vänster) i fast ordning: Fortsätt där du var, Skapat för dig, Samlingar för dig, Fler i din stil (cirklar = varumärken och personer), Områden, Populära samlingar, Kanske intressant för dig. Produktkort behåller text under bilden. "Du följer" bor i Sparat → Följer.
 
-**Samling ↔ varumärke (Daniel, 2026-11-20, brief 29):** en samling är en kuraterad produktuppsättning med en kurator: Kroona (teman, editorial som Spotify-spellistor), ett varumärke (kollektioner) eller en användare (egna samlingar, senare). Ett varumärke är en egen entitet (`Retailer`, `brand`) med en egen sida, Partnerdetalj, som bär varumärkets kollektioner och alla dess produkter. Att varumärken skapar samlingar själva är Fas 1+; i Fas 0 är kollektionerna dummydata (`RETAILER_COLLECTIONS`, 2 vardera för J.Lindeberg och Filippa K). Varumärkes-filtersamlingarna J.Lindeberg och Filippa K i `COLLECTIONS` finns kvar tills Hem/Flöde omarbetas (Flöde, personalisering och följ-lagringen bygger på dem); kort för dem öppnar Partnerdetalj, och följ av varumärket använder deras id som nyckel (`getRetailerFollowKey`).
+**Samling ↔ varumärke (Daniel, 2026-11-20, brief 29):** en samling är en kuraterad produktuppsättning med en kurator: Kroona (teman, editorial som Spotify-spellistor), ett varumärke (kollektioner) eller en användare (egna samlingar, senare). Ett varumärke är en egen entitet (`Retailer`, `brand`) med en egen sida, Partnerdetalj, som bär varumärkets kollektioner och alla dess produkter. Att varumärken skapar samlingar själva är Fas 1+; i Fas 0 är kollektionerna dummydata (`RETAILER_COLLECTIONS`, 2 vardera för J.Lindeberg och Filippa K). Varumärkes-filtersamlingarna J.Lindeberg och Filippa K i `COLLECTIONS` finns kvar tills Hem/Följer omarbetas (Följer, personalisering och följ-lagringen bygger på dem); kort för dem öppnar Partnerdetalj, och följ av varumärket använder deras id som nyckel (`getRetailerFollowKey`).
 
 **Dummydata:** 56 produkter, 42 återförsäljare (35 varumärken med riktiga namn men bara demotext, 4 påhittade butiker, 3 påhittade andrahandstjänster), 142 erbjudanden (99 nya, 43 begagnade). 31 produkter finns begagnade; 5 finns bara begagnade. Begagnat är alltid billigare än nytt. Fem områden: Hemmakontor och Mjukt hem är förvalda följda. Förvalda följda varumärken: J.Lindeberg, Filippa K.
 
@@ -97,4 +97,4 @@ J.Lindeberg (varm intro) · RevolutionRace · Nordic Nest · Adtraction. Vinkel:
 - **"Hero och glas parkerade"** gäller inte längre. Hero-hälsning och glas är beslutade.
 - **"Konto från dag ett"** är ett Fas 1-krav. Fas 0 har inget konto eller backend.
 - **Onboarding (5 steg)** är medvetet parkerad och inte planerad i Fas 0.
-- **Flikarnas roller ändrades 2026-11-18.** Tidigare: Hem känt, Flöde upptäckt med masonry. Nu: Hem hyllor, Flöde följda. Wireframes, ia-karta och Spec bör justeras vid tillfälle.
+- **Flikarnas roller ändrades 2026-11-18.** Tidigare: Hem känt, Flöde upptäckt med masonry. Nu: Hem hyllor, Följer (hette Flöde till brief 44) följda. Wireframes, ia-karta och Spec bör justeras vid tillfälle.

@@ -19,7 +19,7 @@ Det här är den bild som saknats: samma skärm kan vara klar i ett spår och ob
 | Skärm/Yta | 📋 Specad (innehåll bestämt) | 🎨 Designad (visuell riktning klar) | 🔧 Byggd (kod, Claude Code) |
 |---|---|---|---|
 | Hem | Ja, men hero-hälsning (avsnitt 3 nedan) är beslutad HÄR och inte skriven till wireframes.md än | 🚧 Pågående — helskärmsversion itererad i Claude Design, glassystem nästan klart | Okänt — senast verifierat 18 aug, gammal pill-stil, troligen inaktuellt |
-| Flöde | Ja (wireframes.md #6) | ⬜ Inte itererad i Claude Design än | Okänt |
+| Följer | Ja (wireframes.md #6) | ⬜ Inte itererad i Claude Design än | Okänt |
 | Hitta | Ja, plus identifierade justeringar (länk till Produktdetalj, kontextuell tillbaka-knapp, arkiv/ny chatt-platser, tal-växling) | ⬜ Inte itererad | Grundfunktion byggd (18 aug), justeringarna ej gjorda |
 | Sparat | Ja, utökat till fulla egna samlingar (wireframes.md #8) | ⬜ Inte itererad | Bara platt "Gilla"-lista byggd |
 | Produktdetalj | Ja (wireframes.md #1), inkl. begagnat-gruppering/prisläge (spec v1.18) | ⬜ Produktkort itererat isolerat i Claude Design, men inte hela Produktdetalj-vyn | ⬜ Ej byggd |

@@ -4,7 +4,7 @@
 
 **Statuskoder:** ✅ Byggd · 🚧 Delvis byggd · ⬜ Ej byggd
 
-*Uppdaterat 2026-11-18 — flikarnas roller ändrade (se produkt.md): **Hem** = hyllor med kort, **Flöde** = uppdateringar från det man följer, **Hitta** = dialog, urval och jämförelse, **Sparat** = det man sparat och följer. Masonry-grid flyttar in i detaljvyerna. Följa (varumärke, företag, område, samling och — sedan brief 37 — person) byggs lokalt i Fas 0. Profildetalj för personer finns som dummy i Fas 0; social funktion är Fas 1+. Se även `Resan` (journey × flikar).*
+*Uppdaterat 2026-11-18 — flikarnas roller ändrade (se produkt.md): **Hem** = hyllor med kort, **Följer** = uppdateringar från det man följer, **Hitta** = dialog, urval och jämförelse, **Sparat** = det man sparat och följer. Masonry-grid flyttar in i detaljvyerna. Följa (varumärke, företag, område, samling och — sedan brief 37 — person) byggs lokalt i Fas 0. Profildetalj för personer finns som dummy i Fas 0; social funktion är Fas 1+. Se även `Resan` (journey × flikar).*
 *Tidigare: 2026-08-21 — detaljvyerna wireframade, Egna samlingar flyttad till Fas 0.*
 
 **Område** = kategori eller stil med kurerat innehåll (t.ex. "Hemmakontor", "Skandinavisk stil").
@@ -16,14 +16,14 @@
 | Skärm | Syfte | Kopplar till | Status |
 |---|---|---|---|
 | **Hem** | Samlingspunkt, som Spotify: header, filterflikar, AskBar, sedan hyllor (brief 43): Fortsätt där du var · Skapat för dig · Samlingar för dig · Fler i din stil (varumärken + personer) · Områden · Populära samlingar · Kanske intressant för dig. Inga produkter i grid. | Samling-, Partner-, Profil- och Produktdetalj, Hitta | ✅ Hyllor byggda (brief 43). Kvar: filterflikarna filtrerar inget, Områden och mixar saknar destination, hyllström/rankning egen brief. "Du följer" flyttad till Sparat → Följer. |
-| **Flöde** | Uppdateringar från det man följer (varumärken, företag, områden, samlingar) | Produktdetalj, Partner- och Samlingsdetalj | 🚧 Grundversion byggd med gammal roll (blandat upptäcktsflöde), ska omarbetas |
+| **Följer** | Uppdateringar från det man följer (varumärken, företag, områden, samlingar) | Produktdetalj, Partner- och Samlingsdetalj | 🚧 Grundversion byggd med gammal roll (blandat upptäcktsflöde), ska omarbetas |
 | **Hitta** | Dialog som hjälper att bolla och få ett urval, plus jämförelse. Valen (pris, hållbarhet m.m.) är en del av dialogen. | Produktdetalj | ✅ Byggd. Kvar: produktkort länkar till Produktdetalj |
 | **Sparat** | Det man sparat och följer. Flikar Mina samlingar \| Följer. "Gillade produkter" (specialrad, inte en samling) först, sedan egna samlingar (rader/kort). Följer i sektioner. | Samlingsdetalj, Partnerdetalj | ✅ Ny struktur byggd (brief 35). Lägg till i samling, redigera/radera och Personer ej. |
 | **Produktdetalj** | Fördjupning: hållbarhet, begagnat och nytt, liknande produkter, spara. Nav för stegen Jämför och Köp. | Från alla produktkort | ⬜ Wireframe klar (wireframes.md avsnitt 1) |
 | **Samlingsdetalj** | Innehåll i en stil-/temasamling eller egen samling, med masonry-grid. Följ/Avfölj, eller Dela/redigera för egna. | Från samlingskort, Sparat | ✅ Byggd för kuraterade samlingar (brief 28, `app/collection/[id].tsx`). Kurator: Kroona (teman) eller varumärke (kollektioner), brief 29. Egna samlingar och "Gillade produkter" ("Av dig", ingen Följ), brief 32/35. |
 | **Partnerdetalj** | Varumärkes-/återförsäljarprofil: värdegrund, geografisk närvaro, produktgrid. Följ/Avfölj. | Från varumärkescirklar (Hem: Fler i din stil), Sparat → Följer och kuratorraden i Samlingsdetalj | ✅ Byggd för varumärken (brief 29, `app/partner/[id].tsx`) med Samlingar-hylla. Butiker/andrahand ej. |
 | **Profildetalj** | En person: avatar, namn, @handle, följare, bio, Följ, hyllan Samlingar (personens publika samlingar). | Från Följer (Personer), kuratorraden i Samlingsdetalj, ProfileCard | ✅ Fas 0 dummy (brief 37, `app/profile/[id].tsx`). Social funktion Fas 1+. |
-| **Följa (lokalt)** | Följ varumärke, företag, område eller samling. Lagras lokalt, några förvalda i demot. | Flöde, Sparat | ⬜ Ny 2026-11-18 |
+| **Följa (lokalt)** | Följ varumärke, företag, område eller samling. Lagras lokalt, några förvalda i demot. | Följer, Sparat | ⬜ Ny 2026-11-18 |
 | **Egna samlingar** | Skapa/döpa/privat-publik/flytta produkter mellan samlingar | Sparat, Samlingsdetalj | 🚧 Skapa (namn, Privat/Publik) byggt, AsyncStorage (`UserCollectionsContext`, brief 32). Döpa om/radera/flytta i del 2. |
 | **Onboarding** (5 steg) | Smakinsamling | Hem (första körning) | ⬜ Medvetet parkerad |
 
@@ -51,6 +51,6 @@
 ---
 
 ## Öppna frågor
-- Flikroller: **avgjorda 2026-11-18** (se överst och Resan). Wireframes för Hem, Flöde och Sparat behöver göras om.
+- Flikroller: **avgjorda 2026-11-18** (se överst och Resan). Wireframes för Hem, Följer och Sparat behöver göras om.
 - Hem: hyllordning och korttyper avgjorda i brief 43. Öppet: oändlig hyllström och rytmregel, ClusterCards plats.
 - Följa: var ligger "följ"-knappen på produktkort, om alls?

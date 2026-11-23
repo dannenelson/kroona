@@ -3,7 +3,7 @@
 *En sida. Svarar på "vad jobbar vi med nu, och vad kommer sen". Uppdateras när något ändras, aldrig med nya idéer (de går till `idebank`). Senast: 2026-11-19.*
 
 ## Mål för Fas 0 (bekräftat 2026-11-17)
-Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-minuters genomgång av hela köpresan: **Hem → Produktdetalj → Samling → Sparat**, plus Hitta och Flöde.
+Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-minuters genomgång av hela köpresan: **Hem → Produktdetalj → Samling → Sparat**, plus Hitta och Följer.
 
 **Klart när:** de fyra tabbarna och tre detaljvyer (Produkt, Samling, Partner) är byggda på 56 dummyprodukter, i både mörkt och ljust tema, utan att API-nyckeln ligger i klienten.
 
@@ -19,7 +19,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | Yta | Specat | Designat | Byggt |
 |---|---|---|---|
 | Hem | ✅ | 🚧 | 🟡 Gammal stil: tio sektioner, filter utan logik. Ingen hälsningshero eller glas. |
-| Flöde | ✅ | ⬜ | 🟡 Grundversion (`feed.tsx`, ProductGrid) |
+| Följer | ✅ | ⬜ | 🟡 Grundversion (`feed.tsx`, ProductGrid) |
 | Hitta | ✅ | ⬜ | ✅ Fungerande chatt mot Claude API. Saknar länk till Produktdetalj, arkiv/ny chatt och tal. |
 | Sparat | ✅ | ⬜ | 🟡 Ny struktur byggd (brief 35): Mina samlingar \| Följer, Gillade produkter, rader/kort, Följer i sektioner. Lägg till i samling och redigera kvar. |
 | Produktdetalj, Samling, Partner, Profil | ✅ | ⬜ | 🟡 Produkt- (+ lightbox), Samlings- och Partnerdetalj byggda. Profil parkerad. |
@@ -56,7 +56,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 3i. ✅ **Personer i Följer + Profildetalj** (brief 37, dummy) — byggd 2026-11-20.
 3j. **Nästa:** redigera/döp om/radera samling och ta bort produkt ur samling (samlingsvyn).
 4. **Sparat** med egna samlingar och följda (AsyncStorage)
-5. **Hem** (hyllor) i ny design, sedan **Flöde** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
+5. **Hem** (hyllor) i ny design, sedan **Följer** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
 6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning
 
 ## Teknisk skuld (ingen brådska, men inte glömd)

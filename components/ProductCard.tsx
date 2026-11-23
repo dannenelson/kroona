@@ -34,7 +34,7 @@ type Props = {
   // När satt: bilden får en FAST höjd istället för aspectRatio-driven
   // masonry-höjd. Till för horisontella rader (t.ex. RecommendedProductsRow)
   // där alla kort ska ha samma höjd — masonry hör bara hemma i grid-kontext
-  // (ProductGrid/Flöde/Sparat), inte i en scroll-rad.
+  // (ProductGrid/Följer/Sparat), inte i en scroll-rad.
   fixedHeight?: number;
   /** S = bara bild (radie tile), M och L = bild + text under (radie card). */
   size?: ProductCardSize;

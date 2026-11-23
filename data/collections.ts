@@ -70,7 +70,7 @@ export const COLLECTIONS: Collection[] = [
 // Varumärkenas egna kollektioner (brief 29), visas på Partnerdetalj.
 // DUMMYDATA (Fas 0): namn, bild och urval är påhittade för att visa pilot-
 // partners; i Fas 1+ skapar varumärkena dem själva. Ligger utanför COLLECTIONS
-// så att Hem, Flöde och följ-standarden är oförändrade.
+// så att Hem, Följer och följ-standarden är oförändrade.
 export const RETAILER_COLLECTIONS: Collection[] = [
   {
     id: 'jl-golf',
@@ -207,7 +207,7 @@ export function getRetailerCoverImage(retailerId: string): string | undefined {
 /**
  * Nyckeln i följ-lagringen för ett varumärke (följ-målet `{ kind: 'retailer' }`).
  * Finns varumärkets äldre filtersamling används dess id, så att Partnerdetalj,
- * "Du följer" och Flöde visar samma läge; annars återförsäljarens id.
+ * "Du följer" och Följer visar samma läge; annars återförsäljarens id.
  */
 export function getRetailerFollowKey(retailerId: string): string {
   return getBrandFilterCollection(retailerId)?.id ?? retailerId;

@@ -265,7 +265,7 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 - **Migrering:** nuvarande kod har `#0f0f0e` och bara Google Sans Flex (400/500/700). Färgerna migreras i steg 1a och Familjen Grotesk läggs till för rubriker.
 
 ## 11. Filter och pillar ✅
-- **Filtrering** görs med **text-flikar med understrykning** (Pinterest-mönstret), 44 px höga. Gäller Hem, Flöde och Samlingsdetalj.
+- **Filtrering** görs med **text-flikar med understrykning** (Pinterest-mönstret), 44 px höga. Gäller Hem, Följer och Samlingsdetalj.
 - **Pillar** byter innehåll överst på en skärm (vad skärmen handlar om), som Spotify. Används tills vidare **bara överst på Hem** (t.ex. Allt · Mode · Heminredning). Text-flikar snävar in en lista inom ett innehåll. Känns gränsen otydlig när det är byggt slås de ihop. 🔵
 
 ## 🟡 Öppet

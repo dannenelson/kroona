@@ -24,7 +24,7 @@ const ICONS = {
 
 const LABELS: Record<string, string> = {
   index: 'Hem',
-  feed: 'Flöde',
+  feed: 'Följer',
   find: 'Hitta',
   saved: 'Sparat',
 };

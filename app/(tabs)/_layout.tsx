@@ -11,7 +11,7 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Hem' }} />
-      <Tabs.Screen name="feed" options={{ title: 'Flöde' }} />
+      <Tabs.Screen name="feed" options={{ title: 'Följer' }} />
       <Tabs.Screen name="find" options={{ title: 'Hitta' }} />
       <Tabs.Screen name="saved" options={{ title: 'Sparat' }} />
     </Tabs>

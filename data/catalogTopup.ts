@@ -2,7 +2,7 @@ import type { CatalogProduct } from '../types/catalog';
 
 /**
  * Påfyllnad av J.Lindeberg och Filippa K (aug 2026) — dessa två samlingar hade
- * bara 3 produkter vardera, vilket kändes tunt i Flöde/samlingsvyerna. Lägg
+ * bara 3 produkter vardera, vilket kändes tunt i Följer/samlingsvyerna. Lägg
  * till som id '47'–'56' sist i PRODUCTS, samma sätt som newProducts.ts.
  */
 

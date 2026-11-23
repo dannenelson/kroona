@@ -20,7 +20,7 @@ Användare, företag/butik eller varumärke som en identitet. **Alltid cirkel.**
 - **Medium** — bild + metadata under, 2-kolumnsgrid
 - **Large** — bild + metadata under, 1-kolumnsgrid
 
-Samma mönster som CollectionCard/PartnerCard/LinkCard Vertical: bara bildcontainern har `Radius.card` + kant, text under ligger utan bakgrund/rundning, flush med bildbredden. I **grid** (Flöde/Sparat): masonry, bildhöjd styr korthöjd (medvetet, Pinterest-mönster). I **horisontell rad** (`RecommendedProductsRow`): `fixedHeight`-prop tvingar samma höjd på alla kort — masonry hör bara hemma i grid-kontext, inte i en scroll-rad.
+Samma mönster som CollectionCard/PartnerCard/LinkCard Vertical: bara bildcontainern har `Radius.card` + kant, text under ligger utan bakgrund/rundning, flush med bildbredden. I **grid** (Följer/Sparat): masonry, bildhöjd styr korthöjd (medvetet, Pinterest-mönster). I **horisontell rad** (`RecommendedProductsRow`): `fixedHeight`-prop tvingar samma höjd på alla kort — masonry hör bara hemma i grid-kontext, inte i en scroll-rad.
 
 ### CollectionCard — ✅ Form bestämd, namn bekräftat aug 2026, implementerad
 Board-stil: 1 stor bild + 2 mindre i 2-kolumnsuppdelning. **Bara bild-containern är rundad — metadata under ligger utan bakgrund, ingen rundad yttre kortram.** Litet cirkulärt profilfoto på kuratorn överlagt bilden. Metadata under (antal objekt, ålder/senast uppdaterad). Används i `PopularCollectionsRow` (dummy-data, Fas 0-platshållare tills riktiga användarsamlingar finns).
@@ -121,7 +121,7 @@ Ersätter `DiscoveryPreviewCard`s egenbyggda rubrikrad (byggdes fristående inna
 - Ej vald: `textSecondary` (mute). Vald: `textPrimary` och understrykning i `textPrimary`. Ingen accentfärg.
 - **Pill** (`components/Pill.tsx`) byter innehåll överst på en skärm (t.ex. Allt · Mode · Heminredning), filtrerar inte. Vald pill är inverterad: textfärg som yta, bakgrundsfärg som text.
 
-Används på Hem, Flöde och i samlingsdetalj (andra kategorier beroende på samlingstyp, se wireframes.md avsnitt 2).
+Används på Hem, Följer och i samlingsdetalj (andra kategorier beroende på samlingstyp, se wireframes.md avsnitt 2).
 
 ## 8. TopBar — delad navigationskomponent (tillagt aug 2026)
 

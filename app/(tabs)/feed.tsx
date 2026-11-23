@@ -35,7 +35,7 @@ export default function FeedScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingTop: insets.top, paddingHorizontal: spacing.screenMargin, flexGrow: 1 }}
       >
-        <Text style={styles.title}>Flöde</Text>
+        <Text style={styles.title}>Följer</Text>
 
         {feedProducts.length === 0 ? (
           <View style={styles.emptyState}>
