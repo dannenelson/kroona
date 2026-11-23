@@ -59,6 +59,7 @@ import {
   makeStyles,
   useTheme,
   typography,
+  fonts,
   spacing,
   motion,
   edgeBlur,
@@ -85,6 +86,8 @@ export type SheetStep = {
   onClose?: () => void;
   /** 'card' = kort-sheet (brief 40); gäller hela flödet, styrs av första steget. */
   presentation?: 'fullscreen' | 'card';
+  /** Högerställd textlänk på kortets rubrikrad (brief 41, t.ex. "Ny samling"). */
+  headerAction?: { label: string; onPress: () => void };
 };
 
 type SheetApi = {
@@ -315,6 +318,7 @@ export function SheetProvider({ children }: { children: ReactNode }) {
       {step && presentation === 'card' && (
         <CardLayer
           title={step.title}
+          headerAction={step.headerAction}
           depth={steps.length}
           closing={cardClosing}
           onBack={pop}
@@ -397,6 +401,7 @@ export function SheetProvider({ children }: { children: ReactNode }) {
  */
 function CardLayer({
   title,
+  headerAction,
   depth,
   closing,
   onBack,
@@ -407,6 +412,7 @@ function CardLayer({
   children,
 }: {
   title: string;
+  headerAction?: SheetStep['headerAction'];
   depth: number;
   closing: boolean;
   onBack: () => void;
@@ -548,6 +554,17 @@ function CardLayer({
             <Text style={styles.cardTitle} numberOfLines={1} accessibilityRole="header">
               {title}
             </Text>
+            {headerAction ? (
+              // Neutral textlänk (Instagram-mönstret), tryckyta ≥ 44, tonar vid tryck.
+              <Pressable
+                onPress={headerAction.onPress}
+                accessibilityRole="button"
+                hitSlop={spacing.sm}
+                style={({ pressed }) => [styles.cardAction, pressed && styles.cardActionPressed]}
+              >
+                <Text style={styles.cardActionText}>{headerAction.label}</Text>
+              </Pressable>
+            ) : null}
           </View>
         </Reanimated.View>
       </GestureDetector>
@@ -588,7 +605,8 @@ export function SheetContent({
   const top = header
     ? fixedTop + fixedHeight + spacing.md
     : headerBottom + (presentation === 'card' ? spacing.sm : spacing.xxl);
-  const bottom = footer ? footerHeight : 0;
+  // I kortet finns alltid luft och blur nedtill, även utan CTA (brief 41).
+  const bottom = footer ? footerHeight : presentation === 'card' ? spacing.lg : 0;
   const value = useMemo(() => ({ top, bottom }), [top, bottom]);
 
   return (
@@ -602,7 +620,9 @@ export function SheetContent({
 
         {/* Progressiv blur upptill (bakom header och fasta element) och nedtill (bakom CTA). */}
         <EdgeFade position="top" variant="clear" height={top} />
-        {footer ? <EdgeFade position="bottom" variant="clear" height={bottom + fade} /> : null}
+        {footer || presentation === 'card' ? (
+          <EdgeFade position="bottom" variant="clear" height={bottom + fade} />
+        ) : null}
 
         {header ? (
           <View
@@ -661,6 +681,18 @@ const useStyles = makeStyles((t) => ({
     ...typography.headline,
     color: t.colors.textPrimary,
     flex: 1,
+  },
+  cardAction: {
+    minHeight: touchTarget,
+    justifyContent: 'center',
+  },
+  cardActionPressed: {
+    opacity: motion.pressedTextOpacity,
+  },
+  cardActionText: {
+    ...typography.body,
+    fontFamily: fonts.ui600,
+    color: t.colors.textPrimary,
   },
   content: {
     ...StyleSheet.absoluteFill,

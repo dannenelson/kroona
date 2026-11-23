@@ -1,36 +1,41 @@
-import { useIsSaved, useOpenSaveSheet } from '../saved/SaveSheet';
+import { useSaveActions } from '../saved/SaveSheet';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, motion, touchTarget, iconSize } from '../../theme';
 import { usePressAnimation } from '../../hooks/usePressAnimation';
 import { usePop } from '../../hooks/usePop';
 import { haptic } from '../../utils/haptic';
-import HeartIcon from '../../assets/icons/HeartIcon';
-import HeartIconFilled from '../../assets/icons/HeartIcon_filled';
+import BookmarkIcon from '../../assets/icons/BookmarkIcon';
+import BookmarkIconFilled from '../../assets/icons/BookmarkIcon_filled';
 
 /**
- * Spara-knappen på Produktdetalj (brief 13, 38, 40): gemensam Spara-ingång
- * som öppnar kortet "Spara i …" (Gillade produkter + egna samlingar). Hjärta,
- * fyllt när produkten ligger i Gillade produkter eller någon samling; ytan
+ * Spara-knappen på Produktdetalj (brief 13, 40, 41): tryck = snabbspar till
+ * Gillade produkter, långt tryck = kortet "Spara i …" (useSaveActions).
+ * Bokmärke, fyllt när produkten ligger i Gillade produkter eller någon samling; ytan
  * inverteras inte (beslutad avvikelse från designen). Pop vid sparande,
  * lätt haptik, animerad press. Använder befintliga SavedProductsContext.
  */
 export default function SaveButton({ productId }: { productId: string }) {
   const { colors } = useTheme();
   const styles = useStyles();
-  const saved = useIsSaved(productId);
-  const openSaveSheet = useOpenSaveSheet();
+  const { saved, quickSave, openSheet } = useSaveActions(productId);
   const press = usePressAnimation(motion.pressedScale);
   const pop = usePop(saved);
-  const Icon = saved ? HeartIconFilled : HeartIcon;
+  const Icon = saved ? BookmarkIconFilled : BookmarkIcon;
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: saved }}
       accessibilityLabel={saved ? 'Spara, sparad' : 'Spara'}
+      accessibilityHint="Håll in för att spara i en samling"
       onPress={() => {
         haptic.light();
-        openSaveSheet(productId);
+        quickSave();
+      }}
+      delayLongPress={motion.longPressMs}
+      onLongPress={() => {
+        haptic.light();
+        openSheet();
       }}
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}

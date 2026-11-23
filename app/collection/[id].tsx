@@ -104,7 +104,7 @@ export default function CollectionScreen() {
         followable: false,
         byBrand: false,
         emptyTitle: 'Inga gillade produkter än',
-        emptyHint: 'Tryck på hjärtat på en produkt för att spara den här.',
+        emptyHint: 'Tryck på Spara på en produkt för att spara den här.',
       };
     }
     if (userCollection) {

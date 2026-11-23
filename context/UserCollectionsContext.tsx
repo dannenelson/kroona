@@ -1,6 +1,6 @@
 // Egna samlingar (brief 32), samma mönster som SavedProductsContext och
 // FollowedCollectionsContext: state i minnet, AsyncStorage som lagring.
-// "Gillade produkter" (SavedProductsContext, hjärtat) är INTE en samling
+// "Gillade produkter" (SavedProductsContext, snabbspar) är INTE en samling
 // (brief 35): en produkt kan vara både gillad och i samlingar, oberoende.
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';

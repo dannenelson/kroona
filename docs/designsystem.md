@@ -133,7 +133,7 @@ Alla detaljvyer (Produktdetalj, CollectionCard-/PartnerCard-/ProfileCard-detalj)
 - **Höger slot:** alltid kontext-specifika åtgärder, 0–2 ikoner. Innehållet varierar per skärm men positionen och stilen gör det inte.
 
 **Exempel på höger-slot-innehåll per skärm:**
-- Produktdetalj: Gilla (hjärta) och Spara i samling (bokmärke-plus), brief 38. Båda finns också i menyn vid långt tryck på kort (Gilla · Spara i samling · Följ varumärke · Dela · Visa liknande); korten har ingen egen knapp.
+- Produktdetalj: Spara (bokmärke, brief 41): tryck = snabbspar, långt tryck = kortet "Spara i …". Menyn vid långt tryck på kort: Spara/Sparad · Spara i samling · Följ varumärke · Dela · Visa liknande; korten har ingen egen knapp.
 - Hitta: Arkiv + Ny chatt
 - Sparat (tab-rot, inget tillbaka-behov): Ny samling
 - CollectionCard-/PartnerCard-/ProfileCard-detalj: Följ/Avfölj (följda) ELLER Dela/redigera (egna samlingar, se wireframes.md avsnitt 2)
@@ -187,7 +187,7 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 - **Kontextmeny via hook:** `hooks/useLongPressMenu` delas av PartnerCard, samlingskort och listrader (en implementation).
 
 ## 15. Kort-sheet (tillagt 2026-11-23, brief 40)
-- `presentation: 'card'` på första steget ger Sheet som **kort** (YouTube/Instagram): luft runt om, radie 28, nästan solid yta över mörk overlay, vänsterställd rubrik, ingen X (stängs med svep, overlay-tryck eller skrollgesten).
+- `presentation: 'card'` på första steget ger Sheet som **kort** (YouTube/Instagram): luft runt om, radie 28, nästan solid yta över mörk overlay, vänsterställd rubrik, ingen X (stängs med svep, overlay-tryck eller skrollgesten). Valfri `headerAction` på steget = högerställd neutral textlänk på rubrikraden (t.ex. "Ny samling", brief 41). Utan CTA har kortet ändå luft och blur nedtill.
 - **Snapp-beteende:** två lägen, 2/3 och full höjd, i en kontinuerlig gest på UI-tråden: fingret uppåt växer kortet till full höjd innan listan skrollar; nedåt med listan på toppen krymper kortet, och under 2/3 stängs det vid släpp efter avstånd eller fart (fly-out). Listor i kortet använder `SheetScrollView` (kopplas till kortets gest; i helskärm en vanlig ScrollView).
 - Helskärmspresentationen (t.ex. Skapa samling från "+" i Sparat) är oförändrad.
 

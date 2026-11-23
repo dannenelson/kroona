@@ -21,7 +21,7 @@ type Props = {
   subtitleIcon?: ComponentType<IconProps>;
   images: string[];
   width: number;
-  /** Ersätter mosaiken (t.ex. hjärtat för Gillade produkter). */
+  /** Ersätter mosaiken (t.ex. bokmärket för Gillade produkter). */
   cover?: ReactNode;
   menuItems?: ContextMenuItem[];
 };

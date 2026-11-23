@@ -8,9 +8,10 @@ import { useCardPress } from '../hooks/useCardPress';
 import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
-import HeartIcon from '../assets/icons/HeartIcon';
-import HeartIconFilled from '../assets/icons/HeartIcon_filled';
-import { useIsSaved, useOpenSaveSheet } from './saved/SaveSheet';
+import BookmarkIcon from '../assets/icons/BookmarkIcon';
+import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
+import PlusIcon from '../assets/icons/PlusIcon';
+import { useSaveActions } from './saved/SaveSheet';
 import FollowIcon from '../assets/icons/FollowIcon';
 import ShareIcon from '../assets/icons/ShareIcon';
 import SimilarIcon from '../assets/icons/SimilarIcon';
@@ -78,10 +79,10 @@ export default function ProductCard({
 }: Props) {
   const { colors } = useTheme();
   const styles = useStyles();
-  // Spara (brief 40): en ingång, öppnar kortet "Spara i …". Fyllt hjärta när
+  // Spara (brief 41): "Spara" = snabbspar till Gillade produkter ("Sparad" när
+  // den ligger där), "Spara i samling" = kortet "Spara i …". Fyllt bokmärke när
   // produkten ligger i Gillade produkter eller i någon samling.
-  const saved = useIsSaved(id);
-  const openSaveSheet = useOpenSaveSheet();
+  const save = useSaveActions(id);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
   // Standard: öppna Produktdetalj, där kortets bild zoomar till heron (brief 13,
@@ -112,7 +113,8 @@ export default function ProductCard({
   // Följ varumärke, Dela och Visa liknande har ingen logik i Fas 0-steget,
   // de stänger bara menyn.
   const menuItems: ContextMenuItem[] = [
-    { label: 'Spara', icon: saved ? HeartIconFilled : HeartIcon, onPress: () => openSaveSheet(id) },
+    { label: save.liked ? 'Sparad' : 'Spara', icon: save.saved ? BookmarkIconFilled : BookmarkIcon, onPress: save.quickSave },
+    { label: 'Spara i samling', icon: PlusIcon, onPress: save.openSheet },
     { label: 'Följ varumärke', icon: FollowIcon },
     { label: 'Dela', icon: ShareIcon },
     { label: 'Visa liknande', icon: SimilarIcon },

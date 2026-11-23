@@ -1,9 +1,11 @@
-// "Spara i …" (brief 40, Instagram/YouTube-stil): gemensam Spara-ingång från
-// produktvyns Spara-knapp och produktmenyns "Spara". Kort-sheet (Sheet
-// presentation 'card') med bara tre saker: rubrik, en lista där "Gillade
-// produkter" alltid ligger överst följt av egna samlingar (tryck växlar
-// direkt, flera går), och CTA:n "+ Skapa ny" (öppnar Skapa samling i samma
-// kort; Spara där skapar samlingen och lägger produkten i den).
+// Spara (brief 40, 41, Instagram-mönstret):
+// - Tryck = snabbspar: växlar produkten i Gillade produkter, med snackbar
+//   "… sparades i Gillade produkter · Ändra" (Ändra öppnar kortet).
+// - Långt tryck (eller "Spara i samling") = kortet "Spara i …" (Sheet
+//   presentation 'card'): rubrik med länken "Ny samling" till höger, och en
+//   lista där "Gillade produkter" alltid ligger överst följt av egna samlingar
+//   (tryck växlar direkt, flera går). Ny samling öppnar Skapa samling i samma
+//   kort; Spara där skapar samlingen och lägger produkten i den.
 // När kortet stängs visas en snackbar om produkten lagts till någonstans
 // ("<produkt> sparades i <samling>" eller "… i N samlingar"); bara
 // borttagningar ger ingen snackbar.
@@ -16,13 +18,11 @@ import { useSavedProducts } from '../../context/SavedProductsContext';
 import { PRODUCTS } from '../../data/products';
 import { SheetContent, SheetScrollView, useSheet, useSheetInsets, type SheetStep } from '../Sheet';
 import { useSnackbar } from '../Snackbar';
-import Button from '../Button';
 import ListRow from '../ListRow';
 import CollectionMosaic from '../CollectionMosaic';
 import { makeCreateCollectionStep } from './CreateCollectionStep';
-import PlusIcon from '../../assets/icons/PlusIcon';
 import CheckIcon from '../../assets/icons/CheckIcon';
-import HeartIcon from '../../assets/icons/HeartIcon';
+import BookmarkIcon from '../../assets/icons/BookmarkIcon';
 
 /** Samlingar (inkl. Gillade produkter) produkten lagts till i under ett öppet kort (id → namn). */
 type Session = Map<string, string>;
@@ -36,11 +36,12 @@ export function useIsSaved(productId: string) {
   return isSaved(productId) || userCollections.some((c) => c.productIds.includes(productId));
 }
 
-/** Öppnar "Spara i …" för en produkt (Spara-knappen och produktmenyns "Spara"). */
+/** Öppnar "Spara i …" för en produkt (långt tryck på Spara, "Spara i samling", "Ändra"). */
 export function useOpenSaveSheet() {
   const sheet = useSheet();
   const snackbar = useSnackbar();
   const router = useRouter();
+  const { addProductToCollection } = useUserCollections();
   return (productId: string) => {
     const product = PRODUCTS.find((p) => p.id === productId);
     if (!product) return;
@@ -48,6 +49,18 @@ export function useOpenSaveSheet() {
     sheet.open({
       title: 'Spara i …',
       presentation: 'card',
+      // Ny samling: Skapa samling i samma kort (full höjd, chevron tillbaka);
+      // Spara där skapar samlingen och lägger produkten i den.
+      headerAction: {
+        label: 'Ny samling',
+        onPress: () =>
+          sheet.push(
+            makeCreateCollectionStep((id, name) => {
+              addProductToCollection(id, productId);
+              session.set(id, name);
+            }),
+          ),
+      },
       render: () => <SaveSheetStep productId={productId} session={session} />,
       onClose: () => {
         if (session.size === 0) return;
@@ -71,31 +84,37 @@ export function useOpenSaveSheet() {
 }
 
 function SaveSheetStep({ productId, session }: { productId: string; session: Session }) {
-  const sheet = useSheet();
-  const { addProductToCollection } = useUserCollections();
-
-  // Skapa ny: Skapa samling i samma kort (full höjd, chevron tillbaka);
-  // Spara där skapar samlingen och lägger produkten i den.
-  const createNew = () =>
-    sheet.push(
-      makeCreateCollectionStep((id, name) => {
-        addProductToCollection(id, productId);
-        session.set(id, name);
-      }),
-    );
-
   return (
-    <SheetContent
-      edgeToEdge
-      footer={
-        <Button icon={PlusIcon} onPress={createNew}>
-          Skapa ny
-        </Button>
-      }
-    >
+    <SheetContent edgeToEdge>
       <SaveList productId={productId} session={session} />
     </SheetContent>
   );
+}
+
+/**
+ * Spara-gesten (brief 41), samma på alla ställen: `quickSave` (tryck) växlar
+ * produkten i Gillade produkter och visar "… sparades i Gillade produkter ·
+ * Ändra" (ingen snackbar vid borttagning); `openSheet` (långt tryck) öppnar kortet.
+ * `saved` = fylld bokmärkesikon (Gillade eller någon samling), `liked` = i Gillade.
+ */
+export function useSaveActions(productId: string) {
+  const snackbar = useSnackbar();
+  const { isSaved, toggleSaved } = useSavedProducts();
+  const openSaveSheet = useOpenSaveSheet();
+  const saved = useIsSaved(productId);
+  const liked = isSaved(productId);
+  const openSheet = () => openSaveSheet(productId);
+  const quickSave = () => {
+    toggleSaved(productId);
+    if (liked) return;
+    const product = PRODUCTS.find((p) => p.id === productId);
+    snackbar.show({
+      text: `${product?.name ?? 'Produkten'} sparades i ${ALL_SAVED_NAME}`,
+      thumbUri: product?.imageUrl,
+      action: { label: 'Ändra', onPress: openSheet },
+    });
+  };
+  return { saved, liked, quickSave, openSheet };
 }
 
 /** Listan i kortet: Gillade produkter överst, sedan egna samlingar. Skrollar med kortets gest. */
@@ -125,7 +144,7 @@ function SaveList({ productId, session }: { productId: string; session: Session 
         subtitle={countLabel(savedProducts.length)}
         thumb={
           <View style={styles.likedTile}>
-            <HeartIcon color={styles.likedIcon.color} size={iconSize.md} />
+            <BookmarkIcon color={styles.likedIcon.color} size={iconSize.md} />
           </View>
         }
         thumbRadius={radius.control}

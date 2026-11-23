@@ -1,7 +1,7 @@
 // Sparat (brief 35, wireframes.md §8, skiss "Kroona Sparat – ny struktur"):
 // det man sparat och följer.
 // - Header: "Sparat" + "+" (Sheet: Skapa samling). Flikar: Mina samlingar | Följer.
-// - Mina samlingar: "Gillade produkter" (specialrad, INTE en samling; hjärtat
+// - Mina samlingar: "Gillade produkter" (specialrad, INTE en samling; Spara
 //   sparar dit), avdelare, sedan egna samlingar. Rader (standard) eller kort,
 //   valet sparas lokalt. Långt tryck: Öppna, Dela.
 // - Följer: sektioner Varumärken, Personer (brief 37) och Samlingar som rader,
@@ -49,7 +49,7 @@ import { useSnackbar } from '../../components/Snackbar';
 import { createCollectionStep } from '../../components/saved/CreateCollectionStep';
 import type { ContextMenuItem } from '../../components/ProductContextMenu';
 import PlusIcon from '../../assets/icons/PlusIcon';
-import HeartIcon from '../../assets/icons/HeartIcon';
+import BookmarkIcon from '../../assets/icons/BookmarkIcon';
 import LockIcon from '../../assets/icons/LockIcon';
 import ListIcon from '../../assets/icons/ListIcon';
 import GridIcon from '../../assets/icons/GridIcon';
@@ -197,12 +197,12 @@ export default function SavedScreen() {
   );
 }
 
-/** "Gillade produkter": hjärta i upphöjd ruta (rad 56/r14, kort kvadrat/r18). */
+/** "Gillade produkter": bokmärke i upphöjd ruta (rad 56/r14, kort kvadrat/r18), brief 41. */
 function LikedTile({ size, tileRadius, large = false }: { size: number; tileRadius: number; large?: boolean }) {
   const styles = useStyles();
   return (
     <View style={[styles.likedTile, { width: size, height: size, borderRadius: tileRadius }]}>
-      <HeartIcon color={styles.likedIcon.color} size={large ? iconSize.lg * 2 : iconSize.lg} />
+      <BookmarkIcon color={styles.likedIcon.color} size={large ? iconSize.lg * 2 : iconSize.lg} />
     </View>
   );
 }
