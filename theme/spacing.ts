@@ -74,24 +74,23 @@ export const editorialCard = {
   chipAvatar: 20,
 } as const;
 
-/** Nedre menyn (brief 46). Flikraden ligger ovanför hemindikatorn: etikettblockets
- *  underkant `aboveHomeIndicator` över indikatorns överkant, som sitter ca
- *  `homeIndicatorTop` från skärmkanten (iPhone med hemindikator). Utan safe area:
- *  `minBottom` under flikraden. */
+/** Nedre menyn (brief 46, 49). Etikettblockets underkant ligger `labelBottom`
+ *  (36) från skärmkanten på enheter med safe area nedtill, `labelBottomNoInset`
+ *  (24) utan. Flikraden har `sideInset` (28) sidomarginal så att flikarna samlas. */
 export const tabBar = {
   rowHeight: 56,
   iconLabelGap: 3,
-  homeIndicatorTop: 13,
-  aboveHomeIndicator: 16,
-  minBottom: 8,
+  labelBottom: 36,
+  labelBottomNoInset: 24,
+  sideInset: 28,
 } as const;
 
-/** Hem-toppen (brief 46): toppraden 44, avatar 32, logotyp 18 (™ visas från 40),
+/** Hem-toppen (brief 46, 49): toppraden 44, avatar 32, logotyp 12 (™ visas från 40),
  *  filterpillar 36. */
 export const homeHeader = {
   rowHeight: 44,
   avatar: 32,
-  logoHeight: 18,
+  logoHeight: 12,
   logoTrademarkMinHeight: 40,
   filterPillHeight: 36,
 } as const;

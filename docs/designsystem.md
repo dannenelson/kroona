@@ -164,7 +164,7 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 
 ## 10. Hem — hero-hälsning (tillagt aug 2026)
 
-**Uppdaterat 2026-11-23 (brief 46), ersätter foto-heron nedan:** Hem-toppen är `components/Header.tsx`: toppraden (avatar med initialer, centrerad Kroona-logotyp, notisikon), sedan hälsningen **"God morgon, [Namn]" / "God eftermiddag, [Namn]" / "God kväll, [Namn]"** (komma, inget utropstecken; 05–11 / 12–17 / övrigt) i Familjen Grotesk 28/32. Namn och initialer från `DUMMY_USER` (`data/user.ts`). Under den filterpillar (`FilterPills`) och AskBar. Ingen foto-bakgrund. Se `design.md` §8k.
+**Uppdaterat 2026-11-23 (brief 46), ersätter foto-heron nedan:** Hem-toppen är `components/Header.tsx`: toppraden (avatar med initialer, centrerad Kroona-logotyp **12 px hög** utan ™ (18 i brief 46, sänkt i brief 49), notisikon), 24 luft, sedan hälsningen **"God morgon, [Namn]" / "God eftermiddag, [Namn]" / "God kväll, [Namn]"** (komma, inget utropstecken; 05–11 / 12–17 / övrigt) i Familjen Grotesk 28/32. Namn och initialer från `DUMMY_USER` (`data/user.ts`). Under den filterpillar (`FilterPills`) och AskBar. Ingen foto-bakgrund. Se `design.md` §8k.
 
 *Tidigare (aug 2026):* Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund + glassystem (avsnitt 9) på meny/sök-ikonerna. Inget kampanjbudskap, ingen Följ-knapp, ingen pil-uppåt (se avsnitt 8 för varför de INTE hör hemma här). Innehåll: personlig hälsning baserad på tid på dygnet — "Godmorgon [Namn]!" / "God eftermiddag [Namn]!" / "God kväll [Namn]!". Kopplar till Igenkänning-lagret i Kroona_Sammanstallning avsnitt 6.
 

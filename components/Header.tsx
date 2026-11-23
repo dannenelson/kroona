@@ -48,7 +48,7 @@ export default function Header() {
 const useStyles = makeStyles((t) => ({
   wrapper: {
     paddingHorizontal: spacing.screenMargin,
-    gap: spacing.sm,
+    gap: spacing.xl, // toppraden → hälsning 24 (brief 49)
   },
   row: {
     height: homeHeader.rowHeight,

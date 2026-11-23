@@ -39,16 +39,13 @@ const TAB_BLOCK = iconSize.lg + tabBar.iconLabelGap + typography.micro.lineHeigh
 const TAB_INNER_BELOW = (tabBar.rowHeight - TAB_BLOCK) / 2; // 7,5
 
 /**
- * Avstånd från skärmkanten till flikradens underkant (brief 46). Med
- * hemindikator ligger raden ovanför den: etikettens underkant
- * `tabBar.aboveHomeIndicator` (16) över indikatorns överkant
- * (`tabBar.homeIndicatorTop`, 13 från kanten), dvs. 29 från kanten och
- * 21,5 under raden. Utan safe area: `tabBar.minBottom` (8), etiketten 15,5 från kanten.
+ * Avstånd från skärmkanten till flikradens underkant (brief 46, 49).
+ * Etikettblockets underkant ligger `tabBar.labelBottom` (36) från kanten med
+ * safe area nedtill, dvs. raden 28,5 från kanten; utan safe area
+ * `tabBar.labelBottomNoInset` (24), raden 16,5 från kanten.
  */
 export function tabBarBottomPad(insetBottom: number): number {
-  return insetBottom > 0
-    ? tabBar.homeIndicatorTop + tabBar.aboveHomeIndicator - TAB_INNER_BELOW
-    : tabBar.minBottom;
+  return (insetBottom > 0 ? tabBar.labelBottom : tabBar.labelBottomNoInset) - TAB_INNER_BELOW;
 }
 
 /** Utrymme som skärmarnas innehåll lämnar nedtill för menyn (inklusive safe area). */
@@ -135,7 +132,8 @@ const useStyles = makeStyles(() => ({
     bottom: 0,
     left: 0,
     right: 0,
-    paddingHorizontal: spacing.sm,
+    // Flikarna samlas mot mitten (brief 49), fortfarande jämnt fördelade.
+    paddingHorizontal: tabBar.sideInset,
   },
   tabsRow: {
     flexDirection: 'row',
