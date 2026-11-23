@@ -52,7 +52,7 @@ export const editorialCard = {
   portraitSmall: { width: 150, height: 225 },
   landscape: { width: 320, height: 213 },
   mix: { width: 160, height: 160 },
-  collage: { width: 200, height: 267 },
+  collage: { width: 200, height: 250 }, // bildytan, 4:5 (brief 52; 200 × 267 med text på bild förut)
   /** Andel av höjden som toningen täcker (stor/liggande, liten). */
   fadeShare: 0.58,
   fadeShareSmall: 0.56,
@@ -93,7 +93,7 @@ export const tabBar = {
   rowHeight: 56,
   /** Flikikonernas ruta (brief 50; prova 28 eller 32). Glyfen fyller ca 73 %, dvs. ca 23 synligt vid 32.
    *  Ikon + 3 + etikettens radhöjd 14 måste rymmas i `rowHeight` (högst 39). */
-  iconSize: 32,
+  iconSize: 28, // brief 52 (32 i brief 50)
   iconLabelGap: 3,
   labelBottom: 36,
   labelBottomNoInset: 24,

@@ -22,6 +22,8 @@ export const typography = {
   caption: { fontFamily: fonts.ui400, fontSize: 12, lineHeight: 16 },
   micro: { fontFamily: fonts.ui500, fontSize: 10, lineHeight: 14 },
   price: { fontFamily: fonts.ui600 },
+  /** Titel under bilden på flerbildskort (kollage, brief 52): 14/500. */
+  cardTitle: { fontFamily: fonts.ui500, fontSize: 14, lineHeight: 18 },
   /** Hälsningen på Hem (brief 46). */
   greeting: { fontFamily: fonts.display600, fontSize: 28, lineHeight: 32 },
   /** Redaktionella kort (brief 43): titel på bild, stor stående / liggande / liten. */

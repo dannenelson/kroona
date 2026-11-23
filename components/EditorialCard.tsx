@@ -35,6 +35,9 @@ type Props = {
   chip?: ReactNode;
   /** Härlett format (mix, kollage): annan storlek och radie, samma text som varianten. */
   size?: { width: number; height: number; radius: number };
+  /** Textens justering; standard efter variant (stående centrerad, liggande vänster).
+   *  Mixkorten är vänsterställda (brief 52). */
+  align?: 'center' | 'start';
   /** Vit logotyp som ersätter titeln (brief 47); titeln blir tillgänglighetsetikett. */
   logo?: LogoComponent;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
@@ -69,10 +72,12 @@ export default function EditorialCard({
   onPress,
   accessibilityLabel,
   logo: Logo,
+  align,
 }: Props) {
   const styles = useStyles();
   const press = useCardPress();
-  const v = VARIANTS[variant];
+  const base = VARIANTS[variant];
+  const v = { ...base, centered: align ? align === 'center' : base.centered };
   const width = size?.width ?? v.width;
   const height = size?.height ?? v.height;
   const r = size?.radius ?? v.radius;

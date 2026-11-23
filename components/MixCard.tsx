@@ -1,7 +1,5 @@
-import { StyleSheet } from 'react-native';
 import { radius, editorialCard } from '../theme';
 import EditorialCard from './EditorialCard';
-import CollectionMosaic from './CollectionMosaic';
 
 type Props = {
   title: string;
@@ -10,9 +8,11 @@ type Props = {
 };
 
 /**
- * Mix i "Skapat för dig" (brief 43): kvadratiskt kort 160 × 160 med en 2 × 2-
- * mosaik av produktbilder och titel och undertitel på bilden (bara toning,
- * som små stående kort). Ingen destination ännu: mixar har ingen egen vy.
+ * Mix i "Skapat för dig" (brief 43, 52): kvadratiskt kort 160 × 160 med **en**
+ * omslagsbild (mixens första produkt) och titel och undertitel vänsterställda
+ * på bilden (bara toning, som små stående kort). Text på bild bara för ett
+ * enda foto; flerbildskort har texten under (brief 52).
+ * Ingen destination ännu: mixar har ingen egen vy.
  */
 export default function MixCard({ title, subtitle, images }: Props) {
   return (
@@ -21,7 +21,8 @@ export default function MixCard({ title, subtitle, images }: Props) {
       size={{ ...editorialCard.mix, radius: radius.editorialSmall }}
       title={title}
       subtitle={subtitle}
-      cover={<CollectionMosaic images={images} style={StyleSheet.absoluteFill} />}
+      imageUrl={images[0]}
+      align="start"
     />
   );
 }
