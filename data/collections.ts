@@ -2,6 +2,10 @@ import type { Product, ProductStyle } from '../types/product';
 import { getProductsForCollection, getProductsForRetailer } from '../lib/catalog';
 import { RETAILERS } from './retailers';
 import { getPerson } from './people';
+import { CATALOG } from './products';
+
+// Samlingarnas omslag tas från en av produkternas bilder (brief 48).
+const PRODUCTS_BY_ID: Record<string, string> = Object.fromEntries(CATALOG.map((p) => [p.id, p.imageUrl]));
 
 export type CollectionFilter =
   | { type: 'brand'; value: string }
@@ -26,6 +30,8 @@ export interface Collection {
   curator: CollectionCurator;
 }
 
+const img = (id: string) => PRODUCTS_BY_ID[id];
+
 export const COLLECTIONS: Collection[] = [
   {
     id: '1',
@@ -33,7 +39,7 @@ export const COLLECTIONS: Collection[] = [
     defaultFollowed: true,
     name: 'J.Lindeberg',
     tag: 'Varumärke',
-    imageUrl: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400',
+    imageUrl: img('6'),
     filter: { type: 'brand', value: 'J.Lindeberg' },
     curator: { kind: 'retailer', id: 'brand-j-lindeberg' },
   },
@@ -42,7 +48,7 @@ export const COLLECTIONS: Collection[] = [
     kind: 'collection',
     name: 'Filippa K',
     tag: 'Varumärke',
-    imageUrl: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400',
+    imageUrl: img('1'),
     filter: { type: 'brand', value: 'Filippa K' },
     curator: { kind: 'retailer', id: 'brand-filippa-k' },
   },
@@ -52,7 +58,7 @@ export const COLLECTIONS: Collection[] = [
     defaultFollowed: true,
     name: 'Skandinavisk stil',
     tag: 'Tema',
-    imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400',
+    imageUrl: img('17'),
     filter: { type: 'style', value: 'Skandinavisk' },
     curator: { kind: 'kroona' },
   },
@@ -61,65 +67,149 @@ export const COLLECTIONS: Collection[] = [
     kind: 'collection',
     name: 'Urban stil',
     tag: 'Tema',
-    imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400',
+    imageUrl: img('15'),
     filter: { type: 'style', value: 'Urban' },
+    curator: { kind: 'kroona' },
+  },
+  // Kroonas redaktionella samlingar med logotyp (brief 48, logotyper i data/logos.ts).
+  {
+    id: 'k-smarta-hem',
+    kind: 'collection',
+    name: 'Smarta hem',
+    tag: 'Tema',
+    imageUrl: img('7'),
+    filter: { type: 'products', ids: ['7', '4', '9', '2'] },
+    curator: { kind: 'kroona' },
+  },
+  {
+    id: 'k-gaming-deluxe',
+    kind: 'collection',
+    name: 'Gaming Deluxe',
+    tag: 'Tema',
+    imageUrl: img('9'),
+    filter: { type: 'products', ids: ['9', '2', '7', '14'] },
+    curator: { kind: 'kroona' },
+  },
+  {
+    id: 'k-handla-hallbart',
+    kind: 'collection',
+    name: 'Handla hållbart',
+    tag: 'Tema',
+    imageUrl: img('16'),
+    // De sju produkterna med högst hållbarhetspoäng (4,3–4,8).
+    filter: { type: 'products', ids: ['17', '16', '14', '1', '4', '20', '8'] },
+    curator: { kind: 'kroona' },
+  },
+  {
+    id: 'k-second-hand',
+    kind: 'collection',
+    name: 'Second Hand',
+    tag: 'Tema',
+    imageUrl: img('19'),
+    // Kläder som också finns begagnade.
+    filter: { type: 'products', ids: ['1', '11', '13', '19', '10'] },
+    curator: { kind: 'kroona' },
+  },
+  {
+    id: 'k-second-life',
+    kind: 'collection',
+    name: 'Second Life',
+    tag: 'Tema',
+    imageUrl: img('16'),
+    // Hemprodukter som också finns begagnade.
+    filter: { type: 'products', ids: ['16', '14', '17', '2'] },
     curator: { kind: 'kroona' },
   },
 ];
 
-// Varumärkenas egna kollektioner (brief 29), visas på Partnerdetalj.
-// DUMMYDATA (Fas 0): namn, bild och urval är påhittade för att visa pilot-
-// partners; i Fas 1+ skapar varumärkena dem själva. Ligger utanför COLLECTIONS
-// så att Hem, Följer och följ-standarden är oförändrade.
+// Varumärkenas och butikernas egna kollektioner (brief 29, omgjorda i brief 48),
+// visas på Partnerdetalj. DUMMYDATA (Fas 0): namn och urval är påhittade; i Fas 1+
+// skapar återförsäljarna dem själva. Bara kollektioner med minst 2 produkter.
 export const RETAILER_COLLECTIONS: Collection[] = [
   {
-    id: 'jl-golf',
+    id: 'jl-sneakers',
     kind: 'collection',
-    name: 'Golf och rörelse',
+    name: 'Sneakers',
     tag: 'Kollektion',
-    imageUrl: 'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=400',
-    filter: { type: 'products', ids: ['5', '7', '47', '48', '50'] },
+    imageUrl: img('12'),
+    filter: { type: 'products', ids: ['6', '12'] },
     curator: { kind: 'retailer', id: 'brand-j-lindeberg' },
   },
   {
-    id: 'jl-merino',
+    id: 'fk-host',
     kind: 'collection',
-    name: 'Merino och skjortor',
+    name: 'Höstgarderob',
     tag: 'Kollektion',
-    imageUrl: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400',
-    filter: { type: 'products', ids: ['1', '49', '51'] },
-    curator: { kind: 'retailer', id: 'brand-j-lindeberg' },
-  },
-  {
-    id: 'fk-ull',
-    kind: 'collection',
-    name: 'Ull och stickat',
-    tag: 'Kollektion',
-    imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400',
-    filter: { type: 'products', ids: ['2', '8', '27', '53', '55'] },
+    imageUrl: img('1'),
+    filter: { type: 'products', ids: ['1', '11', '18'] },
     curator: { kind: 'retailer', id: 'brand-filippa-k' },
   },
   {
-    id: 'fk-basplagg',
+    id: 'fk-vaskor',
     kind: 'collection',
-    name: 'Basplagg',
+    name: 'Väskor',
     tag: 'Kollektion',
-    imageUrl: 'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=400',
-    filter: { type: 'products', ids: ['52', '54', '56'] },
+    imageUrl: img('11'),
+    filter: { type: 'products', ids: ['11', '18'] },
     curator: { kind: 'retailer', id: 'brand-filippa-k' },
+  },
+  {
+    id: 'wd-urban',
+    kind: 'collection',
+    name: 'Urban vardag',
+    tag: 'Kollektion',
+    imageUrl: img('15'),
+    filter: { type: 'products', ids: ['3', '15'] },
+    curator: { kind: 'retailer', id: 'brand-weekday' },
+  },
+  {
+    id: 'hm-sommar',
+    kind: 'collection',
+    name: 'Sommarfavoriter',
+    tag: 'Kollektion',
+    imageUrl: img('5'),
+    filter: { type: 'products', ids: ['5', '10'] },
+    curator: { kind: 'retailer', id: 'brand-hm' },
+  },
+  {
+    id: 'lx-host',
+    kind: 'collection',
+    name: 'Höst i stan',
+    tag: 'Kollektion',
+    imageUrl: img('19'),
+    filter: { type: 'products', ids: ['19', '13', '8'] },
+    curator: { kind: 'retailer', id: 'brand-lindex' },
+  },
+  {
+    id: 'nn-vardagsrum',
+    kind: 'collection',
+    name: 'Vardagsrummet',
+    tag: 'Kollektion',
+    imageUrl: img('17'),
+    filter: { type: 'products', ids: ['17', '20', '4', '16'] },
+    curator: { kind: 'retailer', id: 'store-nordic-nest' },
+  },
+  {
+    id: 'rd-klassiker',
+    kind: 'collection',
+    name: 'Designklassiker',
+    tag: 'Kollektion',
+    imageUrl: img('14'),
+    filter: { type: 'products', ids: ['14', '20', '4'] },
+    curator: { kind: 'retailer', id: 'store-royal-design' },
   },
 ];
 
-// Personers publika samlingar (brief 37), visas på profilvyn och under
-// "Populära samlingar" på Hem. DUMMYDATA (Fas 0): påhittade personer och urval.
+// Personers publika samlingar (brief 37, omgjorda i brief 48), visas på profilvyn
+// och under "Populära samlingar" på Hem. DUMMYDATA (Fas 0): påhittade personer och urval.
 export const PEOPLE_COLLECTIONS: Collection[] = [
   {
     id: 'pc-maja-ull',
     kind: 'collection',
-    name: 'Vinterlook i ull',
+    name: 'Höstlook i ull och mocka',
     tag: 'Samling',
-    imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400',
-    filter: { type: 'products', ids: ['2', '8', '27', '53', '55', '1'] },
+    imageUrl: img('1'),
+    filter: { type: 'products', ids: ['1', '13', '19', '11'] },
     curator: { kind: 'user', id: 'p-maja' },
   },
   {
@@ -127,17 +217,17 @@ export const PEOPLE_COLLECTIONS: Collection[] = [
     kind: 'collection',
     name: 'Bästa begagnade fynden',
     tag: 'Samling',
-    imageUrl: 'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=400',
-    filter: { type: 'products', ids: ['3', '4', '6', '9', '12'] },
+    imageUrl: img('16'),
+    filter: { type: 'products', ids: ['16', '14', '10', '13'] },
     curator: { kind: 'user', id: 'p-maja' },
   },
   {
     id: 'pc-oskar-hem',
     kind: 'collection',
-    name: 'Litet hem, smart förvaring',
+    name: 'Litet hem, stora favoriter',
     tag: 'Samling',
-    imageUrl: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400',
-    filter: { type: 'products', ids: ['10', '11', '13', '14', '15'] },
+    imageUrl: img('17'),
+    filter: { type: 'products', ids: ['17', '20', '4', '7'] },
     curator: { kind: 'user', id: 'p-oskar' },
   },
   {
@@ -145,8 +235,8 @@ export const PEOPLE_COLLECTIONS: Collection[] = [
     kind: 'collection',
     name: 'Urban på budget',
     tag: 'Samling',
-    imageUrl: 'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=400',
-    filter: { type: 'products', ids: ['5', '7', '16', '17', '18'] },
+    imageUrl: img('3'),
+    filter: { type: 'products', ids: ['3', '10', '15', '5'] },
     curator: { kind: 'user', id: 'p-sara' },
   },
 ];

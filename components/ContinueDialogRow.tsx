@@ -2,6 +2,7 @@ import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { spacing } from '../theme';
 import LinkCard from './LinkCard';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 // "Fortsätt din dialog" — ingen rubrik ovanför (matchar mockupen exakt,
 // kroona_hem_forslag_v3.html visar bara ett bart LinkCard direkt under
@@ -22,7 +23,7 @@ export default function ContinueDialogRow() {
         variant="horizontal"
         title="Vinterjacka, hållbar, runt 2000 kr"
         subtitle="Fortsätt i Hitta"
-        imageUrl="https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=200"
+        imageUrl={PRODUCT_IMAGES.ponchoKnit}
         style={styles.card}
         onPress={() => router.push('/find')}
       />

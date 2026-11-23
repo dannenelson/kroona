@@ -15,7 +15,7 @@ import { makeStyles, spacing, radius, control, listRow, iconSize } from '../../t
 import { useUserCollections } from '../../context/UserCollectionsContext';
 import { ALL_SAVED_ID, ALL_SAVED_NAME } from '../../context/UserCollectionsContext';
 import { useSavedProducts } from '../../context/SavedProductsContext';
-import { PRODUCTS } from '../../data/products';
+import { PRODUCTS, knownProductIds } from '../../data/products';
 import { sortByName } from '../../lib/sortByName';
 import { SheetContent, SheetScrollView, useSheet, useSheetInsets, type SheetStep } from '../Sheet';
 import { useSnackbar } from '../Snackbar';
@@ -169,7 +169,7 @@ function SaveList({ productId, session }: { productId: string; session: Session 
             key={c.id}
             compact
             title={c.name}
-            subtitle={`${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(c.productIds.length)}`}
+            subtitle={`${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length)}`}
             thumb={
               <CollectionMosaic
                 images={images}

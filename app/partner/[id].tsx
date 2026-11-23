@@ -1,5 +1,6 @@
-// Partnerdetalj (brief 29, wireframes.md §3): ett varumärkes sida
-// (Återförsäljare med retailerType 'brand'). Nås från varumärkeskort på Hem
+// Partnerdetalj (brief 29, wireframes.md §3): en återförsäljares sida. Byggd
+// för varumärken; sedan brief 48 öppnas även butiker och andrahandstjänster
+// (Nordic Nest, Royal Design m.fl.), med produkter via deras erbjudanden. Nås från varumärkeskort på Hem
 // ("Du följer", "Fler varumärken i din stil") och från kuratorraden i
 // Samlingsdetalj. Samma hierarkirörelse som Produkt- och Samlingsdetalj
 // (partnerScreenOptions i components/product/productTransition.ts).
@@ -81,11 +82,11 @@ export default function PartnerScreen() {
 
   const back = () => router.back();
 
-  if (!retailer || retailer.retailerType !== 'brand') {
+  if (!retailer) {
     return (
       <View style={[styles.container, styles.empty, { paddingTop: insets.top }]}>
         <TopBar tone="plain" left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }} />
-        <Text style={styles.emptyText}>Varumärket finns inte.</Text>
+        <Text style={styles.emptyText}>Återförsäljaren finns inte.</Text>
       </View>
     );
   }
@@ -139,7 +140,16 @@ export default function PartnerScreen() {
             </Pill>
           </View>
 
-          <SectionTitle title="Om varumärket" style={styles.sectionTitle} />
+          <SectionTitle
+            title={
+              retailer.retailerType === 'brand'
+                ? 'Om varumärket'
+                : retailer.retailerType === 'store'
+                  ? 'Om butiken'
+                  : 'Om tjänsten'
+            }
+            style={styles.sectionTitle}
+          />
           <View style={styles.textBlock}>
             <Text style={styles.paragraph}>{retailer.description}</Text>
             <Text style={styles.paragraph}>{retailer.values}</Text>

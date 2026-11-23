@@ -19,7 +19,8 @@ export type FurnitureType =
   | 'belysning'
   | 'matta'
   | 'textil'
-  | 'dekor';
+  | 'dekor'
+  | 'teknik';
 
 import type { CatalogProduct } from './catalog';
 

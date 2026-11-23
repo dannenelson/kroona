@@ -19,21 +19,23 @@ import DiscoveryMosaicCard from './DiscoveryMosaicCard';
 import DiscoveryPreviewCard from './DiscoveryPreviewCard';
 import ClusterCard from './ClusterCard';
 import LinkCard from './LinkCard';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 const IMG = [
-  'https://images.unsplash.com/photo-1516826957135-700dedea698c',
-  'https://images.unsplash.com/photo-1539109136881-3be0616acf4b',
-  'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef',
-  'https://images.unsplash.com/photo-1598033129183-c4f50c736f10',
-  'https://images.unsplash.com/photo-1473966968600-fa801b869a1a',
-  'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2',
-  'https://images.unsplash.com/photo-1506629082955-511b1aa562c8',
-  'https://images.unsplash.com/photo-1490481651871-ab68de25d43d',
-  'https://images.unsplash.com/photo-1469334031218-e382a71b716b',
-  'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f',
-  'https://images.unsplash.com/photo-1509631179647-0177331693ae',
+  PRODUCT_IMAGES.chairLoungeDark,
+  PRODUCT_IMAGES.backpackLeather,
+  PRODUCT_IMAGES.backpackNavy,
+  PRODUCT_IMAGES.chairRattan,
+  PRODUCT_IMAGES.sneakerBlackStudio,
+  PRODUCT_IMAGES.sneakerBlackLow,
+  PRODUCT_IMAGES.sunglasses,
+  PRODUCT_IMAGES.speakerSmart,
+  PRODUCT_IMAGES.headphonesRetro,
+  PRODUCT_IMAGES.sneakerOrange,
+  PRODUCT_IMAGES.toteWovenLeather,
 ];
-const w = (i: number, width = 400) => `${IMG[i]}?w=${width}`;
+// Lokala dummybilder (brief 48); bredden ignoreras.
+const w = (i: number, _width = 400) => IMG[i];
 
 const COLLECTION_CARDS: {
   id: string;

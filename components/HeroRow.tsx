@@ -6,6 +6,7 @@ import { useSavedProducts } from '../context/SavedProductsContext';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import { MixSignal, signalKey, getKnownSignals } from '../lib/personalizationSignals';
 import SectionTitle from './SectionTitle';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 // 82% av skärmbredden — lämnar en tydlig ~18%-skymt av nästa kort synlig,
@@ -40,7 +41,7 @@ const EDITORIAL_POSTS: EditorialPost[] = [
     eyebrow: 'SÄSONG',
     title: 'Höstens paletter',
     meta: 'Varma toner för kalla dagar',
-    imageUrl: 'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=800',
+    imageUrl: PRODUCT_IMAGES.sneakerBlackLow,
     signals: [
       { type: 'style', value: 'Skandinavisk' },
       { type: 'style', value: 'Minimalistisk' },
@@ -52,7 +53,7 @@ const EDITORIAL_POSTS: EditorialPost[] = [
     eyebrow: 'TEMA',
     title: 'Träningsutrustning',
     meta: 'Funktion möter form',
-    imageUrl: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=800',
+    imageUrl: PRODUCT_IMAGES.chairRattan,
     signals: [
       { type: 'style', value: 'Sportig' },
       { type: 'brand', value: 'Peak Performance' },
@@ -64,7 +65,7 @@ const EDITORIAL_POSTS: EditorialPost[] = [
     eyebrow: 'TEMA',
     title: 'Kontor, ny säsong',
     meta: 'Uppdatera din arbetsplats',
-    imageUrl: 'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=800',
+    imageUrl: PRODUCT_IMAGES.sunglasses,
     signals: [
       { type: 'style', value: 'Minimalistisk' },
       { type: 'brand', value: 'HAY' },
@@ -76,7 +77,7 @@ const EDITORIAL_POSTS: EditorialPost[] = [
     eyebrow: 'SÄSONG',
     title: 'Ytterplagg för hösten',
     meta: 'Regn- och vindtätt i urban stil',
-    imageUrl: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=800',
+    imageUrl: PRODUCT_IMAGES.backpackNavy,
     signals: [
       { type: 'style', value: 'Urban' },
       { type: 'brand', value: 'Rains' },

@@ -8,7 +8,7 @@ export const AREAS: Area[] = [
     kind: 'area',
     name: 'Hemmakontor',
     description: 'Stolar, bord, ljus och förvaring för att arbeta hemma.',
-    filter: { category: 'möbler', types: ['stol', 'bord', 'belysning', 'förvaring'] },
+    filter: { category: 'möbler', types: ['stol', 'bord', 'belysning', 'förvaring', 'teknik'] },
     defaultFollowed: true,
   },
   {
@@ -22,8 +22,9 @@ export const AREAS: Area[] = [
     id: 'area-mjukt-hem',
     kind: 'area',
     name: 'Mjukt hem',
-    description: 'Textilier, mattor och dekor som gör rummet varmare.',
-    filter: { category: 'möbler', types: ['textil', 'matta', 'dekor'] },
+    description: 'Fåtöljer, textilier och dekor som gör rummet varmare.',
+    // Brief 48: katalogen saknar textil, matta och dekor, så fåtöljerna (stol) bär området.
+    filter: { category: 'möbler', types: ['stol', 'textil', 'matta', 'dekor'] },
     defaultFollowed: true,
   },
   {

@@ -26,23 +26,20 @@ export const LOGO_ASPECT = 2;
 /** Återförsäljare (retailer-id) → logotyp. */
 export const RETAILER_LOGOS: Record<string, LogoComponent> = {
   'brand-filippa-k': FilippaK,
-  // TODO 48: id:n skapas i brief 48.
-  // 'brand-hm': Hm,
-  // 'brand-lindex': Lindex,
-  // 'store-nordic-nest': NordicNest,
-  // 'store-royal-design': RoyalDesign,
+  'brand-hm': Hm,
+  'brand-lindex': Lindex,
+  'store-nordic-nest': NordicNest,
+  'store-royal-design': RoyalDesign,
 };
 
 /** Samling eller område (id) → vit logotyp som ersätter titeln på kort. */
 export const COLLECTION_LOGOS: Record<string, LogoComponent> = {
   '2': ScandinaviskDesign, // Skandinavisk stil
-  // TODO 48: området "Begagnad mode" finns inte i data/areas.ts än.
-  // 'area-begagnad-mode': SecondHand,
-  // TODO 48: samlingar skapas i brief 48.
-  // '<second-life>': SecondLife,
-  // '<gaming-deluxe>': GamingDeluxe,
-  // '<handla-hallbart>': HandlaHallbart,
-  // '<smarta-hem>': SmartaHem,
+  'k-smarta-hem': SmartaHem,
+  'k-gaming-deluxe': GamingDeluxe,
+  'k-handla-hallbart': HandlaHallbart,
+  'k-second-hand': SecondHand, // ersätter området "Begagnad mode" (fanns inte, brief 48)
+  'k-second-life': SecondLife,
 };
 
 /** Alla logotyper, för provytan på dev-sidan. */

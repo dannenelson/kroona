@@ -18,7 +18,7 @@ import { useFollowedCollections } from '../../context/FollowedCollectionsContext
 import { useFollowedPeople } from '../../context/FollowedPeopleContext';
 import { getPerson } from '../../data/people';
 import { ALL_SAVED_ID, ALL_SAVED_NAME, useUserCollections } from '../../context/UserCollectionsContext';
-import { PRODUCTS } from '../../data/products';
+import { PRODUCTS, knownProductIds } from '../../data/products';
 import { sortByName } from '../../lib/sortByName';
 import {
   ALL_COLLECTIONS,
@@ -119,7 +119,7 @@ export default function SavedScreen() {
     { label: 'Dela', icon: ShareIcon, onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: thumb }) },
   ];
   const visibility = (c: UserCollection) => ({
-    subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(c.productIds.length, 'produkt', 'produkter')}`,
+    subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length, 'produkt', 'produkter')}`,
     icon: c.visibility === 'public' ? undefined : LockIcon,
   });
   const likedSubtitle = countLabel(savedProducts.length, 'produkt', 'produkter');

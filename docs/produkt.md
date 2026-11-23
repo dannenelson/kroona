@@ -54,7 +54,7 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 
 | Typ | Fält | Fil |
 |---|---|---|
-| **Produkt** (`CatalogProduct`) | id, brand, name, imageUrl (kanonisk), aspectRatio, featured, sustainabilityScore, `isNewArrival` (märket "Nyhet", inte skick), category, style, gender/ageGroup (kläder), type (möbler), `facts` (material, madeIn, certification, valfria). **Inget pris, inget skick.** | `data/products.ts` (`CATALOG`), `newProducts.ts`, `catalogTopup.ts` |
+| **Produkt** (`CatalogProduct`) | id, brand, name, imageUrl (kanonisk), aspectRatio, featured, sustainabilityScore, `isNewArrival` (märket "Nyhet", inte skick), category, style, gender/ageGroup (kläder), type (möbler: stol, soffa, bord, förvaring, belysning, matta, textil, dekor och sedan brief 48 **teknik**), `facts` (material, madeIn, certification, valfria). **Inget pris, inget skick.** | `data/products.ts` (`CATALOG`), bilder i `data/productImages.ts` |
 | **Återförsäljare** (`Retailer`) | id, `kind: 'retailer'`, name, retailerType (`brand` · `store` · `secondhand`), brandName (för brand), description, values, presence (online, stores[]), initial, defaultFollowed | `data/retailers.ts` |
 | **Erbjudande** (`Offer`) | id, productId, retailerId, price, **condition** (`new` · `used`), conditionNote och **pricing** (`fixed` = "Fast pris", `auction` = "Auktion, bud från") för begagnat, stock (`in_stock` · `few_left` · `out_of_stock`), shipping (text), url (dummy) | `data/offers.ts` |
 | **Område** (`Area`) | id, `kind: 'area'`, name, description, filter (category, styles[], types[]), defaultFollowed | `data/areas.ts` |
@@ -70,6 +70,8 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 
 **Hem (brief 43):** hyllor med redaktionella kort (text på bilden; stående centrerad, liggande vänster) i fast ordning: Fortsätt där du var, Skapat för dig, Samlingar för dig, Fler i din stil (cirklar = varumärken och personer), Områden, Populära samlingar, Kanske intressant för dig. Produktkort behåller text under bilden. "Du följer" bor i Sparat → Följer.
 
+**Katalogen (brief 48):** 20 dummyprodukter, en per lokal bild i `assets/dummy/products/` (500 px breda), id `'1'`–`'20'`: kläder och accessoarer (Filippa K, H&M, Lindex, J.Lindeberg, Weekday) och hem och teknik (påhittade märken, säljs via Nordic Nest och Royal Design). Teknik är en möbeltyp (`'teknik'`), ingen egen kategori. Nio återförsäljare: fem varumärken, två hembutiker, två andrahandstjänster. Fem redaktionella Kroona-samlingar med logotyp (Smarta hem, Gaming Deluxe, Handla hållbart, Second Hand, Second Life) utöver Skandinavisk och Urban stil. Sparade och följda id:n som inte längre finns hoppas tyst över (`knownProductIds`). **`assets/dummy/` (bilder och logotyper) ska bytas eller tas bort före publik release.**
+
 **Logotyper (brief 47):** återförsäljar- och samlingslogotyperna i `assets/dummy/` tillhör respektive varumärke och är bara tillfälligt demomaterial. **De ska bytas mot licensierade filer eller tas bort före publik release.**
 
 **Samling ↔ varumärke (Daniel, 2026-11-20, brief 29):** en samling är en kuraterad produktuppsättning med en kurator: Kroona (teman, editorial som Spotify-spellistor), ett varumärke (kollektioner) eller en användare (egna samlingar, senare). Ett varumärke är en egen entitet (`Retailer`, `brand`) med en egen sida, Partnerdetalj, som bär varumärkets kollektioner och alla dess produkter. Att varumärken skapar samlingar själva är Fas 1+; i Fas 0 är kollektionerna dummydata (`RETAILER_COLLECTIONS`, 2 vardera för J.Lindeberg och Filippa K). Varumärkes-filtersamlingarna J.Lindeberg och Filippa K i `COLLECTIONS` finns kvar tills Hem/Följer omarbetas (Följer, personalisering och följ-lagringen bygger på dem); kort för dem öppnar Partnerdetalj, och följ av varumärket använder deras id som nyckel (`getRetailerFollowKey`).
@@ -83,7 +85,7 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 ## Faser
 | Fas | Innehåll |
 |---|---|
-| **0 (nu)** | Demo med 56 dummyprodukter. Ingen backend, tracking eller provision. Målet är att visa pilotpartners. |
+| **0 (nu)** | Demo med 20 dummyprodukter (brief 48, tidigare 56). Ingen backend, tracking eller provision. Målet är att visa pilotpartners. |
 | 1 | En riktig återförsäljare, tracking och provision, konton, Supabase. |
 | 2 | Cirka 100 användare via nätverk och waitlist. |
 | 3 | Fler återförsäljare, kategorier och länder. |

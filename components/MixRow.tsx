@@ -7,6 +7,7 @@ import { PRODUCTS } from '../data/products';
 import { useSavedProducts } from '../context/SavedProductsContext';
 import { useFollowedCollections } from '../context/FollowedCollectionsContext';
 import { MixSignal, signalKey, getKnownSignals } from '../lib/personalizationSignals';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 type Mix = {
   id: string;
@@ -24,10 +25,10 @@ const MIXES: Mix[] = [
     title: 'Minimalistisk vardag',
     subtitle: '24 produkter',
     images: [
-      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=200',
-      'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=200',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=200',
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200',
+      PRODUCT_IMAGES.ponchoKnit,
+      PRODUCT_IMAGES.bootsSuede,
+      PRODUCT_IMAGES.toteWovenLeather,
+      PRODUCT_IMAGES.sneakerRedRunner,
     ],
   },
   {
@@ -35,10 +36,10 @@ const MIXES: Mix[] = [
     title: 'Höstens lager',
     subtitle: '18 produkter',
     images: [
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=200',
-      'https://images.unsplash.com/photo-1495385794356-15371f348c31?w=200',
-      'https://images.unsplash.com/photo-1475180098004-ca77a66827be?w=200',
-      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=200',
+      PRODUCT_IMAGES.backpackLeather,
+      PRODUCT_IMAGES.headphonesBlack,
+      PRODUCT_IMAGES.lampsBrass,
+      PRODUCT_IMAGES.ponchoKnit,
     ],
   },
   {
@@ -46,10 +47,10 @@ const MIXES: Mix[] = [
     title: 'Skandinavisk stil',
     subtitle: '31 produkter',
     images: [
-      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200',
-      'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=200',
-      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200',
-      'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=200',
+      PRODUCT_IMAGES.sneakerRedRunner,
+      PRODUCT_IMAGES.sneakerBlackLow,
+      PRODUCT_IMAGES.headphonesRetro,
+      PRODUCT_IMAGES.bootsSuede,
     ],
   },
 ];
@@ -60,10 +61,10 @@ const MIXES_WEEKLY: Mix[] = [
     title: 'Lyxig finish',
     subtitle: '15 produkter',
     images: [
-      'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=200',
-      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200',
-      'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=200',
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=200',
+      PRODUCT_IMAGES.chairLoungeDark,
+      PRODUCT_IMAGES.sneakerBlackStudio,
+      PRODUCT_IMAGES.sunglasses,
+      PRODUCT_IMAGES.backpackLeather,
     ],
   },
   {
@@ -71,10 +72,10 @@ const MIXES_WEEKLY: Mix[] = [
     title: 'Sportig vardag',
     subtitle: '22 produkter',
     images: [
-      'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=200',
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=200',
-      'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=200',
-      'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=200',
+      PRODUCT_IMAGES.chairRattan,
+      PRODUCT_IMAGES.speakerSmart,
+      PRODUCT_IMAGES.backpackNavy,
+      PRODUCT_IMAGES.sneakerBlackLow,
     ],
   },
   {
@@ -82,10 +83,10 @@ const MIXES_WEEKLY: Mix[] = [
     title: 'Vintage-fynd',
     subtitle: '9 produkter',
     images: [
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=200',
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=200',
-      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200',
+      PRODUCT_IMAGES.sneakerOrange,
+      PRODUCT_IMAGES.toteWovenLeather,
+      PRODUCT_IMAGES.backpackLeather,
+      PRODUCT_IMAGES.sneakerBlackStudio,
     ],
   },
 ];

@@ -3,11 +3,12 @@ import { View, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { spacing } from '../theme';
 import { useUserCollections } from '../context/UserCollectionsContext';
-import { PRODUCTS } from '../data/products';
+import { PRODUCTS, knownProductIds } from '../data/products';
 import { COLLECTION_BOUNDARY_GROUP } from './product/productTransition';
 import SectionTitle from './SectionTitle';
 import EditorialCard from './EditorialCard';
 import CollectionMosaic from './CollectionMosaic';
+import { PRODUCT_IMAGES } from '../data/productImages';
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
 
@@ -25,7 +26,7 @@ export default function ContinueRow() {
   const dialog = {
     title: 'Vinterjacka, hållbar, runt 2000 kr',
     subtitle: 'Fortsätt i Hitta',
-    imageUrl: 'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=800',
+    imageUrl: PRODUCT_IMAGES.ponchoKnit,
   };
 
   const collectionImages = (lastOpenedCollection?.productIds ?? [])
@@ -49,7 +50,7 @@ export default function ContinueRow() {
         variant="landscape"
         status="Senast öppnad"
         title={lastOpenedCollection.name}
-        subtitle={countLabel(lastOpenedCollection.productIds.length)}
+        subtitle={countLabel(knownProductIds(lastOpenedCollection.productIds).length)}
         cover={<CollectionMosaic images={collectionImages} style={StyleSheet.absoluteFill} />}
         boundary={{ id: boundaryId, group: COLLECTION_BOUNDARY_GROUP }}
         onPress={() =>
