@@ -1,60 +1,75 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { makeStyles, typography, spacing, radius, iconSize } from '../theme';
+import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { makeStyles, typography, spacing, touchTarget, iconSize, homeHeader } from '../theme';
+import { DUMMY_USER } from '../data/user';
+import Avatar from './Avatar';
+import KroonaLogo from './KroonaLogo';
+import NotificationIcon from './NotificationIcon';
 
-const AVATAR_SIZE = 32;
+/** "God morgon" 05–11, "God eftermiddag" 12–17, annars "God kväll". */
+export function greetingFor(date: Date): string {
+  const h = date.getHours();
+  if (h >= 5 && h < 12) return 'God morgon';
+  if (h >= 12 && h < 18) return 'God eftermiddag';
+  return 'God kväll';
+}
 
+/**
+ * Hem-toppen (brief 46): toppraden 44 med avatar (initialer), Kroona-logotypen
+ * absolut centrerad (oberoende av sidoelementens bredd) och notisikonen i en
+ * 44 × 44 träffyta, sedan hälsningen efter tid på dygnet.
+ */
 export default function Header() {
   const styles = useStyles();
   return (
-    <View style={styles.header}>
-      <TouchableOpacity style={styles.avatar}>
-        <Text style={styles.avatarText}>D</Text>
-      </TouchableOpacity>
-
-      <Text style={styles.logo}>Kroona</Text>
-
-      <TouchableOpacity style={styles.notifButton}>
-        <Text style={styles.notifIcon}>🔔</Text>
-      </TouchableOpacity>
+    <View style={styles.wrapper}>
+      <View style={styles.row}>
+        {/* Logotypen ligger i ett eget lager över hela raden, så den står mitt på. */}
+        <View style={[StyleSheet.absoluteFill, styles.center]} pointerEvents="none">
+          <KroonaLogo height={homeHeader.logoHeight} />
+        </View>
+        <Avatar initial={DUMMY_USER.initials} size={homeHeader.avatar} />
+        {/* Notisskärmen finns inte än (Fas 0): trycket gör ingenting. */}
+        <Pressable
+          style={styles.bell}
+          accessibilityRole="button"
+          accessibilityLabel="Notiser"
+          onPress={() => {}}
+        >
+          <NotificationIcon size={iconSize.lg} />
+        </Pressable>
+      </View>
+      <Text style={styles.greeting}>
+        {greetingFor(new Date())}, {DUMMY_USER.name}
+      </Text>
     </View>
   );
 }
 
 const useStyles = makeStyles((t) => ({
-  header: {
+  wrapper: {
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.sm,
+  },
+  row: {
+    height: homeHeader.rowHeight,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.screenMargin,
-    paddingVertical: spacing.md,
   },
-  avatar: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
-    borderRadius: radius.full,
-    backgroundColor: t.colors.surface,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderColor: t.colors.border,
+  center: {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: {
-    ...typography.label,
-    color: t.colors.textPrimary,
-  },
-  logo: {
-    ...typography.title2,
-    color: t.colors.textPrimary,
-    letterSpacing: 2, // lokal: logotypens spärrning
-    textTransform: 'uppercase',
-  },
-  notifButton: {
-    width: AVATAR_SIZE,
-    height: AVATAR_SIZE,
+  bell: {
+    width: touchTarget,
+    height: touchTarget,
     alignItems: 'center',
     justifyContent: 'center',
+    // Ikonens kant (inte träffytans) linjerar med skärmmarginalen.
+    marginRight: -(touchTarget - iconSize.lg) / 2,
   },
-  notifIcon: {
-    fontSize: iconSize.md - 4, // lokal: emoji-ikon, optiskt 16 tills ikonbibliotek finns
+  greeting: {
+    ...typography.greeting,
+    color: t.colors.textPrimary,
   },
 }));

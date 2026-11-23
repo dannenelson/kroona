@@ -11,7 +11,7 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, motion, edgeBlur, snackbar } from '../theme';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import { haptic } from '../utils/haptic';
-import { TAB_BAR_HEIGHT } from './CustomTabBar';
+import { tabBarSpace } from './CustomTabBar';
 import Button from './Button';
 
 export type SnackbarOptions = {
@@ -97,7 +97,7 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
 
   const api = useMemo(() => ({ show }), [show]);
   const onTabs = TAB_PATHS.has(pathname);
-  const bottom = onTabs ? TAB_BAR_HEIGHT + insets.bottom + spacing.md : snackbar.bottomOffset;
+  const bottom = onTabs ? tabBarSpace(insets.bottom) + spacing.md : snackbar.bottomOffset;
   // Minska rörelse: bara tonning. Annars glider den upp; opaciteten ligger på
   // ett eget lager utanför blurren (opacitet på blurrens förälder bryter glaset,
   // se Glass.tsx), så den används bara i reduce motion.

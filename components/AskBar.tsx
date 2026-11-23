@@ -48,7 +48,6 @@ export default function AskBar() {
 const useStyles = makeStyles((t) => ({
   wrapper: {
     paddingHorizontal: spacing.screenMargin,
-    marginTop: spacing.sm,
   },
   bar: {
     flexDirection: 'row',

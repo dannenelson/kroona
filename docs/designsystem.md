@@ -164,7 +164,9 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 
 ## 10. Hem — hero-hälsning (tillagt aug 2026)
 
-Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund + glassystem (avsnitt 9) på meny/sök-ikonerna. Inget kampanjbudskap, ingen Följ-knapp, ingen pil-uppåt (se avsnitt 8 för varför de INTE hör hemma här). Innehåll: personlig hälsning baserad på tid på dygnet — "Godmorgon [Namn]!" / "God eftermiddag [Namn]!" / "God kväll [Namn]!". Kopplar till Igenkänning-lagret i Kroona_Sammanstallning avsnitt 6.
+**Uppdaterat 2026-11-23 (brief 46), ersätter foto-heron nedan:** Hem-toppen är `components/Header.tsx`: toppraden (avatar med initialer, centrerad Kroona-logotyp, notisikon), sedan hälsningen **"God morgon, [Namn]" / "God eftermiddag, [Namn]" / "God kväll, [Namn]"** (komma, inget utropstecken; 05–11 / 12–17 / övrigt) i Familjen Grotesk 28/32. Namn och initialer från `DUMMY_USER` (`data/user.ts`). Under den filterpillar (`FilterPills`) och AskBar. Ingen foto-bakgrund. Se `design.md` §8k.
+
+*Tidigare (aug 2026):* Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund + glassystem (avsnitt 9) på meny/sök-ikonerna. Inget kampanjbudskap, ingen Följ-knapp, ingen pil-uppåt (se avsnitt 8 för varför de INTE hör hemma här). Innehåll: personlig hälsning baserad på tid på dygnet — "Godmorgon [Namn]!" / "God eftermiddag [Namn]!" / "God kväll [Namn]!". Kopplar till Igenkänning-lagret i Kroona_Sammanstallning avsnitt 6.
 
 ## 11. Kortinnehåll — pris- och betygsformat (tillagt aug 2026)
 
@@ -198,11 +200,11 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 - **Ligger kvar men monteras inte längre på Hem:** `ContinueDialogRow`, `CollectionRow` ("Du följer"), `DiscoverBrandsRow` (logiken delas via `useDiscoverBrandTiles`), `DiscoveryMosaicCard`, `HeroRow`, `DiscoveryPreviewCard`, `CollectionCard`.
 
 ## 17. SVG-filer: ikoner och logotyper (tillagt 2026-11-23, brief 45)
-- **Konvention:** nya ikoner är `.svg`-filer under `assets/svg/icons/` (24 × 24, linjeikoner med linjetjocklek 1,8, `stroke`/`fill="currentColor"`). Logotyper ligger under `assets/logos/`. De gamla TSX-ikonerna i `assets/icons/` ersätts först när de ändå ändras.
+- **Konvention:** nya ikoner är `.svg`-filer under `assets/svg/icons/` (24 × 24, linjeikoner med linjetjocklek 1,5 som övriga ikoner, `stroke`/`fill="currentColor"`). Logotyper ligger under `assets/logos/`. De gamla TSX-ikonerna i `assets/icons/` ersätts först när de ändå ändras.
 - **Pipeline:** Metro importerar `.svg` som React-komponent (`react-native-svg-transformer`, `metro.config.js`, typer i `types/svg.d.ts`). `.svgrrc` i roten tar bort fasta `width`/`height` (`dimensions: false`), behåller `viewBox` och byter svart (`#000`, `#000000`, `black`) mot `currentColor`. Komponenten tar då `width`, `height` och `color` (färgen ger `currentColor`). Ändras `.svgrrc` måste Metro startas med `-c`.
-- **Wrappers:** `components/KroonaLogo.tsx` (`height`, bredden från proportionen 1440:238, `color` default `textPrimary`) och `components/NotificationIcon.tsx` (`size` default `iconSize.lg`, `color` default `textPrimary`). Provyta: dev-sidan `app/components.tsx`.
+- **Wrappers:** `components/KroonaLogo.tsx` (`height`, bredden från proportionen 1440:238, `color` default `textPrimary`, `trademark` default från 40 px höjd: under det beskärs viewBox till ordbilden 1378 bred så att ™ döljs, brief 46) och `components/NotificationIcon.tsx` (`size` default `iconSize.lg`, `color` default `textPrimary`; klockan ritad med linje 1,5 sedan brief 46, som övriga ikoner). Provyta: dev-sidan `app/components.tsx`.
 - **Lägga till en ny ikon:**
-  1. Exportera 24 × 24 med linje 1,8 och spara som `assets/svg/icons/<namn>.svg` (svart eller `currentColor`, ingen `style` på roten).
+  1. Exportera 24 × 24 med linje 1,5 och spara som `assets/svg/icons/<namn>.svg` (svart eller `currentColor`, ingen `style` på roten).
   2. Importera den: `import XSvg from '../assets/svg/icons/<namn>.svg'`.
   3. Rita `<XSvg width={size} height={size} color={colors.textPrimary} />` (eller gör en liten wrapper som `NotificationIcon` när den används på 2+ ställen).
 

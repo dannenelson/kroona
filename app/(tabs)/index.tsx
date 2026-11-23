@@ -4,7 +4,7 @@ import { Link } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing } from '../../theme';
 import Header from '../../components/Header';
-import TextTabs from '../../components/TextTabs';
+import FilterPills from '../../components/FilterPills';
 import AskBar from '../../components/AskBar';
 import ContinueRow from '../../components/ContinueRow';
 import MixRow from '../../components/MixRow';
@@ -13,9 +13,9 @@ import MoreInYourStyleRow from '../../components/MoreInYourStyleRow';
 import AreasRow from '../../components/AreasRow';
 import PopularCollectionsRow from '../../components/PopularCollectionsRow';
 import RecommendedProductsRow from '../../components/RecommendedProductsRow';
-import { TAB_BAR_HEIGHT } from '../../components/CustomTabBar';
+import { tabBarSpace } from '../../components/CustomTabBar';
 
-// Rent visuell filterrad, som tidigare FilterPills: byter bara vald flik och
+// Rent visuell filterrad (pillar sedan brief 46): byter bara vald pill och
 // filtrerar ingenting ännu.
 const FILTERS = ['Allt', 'Kläder', 'Möbler', 'Begagnat'] as const;
 type Filter = (typeof FILTERS)[number];
@@ -31,12 +31,16 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top,
-          paddingBottom: TAB_BAR_HEIGHT + insets.bottom + spacing.xxl,
+          paddingBottom: tabBarSpace(insets.bottom) + spacing.xxl,
         }}
       >
-        <Header />
-        <TextTabs items={FILTERS} selected={filter} onSelect={setFilter} />
-        <AskBar />
+        {/* Hem-toppen (brief 46): toppraden + hälsning, filterpillar, AskBar.
+            Toppraden → hälsning 8 (i Header), hälsning → pillar 16, pillar → AskBar 16. */}
+        <View style={styles.top}>
+          <Header />
+          <FilterPills items={FILTERS} selected={filter} onSelect={setFilter} />
+          <AskBar />
+        </View>
         {/* Dev-länk till komponentsidan, bara i utvecklingsläge.
             Flyttas eller tas bort när Hem byggs om. */}
         {__DEV__ && (
@@ -64,6 +68,9 @@ const useStyles = makeStyles((t) => ({
   container: {
     flex: 1,
     backgroundColor: t.colors.bg,
+  },
+  top: {
+    gap: spacing.lg,
   },
   devLink: {
     paddingHorizontal: spacing.screenMargin,

@@ -31,7 +31,7 @@ import {
 } from '../../data/collections';
 import { getProductsForRetailer, getRetailer } from '../../lib/catalog';
 import type { Person, Retailer, UserCollection } from '../../types/catalog';
-import { TAB_BAR_HEIGHT } from '../../components/CustomTabBar';
+import { tabBarSpace } from '../../components/CustomTabBar';
 import {
   COLLECTION_BOUNDARY_GROUP,
   PARTNER_BOUNDARY_GROUP,
@@ -127,7 +127,7 @@ export default function SavedScreen() {
     <View style={styles.container}>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingTop: insets.top, paddingBottom: TAB_BAR_HEIGHT + insets.bottom, flexGrow: 1 }}
+        contentContainerStyle={{ paddingTop: insets.top, paddingBottom: tabBarSpace(insets.bottom), flexGrow: 1 }}
       >
         <View style={styles.header}>
           <Text style={styles.title} accessibilityRole="header">

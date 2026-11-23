@@ -21,7 +21,7 @@ import { Product } from '../../types/product';
 import { askClaude, ClaudeMessage } from '../../lib/claudeProxy';
 import { buildHittaSystemPrompt, SHOW_PRODUCTS_TOOL } from '../../lib/kroonaSystemPrompt';
 import ProductGrid from '../../components/ProductGrid';
-import { TAB_BAR_HEIGHT } from '../../components/CustomTabBar';
+import { tabBarSpace } from '../../components/CustomTabBar';
 
 type ChatRole = 'user' | 'assistant' | 'error';
 
@@ -254,7 +254,7 @@ export default function FindScreen() {
           showsVerticalScrollIndicator={false}
         />
 
-        <View style={[styles.inputRow, { paddingBottom: insets.bottom + TAB_BAR_HEIGHT }]}>
+        <View style={[styles.inputRow, { paddingBottom: tabBarSpace(insets.bottom) }]}>
           <TextInput
             style={styles.input}
             value={inputText}

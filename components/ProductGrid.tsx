@@ -4,7 +4,7 @@ import { Product } from '../types/product';
 import ProductCard from './ProductCard';
 import SectionTitle from './SectionTitle';
 import { spacing } from '../theme';
-import { TAB_BAR_HEIGHT } from './CustomTabBar';
+import { tabBarSpace } from './CustomTabBar';
 
 type Props = {
   products: Product[];
@@ -22,7 +22,7 @@ export default function ProductGrid({ products, title, compact }: Props) {
       style={[
         styles.section,
         compact && styles.sectionCompact,
-        !compact && { paddingBottom: TAB_BAR_HEIGHT + insets.bottom },
+        !compact && { paddingBottom: tabBarSpace(insets.bottom) },
       ]}
     >
       {title && <SectionTitle title={title} />}

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Animated, View, Text, Pressable } from 'react-native';
 import { BottomTabBarProps } from 'expo-router/js-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, typography, spacing, motion, touchTarget, iconSize } from '../theme';
+import { makeStyles, useTheme, typography, spacing, motion, iconSize, tabBar } from '../theme';
 import EdgeFade from './EdgeFade';
 import { usePressAnimation } from '../hooks/usePressAnimation';
 
@@ -29,22 +29,38 @@ const LABELS: Record<string, string> = {
   saved: 'Sparat',
 };
 
-// Lokala mått för tab-baren (flikbredd och höjd är komponentmått, inte spacing).
+// Lokala mått för tab-baren (flikbredd är ett komponentmått, inte spacing).
 // Referensen "Kroona Looken A": flik 56 hög, ikon 25 (här iconSize.lg 24),
-// etikett 10,5/500 (här micro 10/14), ikonerna ligger lågt nära hemindikatorn.
+// etikett 10,5/500 (här micro 10/14).
 const TAB_WIDTH = 80;
-const TAB_ROW_HEIGHT = touchTarget + spacing.md; // 56
-const TAB_GAP = 3; // lokal optisk justering: ikon → etikett (referensen)
-// Hur långt in i hemindikatorns safe area flikarna sänks (referensen: 10 px
-// från skärmkanten på en iPhone med 34 px safe area).
-const NAV_LOWER = spacing.xl;
+
+// Ikon + avstånd + etikett, och luften under etiketten inne i den 56 höga raden.
+const TAB_BLOCK = iconSize.lg + tabBar.iconLabelGap + typography.micro.lineHeight; // 41
+const TAB_INNER_BELOW = (tabBar.rowHeight - TAB_BLOCK) / 2; // 7,5
+
+/**
+ * Avstånd från skärmkanten till flikradens underkant (brief 46). Med
+ * hemindikator ligger raden ovanför den: etikettens underkant
+ * `tabBar.aboveHomeIndicator` (16) över indikatorns överkant
+ * (`tabBar.homeIndicatorTop`, 13 från kanten), dvs. 29 från kanten och
+ * 21,5 under raden. Utan safe area: `tabBar.minBottom` (8), etiketten 15,5 från kanten.
+ */
+export function tabBarBottomPad(insetBottom: number): number {
+  return insetBottom > 0
+    ? tabBar.homeIndicatorTop + tabBar.aboveHomeIndicator - TAB_INNER_BELOW
+    : tabBar.minBottom;
+}
+
+/** Utrymme som skärmarnas innehåll lämnar nedtill för menyn (inklusive safe area). */
+export function tabBarSpace(insetBottom: number): number {
+  return tabBarBottomPad(insetBottom) + tabBar.rowHeight + spacing.sm;
+}
 
 export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useStyles();
-  // Flikarna sänks in i safe area, men aldrig närmare kanten än spacing.sm.
-  const bottomPad = Math.max(insets.bottom - NAV_LOWER, spacing.sm);
+  const bottomPad = tabBarBottomPad(insets.bottom);
 
   return (
     <View style={[styles.container, { paddingBottom: bottomPad }]} pointerEvents="box-none">
@@ -128,10 +144,10 @@ const useStyles = makeStyles(() => ({
   },
   tab: {
     width: TAB_WIDTH,
-    height: TAB_ROW_HEIGHT,
+    height: tabBar.rowHeight,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: TAB_GAP,
+    gap: tabBar.iconLabelGap,
   },
   label: {
     ...typography.micro,
@@ -139,8 +155,3 @@ const useStyles = makeStyles(() => ({
     textAlign: 'center',
   },
 }));
-
-// Utrymme som skärmarnas innehåll lämnar för tab-baren, utöver insets.bottom.
-// Flikraden plus luft. Flikarna sänks in i safe area på enheter med
-// hemindikator, så på dem blir det lite extra luft (ofarligt).
-export const TAB_BAR_HEIGHT = TAB_ROW_HEIGHT + spacing.sm;

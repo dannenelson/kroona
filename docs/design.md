@@ -243,6 +243,12 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Cirkel = identitet:** varumärken och personer (76 px, namn under). Aldrig cirklar för samlingar eller innehåll.
 - **Hem, ordning** (32 px mellan hyllorna, rubrik `SectionTitle`): Fortsätt där du var (liggande) · Skapat för dig (mix) · Samlingar för dig (stor stående) · Fler i din stil (cirklar) · Områden (liten stående) · Populära samlingar (kollage) · Kanske intressant för dig (produktkort). En hylla utan innehåll döljs, aldrig tom rubrik.
 
+## 8k. Hem-topp och nedre menyn (brief 46)
+- **Toppraden** 44 hög (`homeHeader`), skärmmarginal: avatar 32 med initialer (`DUMMY_USER` i `data/user.ts`) till vänster, **Kroona-logotypen 18 hög absolut centrerad** (eget lager över raden, oberoende av sidoelementens bredd, ™ visas först från 40 px), notisikon 24 i en 44 × 44 träffyta till höger (ikonens kant linjerar med marginalen).
+- **Hälsning** under raden: "God morgon / God eftermiddag / God kväll, Daniel" (05–11 / 12–17 / övrigt), `typography.greeting` (Familjen Grotesk 600, 28/32), `textPrimary`.
+- **Avstånd:** toppraden → hälsning 8, hälsning → pillar 16, pillar → AskBar 16 (`gap`).
+- **Nedre menyn:** flikraden 56 hög (`tabBar.rowHeight`), ikon 24, ikon → etikett 3, ligger **ovanför hemindikatorn**: radens underkant 21,5 från skärmkanten, så att etikettblocket slutar 29 från kanten = 16 över indikatorns överkant (ca 13 från kanten). Utan safe area: radens underkant 8 från kanten (`tabBar.minBottom`). Kantblurren nedtill är oförändrad (128, samma stopp). Skärmarnas nedre utrymme: `tabBarSpace(insets.bottom)` = radens avstånd + 56 + 8.
+
 ## 8h. Sheet, Button och Snackbar (brief 33, godkänt 2026-11-20)
 - **Knappar är aldrig fullbreddsrader** (utom i listor). CTA = `Button` (`components/Button.tsx`): pill som följer sitt innehåll, centrerad, minst `control.ctaHeight` 56 hög, `headline` (17/600), sidmarginal `control.ctaPaddingX` 28 (sänkt från 44 i brief 39 så att två CTA:er ryms på en rad). **primary** = ljus yta (`textPrimary`, text i `bg`), **secondary** = tonad yta (`pressed`). Kompakt storlek (`control.compactHeight` 36) för t.ex. snackbarens åtgärd. Tryckrespons som korten (`useCardPress`), lätt haptik, inaktiv = `disabledOpacity`.
 - **Sheet** (`components/Sheet.tsx`, `useSheet()`): helskärmslager på rotnivå, ingen RN Modal. Blur (`edgeBlur.menuBackdropIntensity`) + `sheetScrim` (kraftigare än kontextmenyns `scrim`, brief 34: skärmen under ska bara anas; ljust tema = ljus slöja). Mini-stack `open/push/pop/close`; header med glasknappar 44: **X alltid till höger** (stänger hela flödet), **tillbaka-chevron till vänster** i senare steg, centrerad titel (`headline`) med lika breda sidor så att den står still mellan stegen. Innehåll via `<SheetContent footer={<Button/>}>`: CTA centrerad nederst (40 px eller safe area) och ovanför tangentbordet. Öppna/stäng: tonar och stiger `motion.sheet.rise` (`open` 280 / `close` 220 ms); stegbyte tonar och glider `stepShift` (220 ms); Minska rörelse: bara tonning. Stängs med X, Androids bakåt och swipe nedåt (`motion.sheet.dismissDistance`); steg med skrollande lista sätter `swipeToClose: false`.
@@ -265,7 +271,7 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 - **Migrering:** nuvarande kod har `#0f0f0e` och bara Google Sans Flex (400/500/700). Färgerna migreras i steg 1a och Familjen Grotesk läggs till för rubriker.
 
 ## 11. Filter och pillar ✅
-- **Filtrering** görs med **text-flikar med understrykning** (Pinterest-mönstret), 44 px höga. Gäller Hem, Följer och Samlingsdetalj.
+- **Filtrering** görs med **text-flikar med understrykning** (Pinterest-mönstret), 44 px höga. Gäller Följer och Samlingsdetalj. **Undantag Hem (brief 46):** filterpillar (`FilterPills`, Pill i storleken `filter`, 36 hög, 8 mellan, vald inverterad, selection-haptik, horisontell scroll).
 - **Pillar** byter innehåll överst på en skärm (vad skärmen handlar om), som Spotify. Används tills vidare **bara överst på Hem** (t.ex. Allt · Mode · Heminredning). Text-flikar snävar in en lista inom ett innehåll. Känns gränsen otydlig när det är byggt slås de ihop. 🔵
 
 ## 🟡 Öppet
