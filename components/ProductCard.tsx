@@ -4,16 +4,13 @@ import Transition from 'react-native-screen-transitions';
 import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
 import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
-import { useSavedProducts } from '../context/SavedProductsContext';
 import { useCardPress } from '../hooks/useCardPress';
-import { useToggleSaved } from '../hooks/useToggleSaved';
 import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import HeartIcon from '../assets/icons/HeartIcon';
 import HeartIconFilled from '../assets/icons/HeartIcon_filled';
-import BookmarkPlusIcon from '../assets/icons/BookmarkPlusIcon';
-import { useOpenAddToCollection } from './saved/AddToCollectionStep';
+import { useIsSaved, useOpenSaveSheet } from './saved/SaveSheet';
 import FollowIcon from '../assets/icons/FollowIcon';
 import ShareIcon from '../assets/icons/ShareIcon';
 import SimilarIcon from '../assets/icons/SimilarIcon';
@@ -81,10 +78,10 @@ export default function ProductCard({
 }: Props) {
   const { colors } = useTheme();
   const styles = useStyles();
-  const { isSaved } = useSavedProducts();
-  const toggleSaved = useToggleSaved();
-  const openAddToCollection = useOpenAddToCollection();
-  const saved = isSaved(id);
+  // Spara (brief 40): en ingång, öppnar kortet "Spara i …". Fyllt hjärta när
+  // produkten ligger i Gillade produkter eller i någon samling.
+  const saved = useIsSaved(id);
+  const openSaveSheet = useOpenSaveSheet();
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
   // Standard: öppna Produktdetalj, där kortets bild zoomar till heron (brief 13,
@@ -112,15 +109,10 @@ export default function ProductCard({
   const isSmall = size === 'S';
   const isLarge = size === 'L';
 
-  // Spara använder befintlig SavedProductsContext. Följ varumärke, Dela och
-  // Visa liknande har ingen logik i Fas 0-steget, de stänger bara menyn.
+  // Följ varumärke, Dela och Visa liknande har ingen logik i Fas 0-steget,
+  // de stänger bara menyn.
   const menuItems: ContextMenuItem[] = [
-    {
-      label: saved ? 'Gillad' : 'Gilla',
-      icon: saved ? HeartIconFilled : HeartIcon,
-      onPress: () => toggleSaved(id),
-    },
-    { label: 'Spara i samling', icon: BookmarkPlusIcon, onPress: () => openAddToCollection(id) },
+    { label: 'Spara', icon: saved ? HeartIconFilled : HeartIcon, onPress: () => openSaveSheet(id) },
     { label: 'Följ varumärke', icon: FollowIcon },
     { label: 'Dela', icon: ShareIcon },
     { label: 'Visa liknande', icon: SimilarIcon },

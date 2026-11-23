@@ -1,7 +1,6 @@
-import { useToggleSaved } from '../../hooks/useToggleSaved';
+import { useIsSaved, useOpenSaveSheet } from '../saved/SaveSheet';
 import { Animated, Pressable, StyleSheet, Text } from 'react-native';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, motion, touchTarget, iconSize } from '../../theme';
-import { useSavedProducts } from '../../context/SavedProductsContext';
 import { usePressAnimation } from '../../hooks/usePressAnimation';
 import { usePop } from '../../hooks/usePop';
 import { haptic } from '../../utils/haptic';
@@ -9,17 +8,17 @@ import HeartIcon from '../../assets/icons/HeartIcon';
 import HeartIconFilled from '../../assets/icons/HeartIcon_filled';
 
 /**
- * Gilla-knappen på Produktdetalj (brief 13, hjärta sedan brief 38): snabbspar
- * till Gillade produkter. Gillad = fyllt hjärta och texten "Gillad"; ytan
+ * Spara-knappen på Produktdetalj (brief 13, 38, 40): gemensam Spara-ingång
+ * som öppnar kortet "Spara i …" (Gillade produkter + egna samlingar). Hjärta,
+ * fyllt när produkten ligger i Gillade produkter eller någon samling; ytan
  * inverteras inte (beslutad avvikelse från designen). Pop vid sparande,
  * lätt haptik, animerad press. Använder befintliga SavedProductsContext.
  */
 export default function SaveButton({ productId }: { productId: string }) {
   const { colors } = useTheme();
   const styles = useStyles();
-  const { isSaved } = useSavedProducts();
-  const toggleSaved = useToggleSaved();
-  const saved = isSaved(productId);
+  const saved = useIsSaved(productId);
+  const openSaveSheet = useOpenSaveSheet();
   const press = usePressAnimation(motion.pressedScale);
   const pop = usePop(saved);
   const Icon = saved ? HeartIconFilled : HeartIcon;
@@ -28,10 +27,10 @@ export default function SaveButton({ productId }: { productId: string }) {
     <Pressable
       accessibilityRole="button"
       accessibilityState={{ selected: saved }}
-      accessibilityLabel={saved ? 'Gillad, tryck för att ta bort' : 'Gilla'}
+      accessibilityLabel={saved ? 'Spara, sparad' : 'Spara'}
       onPress={() => {
         haptic.light();
-        toggleSaved(productId);
+        openSaveSheet(productId);
       }}
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}
@@ -43,7 +42,7 @@ export default function SaveButton({ productId }: { productId: string }) {
         <Animated.View style={{ transform: [{ scale: pop }] }}>
           <Icon color={colors.textPrimary} size={iconSize.md} />
         </Animated.View>
-        <Text style={styles.label}>{saved ? 'Gillad' : 'Gilla'}</Text>
+        <Text style={styles.label}>Spara</Text>
       </Animated.View>
     </Pressable>
   );

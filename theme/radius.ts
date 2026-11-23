@@ -14,6 +14,8 @@ export const radius = {
   collection: 18,
   /** Chattbubbla. */
   bubble: 20,
+  /** Kort-sheet (brief 40, YouTube-stil), squircle. */
+  sheetCard: 28,
   /** Skärmens egen hörnradie (inget officiellt API): iPhone med Dynamic Island
    *  ca 55, med notch ca 44. Används när en hel skärm dras (spik brief 17). */
   screenDynamicIsland: 55,

@@ -51,6 +51,10 @@ export type ColorRoles = {
   scrim: string;
   /** Bakom Sheet (brief 34): kraftigare än `scrim`, skärmen under ska bara anas. */
   sheetScrim: string;
+  /** Kort-sheetens yta (brief 40): `surface` nästan solid (0,96), släpper inte igenom innehållet bakom. */
+  sheetCard: string;
+  /** Mörk overlay bakom kort-sheeten (brief 40), mörk i båda teman som YouTube/Instagram. */
+  sheetCardScrim: string;
   success: string;
   successSubtle: string;
   warning: string;
@@ -70,6 +74,8 @@ export const darkColors: ColorRoles = {
   menu: 'rgba(44,46,52,0.80)',
   scrim: 'rgba(8,9,11,0.40)',
   sheetScrim: 'rgba(8,9,11,0.72)',
+  sheetCard: 'rgba(31,34,39,0.96)', // ink850 vid 0,96
+  sheetCardScrim: 'rgba(8,9,11,0.60)',
   success: raw.green,
   successSubtle: raw.greenNight,
   warning: raw.amber,
@@ -90,6 +96,8 @@ export const lightColors: ColorRoles = {
   scrim: 'rgba(21,23,27,0.12)',
   // Ljust tema: ljus slöja (paper50), så att mörk text och fält förblir läsbara.
   sheetScrim: 'rgba(245,246,248,0.80)',
+  sheetCard: 'rgba(255,255,255,0.96)', // white vid 0,96
+  sheetCardScrim: 'rgba(21,23,27,0.40)',
   success: raw.greenDeep,
   successSubtle: raw.greenMist,
   warning: raw.amberDeep,

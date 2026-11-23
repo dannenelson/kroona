@@ -37,6 +37,13 @@ export const listRow = {
   compactThumb: 48,
 } as const;
 
+/** Kort-sheet (brief 40): luft runt kortet (sidor och botten, plus safe area)
+ *  och snapp-läget i mitten som andel av skärmhöjden. */
+export const sheetCard = {
+  inset: 8,
+  midRatio: 2 / 3,
+} as const;
+
 /** Avatar på profilvyn (brief 37). Rader använder `listRow.compactThumb` (48). */
 export const profileAvatar = 96;
 

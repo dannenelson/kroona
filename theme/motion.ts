@@ -39,6 +39,10 @@ export const motion = {
    *  innehållet stiger in (px), byte mellan steg (ms, px) och hur långt en
    *  swipe nedåt måste gå för att stänga (px). Minska rörelse: bara tonning. */
   sheet: { open: 280, close: 220, rise: 24, step: 220, stepShift: 24, dismissDistance: 120 },
+  /** Kort-sheet (brief 40): snapp mellan 2/3 och full höjd med `spring`; släpp
+   *  under 2/3 stänger efter `dismissDistance` (px) eller med fart över
+   *  `snapVelocity` (px/s), då kortet flyger ut på `flyOut` ms. */
+  sheetCard: { dismissDistance: 80, snapVelocity: 800, flyOut: 200 },
   /** Produktdetalj: informationen tonas in under övergångens sista del (progress 0,75 → 1). */
   detailRevealFrom: 0.75,
   /** Hierarkirörelsen (spik brief 18): zoomens fjädrar, bibliotekets

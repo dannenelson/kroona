@@ -17,7 +17,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 1. Hero-bild — produktens kanoniska bild
 2. Varumärke + produktnamn
 3. Hållbarhetsindex — fullt utfällt, oförändrat oavsett erbjudande
-4. Gilla-knapp (hjärta), primär position, + Spara i samling (bokmärke-plus) bredvid
+4. Spara-knapp (hjärta, fyllt när sparad), primär position: öppnar kortet "Spara i …" (brief 40)
 5. **"Finns begagnad hos"** — begagnat-erbjudanden, visas FÖRE nytt. Rad: tjänst, prisläge ("Fast pris: X kr" eller "Auktion, bud från X kr"), länk ut.
 6. **"Köp hos"** — nytt-erbjudanden: AF-namn, pris, lager, geografi. Sortering, default pris. Påverkar aldrig begagnat-listan.
 7. Liknande produkter — horisontell rad
@@ -125,24 +125,22 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Personer** (brief 37, dummy), **Samlingar**, **Områden**.
 5. Bekräftelser via Snackbar ("<produkt> sparades i <samling> · Visa").
 
-**Byggt (brief 35, Personer brief 37):** allt ovan utom Områden (ingen följ-lagring för områden än, sektionen döljs). Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Långt tryck: Öppna/Dela (egna), Öppna/Sluta följa (Följer). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). Spara i samling från produkt: se §8b (brief 36). **Ej byggt:** redigera/döp om/radera, ta bort produkt ur samling (i samlingsvyn), eget omslag.
+**Byggt (brief 35, Personer brief 37):** allt ovan utom Områden (ingen följ-lagring för områden än, sektionen döljs). Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Långt tryck: Öppna/Dela (egna), Öppna/Sluta följa (Följer). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). Spara från produkt: se §8b (brief 40). **Ej byggt:** redigera/döp om/radera, ta bort produkt ur samling (i samlingsvyn), eget omslag.
 
 Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat/Publik, ingen Följ; Dela/redigera kommer i del 2). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
 
 ---
 
-## 8b. Lägg till i samling (Sheet-steg) — ✅ Byggd (brief 36, skiss "SheetLaggTill")
-**Nås från:** knappen bokmärke-plus bredvid Gilla på Produktdetalj och menyvalet "Spara i samling" i produktkortets kontextmeny. Gilla (hjärta, snabbspar → Gillade produkter) är skilt från detta.
+## 8b. Spara i … (kort-sheet) — ✅ Byggd (brief 40, ersätter Lägg till i samling från brief 36–39)
+**Nås från:** Spara-knappen (hjärta) på Produktdetalj och "Spara" i produktkortets långt tryck-meny. En gemensam ingång; Gilla/Spara-uppdelningen är borttagen.
 
-1. Header: titel "Lägg till i samling", X till höger
-2. Produktchip: bild 40, namn, varumärke
-3. Sökfält "Sök samlingar" (filtrerar egna samlingar på namn)
-4. Lista: egna samlingar som rader (mosaik 48, namn, "N produkter" + "· redan tillagd"), val-cirkel till höger (tom ring / fylld med bock). Tryck växlar direkt, lagret står kvar.
-5. Fast CTA nederst, listan skrollar bakom (och bakom chip/sök upptill) med progressiv blur: **+ Skapa ny** (sekundär) och **Klar** (primär, stänger) alltid på en rad → Skapa ny öppnar steget Skapa samling; Spara där skapar samlingen och lägger produkten i den, lagret stängs.
-6. Tomt läge: "Du har inga samlingar än." + "Skapa ny samling" som primär (ingen Klar).
+1. Kort med luft runt om över mörk overlay; öppnas på 2/3 av skärmhöjden, växer till full höjd när man skrollar upp, krymper och stängs när man drar ned på listans topp (eller trycker på overlayen)
+2. Rubrik "Spara i …" (vänsterställd)
+3. Lista: **Gillade produkter** alltid överst (hjärta, antal), sedan egna samlingar (mosaik 48, namn, "Privat/Publik · N produkter"), val-cirkel till höger; tryck växlar direkt, flera går
+4. CTA "+ Skapa ny" (sticky, wrap-bredd) → Skapa samling i samma kort (full höjd, chevron tillbaka); Spara skapar samlingen med produkten i, kortet stängs
+5. Ingen produktchip, ingen sök, ingen X/Klar
 
-Vid stängning, om produkten lagts till: snackbar "<produkt> sparades i <samling> · Visa" (→ samlingen) eller "… i N samlingar · Visa" (→ Sparat). Bara borttagningar: ingen snackbar. Swipe ned stänger inte (listan skrollar).
-
+Vid stängning, om något lagts till: snackbar "<produkt> sparades i <samling> · Visa" (Gillade produkter räknas som en) eller "… i N samlingar · Visa" (→ Sparat). Bara borttagningar: ingen snackbar.
 ---
 
 ## Konsekvenser för andra dokument

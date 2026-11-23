@@ -8,8 +8,15 @@
 //   // i ett steg: sheet.push(nästaSteg), sheet.pop(), sheet.close()
 //
 // Ett steg ritar sitt innehåll med <SheetContent footer={<Button …/>}>, som
-// håller CTA:n nederst och ovanför tangentbordet. Steg med egen skrollande
-// lista kan stänga av swipe-stängningen (`swipeToClose: false`).
+// håller CTA:n nederst och ovanför tangentbordet.
+//
+// Två presentationer (första stegets `presentation`):
+// - 'fullscreen' (standard): helskärmslager med blur + scrim och X/chevron.
+// - 'card' (brief 40, YouTube/Instagram-stil): kort med luft runt om över en
+//   mörk overlay, vänsterställd rubrik. Två snapp-lägen, 2/3 och full höjd:
+//   skroll uppåt växer kortet först, skroll nedåt på listans topp krymper det
+//   och stänger under 2/3 (en kontinuerlig gest, UI-tråden). Listor i kortet
+//   använder <SheetScrollView>, som kopplas till kortets gest.
 import {
   createContext,
   useCallback,
@@ -20,11 +27,47 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { Animated, BackHandler, Keyboard, KeyboardAvoidingView, StyleSheet, Text, View } from 'react-native';
+import {
+  Animated,
+  BackHandler,
+  Keyboard,
+  KeyboardAvoidingView,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+  type ScrollViewProps,
+} from 'react-native';
+import Reanimated, {
+  interpolate,
+  scrollTo,
+  useAnimatedRef,
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+  type SharedValue,
+} from 'react-native-reanimated';
+import { scheduleOnRN } from 'react-native-worklets';
 import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
-import { makeStyles, useTheme, typography, spacing, motion, edgeBlur, touchTarget, snackbar, control } from '../theme';
+import { GestureDetector, useNativeGesture, usePanGesture, type PanGesture } from 'react-native-gesture-handler';
+import {
+  makeStyles,
+  useTheme,
+  typography,
+  spacing,
+  motion,
+  edgeBlur,
+  touchTarget,
+  snackbar,
+  control,
+  radius,
+  sheetCard,
+} from '../theme';
 import EdgeFade from './EdgeFade';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import IconButton from './IconButton';
@@ -40,6 +83,8 @@ export type SheetStep = {
   swipeToClose?: boolean;
   /** Anropas när lagret stängs (X, swipe, bakåt eller `close()`), för alla steg i stacken. */
   onClose?: () => void;
+  /** 'card' = kort-sheet (brief 40); gäller hela flödet, styrs av första steget. */
+  presentation?: 'fullscreen' | 'card';
 };
 
 type SheetApi = {
@@ -56,6 +101,57 @@ const SheetContext = createContext<SheetApi | null>(null);
 
 /** Headerns underkant i lagret (från SheetProvider), för stegens marginaler. */
 const SheetLayoutContext = createContext(0);
+
+/** 'card' inne i kort-sheeten (brief 40), annars 'fullscreen'. */
+const SheetPresentationContext = createContext<'fullscreen' | 'card'>('fullscreen');
+
+/** Kortets gest och skroll, för <SheetScrollView> (brief 40). */
+type CardScroll = {
+  pan: PanGesture;
+  scrollRef: ReturnType<typeof useAnimatedRef<Reanimated.ScrollView>>;
+  scrollY: SharedValue<number>;
+  hasScroll: SharedValue<boolean>;
+};
+const SheetCardScrollContext = createContext<CardScroll | null>(null);
+
+/**
+ * Skrollande lista i ett steg. I kort-sheeten kopplas den till kortets gest:
+ * skroll uppåt växer kortet först, skroll nedåt på toppen krymper/stänger det.
+ * I helskärm är den en vanlig ScrollView.
+ */
+export function SheetScrollView(props: ScrollViewProps) {
+  const card = useContext(SheetCardScrollContext);
+  if (!card) return <ScrollView {...props} />;
+  return <CardScrollView card={card} {...props} />;
+}
+
+function CardScrollView({ card, ...props }: ScrollViewProps & { card: CardScroll }) {
+  const native = useNativeGesture({ simultaneousWith: card.pan });
+  // Fånga bara shared values i workleten (inte gesten), annars fryses gestens
+  // relationslista och kan inte uppdateras när listan monteras igen.
+  const { scrollY, hasScroll } = card;
+  const onScroll = useAnimatedScrollHandler((e) => {
+    scrollY.value = e.contentOffset.y;
+  });
+  useEffect(() => {
+    hasScroll.value = true;
+    return () => {
+      hasScroll.value = false;
+    };
+  }, [hasScroll]);
+  return (
+    <GestureDetector gesture={native}>
+      <Reanimated.ScrollView
+        {...props}
+        ref={card.scrollRef}
+        onScroll={onScroll}
+        scrollEventThrottle={16}
+        // Ingen gummistuds överst: där tar kortets gest över.
+        bounces={false}
+      />
+    </GestureDetector>
+  );
+}
 
 /** Marginaler för skrollande innehåll i ett steg (brief 39). */
 type SheetInsets = { top: number; bottom: number };
@@ -90,6 +186,11 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   stackRef.current = steps;
   // Riktning för senaste stegbytet: 1 = framåt (push), -1 = bakåt (pop).
   const [direction, setDirection] = useState<1 | -1>(1);
+  // Kort-sheet: stängning animeras av CardLayer, som sedan anropar finishCardClose.
+  const [cardClosing, setCardClosing] = useState(false);
+  const presentation = steps[0]?.presentation ?? 'fullscreen';
+  const presentationRef = useRef(presentation);
+  presentationRef.current = presentation;
   const shown = useRef(new Animated.Value(0)).current;
   const drag = useRef(new Animated.Value(0)).current;
   const stepIn = useRef(new Animated.Value(1)).current;
@@ -110,6 +211,7 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   const open = useCallback(
     (step: SheetStep) => {
       setSteps([step]);
+      setCardClosing(false);
       drag.setValue(0);
       stepIn.setValue(1);
       shown.setValue(0);
@@ -121,6 +223,10 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   const close = useCallback(() => {
     Keyboard.dismiss();
     stackRef.current.forEach((s) => s.onClose?.());
+    if (presentationRef.current === 'card') {
+      setCardClosing(true);
+      return;
+    }
     Animated.timing(shown, { toValue: 0, duration: motion.sheet.close, useNativeDriver: true }).start(
       ({ finished }) => {
         if (!finished) return;
@@ -183,6 +289,10 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   });
 
   const api = useMemo(() => ({ open, push, pop, close }), [open, push, pop, close]);
+  const finishCardClose = useCallback(() => {
+    setSteps([]);
+    setCardClosing(false);
+  }, []);
   // Headerns underkant: stegens innehåll börjar (eller skrollar) under den.
   const headerBottom = insets.top + spacing.sm + touchTarget;
 
@@ -202,7 +312,21 @@ export function SheetProvider({ children }: { children: ReactNode }) {
   return (
     <SheetContext.Provider value={api}>
       {children}
-      {step && (
+      {step && presentation === 'card' && (
+        <CardLayer
+          title={step.title}
+          depth={steps.length}
+          closing={cardClosing}
+          onBack={pop}
+          onRequestClose={close}
+          onClosed={finishCardClose}
+          stepStyle={{ opacity: stepIn, transform: [{ translateX: stepShift }] }}
+          stepKey={steps.length}
+        >
+          {step.render()}
+        </CardLayer>
+      )}
+      {step && presentation === 'fullscreen' && (
         <View style={StyleSheet.absoluteFill} accessibilityViewIsModal>
           <Animated.View
             pointerEvents="none"
@@ -263,6 +387,175 @@ export function SheetProvider({ children }: { children: ReactNode }) {
 }
 
 /**
+ * Kort-sheeten (brief 40). Bottenförankrat kort med luft runt om över en mörk
+ * overlay; synlig höjd `h` är ett shared value med snapp-lägena 2/3 och full.
+ * En pan-gest på kortet körs samtidigt med listans skroll (SheetScrollView):
+ * fingret uppåt växer kortet till full höjd medan listan hålls på toppen,
+ * därefter skrollar listan; fingret nedåt på listans topp krymper kortet, och
+ * under 2/3 stängs det vid släpp efter avstånd eller fart. Allt på UI-tråden.
+ * Minska rörelse: kortet tonar in/ut i stället för att glida.
+ */
+function CardLayer({
+  title,
+  depth,
+  closing,
+  onBack,
+  onRequestClose,
+  onClosed,
+  stepStyle,
+  stepKey,
+  children,
+}: {
+  title: string;
+  depth: number;
+  closing: boolean;
+  onBack: () => void;
+  onRequestClose: () => void;
+  onClosed: () => void;
+  stepStyle: object;
+  stepKey: number;
+  children: ReactNode;
+}) {
+  const styles = useStyles();
+  const insets = useSafeAreaInsets();
+  const reduceMotion = useReduceMotion();
+  const { height: windowHeight } = useWindowDimensions();
+  const bottomGap = insets.bottom + sheetCard.inset;
+  const full = windowHeight - insets.top - sheetCard.inset - bottomGap;
+  const mid = Math.min(full, windowHeight * sheetCard.midRatio);
+  const headerBottom = spacing.md + touchTarget;
+
+  const h = useSharedValue(0);
+  const fade = useSharedValue(reduceMotion ? 0 : 1);
+  const lastY = useSharedValue(0);
+  const scrollY = useSharedValue(0);
+  const hasScroll = useSharedValue(false);
+  const scrollRef = useAnimatedRef<Reanimated.ScrollView>();
+
+  // Öppna: glid upp till 2/3 (Minska rörelse: direkt på 2/3 och tona in).
+  useEffect(() => {
+    if (reduceMotion) {
+      h.value = mid;
+      fade.value = withTiming(1, { duration: motion.sheet.open });
+    } else {
+      h.value = withSpring(mid, motion.spring);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Senare steg (t.ex. Skapa samling) får full höjd.
+  useEffect(() => {
+    if (depth > 1) h.value = reduceMotion ? full : withSpring(full, motion.spring);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [depth]);
+
+  // Stäng: glid ut (eller tona ut), sedan avmonteras lagret.
+  useEffect(() => {
+    if (!closing) return;
+    const done = (finished?: boolean) => {
+      'worklet';
+      if (finished) scheduleOnRN(onClosed);
+    };
+    if (reduceMotion) fade.value = withTiming(0, { duration: motion.sheet.close }, done);
+    else h.value = withTiming(0, { duration: motion.sheetCard.flyOut }, done);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [closing]);
+
+  const snapTo = (target: number) => {
+    'worklet';
+    h.value = reduceMotion ? target : withSpring(target, motion.spring);
+  };
+  const lockScroll = () => {
+    'worklet';
+    if (hasScroll.value) scrollTo(scrollRef, 0, 0, false);
+  };
+
+  const pan = usePanGesture({
+    activeOffsetY: [-motion.dismissActivationDistance, motion.dismissActivationDistance],
+    failOffsetX: [-motion.dismissActivationDistance, motion.dismissActivationDistance],
+    onBegin: () => {
+      'worklet';
+      lastY.value = 0;
+    },
+    onUpdate: (e) => {
+      'worklet';
+      const dy = e.translationY - lastY.value;
+      lastY.value = e.translationY;
+      if (dy < 0 && h.value < full) {
+        // Fingret uppåt: kortet växer först, listan står still på toppen.
+        h.value = Math.min(full, h.value - dy);
+        lockScroll();
+      } else if (dy > 0 && scrollY.value <= 0) {
+        // Fingret nedåt med listan på toppen: kortet krymper (under 2/3 = stäng-drag).
+        h.value = Math.max(0, h.value - dy);
+        lockScroll();
+      }
+    },
+    onDeactivate: (e) => {
+      'worklet';
+      const v = e.velocityY;
+      const { snapVelocity, dismissDistance } = motion.sheetCard;
+      if (h.value < mid - 1) {
+        if (v > snapVelocity || h.value < mid - dismissDistance) scheduleOnRN(onRequestClose);
+        else snapTo(mid);
+        return;
+      }
+      if (v < -snapVelocity) snapTo(full);
+      else if (v > snapVelocity) snapTo(mid);
+      else snapTo(h.value > (mid + full) / 2 ? full : mid);
+    },
+  });
+
+  const cardStyle = useAnimatedStyle(() => ({ height: h.value, opacity: fade.value }));
+  const scrimStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(h.value, [0, mid], [0, 1], 'clamp') * fade.value,
+  }));
+  const cardScroll = useMemo(() => ({ pan, scrollRef, scrollY, hasScroll }), [pan, scrollRef, scrollY, hasScroll]);
+
+  return (
+    <View style={StyleSheet.absoluteFill} accessibilityViewIsModal>
+      <Reanimated.View style={[StyleSheet.absoluteFill, scrimStyle]}>
+        <Pressable
+          style={[StyleSheet.absoluteFill, styles.cardScrim]}
+          onPress={onRequestClose}
+          accessibilityLabel="Stäng"
+        />
+      </Reanimated.View>
+      <GestureDetector gesture={pan}>
+        <Reanimated.View
+          style={[
+            styles.card,
+            { left: sheetCard.inset, right: sheetCard.inset, bottom: bottomGap },
+            cardStyle,
+          ]}
+        >
+          <SheetPresentationContext.Provider value="card">
+            <SheetCardScrollContext.Provider value={cardScroll}>
+              <SheetLayoutContext.Provider value={headerBottom}>
+                <KeyboardAvoidingView behavior="padding" style={styles.flex}>
+                  <Animated.View key={stepKey} style={[styles.flex, stepStyle]}>
+                    {children}
+                  </Animated.View>
+                </KeyboardAvoidingView>
+              </SheetLayoutContext.Provider>
+            </SheetCardScrollContext.Provider>
+          </SheetPresentationContext.Provider>
+          {/* Vänsterställd rubrik; tillbaka-chevron i senare steg. Ingen X. */}
+          <View style={styles.cardHeader} pointerEvents="box-none">
+            {depth > 1 ? (
+              <IconButton tone="theme" icon={BackIcon} accessibilityLabel="Tillbaka" onPress={onBack} />
+            ) : null}
+            <Text style={styles.cardTitle} numberOfLines={1} accessibilityRole="header">
+              {title}
+            </Text>
+          </View>
+        </Reanimated.View>
+      </GestureDetector>
+    </View>
+  );
+}
+
+/**
  * Ett stegs layout (brief 33, 38, 39). Innehållet fyller lagret och går bakom
  * headern, de fasta elementen (`header`, t.ex. produktchip + sök) och CTA-ytan
  * (`footer`), där det blurras progressivt med kantblurren (EdgeFade, samma som
@@ -286,12 +579,15 @@ export function SheetContent({
   const styles = useStyles();
   const insets = useSafeAreaInsets();
   const headerBottom = useContext(SheetLayoutContext);
+  const presentation = useContext(SheetPresentationContext);
   const [fixedHeight, setFixedHeight] = useState(0);
   const [footerHeight, setFooterHeight] = useState(0);
   const fade = control.sheetFadeHeight;
   // Fasta element börjar en bit under headern; innehållet under dem.
   const fixedTop = headerBottom + spacing.lg;
-  const top = header ? fixedTop + fixedHeight + spacing.md : headerBottom + spacing.xxl;
+  const top = header
+    ? fixedTop + fixedHeight + spacing.md
+    : headerBottom + (presentation === 'card' ? spacing.sm : spacing.xxl);
   const bottom = footer ? footerHeight : 0;
   const value = useMemo(() => ({ top, bottom }), [top, bottom]);
 
@@ -319,7 +615,11 @@ export function SheetContent({
         {footer ? (
           <View
             onLayout={(e) => setFooterHeight(e.nativeEvent.layout.height)}
-            style={[styles.footer, { paddingBottom: Math.max(insets.bottom, snackbar.bottomOffset) }]}
+            style={[
+              styles.footer,
+              // I kortet ligger CTA:n en bit över kortets kant; i helskärm över safe area.
+              { paddingBottom: presentation === 'card' ? spacing.lg : Math.max(insets.bottom, snackbar.bottomOffset) },
+            ]}
           >
             {footer}
           </View>
@@ -335,6 +635,32 @@ const useStyles = makeStyles((t) => ({
   },
   scrim: {
     backgroundColor: t.colors.sheetScrim,
+  },
+  cardScrim: {
+    backgroundColor: t.colors.sheetCardScrim,
+  },
+  card: {
+    position: 'absolute',
+    overflow: 'hidden',
+    borderRadius: radius.sheetCard,
+    borderCurve: 'continuous',
+    backgroundColor: t.colors.sheetCard,
+  },
+  cardHeader: {
+    position: 'absolute',
+    top: spacing.md,
+    left: 0,
+    right: 0,
+    height: touchTarget,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.screenMargin,
+  },
+  cardTitle: {
+    ...typography.headline,
+    color: t.colors.textPrimary,
+    flex: 1,
   },
   content: {
     ...StyleSheet.absoluteFill,
