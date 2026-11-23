@@ -44,6 +44,36 @@ export const sheetCard = {
   midRatio: 2 / 3,
 } as const;
 
+/** Redaktionella kort (brief 43, skissens mått på 390 bred skärm).
+ *  Text på bilden; toning över nedre `fadeShare`, blur över nedre `blurShare`.
+ *  `mix` (Skapat för dig) och `collage` (Populära samlingar) är härledda format. */
+export const editorialCard = {
+  portraitLarge: { width: 280, height: 373 },
+  portraitSmall: { width: 150, height: 225 },
+  landscape: { width: 320, height: 213 },
+  mix: { width: 160, height: 160 },
+  collage: { width: 200, height: 267 },
+  /** Andel av höjden som toningen täcker (stor/liggande, liten). */
+  fadeShare: 0.58,
+  fadeShareSmall: 0.56,
+  /** Andel av höjden som blurren täcker, och blurradie i px (≈ 3,5 intensity per px). */
+  blurShare: 0.48,
+  blurPx: 12,
+  /** Progressiv blur: fyra lager à 25 % av `blurPx`; lagren staplas, så blurren ökar nedåt
+   *  (maskens start/slut som andel av blurzonen). */
+  blurLayers: [
+    { strength: 0.25, maskStops: [0, 0.3] },
+    { strength: 0.25, maskStops: [0.2, 0.5] },
+    { strength: 0.25, maskStops: [0.4, 0.7] },
+    { strength: 0.25, maskStops: [0.6, 0.9] },
+  ],
+  /** Inre luft för texten på bilden (stor/liggande, liten). */
+  padding: 16,
+  paddingSmall: 12,
+  /** Kuratorchippet överst till vänster (kollagekort): avatar 20. */
+  chipAvatar: 20,
+} as const;
+
 /** Avatar på profilvyn (brief 37). Rader använder `listRow.compactThumb` (48). */
 export const profileAvatar = 96;
 

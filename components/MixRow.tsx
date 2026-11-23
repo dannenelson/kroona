@@ -27,6 +27,7 @@ const MIXES: Mix[] = [
       'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=200',
       'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=200',
       'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=200',
+      'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200',
     ],
   },
   {
@@ -37,6 +38,7 @@ const MIXES: Mix[] = [
       'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=200',
       'https://images.unsplash.com/photo-1495385794356-15371f348c31?w=200',
       'https://images.unsplash.com/photo-1475180098004-ca77a66827be?w=200',
+      'https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=200',
     ],
   },
   {
@@ -47,6 +49,7 @@ const MIXES: Mix[] = [
       'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=200',
       'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=200',
       'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=200',
+      'https://images.unsplash.com/photo-1516762689617-e1cffcef479d?w=200',
     ],
   },
 ];
@@ -60,6 +63,7 @@ const MIXES_WEEKLY: Mix[] = [
       'https://images.unsplash.com/photo-1516826957135-700dedea698c?w=200',
       'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200',
       'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=200',
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=200',
     ],
   },
   {
@@ -70,6 +74,7 @@ const MIXES_WEEKLY: Mix[] = [
       'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=200',
       'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=200',
       'https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?w=200',
+      'https://images.unsplash.com/photo-1487222477894-8943e31ef7b2?w=200',
     ],
   },
   {
@@ -80,14 +85,14 @@ const MIXES_WEEKLY: Mix[] = [
       'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=200',
       'https://images.unsplash.com/photo-1509631179647-0177331693ae?w=200',
       'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=200',
+      'https://images.unsplash.com/photo-1473966968600-fa801b869a1a?w=200',
     ],
   },
 ];
 
 // Under den här gränsen har en signal (varumärke/stil) för få matchande
-// produkter för att fylla MixCards tre fasta bild-slots (images[0..2],
-// ingen fallback där) — mixen hoppas då över istället för att visa trasiga
-// bildplatser.
+// produkter för att ge MixCard ett omslag — mixen hoppas då över. Omslaget
+// är en 2 × 2-mosaik (brief 43); med 3 produkter blir det en stor och två små.
 const MIN_PRODUCTS_FOR_MIX = 3;
 
 type MixBuildResult = { mix: Mix; count: number };
@@ -103,7 +108,7 @@ function buildMixFromSignal(signal: MixSignal): MixBuildResult | null {
       id: signalKey(signal),
       title: signal.type === 'style' ? `${signal.value} stil` : signal.value,
       subtitle: `${matches.length} produkter`,
-      images: matches.slice(0, 3).map((p) => p.imageUrl),
+      images: matches.slice(0, 4).map((p) => p.imageUrl),
     },
   };
 }
@@ -133,7 +138,12 @@ function MixSection({
   );
 }
 
-export default function MixRow() {
+type Props = {
+  /** Visa även "Veckans mix" (Hem visar bara "Skapat för dig" sedan brief 43). */
+  weekly?: boolean;
+};
+
+export default function MixRow({ weekly = true }: Props) {
   const { savedProducts } = useSavedProducts();
   const { followedCollectionIds } = useFollowedCollections();
 
@@ -182,7 +192,7 @@ export default function MixRow() {
   return (
     <>
       <MixSection title="Skapat för dig" subtitle="Uppdateras varje vecka" mixes={row1Mixes} />
-      <MixSection title="Veckans mix" mixes={row2Mixes} />
+      {weekly ? <MixSection title="Veckans mix" mixes={row2Mixes} /> : null}
     </>
   );
 }

@@ -10,20 +10,23 @@ type Props = {
 /**
  * Rund avatar med initialer (brief 35, 37): varumärken och personer tills
  * riktiga bilder finns. Yta `surfaceRaised`; texten skalar med storleken
- * (`headline` för små, `title1` från 64 och uppåt).
+ * (`micro` under 32, `body` för små, `title1` från 64 och uppåt).
  */
 export default function Avatar({ initial, size, style }: Props) {
   const styles = useStyles();
   const large = size >= LARGE;
+  const tiny = size < SMALL;
   return (
     <View style={[styles.circle, { width: size, height: size }, style]}>
-      <Text style={large ? styles.textLarge : styles.text}>{initial}</Text>
+      <Text style={large ? styles.textLarge : tiny ? styles.textTiny : styles.text}>{initial}</Text>
     </View>
   );
 }
 
-// Från denna storlek får initialerna rubrikstorlek.
+// Från denna storlek får initialerna rubrikstorlek; under SMALL (t.ex. chip,
+// brief 43) minsta textstorleken.
 const LARGE = 64;
+const SMALL = 32;
 
 const useStyles = makeStyles((t) => ({
   circle: {
@@ -34,6 +37,11 @@ const useStyles = makeStyles((t) => ({
   },
   text: {
     ...typography.body,
+    fontFamily: fonts.ui600,
+    color: t.colors.textPrimary,
+  },
+  textTiny: {
+    ...typography.micro,
     fontFamily: fonts.ui600,
     color: t.colors.textPrimary,
   },

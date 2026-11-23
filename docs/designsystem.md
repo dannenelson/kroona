@@ -191,6 +191,12 @@ Kort, kompakt hero överst på Hem (INTE en fullskärms-hero) — foto-bakgrund 
 - **Snapp-beteende:** två lägen, 2/3 och full höjd, i en kontinuerlig gest på UI-tråden: fingret uppåt växer kortet till full höjd innan listan skrollar; nedåt med listan på toppen krymper kortet, och under 2/3 stängs det vid släpp efter avstånd eller fart (fly-out). Listor i kortet använder `SheetScrollView` (kopplas till kortets gest; i helskärm en vanlig ScrollView).
 - Helskärmspresentationen (t.ex. Skapa samling från "+" i Sparat) är oförändrad.
 
+## 16. EditorialCard (tillagt 2026-11-23, brief 43)
+- `components/EditorialCard.tsx`: redaktionellt bildkort med **text på bilden** (toning + blur i botten). Varianter `portraitLarge` (280 × 373, r24, toning + blur), `portraitSmall` (150 × 225, r16, bara toning) och `landscape` (320 × 213, r20, toning + blur, valfri `status`-rad). Stående = centrerad text, liggande = vänsterställd. Mått, typ och radier som tokens (`editorialCard`, `typography.editorial*`, `radius.editorial*`), se `design.md` §8j.
+- Props: `title`, `subtitle`, `status`, `imageUrl` eller `cover` (t.ex. `CollectionMosaic` eller kollage), `chip` (överst till vänster), `size` (härlett format: mix, kollage), `boundary` (`{ id, group }`, zoom till detaljvy: hela kortet är källan, CollectionCard-mönstret) och `onPress`. Tryckrespons `useCardPress`. Utan `onPress` är kortet inte tryckbart.
+- Används av Hems hyllor: `ContinueRow`, `MixCard` (via `MixRow`), `CollectionsForYouRow`, `AreasRow`, `PopularCollectionsRow` (kollage). Cirklar i `MoreInYourStyleRow` använder `ProfileCard`.
+- **Ligger kvar men monteras inte längre på Hem:** `ContinueDialogRow`, `CollectionRow` ("Du följer"), `DiscoverBrandsRow` (logiken delas via `useDiscoverBrandTiles`), `DiscoveryMosaicCard`, `HeroRow`, `DiscoveryPreviewCard`, `CollectionCard`.
+
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.
 - Steget sätter `swipeToClose: false` (listan skrollar) och kan ha `onClose` för en sammanfattande snackbar när lagret stängs.

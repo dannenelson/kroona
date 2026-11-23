@@ -14,6 +14,11 @@ export const radius = {
   collection: 18,
   /** Chattbubbla. */
   bubble: 20,
+  /** Redaktionella kort (brief 43, EditorialCard): radien skalar med storleken.
+   *  Stor stående 24, liggande 20, liten stående (och mixkort) 16. */
+  editorialLarge: 24,
+  editorialMedium: 20,
+  editorialSmall: 16,
   /** Kort-sheet (brief 40, YouTube-stil), squircle. */
   sheetCard: 28,
   /** Skärmens egen hörnradie (inget officiellt API): iPhone med Dynamic Island

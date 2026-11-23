@@ -4,7 +4,7 @@
 // Partnerdetalj och Sparat ("Gillade produkter" med id `saved` och egna samlingar,
 // brief 32). Ligger i rotens stack som Produktdetalj, med samma hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
 // kantswipe stänger (collectionScreenOptions i components/product/productTransition.ts).
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Image, Pressable, Text, View, useWindowDimensions } from 'react-native';
 import Reanimated, {
   Extrapolation,
@@ -89,8 +89,13 @@ export default function CollectionScreen() {
   const styles = useStyles();
   const { isFollowed, toggleFollowed } = useFollowedCollections();
   const { savedProducts } = useSavedProducts();
-  const { getUserCollection } = useUserCollections();
+  const { getUserCollection, markCollectionOpened } = useUserCollections();
   const userCollection = getUserCollection(id);
+  // "Fortsätt där du var" på Hem visar senast öppnade egna samling (brief 43).
+  const isUserCollection = !!userCollection;
+  useEffect(() => {
+    if (isUserCollection) markCollectionOpened(id);
+  }, [id, isUserCollection, markCollectionOpened]);
 
   // "Gillade produkter" (id `saved`, ingen samling men samma vy), en egen samling eller en kuraterad.
   const collection = useMemo<CollectionView | undefined>(() => {

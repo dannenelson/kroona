@@ -16,12 +16,16 @@ const TITLE = 'Fler varumärken i din stil';
 // kurerad snarare än en fullständig lista.
 const MAX_TILES = 6;
 
-type BrandTile = { brand: string; count: number };
+export type BrandTile = { brand: string; count: number };
 
-export default function DiscoverBrandsRow() {
+/**
+ * Varumärken i användarens stil som användaren inte redan följer, flest
+ * matchande produkter först. Används också av "Fler i din stil" på Hem (brief 43).
+ */
+export function useDiscoverBrandTiles(): BrandTile[] {
   const { followedCollectionIds } = useFollowedCollections();
 
-  const tiles = useMemo<BrandTile[]>(() => {
+  return useMemo<BrandTile[]>(() => {
     const followedStyleValues = COLLECTIONS.filter(
       (c) => c.filter.type === 'style' && followedCollectionIds.includes(c.id)
     ).map((c) => (c.filter as { type: 'style'; value: string }).value);
@@ -56,6 +60,10 @@ export default function DiscoverBrandsRow() {
       .sort((a, b) => b.count - a.count)
       .slice(0, MAX_TILES);
   }, [followedCollectionIds]);
+}
+
+export default function DiscoverBrandsRow() {
+  const tiles = useDiscoverBrandTiles();
 
   if (tiles.length === 0) return null;
 

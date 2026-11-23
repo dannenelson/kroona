@@ -153,6 +153,9 @@ Layout sker med `gap`, aldrig `marginRight` eller `marginBottom` på enskilda ko
 | `lifted` | 16 | lyft kort i kontextmeny, flödesbilder |
 | `collection` | 18 | samlingskort, jämförelse |
 | `bubble` | 20 | chattbubbla (6 nere höger) |
+| `editorialLarge` | 24 | redaktionellt kort, stor stående (brief 43) |
+| `editorialMedium` | 20 | redaktionellt kort, liggande och kollagekort (brief 43) |
+| `editorialSmall` | 16 | redaktionellt kort, liten stående och mixkort (brief 43) |
 | `full` | 999 | pillar (34 hög) och cirklar (glasknapp 44, sökfält 50, varumärke) |
 
 **Squircle:** alla rundningar utom cirklar och pillar har `borderCurve: 'continuous'`.
@@ -231,6 +234,14 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Mina samlingar:** verktygsrad med "N samlingar" (bara egna, `label`) och **vy-växlaren** rader | kort (`SegmentedIcons`). Rader: `ListRow` 76 hög, thumb 56 / `radius.card`; "Gillade produkter" med hjärta i `surfaceRaised`-ruta, avdelare (`sep`), sedan egna samlingar (mosaikthumb, "Privat · N produkter" med lås 12 / "Publik · N produkter"). Kort: 2 kolumner, kvadratiskt omslag `radius.collection`, Gillade produkter först med hjärta. Tryck = `pressed`-yta på rader, `useCardPress` på kort; zoom till Samlingsdetalj från thumb/omslag.
 - **Följer:** sektioner med `title2`-rubrik och "Visa alla" (`label`, bara vid > 3, expanderar på plats). Varumärken: kompakt rad 64, rund avatar 48 med initialer. Samlingar: mosaik 48 / `radius.control`, "Av Kroona/<varumärke>".
 - **Tomlägen:** kort text (`body`, `textSecondary`) + `Button` (wrap): "Skapa samling" respektive "Utforska" (→ Hitta).
+
+## 8j. Korttyper och Hem (brief 43)
+- **Två sorters bildkort.** **Redaktionella kort** (samlingar, mixar, områden, fortsätt-kort, `components/EditorialCard.tsx`): **text på bilden**, med mörk toning (#0E1014, 0 → 56 % → 78 %) över nedre 58 % och **äkta blur** (ca 12 px, fyra maskade BlurView-lager à 25 % så att den byggs upp gradvis) över nedre 48 %. Små kort (liten stående, mix, kollage) har bara toning (0 → 50 → 76 % över 56 %). **Produktkort är oförändrade:** text under bilden, `radius.card` 14, pris och betyg aldrig på foto.
+- **Textregel:** stående kort har **centrerad** text, liggande **vänsterställd** (valfri statusrad ovanför titeln). Titel max 2 rader med ellipsis; undertitel 1 rad, vit 76 % (`overlay.onPhotoMuted`).
+- **Format** (`editorialCard` i `theme/spacing.ts`): stor stående 280 × 373 (3:4), radie 24, titel 22/26; liten stående 150 × 225 (2:3), radie 16, titel 16/20, undertitel 12; liggande 320 × 213 (3:2), radie 20, titel 18/22, undertitel 13. Härledda: mix 160 × 160 (2 × 2-mosaik, radie 16), kollage 200 × 267 (en bred bild över två små, glaschip med kurator överst till vänster, radie 20). **Radien skalar med storleken**, squircle.
+- **Kant:** en 1 px inre linje ovanpå bilden (`colors.imageEdge`: vit 12 % mörkt, mörk 10 % ljust), aldrig dubbel kant. Utan bild: `placeholder`-yta, texten ligger kvar på toningen.
+- **Cirkel = identitet:** varumärken och personer (76 px, namn under). Aldrig cirklar för samlingar eller innehåll.
+- **Hem, ordning** (32 px mellan hyllorna, rubrik `SectionTitle`): Fortsätt där du var (liggande) · Skapat för dig (mix) · Samlingar för dig (stor stående) · Fler i din stil (cirklar) · Områden (liten stående) · Populära samlingar (kollage) · Kanske intressant för dig (produktkort). En hylla utan innehåll döljs, aldrig tom rubrik.
 
 ## 8h. Sheet, Button och Snackbar (brief 33, godkänt 2026-11-20)
 - **Knappar är aldrig fullbreddsrader** (utom i listor). CTA = `Button` (`components/Button.tsx`): pill som följer sitt innehåll, centrerad, minst `control.ctaHeight` 56 hög, `headline` (17/600), sidmarginal `control.ctaPaddingX` 28 (sänkt från 44 i brief 39 så att två CTA:er ryms på en rad). **primary** = ljus yta (`textPrimary`, text i `bg`), **secondary** = tonad yta (`pressed`). Kompakt storlek (`control.compactHeight` 36) för t.ex. snackbarens åtgärd. Tryckrespons som korten (`useCardPress`), lätt haptik, inaktiv = `disabledOpacity`.

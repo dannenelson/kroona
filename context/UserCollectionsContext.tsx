@@ -2,11 +2,13 @@
 // FollowedCollectionsContext: state i minnet, AsyncStorage som lagring.
 // "Gillade produkter" (SavedProductsContext, snabbspar) är INTE en samling
 // (brief 35): en produkt kan vara både gillad och i samlingar, oberoende.
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserCollection } from '../types/catalog';
 
 const STORAGE_KEY = '@kroona/userCollections';
+/** Senast öppnade egna samling (brief 43, hyllan "Fortsätt där du var" på Hem). */
+const LAST_OPENED_KEY = '@kroona/lastOpenedCollection';
 
 /** Id för "Gillade produkter" i routes (`/collection/saved`, samma vy som samlingar). */
 export const ALL_SAVED_ID = 'saved';
@@ -22,6 +24,10 @@ type UserCollectionsContextValue = {
   addProductToCollection: (collectionId: string, productId: string) => void;
   /** Tar bort en produkt ur en egen samling (Lägg till i samling, brief 36). */
   removeProductFromCollection: (collectionId: string, productId: string) => void;
+  /** Senast öppnade egna samling, om den finns kvar (brief 43). */
+  lastOpenedCollection: UserCollection | undefined;
+  /** Anropas när en egen samling öppnas i Samlingsdetalj. */
+  markCollectionOpened: (collectionId: string) => void;
 };
 
 const UserCollectionsContext = createContext<UserCollectionsContextValue | null>(null);
@@ -29,12 +35,14 @@ const UserCollectionsContext = createContext<UserCollectionsContextValue | null>
 export function UserCollectionsProvider({ children }: { children: React.ReactNode }) {
   const [collections, setCollections] = useState<UserCollection[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
+  const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) setCollections(JSON.parse(raw));
+        setLastOpenedId(await AsyncStorage.getItem(LAST_OPENED_KEY));
       } catch (error) {
         console.warn('Kunde inte läsa egna samlingar från AsyncStorage', error);
       } finally {
@@ -81,6 +89,13 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
 
   const getUserCollection = (id: string) => collections.find((c) => c.id === id);
 
+  const markCollectionOpened = useCallback((collectionId: string) => {
+    setLastOpenedId(collectionId);
+    AsyncStorage.setItem(LAST_OPENED_KEY, collectionId).catch((error) =>
+      console.warn('Kunde inte spara senast öppnade samling', error),
+    );
+  }, []);
+
   return (
     <UserCollectionsContext.Provider
       value={{
@@ -89,6 +104,8 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
         createCollection,
         addProductToCollection,
         removeProductFromCollection,
+        lastOpenedCollection: lastOpenedId ? collections.find((c) => c.id === lastOpenedId) : undefined,
+        markCollectionOpened,
       }}
     >
       {children}

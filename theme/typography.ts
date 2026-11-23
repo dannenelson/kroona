@@ -22,6 +22,10 @@ export const typography = {
   caption: { fontFamily: fonts.ui400, fontSize: 12, lineHeight: 16 },
   micro: { fontFamily: fonts.ui500, fontSize: 10, lineHeight: 14 },
   price: { fontFamily: fonts.ui600 },
+  /** Redaktionella kort (brief 43): titel på bild, stor stående / liggande / liten. */
+  editorialLarge: { fontFamily: fonts.display600, fontSize: 22, lineHeight: 26 },
+  editorialMedium: { fontFamily: fonts.display600, fontSize: 18, lineHeight: 22 },
+  editorialSmall: { fontFamily: fonts.display600, fontSize: 16, lineHeight: 20 },
 } satisfies Record<string, TypeStyle>;
 
 export const letterSpacing = {

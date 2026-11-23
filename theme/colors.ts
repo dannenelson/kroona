@@ -55,6 +55,8 @@ export type ColorRoles = {
   sheetCard: string;
   /** Mörk overlay bakom kort-sheeten (brief 40), mörk i båda teman som YouTube/Instagram. */
   sheetCardScrim: string;
+  /** Inre kantlinje på bildkort med text på bilden (brief 43): vit 12 % / mörk 10 %. */
+  imageEdge: string;
   success: string;
   successSubtle: string;
   warning: string;
@@ -76,6 +78,7 @@ export const darkColors: ColorRoles = {
   sheetScrim: 'rgba(8,9,11,0.72)',
   sheetCard: 'rgba(31,34,39,0.96)', // ink850 vid 0,96
   sheetCardScrim: 'rgba(8,9,11,0.60)',
+  imageEdge: 'rgba(255,255,255,0.12)',
   success: raw.green,
   successSubtle: raw.greenNight,
   warning: raw.amber,
@@ -98,6 +101,7 @@ export const lightColors: ColorRoles = {
   sheetScrim: 'rgba(245,246,248,0.80)',
   sheetCard: 'rgba(255,255,255,0.96)', // white vid 0,96
   sheetCardScrim: 'rgba(21,23,27,0.40)',
+  imageEdge: 'rgba(21,23,27,0.10)',
   success: raw.greenDeep,
   successSubtle: raw.greenMist,
   warning: raw.amberDeep,
@@ -121,6 +125,14 @@ export const overlay = {
       'rgba(14,16,20,1)',
     ] as [string, string, ...string[]],
     locations: [0, 0.4, 0.65, 1] as [number, number, ...number[]],
+  },
+  /** Undertext på foto (redaktionella kort, brief 43): vit 76 %. */
+  onPhotoMuted: 'rgba(255,255,255,0.76)',
+  /** Toning i botten av redaktionella kort (brief 43), mörk #0E1014. */
+  editorialFade: {
+    colors: ['rgba(14,16,20,0)', 'rgba(14,16,20,0.56)', 'rgba(14,16,20,0.78)'] as [string, string, ...string[]],
+    colorsSmall: ['rgba(14,16,20,0)', 'rgba(14,16,20,0.5)', 'rgba(14,16,20,0.76)'] as [string, string, ...string[]],
+    locations: [0, 0.5, 1] as [number, number, ...number[]],
   },
   // Kantblurens toning över foto (överst på Produktdetalj).
   photoFade: ['rgba(0,0,0,0.4)', 'rgba(0,0,0,0)'] as [string, string],
