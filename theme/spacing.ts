@@ -86,15 +86,18 @@ export const logo = {
   headerCircle: 64,
 } as const;
 
-/** Nedre menyn (brief 46, 49). Etikettblockets underkant ligger `labelBottom`
+/** Nedre menyn (brief 46, 49, 50). Etikettblockets underkant ligger `labelBottom`
  *  (36) från skärmkanten på enheter med safe area nedtill, `labelBottomNoInset`
- *  (24) utan. Flikraden har `sideInset` (28) sidomarginal så att flikarna samlas. */
+ *  (24) utan. Flikraden har `sideInset` (18 sedan brief 50, 28 i brief 49) sidomarginal. */
 export const tabBar = {
   rowHeight: 56,
+  /** Flikikonernas ruta (brief 50; prova 28 eller 32). Glyfen fyller ca 73 %, dvs. ca 23 synligt vid 32.
+   *  Ikon + 3 + etikettens radhöjd 14 måste rymmas i `rowHeight` (högst 39). */
+  iconSize: 32,
   iconLabelGap: 3,
   labelBottom: 36,
   labelBottomNoInset: 24,
-  sideInset: 28,
+  sideInset: 18,
 } as const;
 
 /** Hem-toppen (brief 46, 49): toppraden 44, avatar 32, logotyp 12 (™ visas från 40),

@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { Animated, View, Text, Pressable } from 'react-native';
 import { BottomTabBarProps } from 'expo-router/js-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, typography, spacing, motion, iconSize, tabBar } from '../theme';
+import { makeStyles, useTheme, typography, spacing, motion, tabBar } from '../theme';
 import EdgeFade from './EdgeFade';
 import { usePressAnimation } from '../hooks/usePressAnimation';
 
@@ -30,19 +30,20 @@ const LABELS: Record<string, string> = {
 };
 
 // Lokala mått för tab-baren (flikbredd är ett komponentmått, inte spacing).
-// Referensen "Kroona Looken A": flik 56 hög, ikon 25 (här iconSize.lg 24),
+// Referensen "Kroona Looken A": flik 56 hög, ikon `tabBar.iconSize` (32 sedan brief 50),
 // etikett 10,5/500 (här micro 10/14).
 const TAB_WIDTH = 80;
 
 // Ikon + avstånd + etikett, och luften under etiketten inne i den 56 höga raden.
-const TAB_BLOCK = iconSize.lg + tabBar.iconLabelGap + typography.micro.lineHeight; // 41
-const TAB_INNER_BELOW = (tabBar.rowHeight - TAB_BLOCK) / 2; // 7,5
+const TAB_BLOCK = tabBar.iconSize + tabBar.iconLabelGap + typography.micro.lineHeight; // 49 (med ikon 32)
+const TAB_INNER_BELOW = (tabBar.rowHeight - TAB_BLOCK) / 2; // 3,5 (med ikon 32)
 
 /**
  * Avstånd från skärmkanten till flikradens underkant (brief 46, 49).
  * Etikettblockets underkant ligger `tabBar.labelBottom` (36) från kanten med
- * safe area nedtill, dvs. raden 28,5 från kanten; utan safe area
- * `tabBar.labelBottomNoInset` (24), raden 16,5 från kanten.
+ * safe area nedtill; utan safe area `tabBar.labelBottomNoInset` (24). Raden
+ * räknas fram från etiketten, så en större ikon växer uppåt (brief 50): med
+ * ikon 32 ligger raden 32,5 från kanten (20,5 utan safe area).
  */
 export function tabBarBottomPad(insetBottom: number): number {
   return (insetBottom > 0 ? tabBar.labelBottom : tabBar.labelBottomNoInset) - TAB_INNER_BELOW;
@@ -88,7 +89,7 @@ export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTa
 
           return (
             <NavTab key={route.key} label={label} selected={isFocused} onPress={onPress}>
-              <Icon color={color} size={iconSize.lg} />
+              <Icon color={color} size={tabBar.iconSize} />
               <Text style={[styles.label, { color }]}>{label}</Text>
             </NavTab>
           );
