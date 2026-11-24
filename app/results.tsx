@@ -60,6 +60,7 @@ export default function ResultsScreen() {
             första sökningen. "Avbryt" i sökläget återställer detta resultat. */}
         <AskBar
           inline
+          icon="search"
           value={term}
           style={styles.field}
           onPress={() =>

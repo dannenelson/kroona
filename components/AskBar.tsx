@@ -2,6 +2,7 @@ import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-nat
 import { useRouter } from 'expo-router';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, control, iconSize } from '../theme';
 import StarIcon from '../assets/icons/StarIcon';
+import FindIcon from '../assets/icons/FindIcon';
 import MicIcon from '../assets/icons/MicIcon';
 
 type Props = {
@@ -9,6 +10,9 @@ type Props = {
   value?: string;
   /** Standard: öppna sökläget (med `value` ifyllt). */
   onPress?: () => void;
+  /** Ikonen till vänster: AI-stjärnan (standard) eller förstoringsglaset
+   *  (Sökresultat, där fältet visar en sökning, brief 55). */
+  icon?: 'star' | 'search';
   /** Utan egen sidomarginal (när fältet ligger i en rad med annat). */
   inline?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -20,7 +24,7 @@ type Props = {
  * Tryck öppnar sökläget (app/search.tsx), där man väljer sök eller dialog.
  * Används på Hem, Hitta och Sökresultat.
  */
-export default function AskBar({ value, onPress, inline, style }: Props) {
+export default function AskBar({ value, onPress, icon = 'star', inline, style }: Props) {
   const router = useRouter();
   const { colors } = useTheme();
   const styles = useStyles();
@@ -35,7 +39,11 @@ export default function AskBar({ value, onPress, inline, style }: Props) {
         accessibilityLabel={value ? `Sökning: ${value}. Ändra` : 'Fråga eller sök'}
         style={({ pressed }) => [styles.bar, pressed && styles.pressed]}
       >
-        <StarIcon color={colors.textPrimary} size={iconSize.md} />
+        {icon === 'search' ? (
+          <FindIcon color={colors.textSecondary} size={iconSize.md} />
+        ) : (
+          <StarIcon color={colors.textPrimary} size={iconSize.md} />
+        )}
         <Text style={[styles.text, !value && styles.placeholder]} numberOfLines={1}>
           {value || 'Fråga eller sök'}
         </Text>

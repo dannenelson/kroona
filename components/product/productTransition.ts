@@ -47,9 +47,17 @@ export function withDepthVisibility(
   return { ...style, content: { opacity: 1, ...content } };
 }
 
-/** Flikarna (gridden): som idag, men dolda när två eller fler skärmar ligger ovanför. */
+/**
+ * Flikarna (gridden): som idag, men dolda när två eller fler skärmar ligger ovanför.
+ * `keep` (brief 55, tidigare `pause`): med två skärmar ovanför blir flikarna
+ * "inactive", och `pause` lägger dem i en dold React Activity som river
+ * effekterna. Då nollställs flik-navigatorns tillstånd (bara Hem), så tillbaka
+ * från t.ex. Områden → Vintage eller sökläge → resultat landade på Hem i stället
+ * för på Hitta. `keep` behåller dem monterade; de syns ändå inte
+ * (withDepthVisibility sätter opacitet 0 på djup 2 och mer).
+ */
 export const tabsScreenOptions: BlankStackNavigationOptions = {
-  inactiveBehavior: 'pause',
+  inactiveBehavior: 'keep',
   screenStyleInterpolator: ({ stackProgress }) => {
     'worklet';
     return withDepthVisibility({}, stackProgress);
