@@ -119,7 +119,7 @@ Alla ikoner har viewBox `0 0 24 24`.
   - **48** för Gillade-rutan.
 - **Standardstorlek i filerna:** 24 i de flesta. Undantagen är Chevron 16, Bock 16, Rader och Kort 18 och Lås 12.
 - **Följ och Sluta följa** använder samma ikon. Det finns ingen "följer"-variant (bock eller fylld).
-- **Kommentarerna "Provisorisk ikon"** står i 17 filer, med hänvisning till öppen fråga 3 i `docs/design.md`.
+- **Kommentarerna "Provisorisk ikon"** står i 19 filer, med hänvisning till öppen fråga 3 i `docs/design.md`.
 
 ## 3. Ikoner som finns eller saknas
 
