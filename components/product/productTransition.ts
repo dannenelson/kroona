@@ -186,3 +186,49 @@ export const lightboxScreenOptions: BlankStackNavigationOptions = {
     close: { ...motion.lightboxFade.close, easing: lightboxCloseEasing, reduceMotion: ReduceMotion.Never },
   },
 };
+
+/**
+ * Vanlig push (brief 53: Sökresultat och Dialog): skärmen glider in från höger
+ * och stängs med tillbakaknappen eller kantswipe. Ingen zoom (ingen kortbild).
+ * Minska rörelse: ingen förflyttning, bara opacitet.
+ */
+export const pushScreenOptions: BlankStackNavigationOptions = {
+  gestureEnabled: true,
+  gestureDirection: { gesture: 'horizontal', area: motion.dismissEdgeWidth },
+  gestureVelocityImpact: motion.dismissVelocityImpact,
+  screenStyleInterpolator: ({ focused, current, layouts, stackProgress }) => {
+    'worklet';
+    if (!focused) return withDepthVisibility({}, stackProgress);
+    const p = Math.min(1, Math.max(0, current.progress));
+    const reduce = reduceMotionShared.value;
+    return withDepthVisibility(
+      {
+        content: {
+          style: reduce
+            ? { opacity: p }
+            : { transform: [{ translateX: interpolate(p, [0, 1], [layouts.screen.width, 0], 'clamp') }] },
+        },
+      },
+      stackProgress,
+    );
+  },
+  transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
+};
+
+/**
+ * Sökläget (brief 53): tonar in över skärmen man kom från, utan förflyttning,
+ * så att fältet upplevs som samma fält. Stängs med "Avbryt" (ingen gest).
+ */
+export const searchScreenOptions: BlankStackNavigationOptions = {
+  gestureEnabled: false,
+  screenStyleInterpolator: ({ focused, current, stackProgress }) => {
+    'worklet';
+    if (!focused) return withDepthVisibility({}, stackProgress);
+    const p = Math.min(1, Math.max(0, current.progress));
+    return withDepthVisibility({ content: { style: { opacity: p } } }, stackProgress);
+  },
+  transitionSpec: {
+    open: { ...motion.searchFade.open, reduceMotion: ReduceMotion.Never },
+    close: { ...motion.searchFade.close, reduceMotion: ReduceMotion.Never },
+  },
+};

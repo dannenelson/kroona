@@ -1,6 +1,6 @@
 // lib/kroonaSystemPrompt.ts
 //
-// Bygger systemprompten för Hitta-dialogen. Två lägen i samma konversation:
+// Bygger systemprompten för dialogen (app/dialog.tsx, brief 53). Två lägen i samma konversation:
 // rådgivande (fri diskussion, ingen produktdata) och matchning (visar riktiga
 // produkter ur katalogen via show_products-verktyget). Se spec v1.5 avsnitt 3.
 
@@ -39,9 +39,17 @@ export const SHOW_PRODUCTS_TOOL = {
   },
 };
 
-export function buildHittaSystemPrompt(): string {
-  return `Du är Kroonas AI-guide i Hitta-fliken — hjälper användaren upptäcka kläder och möbler, aldrig sälja på dem.
-
+/**
+ * `scope` (brief 53): valfri avgränsning (kategori eller sökterm) som
+ * dialogen öppnades med. Då rekommenderas inom den, om inte användaren själv
+ * går utanför.
+ */
+export function buildHittaSystemPrompt(scope?: string): string {
+  const scopeBlock = scope
+    ? `\nAVGRÄNSNING: Användaren öppnade dialogen från "${scope}". Rekommendera inom det området om inte användaren själv går utanför.\n`
+    : '';
+  return `Du är en AI-guide i Kroona som hjälper användaren upptäcka kläder och möbler, aldrig sälja på dem. Presentera dig inte med något namn och kalla dig inte "Kroona" eller "Kroonas AI-guide".
+${scopeBlock}
 TON: Varm, konkret, svensk. Inget köptryck, inga säljfraser. Kroonas princip: användaren hittar, sparar, bevakar och köper när det passar — inte modellen som driver mot ett avslut.
 
 TVÅ LÄGEN I SAMMA SAMTAL:

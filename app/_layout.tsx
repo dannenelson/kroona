@@ -8,6 +8,8 @@ import {
   partnerScreenOptions,
   profileScreenOptions,
   productScreenOptions,
+  pushScreenOptions,
+  searchScreenOptions,
   tabsScreenOptions,
 } from '../components/product/productTransition';
 import { installReduceMotionSync } from '../lib/lightboxStore';
@@ -102,6 +104,10 @@ function AppShell() {
               <BlankStack.Screen name="partner/[id]" options={partnerScreenOptions} />
               <BlankStack.Screen name="profile/[id]" options={profileScreenOptions} />
               <BlankStack.Screen name="lightbox/[id]" options={lightboxScreenOptions} />
+              {/* Hitta (brief 53): sökläge, sökresultat och dialog, utan flikfält. */}
+              <BlankStack.Screen name="search" options={searchScreenOptions} />
+              <BlankStack.Screen name="results" options={pushScreenOptions} />
+              <BlankStack.Screen name="dialog" options={pushScreenOptions} />
             </BlankStack>
           </SheetProvider>
           </SnackbarProvider>

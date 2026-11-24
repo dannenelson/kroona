@@ -124,4 +124,6 @@ export const motion = {
   menuOffset: 12,
   /** Stängning utan fjäder (reduce motion, och bakgrundens toning). */
   menuFadeDuration: 180,
+  /** Sökläget (brief 53) tonar in och ut över skärmen man kom från. */
+  searchFade: { open: { duration: 200 }, close: { duration: 180 } },
 } as const;

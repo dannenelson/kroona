@@ -34,7 +34,8 @@ export default function HomeScreen() {
           paddingBottom: tabBarSpace(insets.bottom) + spacing.xxl,
         }}
       >
-        {/* Hem-toppen (brief 46): toppraden + hälsning, filterpillar, AskBar.
+        {/* Hem-toppen (brief 46): toppraden + hälsning, filterpillar, AskBar
+            (tryckbart fält "Fråga eller sök" som öppnar sökläget, brief 53).
             Toppraden → hälsning 8 (i Header), hälsning → pillar 16, pillar → AskBar 16. */}
         <View style={styles.top}>
           <Header />

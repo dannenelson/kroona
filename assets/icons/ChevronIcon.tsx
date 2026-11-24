@@ -7,11 +7,13 @@ import Svg, { Path } from "react-native-svg"
 type Props = {
   color: string;
   size?: number;
+  /** Linjetjocklek (standard 2; "Visa fler"-länken 2,2, brief 53). */
+  strokeWidth?: number;
 }
 
-const ChevronIcon = ({ color, size = 16 }: Props) => (
+const ChevronIcon = ({ color, size = 16, strokeWidth = 2 }: Props) => (
   <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <Path stroke={color} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" d="M9.5 6l6 6-6 6" />
+    <Path stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" d="M9.5 6l6 6-6 6" />
   </Svg>
 )
 

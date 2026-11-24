@@ -1,7 +1,7 @@
 // Urvalsfunktioner för datamodellen (brief 12). Rena funktioner: all data tas
 // som argument med appens dummydata som standard, så att de går att testa med
 // egna data. Produktlistor returneras i kortformatet (Product) som ProductCard läser.
-import type { Area, Offer, OfferCondition, Retailer } from '../types/catalog';
+import type { Area, IdeaFilter, Offer, OfferCondition, Retailer } from '../types/catalog';
 import type { Product } from '../types/product';
 import type { Collection } from '../data/collections';
 import { PRODUCTS } from '../data/products';
@@ -113,12 +113,24 @@ export function getProductsForCollection(
 
 /** Produkter i ett område: kategori, stilar och/eller möbeltyper (alla villkor som anges). */
 export function getProductsForArea(area: Area, products: readonly Product[] = PRODUCTS): Product[] {
-  const { category, styles, types } = area.filter;
+  return getProductsForFilter(area.filter, products);
+}
+
+/**
+ * Produkter för ett urval (område eller idé, brief 53): alla villkor som anges
+ * måste gälla. Pris är kortets pris (lägsta nya, annars lägsta begagnade).
+ */
+export function getProductsForFilter(filter: IdeaFilter, products: readonly Product[] = PRODUCTS): Product[] {
+  const { category, styles, types, newOnly, maxPrice, material } = filter;
+  const mat = material?.toLowerCase();
   return products.filter(
     (p) =>
       (!category || p.category === category) &&
       (!styles || styles.includes(p.style)) &&
-      (!types || (p.type !== undefined && types.includes(p.type))),
+      (!types || (p.type !== undefined && types.includes(p.type))) &&
+      (!newOnly || !!p.isNew) &&
+      (maxPrice === undefined || p.price <= maxPrice) &&
+      (!mat || !!p.facts?.material?.toLowerCase().includes(mat)),
   );
 }
 

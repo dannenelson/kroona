@@ -16,6 +16,7 @@ import EdgeFade from '../components/EdgeFade';
 import KroonaLogo from '../components/KroonaLogo';
 import NotificationIcon from '../components/NotificationIcon';
 import EditorialCard from '../components/EditorialCard';
+import SectionTitle from '../components/SectionTitle';
 import { ALL_RETAILER_LOGO_FILES, ALL_COLLECTION_LOGO_FILES, LOGO_ASPECT } from '../data/logos';
 import { setGestureDebug, useGestureDebug } from '../utils/devGestureDebug'; // TEMP-DEBUG-GEST
 import BackIcon from '../assets/icons/BackIcon';
@@ -97,6 +98,11 @@ export default function ComponentsScreen() {
               {gestureDebug ? 'Gestdiagnos på' : 'Gestdiagnos av'}
             </Pill>
           </View>
+        </Section>
+
+        <Section title="Hyllrubrik med Visa fler (brief 53)">
+          {/* Ingen hylla i appen har en destination än, så länken syns bara här. */}
+          <SectionTitle title="Idéer för dig" cta={{ onPress: () => {} }} />
         </Section>
 
         <Section title="SVG · Logotyp och notisikon">

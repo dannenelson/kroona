@@ -139,3 +139,20 @@ export const pagerDots = {
   /** Direkt på foto (heron, brief 21): högre, eftersom ingen bakgrund ligger bakom. */
   inactiveOpacityOnPhoto: 0.55,
 } as const;
+
+/** "Visa fler ›" i hyllrubriker (brief 53): chevron 14, linje 2,2, 2 mellan text och chevron. */
+export const sectionLink = {
+  chevronSize: 14,
+  chevronStroke: 2.2,
+  gap: 2,
+} as const;
+
+/** Hitta (brief 53): idékort 240 × 160, kategorikort 109 × 150, områdeskort 92 höga
+ *  (bredden räknas fram: två kolumner inom skärmmarginalen). */
+export const findCards = {
+  idea: { width: 240, height: 160 },
+  category: { width: 109, height: 150 },
+  areaHeight: 92,
+  /** Förstoringsglaset före idékortets titel. */
+  ideaIcon: 16,
+} as const;

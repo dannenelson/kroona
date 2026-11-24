@@ -1,46 +1,46 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useRouter } from 'expo-router';
-import { makeStyles, useTheme, typography, fonts, spacing, radius } from '../theme';
+import { makeStyles, useTheme, typography, fonts, spacing, radius, control, iconSize } from '../theme';
+import StarIcon from '../assets/icons/StarIcon';
+import MicIcon from '../assets/icons/MicIcon';
 
-// "Fråga Kroona"-sökfält. Riktig inmatning — texten skickas till Hitta som
-// en router-param (`query`) och auto-skickas där som första meddelandet i
-// en ny konversation (se app/(tabs)/find.tsx). Pilen är bara aktiv när
-// fältet innehåller text (samma disabled-mönster som find.tsx:s egen
-// skicka-knapp) — en tom flik nås fortfarande via flikfältet.
-export default function AskBar() {
+type Props = {
+  /** Söktermen som visas i fältet (Sökresultat); utan den visas platshållaren. */
+  value?: string;
+  /** Standard: öppna sökläget (med `value` ifyllt). */
+  onPress?: () => void;
+  /** Utan egen sidomarginal (när fältet ligger i en rad med annat). */
+  inline?: boolean;
+  style?: StyleProp<ViewStyle>;
+};
+
+/**
+ * "Fråga eller sök" (brief 53): ett tryckbart fält, inte en riktig inmatning.
+ * 56 högt, stjärna till vänster, mikrofon till höger (bara ikon i Fas 0).
+ * Tryck öppnar sökläget (app/search.tsx), där man väljer sök eller dialog.
+ * Används på Hem, Hitta och Sökresultat.
+ */
+export default function AskBar({ value, onPress, inline, style }: Props) {
   const router = useRouter();
-  const [query, setQuery] = useState('');
   const { colors } = useTheme();
   const styles = useStyles();
 
-  const handleSend = () => {
-    const trimmed = query.trim();
-    if (!trimmed) return;
-    router.push({ pathname: '/find', params: { query: trimmed } });
-    setQuery('');
-  };
+  const open = onPress ?? (() => router.push({ pathname: '/search', params: value ? { q: value } : {} }));
 
   return (
-    <View style={styles.wrapper}>
-      <View style={styles.bar}>
-        <TextInput
-          style={styles.input}
-          value={query}
-          onChangeText={setQuery}
-          placeholder="Vad letar du efter idag?"
-          placeholderTextColor={colors.textTertiary}
-          onSubmitEditing={handleSend}
-          returnKeyType="send"
-        />
-        <TouchableOpacity
-          onPress={handleSend}
-          disabled={!query.trim()}
-          style={[styles.arrowButton, !query.trim() && styles.arrowButtonDisabled]}
-        >
-          <Text style={styles.arrow}>→</Text>
-        </TouchableOpacity>
-      </View>
+    <View style={[!inline && styles.wrapper, style]}>
+      <Pressable
+        onPress={open}
+        accessibilityRole="search"
+        accessibilityLabel={value ? `Sökning: ${value}. Ändra` : 'Fråga eller sök'}
+        style={({ pressed }) => [styles.bar, pressed && styles.pressed]}
+      >
+        <StarIcon color={colors.textPrimary} size={iconSize.md} />
+        <Text style={[styles.text, !value && styles.placeholder]} numberOfLines={1}>
+          {value || 'Fråga eller sök'}
+        </Text>
+        <MicIcon color={colors.textSecondary} size={iconSize.lg} />
+      </Pressable>
     </View>
   );
 }
@@ -50,33 +50,24 @@ const useStyles = makeStyles((t) => ({
     paddingHorizontal: spacing.screenMargin,
   },
   bar: {
+    height: control.fieldHeight,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
+    gap: spacing.md,
     backgroundColor: t.colors.surfaceRaised,
     borderRadius: radius.full,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
   },
-  input: {
+  pressed: {
+    backgroundColor: t.colors.pressed,
+  },
+  text: {
     flex: 1,
-    ...typography.label,
-    fontFamily: fonts.ui400, // regular som tidigare
-    lineHeight: undefined, // TextInput: låt plattformen styra radhöjden
-    color: t.colors.textPrimary,
-    padding: 0,
-  },
-  arrowButton: {
-    width: spacing.xl,
-    height: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  arrowButtonDisabled: {
-    opacity: 0.4,
-  },
-  arrow: {
     ...typography.body,
     color: t.colors.textPrimary,
+  },
+  placeholder: {
+    fontFamily: fonts.ui400,
+    color: t.colors.textSecondary,
   },
 }));

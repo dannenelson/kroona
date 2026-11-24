@@ -89,12 +89,25 @@ export interface Area {
   kind: 'area';
   name: string;
   description: string;
-  filter: {
-    category?: ProductCategory;
-    styles?: ProductStyle[];
-    types?: FurnitureType[];
-  };
+  filter: AreaFilter;
   defaultFollowed?: boolean;
+}
+
+/** Ett områdes urval: alla villkor som anges måste gälla. */
+export interface AreaFilter {
+  category?: ProductCategory;
+  styles?: ProductStyle[];
+  types?: FurnitureType[];
+}
+
+/**
+ * Färdig sökning (brief 53, data/ideas.ts): samma form som områdets urval,
+ * plus nyheter, maxpris (lägsta pris i kortformatet) och material (delsträng).
+ */
+export interface IdeaFilter extends AreaFilter {
+  newOnly?: boolean;
+  maxPrice?: number;
+  material?: string;
 }
 
 /** Något som kan följas. Bara data i Fas 0-steget, logiken byggs senare. */

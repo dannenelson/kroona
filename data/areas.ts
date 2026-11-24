@@ -41,4 +41,12 @@ export const AREAS: Area[] = [
     description: 'Plagg för rörelse och väder.',
     filter: { category: 'kläder', styles: ['Sportig'] },
   },
+  {
+    // Brief 53: Hittas grid "Områden och stilar" har sex kort.
+    id: 'area-vintage',
+    kind: 'area',
+    name: 'Vintage',
+    description: 'Mocka, rotting och former som håller över tid.',
+    filter: { styles: ['Vintage'] },
+  },
 ];

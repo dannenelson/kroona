@@ -1,7 +1,7 @@
 // Enda ingången till temat. Importera härifrån, inte från enskilda filer.
 export { darkColors, lightColors, overlay, edgeFadeStops, withAlpha, type ColorRoles } from './colors';
 export { fonts, typography, letterSpacing } from './typography';
-export { spacing, touchTarget, iconSize, pagerDots, control, snackbar, listRow, segmented, profileAvatar, sheetCard, editorialCard, tabBar, homeHeader, logo } from './spacing';
+export { spacing, touchTarget, iconSize, pagerDots, control, snackbar, listRow, segmented, profileAvatar, sheetCard, editorialCard, tabBar, homeHeader, logo, sectionLink, findCards } from './spacing';
 export { radius } from './radius';
 export { darkShadows, lightShadows, photoShadows, type Shadows } from './shadows';
 export { motion } from './motion';

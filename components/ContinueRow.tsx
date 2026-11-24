@@ -25,7 +25,7 @@ export default function ContinueRow() {
 
   const dialog = {
     title: 'Vinterjacka, hållbar, runt 2000 kr',
-    subtitle: 'Fortsätt i Hitta',
+    subtitle: 'Fortsätt dialogen',
     imageUrl: PRODUCT_IMAGES.ponchoKnit,
   };
 
@@ -42,7 +42,8 @@ export default function ContinueRow() {
       title={dialog.title}
       subtitle={dialog.subtitle}
       imageUrl={dialog.imageUrl}
-      onPress={() => router.push('/find')}
+      // Dialogen är en egen skärm sedan brief 53 (ingen sparad historik i Fas 0: öppnar tom).
+      onPress={() => router.push('/dialog')}
     />,
     lastOpenedCollection ? (
       <EditorialCard

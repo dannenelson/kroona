@@ -111,6 +111,7 @@ Generalisering av `SectionTitle`. Ligger alltid UTANFÖR kort-wrappern, aldrig i
 - **Rubrik** — alltid närvarande, samma stil överallt
 - **Preheader** (valbar, ovanför rubriken) ELLER **Subheader** (valbar, under rubriken) — **aldrig båda samtidigt**
 - **Icon** (valbar, höger, länkar vidare) ELLER **CTA-länk** ("Visa fler", höger, länkar vidare) — **aldrig båda samtidigt**
+- **"Visa fler ›" är standard** (brief 53): `cta={{ onPress }}` ritar "Visa fler" 13/18 `textSecondary` + chevron 14 (linje 2,2). Stora chevroner i hyllrubriker används inte. Länken visas **bara när hyllan har en destination**; i Fas 0 har ingen hylla på Hem eller Hitta det än (syns på dev-sidan).
 
 Ersätter `DiscoveryPreviewCard`s egenbyggda rubrikrad (byggdes fristående innan `SectionTitle` hade ikon-stöd) — konsolideras till samma komponent.
 
@@ -215,6 +216,12 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **`BrandLogo`** (`components/BrandLogo.tsx`, `retailerId`, `size`, `initial`, `shape: 'circle' | 'plate'`): logotypen på en **mörk platta** `overlay.logoPlate` (ink850, samma i båda teman eftersom flera logotyper är vita) med 1 px kant `overlay.logoPlateEdge` (vit 12 %). Logotypen tar `logo.plateShare` (60 %) av bredden, proportionen bevaras. Saknas logotyp: initialavatar (`Avatar`). `hasBrandLogo(id)` för att välja.
 - **Var:** cirklar i "Fler i din stil" (`ProfileCard` 76), Partnerdetaljens huvud (cirkel `logo.headerCircle` 64 ovanför namnet), varumärkesrader i Sparat → Följer (48), och `PartnerCard` variant `brand` (platta 2:1 i stället för namnet; namnet blir tillgänglighetsetikett).
 - **Samlingslogotyp på kort:** `EditorialCard` tar `logo` (vit). Den ersätter titeln, ovanpå toningen: stående centrerad, liggande vänsterställd, bredd `logo.largeShare` **65 %** (stor/liggande) / `logo.smallShare` **85 %** (liten) men högst `logo.maxHeight` **72** hög, det som binder först (brief 51; tidigare 60 / 75 % och 36). Slutvärden: stort kort 144 × 72, liggande 144 × 72, litet 127,5 × 64. Undertiteln ligger kvar; titeln blir tillgänglighetsetikett. Används i "Samlingar för dig" och "Områden" via `COLLECTION_LOGOS`.
+
+## 19. Hitta: fält, idékort och sökläge (tillagt 2026-11-24, brief 53)
+- **AskBar** = tryckbart fält "Fråga eller sök" (56, pill, stjärna vänster, mikrofon höger). Prop `value` visar söktermen (Sökresultat), `inline` tar bort sidomarginalen. Ingen riktig inmatning; sökläget (`app/search.tsx`) har det aktiva fältet.
+- **Idékort** = `EditorialCard` `landscape` i formatet 240 × 160 med `titleIcon` (förstoringsglas). Data i `data/ideas.ts` (`id`, `title`, `image`, `filter`; filtret har områdets form plus `newOnly`, `maxPrice`, `material`).
+- **Kategorikort** 109 × 150 och **områdeskort** (2-kolumnsgrid, 92 höga) är också `EditorialCard` med härlett format. Text på bild eftersom varje kort är ett enda foto.
+- **Sökläge:** handlingsrader "Sök efter" / "Fråga om", sedan förslag eller senaste sökningar. Se design.md §8l.
 
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.

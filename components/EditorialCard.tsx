@@ -40,6 +40,8 @@ type Props = {
   align?: 'center' | 'start';
   /** Vit logotyp som ersätter titeln (brief 47); titeln blir tillgänglighetsetikett. */
   logo?: LogoComponent;
+  /** Liten ikon före titeln, t.ex. förstoringsglas på idékort (brief 53). */
+  titleIcon?: ReactNode;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
   boundary?: { id: string; group: string };
   onPress?: () => void;
@@ -73,6 +75,7 @@ export default function EditorialCard({
   accessibilityLabel,
   logo: Logo,
   align,
+  titleIcon,
 }: Props) {
   const styles = useStyles();
   const press = useCardPress();
@@ -141,15 +144,19 @@ export default function EditorialCard({
             style={!v.centered && styles.logoStart}
           />
         ) : (
-        <Text
-          style={[
-            variant === 'portraitLarge' ? styles.titleLarge : variant === 'landscape' ? styles.titleMedium : styles.titleSmall,
-            v.centered && styles.centered,
-          ]}
-          numberOfLines={2}
-        >
-          {title}
-        </Text>
+        <View style={[styles.titleRow, v.centered && styles.titleRowCentered]}>
+          {titleIcon}
+          <Text
+            style={[
+              variant === 'portraitLarge' ? styles.titleLarge : variant === 'landscape' ? styles.titleMedium : styles.titleSmall,
+              v.centered && styles.centered,
+              styles.titleShrink,
+            ]}
+            numberOfLines={2}
+          >
+            {title}
+          </Text>
+        </View>
         )}
         {subtitle ? (
           <Text style={[v.small ? styles.subtitleSmall : styles.subtitle, v.centered && styles.centered]} numberOfLines={1}>
@@ -234,6 +241,17 @@ const useStyles = makeStyles((t) => ({
   },
   textCentered: {
     alignItems: 'center',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6, // lokal optisk luft: ikon → titel (brief 53)
+  },
+  titleRowCentered: {
+    justifyContent: 'center',
+  },
+  titleShrink: {
+    flexShrink: 1,
   },
   centered: {
     textAlign: 'center',

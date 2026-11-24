@@ -31,7 +31,7 @@ Göra köpresan enklare och roligare för alla konsumenter, oavsett intresse ell
 |---|---|
 | **Hem** | Samlingspunkt, som Spotify: kompakt hälsningshero, sedan hyllor med kort (samlingar, varumärken, områden, rekommendationer). Inga produkter i grid. Tryck öppnar ett eget läge. |
 | **Följer** | Uppdateringar från det man följer: varumärken, företag, områden, samlingar. |
-| **Hitta** | Dialog som hjälper att bolla och få ett urval, plus jämförelse. Valen (pris, hållbarhet m.m.) är en del av dialogen. Inline produktkort. |
+| **Hitta** | Hitta produkter på tre sätt (brief 53): **sök** (fritext, träffar direkt), **dialog** (AI-hjälp att välja, med eller utan avgränsning till en kategori eller sökterm) och **kategorier**. Ett fält, "Fråga eller sök", både söker och frågar; standard är sök. Dialogen är en egen skärm med inline produktkort. **AI:n har inget namn i UI** (ett namn kan komma senare, men aldrig "Kroona"); ingen text säger "Fråga Kroona" eller "Kroonas AI-guide". |
 | **Sparat** | Det man sparat och följer, där man hanterar det. Flikar Mina samlingar \| Följer. "Gillade produkter" (hjärtat) först, sedan egna samlingar. |
 
 **Detaljvyer:** Produktdetalj, Samlingsdetalj, Partnerdetalj (varumärke/företag) och Profildetalj (personer). **Personer går att följa** (Daniel, 2026-11-20, brief 37): i Fas 0 som dummydata med lokal följ-lagring; riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) är Fas 1+. Masonry-grid (Pinterest-känsla) bor i detaljvyerna, inte på en flik.
