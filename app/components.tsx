@@ -101,7 +101,7 @@ export default function ComponentsScreen() {
         </Section>
 
         <Section title="Hyllrubrik med Visa fler (brief 53)">
-          {/* Ingen hylla i appen har en destination än, så länken syns bara här. */}
+          {/* Exempel; i appen har Idéer, Kategorier och Områden länken (brief 54). */}
           <SectionTitle title="Idéer för dig" cta={{ onPress: () => {} }} />
         </Section>
 

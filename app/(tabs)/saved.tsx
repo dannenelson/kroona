@@ -8,7 +8,7 @@
 //   max 3 med "Visa alla" (expanderar på plats). Långt tryck: Öppna, Sluta
 //   följa. Områden döljs (ingen följ-lagring för områden än).
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
-import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,8 +29,9 @@ import {
   getRetailerIdForBrandCollection,
   type Collection,
 } from '../../data/collections';
-import { getProductsForRetailer, getRetailer } from '../../lib/catalog';
-import type { Person, Retailer, UserCollection } from '../../types/catalog';
+import { getProductsForArea, getProductsForRetailer, getRetailer } from '../../lib/catalog';
+import { AREAS } from '../../data/areas';
+import type { Area, Person, Retailer, UserCollection } from '../../types/catalog';
 import { tabBarSpace } from '../../components/CustomTabBar';
 import {
   COLLECTION_BOUNDARY_GROUP,
@@ -284,10 +285,17 @@ function FollowingTab() {
 
   // Varumärken: följda direkt (återförsäljar-id) eller via sin varumärkessamling.
   // Samlingar: teman och kollektioner (inte varumärkens filtersamlingar).
-  const { brands, collections } = useMemo(() => {
+  // Områden (brief 54): följs med områdets id i samma mängd som samlingar och varumärken.
+  const { brands, collections, areas } = useMemo(() => {
     const brandMap = new Map<string, Retailer>();
     const cols: Collection[] = [];
+    const areaList: Area[] = [];
     for (const key of followedCollectionIds) {
+      const area = AREAS.find((a) => a.id === key);
+      if (area) {
+        areaList.push(area);
+        continue;
+      }
       const c = ALL_COLLECTIONS.find((x) => x.id === key);
       if (c && c.filter.type !== 'brand') {
         cols.push(c);
@@ -298,10 +306,14 @@ function FollowingTab() {
       if (r && r.retailerType === 'brand') brandMap.set(r.id, r);
     }
     // A–Ö (brief 42); "Visa alla" visar då de tre första alfabetiskt först.
-    return { brands: sortByName([...brandMap.values()], (r) => r.name), collections: sortByName(cols, (c) => c.name) };
+    return {
+      brands: sortByName([...brandMap.values()], (r) => r.name),
+      collections: sortByName(cols, (c) => c.name),
+      areas: sortByName(areaList, (a) => a.name),
+    };
   }, [followedCollectionIds]);
 
-  if (brands.length === 0 && people.length === 0 && collections.length === 0) {
+  if (brands.length === 0 && people.length === 0 && collections.length === 0 && areas.length === 0) {
     return (
       <View style={styles.empty}>
         <Text style={styles.emptyText}>Det du följer samlas här.</Text>
@@ -335,6 +347,11 @@ function FollowingTab() {
         title="Personer"
         items={people}
         render={(p) => <PersonRow key={p.id} person={p} onUnfollow={() => toggleFollowPerson(p.id)} />}
+      />
+      <Section
+        title="Områden"
+        items={areas}
+        render={(a) => <AreaRow key={a.id} area={a} onUnfollow={() => toggleFollowed(a.id)} />}
       />
       <Section
         title="Samlingar"
@@ -411,6 +428,35 @@ function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subt
           icon: ChevronIcon,
           onPress: () => router.push({ pathname: '/partner/[id]', params: { id: retailer.id } }),
         },
+        { label: 'Sluta följa', icon: FollowIcon, onPress: onUnfollow },
+      ]}
+    />
+  );
+}
+
+/** Område som rad (brief 54): första produktens bild som thumb 48, antal produkter, öppnar Områdesdetalj. */
+function AreaRow({ area, onUnfollow }: { area: Area; onUnfollow: () => void }) {
+  const router = useRouter();
+  const styles = useStyles();
+  const size = listRow.compactThumb;
+  const products = getProductsForArea(area);
+  const open = () => router.push({ pathname: '/area/[id]', params: { id: area.id } });
+  return (
+    <ListRow
+      title={area.name}
+      subtitle={countLabel(products.length, 'produkt', 'produkter')}
+      compact
+      thumb={
+        <Image
+          source={{ uri: products[0]?.imageUrl }}
+          style={[styles.thumbMosaic, { width: size, height: size, borderRadius: radius.card }]}
+        />
+      }
+      thumbRadius={radius.card}
+      onPress={open}
+      menuImageUri={products[0]?.imageUrl}
+      menuItems={[
+        { label: 'Öppna', icon: ChevronIcon, onPress: open },
         { label: 'Sluta följa', icon: FollowIcon, onPress: onUnfollow },
       ]}
     />

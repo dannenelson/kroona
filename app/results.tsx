@@ -55,7 +55,20 @@ export default function ResultsScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topRow}>
         <IconButton icon={BackIcon} tone="theme" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
-        <AskBar inline value={term} style={styles.field} />
+        {/* Sök om (brief 54): sökläget ERSÄTTER resultatet, och den nya sökningen
+            ersätter i sin tur sökläget, så att tillbaka går dit man var före
+            första sökningen. "Avbryt" i sökläget återställer detta resultat. */}
+        <AskBar
+          inline
+          value={term}
+          style={styles.field}
+          onPress={() =>
+            router.replace({
+              pathname: '/search',
+              params: idea ? { q: term, fromIdea: idea.id } : { q: term, fromQ: term },
+            })
+          }
+        />
       </View>
 
       <ScrollView

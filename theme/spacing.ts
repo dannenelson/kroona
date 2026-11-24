@@ -155,4 +155,6 @@ export const findCards = {
   areaHeight: 92,
   /** Förstoringsglaset före idékortets titel. */
   ideaIcon: 16,
+  /** "Fråga om …" i kategorivyn (brief 54): pill 40 hög. */
+  askChipHeight: 40,
 } as const;

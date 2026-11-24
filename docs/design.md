@@ -256,6 +256,9 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Sökresultat och Dialog** glider in från höger (`pushScreenOptions`) och stängs med tillbaka eller kantswipe. Bannern i Sökresultat: `surface`, `radius.card`, stjärna i cirkel 44, titel `label`, undertext `caption`, chevron.
 - **Idékort** (Hitta, Idéer för dig): liggande redaktionellt kort **240 × 160**, radie 20, text vänsterställd på bilden med förstoringsglas 16 före titeln (`EditorialCard` `titleIcon`). Tryck öppnar Sökresultat direkt.
 - **Kategorikort:** stående **109 × 150**, radie 16, centrerad titel på bilden. **Områdeskort:** 2-kolumnsgrid, **92 höga**, bredden räknas fram (två kolumner inom skärmmarginalen, gap 8; 169 i skissen med marginal 20), radie 16, titel + "N produkter" vänsterställda på bilden. Mått i `findCards` (`theme/spacing.ts`).
+- **List- och filtervyer utan bild (brief 54):** Kategorivy, Alla kategorier, Alla områden, Områdesdetalj och Idéer delar toppen `ScreenHeader`: TopBar med tillbaka, rubrik `typography.screenTitle` (Familjen Grotesk 600, 28/32), därunder rader med `gap` 12. Glider in från höger (`pushScreenOptions`).
+- **Kategorivy:** "Fråga om …" är en pill **40 hög** (`findCards.askChipHeight`), `surfaceRaised` (surface2) med hårlinjekant, stjärna 18 + `label`; antal produkter `caption` dämpat till höger. Pillar 36 (`FilterPills`) under, sedan produktgrid.
+- **Alla kategorier:** `ListRow` (76 hög) med bild 56 × 56 radie 14, namn, antal, chevron. **Områdesdetalj:** beskrivning `body` dämpad, antal + Följ-pill (som Samlingsdetalj). **Idéer:** idékorten i en kolumn, fulla bredden, samma proportion som 240 × 160.
 - **"Visa fler ›"** i hyllrubriker (`SectionTitle` `cta`): `label` 13/18 i `textSecondary` + chevron 14 med linje 2,2 (`sectionLink`), till höger i rubrikraden. Ersätter stora chevroner. **Visas bara när hyllan har en destination.**
 
 ## 8h. Sheet, Button och Snackbar (brief 33, godkänt 2026-11-20)

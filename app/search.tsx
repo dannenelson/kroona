@@ -16,7 +16,8 @@ import { addRecentSearch, loadRecentSearches } from '../lib/recentSearches';
 type IconProps = { color: string; size?: number };
 
 export default function SearchScreen() {
-  const { q } = useLocalSearchParams<{ q?: string }>();
+  // fromQ / fromIdea: sökläget öppnades från Sökresultat och ersatte det (brief 54).
+  const { q, fromQ, fromIdea } = useLocalSearchParams<{ q?: string; fromQ?: string; fromIdea?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -43,6 +44,14 @@ export default function SearchScreen() {
     if (!t) return;
     Keyboard.dismiss();
     router.replace({ pathname: '/dialog', params: { query: t } });
+  };
+
+  // Avbryt: tillbaka, eller återställ resultatet som sökläget ersatte.
+  const cancel = () => {
+    Keyboard.dismiss();
+    if (fromIdea) router.replace({ pathname: '/results', params: { idea: fromIdea } });
+    else if (fromQ) router.replace({ pathname: '/results', params: { q: fromQ } });
+    else router.back();
   };
 
   const suggestions = trimmed ? searchSuggestions(trimmed) : [];
@@ -80,7 +89,7 @@ export default function SearchScreen() {
             </Pressable>
           ) : null}
         </View>
-        <Pressable onPress={() => router.back()} accessibilityRole="button" hitSlop={spacing.sm}>
+        <Pressable onPress={cancel} accessibilityRole="button" hitSlop={spacing.sm}>
           <Text style={styles.cancel}>Avbryt</Text>
         </Pressable>
       </View>

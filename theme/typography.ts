@@ -26,6 +26,8 @@ export const typography = {
   cardTitle: { fontFamily: fonts.ui500, fontSize: 14, lineHeight: 18 },
   /** Hälsningen på Hem (brief 46). */
   greeting: { fontFamily: fonts.display600, fontSize: 28, lineHeight: 32 },
+  /** Rubrik i list- och filtervyer utan bild (kategori, område, listor; brief 54): 28/32. */
+  screenTitle: { fontFamily: fonts.display600, fontSize: 28, lineHeight: 32 },
   /** Redaktionella kort (brief 43): titel på bild, stor stående / liggande / liten. */
   editorialLarge: { fontFamily: fonts.display600, fontSize: 20, lineHeight: 24 }, // 22/26 före brief 51
   editorialMedium: { fontFamily: fonts.display600, fontSize: 18, lineHeight: 22 },

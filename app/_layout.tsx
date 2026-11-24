@@ -108,6 +108,12 @@ function AppShell() {
               <BlankStack.Screen name="search" options={searchScreenOptions} />
               <BlankStack.Screen name="results" options={pushScreenOptions} />
               <BlankStack.Screen name="dialog" options={pushScreenOptions} />
+              {/* Brief 54: kategorier, områden och idéer. */}
+              <BlankStack.Screen name="category/[id]" options={pushScreenOptions} />
+              <BlankStack.Screen name="categories" options={pushScreenOptions} />
+              <BlankStack.Screen name="areas" options={pushScreenOptions} />
+              <BlankStack.Screen name="area/[id]" options={pushScreenOptions} />
+              <BlankStack.Screen name="ideas" options={pushScreenOptions} />
             </BlankStack>
           </SheetProvider>
           </SnackbarProvider>

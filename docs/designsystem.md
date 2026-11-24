@@ -111,7 +111,7 @@ Generalisering av `SectionTitle`. Ligger alltid UTANFÖR kort-wrappern, aldrig i
 - **Rubrik** — alltid närvarande, samma stil överallt
 - **Preheader** (valbar, ovanför rubriken) ELLER **Subheader** (valbar, under rubriken) — **aldrig båda samtidigt**
 - **Icon** (valbar, höger, länkar vidare) ELLER **CTA-länk** ("Visa fler", höger, länkar vidare) — **aldrig båda samtidigt**
-- **"Visa fler ›" är standard** (brief 53): `cta={{ onPress }}` ritar "Visa fler" 13/18 `textSecondary` + chevron 14 (linje 2,2). Stora chevroner i hyllrubriker används inte. Länken visas **bara när hyllan har en destination**; i Fas 0 har ingen hylla på Hem eller Hitta det än (syns på dev-sidan).
+- **"Visa fler ›" är standard** (brief 53): `cta={{ onPress }}` ritar "Visa fler" 13/18 `textSecondary` + chevron 14 (linje 2,2). Stora chevroner i hyllrubriker används inte. Länken visas **bara när hyllan har en destination**. Sedan brief 54: Idéer för dig → Idéer, Kategorier → Alla kategorier, Områden och stilar (Hitta) och Områden (Hem) → Alla områden.
 
 Ersätter `DiscoveryPreviewCard`s egenbyggda rubrikrad (byggdes fristående innan `SectionTitle` hade ikon-stöd) — konsolideras till samma komponent.
 
@@ -222,6 +222,13 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **Idékort** = `EditorialCard` `landscape` i formatet 240 × 160 med `titleIcon` (förstoringsglas). Data i `data/ideas.ts` (`id`, `title`, `image`, `filter`; filtret har områdets form plus `newOnly`, `maxPrice`, `material`).
 - **Kategorikort** 109 × 150 och **områdeskort** (2-kolumnsgrid, 92 höga) är också `EditorialCard` med härlett format. Text på bild eftersom varje kort är ett enda foto.
 - **Sökläge:** handlingsrader "Sök efter" / "Fråga om", sedan förslag eller senaste sökningar. Se design.md §8l.
+
+## 20. Kategorier, områden och ScreenHeader (tillagt 2026-11-24, brief 54)
+- **ScreenHeader** (`components/ScreenHeader.tsx`): tillbaka + rubrik 28/32 (`screenTitle`) + valfria rader under. Delas av Kategorivy, Alla kategorier, Alla områden, Områdesdetalj och Idéer.
+- **AreaGrid** (`components/AreaGrid.tsx`): områdeskorten i 2-kolumnsgrid (Hitta med `limit` 6, Alla områden utan). Tryck öppnar Områdesdetalj, liksom korten i Hem-hyllan Områden.
+- **IdeaCard** (`components/IdeaCard.tsx`): idékortet, 240 × 160 eller `width` (fulla bredden) med samma proportion.
+- **Kategorier** i `data/categories.ts`: namn, kortbild, urval och pillar (visas bara om de ger träffar).
+- **Följ område:** samma mängd som samlingar och varumärken (`FollowedCollectionsContext`), nyckel = områdets id. Sparat → Följer har sektionen **Områden**.
 
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.
