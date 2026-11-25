@@ -20,7 +20,7 @@ Användare, företag/butik eller varumärke som en identitet. **Alltid cirkel.**
 - **Medium** — bild + metadata under, 2-kolumnsgrid
 - **Large** — bild + metadata under, 1-kolumnsgrid
 
-Samma mönster som CollectionCard/PartnerCard/LinkCard Vertical: bara bildcontainern har `Radius.card` + kant, text under ligger utan bakgrund/rundning, flush med bildbredden. I **grid** (Följer/Sparat): masonry, bildhöjd styr korthöjd (medvetet, Pinterest-mönster). I **horisontell rad** (`RecommendedProductsRow`): `fixedHeight`-prop tvingar samma höjd på alla kort — masonry hör bara hemma i grid-kontext, inte i en scroll-rad.
+Samma mönster som CollectionCard/PartnerCard/LinkCard Vertical: bara bildcontainern har `Radius.card` + kant, text under ligger utan bakgrund/rundning, flush med bildbredden. I **grid** (Följer/Sparat): masonry, bildhöjd styr korthöjd (medvetet, Pinterest-mönster; Följer se §21). I **horisontell rad** (`RecommendedProductsRow`): `fixedHeight`-prop tvingar samma höjd på alla kort — masonry hör bara hemma i grid-kontext, inte i en scroll-rad.
 
 ### CollectionCard — ✅ Form bestämd, namn bekräftat aug 2026, implementerad
 Board-stil: 1 stor bild + 2 mindre i 2-kolumnsuppdelning. **Bara bild-containern är rundad — metadata under ligger utan bakgrund, ingen rundad yttre kortram.** Litet cirkulärt profilfoto på kuratorn överlagt bilden. Metadata under (antal objekt, ålder/senast uppdaterad). Används i `PopularCollectionsRow` (dummy-data, Fas 0-platshållare tills riktiga användarsamlingar finns).
@@ -240,6 +240,12 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **IdeaCard** (`components/IdeaCard.tsx`): idékortet, 240 × 160 eller `width` (fulla bredden) med samma proportion.
 - **Kategorier** i `data/categories.ts`: namn, kortbild, urval och pillar (visas bara om de ger träffar).
 - **Följ område:** samma mängd som samlingar och varumärken (`FollowedCollectionsContext`), nyckel = områdets id. Sparat → Följer har sektionen **Områden**.
+
+## 21. Följer: masonry-kort och en-kolumn-kort (tillagt 2026-11-25, brief 59)
+- **Masonry-kort** = `ProductCard` M med `aspectRatio` från `masonryRatio(product)` (`lib/followFeed.ts`): produktbildens proportion avrundad till 3:4, 2:3, 4:5 eller 1:1, annars stabil från id. Två kolumner, varje kort i den kortaste (`layoutMasonry`), `followFeed.masonryRowGap` 20 i höjdled, `spacing.gutter` mellan kolumnerna.
+- **En-kolumn-kort** = `ProductCard` L i full bredd med `aspectRatio={followFeed.singleRatio}` (4:5) och **`saveButton`**: textblocket till vänster, bokmärke (`Icon bookmark`, fyllt när sparad, 44-yta, ikonens kant linjerar med bildens) till höger. Tryck = snabbspar (som "Spara" i kontextmenyn), långt tryck = "Spara i …". `followFeed.singleRowGap` 28 mellan korten.
+- **Filter:** `lib/productFilters.ts` (`ProductFilter`, `BASE_FILTER_OPTIONS`, `filterOptionsWithAreas`, `filterProducts`), tänkt att delas med Hems pillar senare.
+- **Flödet:** `lib/followFeed.ts` (`buildFollowFeed` med frö, `getFollowedProducts`, `getInspirationProducts`, `FEED_LIMIT` 40).
 
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.

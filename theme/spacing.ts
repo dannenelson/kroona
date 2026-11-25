@@ -156,6 +156,15 @@ export const sectionLink = {
   gap: 2,
 } as const;
 
+/** Följer (brief 59): masonry 2 kolumner (`spacing.gutter` emellan) med 20 mellan
+ *  korten i höjdled; en kolumn med kort i full bredd och 28 mellan. */
+export const followFeed = {
+  masonryRowGap: 20,
+  singleRowGap: 28,
+  /** En kolumn: bild 4:5 (bredd / höjd). */
+  singleRatio: 4 / 5,
+} as const;
+
 /** Hitta (brief 53): idékort 240 × 160, kategorikort 109 × 150, områdeskort 92 höga
  *  (bredden räknas fram: två kolumner inom skärmmarginalen). */
 export const findCards = {

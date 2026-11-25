@@ -3,7 +3,8 @@ import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
 import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
-import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
+import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion, touchTarget, iconSize } from '../theme';
+import { haptic } from '../utils/haptic';
 import { useCardPress } from '../hooks/useCardPress';
 import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
@@ -41,13 +42,17 @@ type Props = {
   // Heter inte `style`: produktdata har ett eget fält `style` (Minimalistisk
   // osv.) och skickas in med spread. Slås ihop sist enligt kontraktet.
   containerStyle?: StyleProp<ViewStyle>;
+  /** Spara-knapp (bokmärke) till höger om texten, en-kolumnsflödet i Följer (brief 59).
+   *  Tryck = snabbspar till Gillade (som "Spara" i menyn), långt tryck = "Spara i …". */
+  saveButton?: boolean;
 };
 
 
 /**
  * ProductCard enligt referensen "Kroona Looken A" och design.md §0/§4. Bara
  * bilden är rundad (squircle), texten ligger under utan bakgrund.
- * Ingen Spara-knapp på kortet: Spara m.fl. ligger i menyn vid långt tryck.
+ * Ingen Spara-knapp på kortet: Spara m.fl. ligger i menyn vid långt tryck
+ * (undantag: `saveButton` i en-kolumnsflödet på Följer, brief 59).
  * States: default, pressed (skala 0,96, animerat), disabled (35 % opacitet).
  */
 export default function ProductCard({
@@ -69,6 +74,7 @@ export default function ProductCard({
   menu = true,
   disabled = false,
   containerStyle,
+  saveButton = false,
 }: Props) {
   const { colors } = useTheme();
   const styles = useStyles();
@@ -214,35 +220,52 @@ export default function ProductCard({
           )}
 
           {!isSmall && (
-            <View style={styles.info}>
-              <Text style={styles.brand} numberOfLines={1}>
-                {brand}
-              </Text>
-              <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
-                {name}
-              </Text>
-              <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
-                {formatPrice(price)}
-                <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
-              </Text>
-              <View style={styles.ratings}>
-                {rating !== undefined && (
+            <View style={saveButton ? styles.infoRow : styles.info}>
+              <View style={styles.infoText}>
+                <Text style={styles.brand} numberOfLines={1}>
+                  {brand}
+                </Text>
+                <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
+                  {name}
+                </Text>
+                <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
+                  {formatPrice(price)}
+                  <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
+                </Text>
+                <View style={styles.ratings}>
+                  {rating !== undefined && (
+                    <View style={styles.rating}>
+                      <Icon name="star" filled color={colors.textSecondary} size={typography.caption.fontSize} />
+                      <Text style={styles.ratingText}>{formatScore(rating)}</Text>
+                      {reviewCount !== undefined && (
+                        <Text style={styles.ratingCount}>({reviewCount})</Text>
+                      )}
+                    </View>
+                  )}
+                  {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
                   <View style={styles.rating}>
-                    <Icon name="star" filled color={colors.textSecondary} size={typography.caption.fontSize} />
-                    <Text style={styles.ratingText}>{formatScore(rating)}</Text>
-                    {reviewCount !== undefined && (
-                      <Text style={styles.ratingCount}>({reviewCount})</Text>
-                    )}
+                    <Icon name="leaf" color={colors.textSecondary} size={typography.caption.fontSize} />
+                    <Text style={styles.ratingText}>
+                      {formatScore(sustainabilityScore)}
+                    </Text>
                   </View>
-                )}
-                {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
-                <View style={styles.rating}>
-                  <Icon name="leaf" color={colors.textSecondary} size={typography.caption.fontSize} />
-                  <Text style={styles.ratingText}>
-                    {formatScore(sustainabilityScore)}
-                  </Text>
                 </View>
               </View>
+              {saveButton && (
+                <Pressable
+                  onPress={() => {
+                    haptic.light();
+                    save.quickSave();
+                  }}
+                  onLongPress={save.openSheet}
+                  accessibilityRole="button"
+                  accessibilityLabel={save.liked ? 'Sparad' : 'Spara'}
+                  accessibilityState={{ selected: save.saved }}
+                  style={({ pressed }) => [styles.save, pressed && styles.savePressed]}
+                >
+                  <Icon name="bookmark" filled={save.saved} color={colors.textPrimary} size={iconSize.lg} />
+                </Pressable>
+              )}
             </View>
           )}
         </Animated.View>
@@ -301,7 +324,28 @@ const useStyles = makeStyles((t) => ({
   },
   info: {
     paddingTop: spacing.sm,
+  },
+  infoRow: {
+    paddingTop: spacing.sm,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+  },
+  infoText: {
+    flex: 1,
     gap: spacing.xs,
+  },
+  // Bokmärket: 44-yta, ikonens högerkant linjerar med bildens högerkant.
+  save: {
+    width: touchTarget,
+    height: touchTarget,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: -(touchTarget - iconSize.lg) / 2,
+    marginTop: -(touchTarget - iconSize.lg) / 2 + spacing.xs,
+  },
+  savePressed: {
+    opacity: motion.disabledOpacity,
   },
   brand: {
     ...typography.label,

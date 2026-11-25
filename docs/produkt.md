@@ -30,11 +30,11 @@ Göra köpresan enklare och roligare för alla konsumenter, oavsett intresse ell
 | Flik | Roll |
 |---|---|
 | **Hem** | Samlingspunkt, som Spotify: kompakt hälsningshero, sedan hyllor med kort (samlingar, varumärken, områden, rekommendationer). Inga produkter i grid. Tryck öppnar ett eget läge. |
-| **Följer** | Uppdateringar från det man följer: varumärken, företag, områden, samlingar. |
+| **Följer** | Ett Pinterest-flöde (brief 59): produkter från det man följer (samlingar, varumärken och butiker, områden, personers samlingar) och inspiration som liknar det, **blandade jämnt** i ny slumpad ordning varje gång (öppning och pull-to-refresh). Ingen text säger varför en produkt visas. Två vyer (masonry, en kolumn), pillar som filtrerar (Alla, Kläder, Möbler, Begagnat, följda områden). Följer man inget: tomläge med områden. Riktig rekommendation är Fas 1+. |
 | **Hitta** | Hitta produkter på tre sätt (brief 53): **sök** (fritext, träffar direkt), **dialog** (AI-hjälp att välja, med eller utan avgränsning till en kategori eller sökterm) och **kategorier**. Ett fält, "Fråga eller sök", både söker och frågar; standard är sök. Dialogen är en egen skärm med inline produktkort. **AI:n har inget namn i UI** (ett namn kan komma senare, men aldrig "Kroona"); ingen text säger "Fråga Kroona" eller "Kroonas AI-guide". |
 | **Sparat** | Det man sparat och följer, där man hanterar det. Flikar Mina samlingar \| Följer. "Gillade produkter" (hjärtat) först, sedan egna samlingar. |
 
-**Detaljvyer:** Produktdetalj, Samlingsdetalj, Partnerdetalj (varumärke/företag) och Profildetalj (personer). **Personer går att följa** (Daniel, 2026-11-20, brief 37): i Fas 0 som dummydata med lokal följ-lagring; riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) är Fas 1+. Masonry-grid (Pinterest-känsla) bor i detaljvyerna, inte på en flik.
+**Detaljvyer:** Produktdetalj, Samlingsdetalj, Partnerdetalj (varumärke/företag) och Profildetalj (personer). **Personer går att följa** (Daniel, 2026-11-20, brief 37): i Fas 0 som dummydata med lokal följ-lagring; riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) är Fas 1+. Masonry-grid (Pinterest-känsla) bor i detaljvyerna och sedan brief 59 i Följer.
 Hem är det som är relevant nu, Följer är det man följer. Fliken hette Flöde fram till brief 44 (2026-11-23); route och fil heter fortfarande `feed`.
 
 ## Låsta beslut
