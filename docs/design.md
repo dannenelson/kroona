@@ -124,7 +124,7 @@ Familjen Grotesk (display) ✅ + Google Sans Flex (UI) 🔵. Google Sans Flex ä
 | `micro` (täta kortetiketter, badges, overline) | Google Sans Flex | 500 | 10 / 14 | 🔵 |
 | `price` | Google Sans Flex | 600 | enligt kontext | ✅ format |
 
-**Prisformat** ✅: `1 490 kr`, "kr" direkt efter siffran på samma rad och cirka 70 % av prisets storlek. **Betyg** ✅: ikon före värde, `★ 4,8 (312)` och `🍃 4,2`.
+**Prisformat** ✅: `1 490 kr`, "kr" direkt efter siffran på samma rad och cirka 70 % av prisets storlek. **Betyg** ✅: ikon före värde, `★ 4,8 (312)` och `🍃 4,2`. Raden radbryts aldrig: får den inte plats på ett smalt kort utelämnas antalet omdömen (brief 60). Produkter utan betyg visar bara hållbarhet; Produktdetalj har raden "Betyg" ("4,6 av 5 (128 omdömen)") ovanför Hållbarhetsindex, bara när betyg finns.
 Textstorlek skalas med systemets inställning för text, och layouten måste tåla det. 🔵
 
 Referensen "Kroona Looken A" använder några storlekar utan egen stil (pill 14/500, flik och knapp 15/500, kortetikett 13/400, navigation 10,5/500). Koden använder närmaste stil (`label`, `caption`, `micro`) tills de eventuellt läggs till. 🟡

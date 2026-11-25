@@ -26,6 +26,10 @@ export interface CatalogProduct {
   aspectRatio?: number;
   featured?: boolean;
   sustainabilityScore: number;
+  /** Kundbetyg 0–5 med en decimal (brief 60). Saknas = inget betyg visas. */
+  rating?: number;
+  /** Antal omdömen bakom betyget. */
+  reviewCount?: number;
   /** Märket "Nyhet": nytillkommen i katalogen. Inte skick (det ligger på Erbjudandet). */
   isNewArrival?: boolean;
   /** Fler bilder utöver `imageUrl` (lightboxen, brief 19). */

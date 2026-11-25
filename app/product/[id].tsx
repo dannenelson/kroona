@@ -49,6 +49,9 @@ const HERO_ASPECT = 4 / 5;
 const SIMILAR_WIDTH = 140;
 const SIMILAR_IMAGE_HEIGHT = 176;
 
+/** " (128 omdömen)" / " (1 omdöme)", tomt utan antal. */
+const reviewsLabel = (n?: number) => (n === undefined ? '' : ` (${n} ${n === 1 ? 'omdöme' : 'omdömen'})`);
+
 const STOCK_LABEL: Record<Offer['stock'], string> = {
   in_stock: 'I lager',
   few_left: 'Få kvar',
@@ -174,6 +177,10 @@ export default function ProductScreen() {
   }
 
   const facts: Fact[] = [
+    // Betyg (brief 60) direkt ovanför hållbarhet; ingen rad när produkten saknar betyg.
+    ...(product.rating !== undefined
+      ? [{ label: 'Betyg', value: `${formatScore(product.rating)} av 5${reviewsLabel(product.reviewCount)}` }]
+      : []),
     { label: 'Hållbarhetsindex', value: `${formatScore(product.sustainabilityScore)} av 5` },
     ...(product.facts?.material ? [{ label: 'Material', value: product.facts.material }] : []),
     ...(product.facts?.madeIn ? [{ label: 'Tillverkad i', value: product.facts.madeIn }] : []),

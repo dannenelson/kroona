@@ -109,6 +109,15 @@ export default function ProductCard({
   const isSmall = size === 'S';
   const isLarge = size === 'L';
 
+  // Betygsraden radbryts aldrig (brief 60): får den inte plats på ett smalt
+  // kort utelämnas antalet omdömen. Mäts mot radens bredd och lövgruppens slut.
+  const [countFits, setCountFits] = useState(true);
+  const ratingsRow = useRef({ width: 0, leafEnd: 0 });
+  const checkRatingsFit = () => {
+    const { width, leafEnd } = ratingsRow.current;
+    if (countFits && width > 0 && leafEnd > width + 0.5) setCountFits(false);
+  };
+
   // Följ varumärke, Dela och Visa liknande har ingen logik i Fas 0-steget,
   // de stänger bara menyn.
   const menuItems: ContextMenuItem[] = [
@@ -232,18 +241,31 @@ export default function ProductCard({
                   {formatPrice(price)}
                   <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
                 </Text>
-                <View style={styles.ratings}>
+                <View
+                  style={styles.ratings}
+                  onLayout={(e) => {
+                    ratingsRow.current.width = e.nativeEvent.layout.width;
+                    checkRatingsFit();
+                  }}
+                >
                   {rating !== undefined && (
                     <View style={styles.rating}>
                       <Icon name="star" filled color={colors.textSecondary} size={typography.caption.fontSize} />
                       <Text style={styles.ratingText}>{formatScore(rating)}</Text>
-                      {reviewCount !== undefined && (
+                      {reviewCount !== undefined && countFits && (
                         <Text style={styles.ratingCount}>({reviewCount})</Text>
                       )}
                     </View>
                   )}
                   {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
-                  <View style={styles.rating}>
+                  <View
+                    style={styles.rating}
+                    onLayout={(e) => {
+                      const { x, width } = e.nativeEvent.layout;
+                      ratingsRow.current.leafEnd = x + width;
+                      checkRatingsFit();
+                    }}
+                  >
                     <Icon name="leaf" color={colors.textSecondary} size={typography.caption.fontSize} />
                     <Text style={styles.ratingText}>
                       {formatScore(sustainabilityScore)}
@@ -382,7 +404,8 @@ const useStyles = makeStyles((t) => ({
   ratings: {
     flexDirection: 'row',
     alignItems: 'center',
-    flexWrap: 'wrap',
+    flexWrap: 'nowrap',
+    overflow: 'hidden',
     gap: spacing.md,
   },
   rating: {
