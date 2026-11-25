@@ -3,7 +3,6 @@ import { Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { makeStyles, typography, spacing } from '../theme';
 import TopBar from './TopBar';
-import BackIcon from '../assets/icons/BackIcon';
 
 type Props = {
   title: string;
@@ -21,7 +20,7 @@ export default function ScreenHeader({ title, children }: Props) {
   const styles = useStyles();
   return (
     <View>
-      <TopBar left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
+      <TopBar left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
       <View style={styles.body}>
         <Text style={styles.title} accessibilityRole="header">
           {title}

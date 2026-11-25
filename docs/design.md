@@ -43,7 +43,7 @@ Radier: bildkort/lista/meny 14 · samlingskort 16–18 · jämförelse 18 · pil
 
 **Hållbarhet visas neutralt** (ingen grön/röd). `success`/`warning`/`successSubtle` finns kvar i temat bara för att Hitta (`warning`), CardShowcase och ClusterCard använder dem. Städas när de filerna tas bort.
 
-**Kvar att avgöra:** ljust glas över ren yta (syns knappt), solid scrim i botten i ljust, Spara-knappens storlek på små kort, ikonstil, om översta toningen i Expo Go är iOS 26 native scroll-edge.
+**Kvar att avgöra:** ljust glas över ren yta (syns knappt), solid scrim i botten i ljust, Spara-knappens storlek på små kort, om översta toningen i Expo Go är iOS 26 native scroll-edge.
 
 ## 1. Princip: två lager
 1. **Grundtokens** är råa värden (`#15171B`, `16`). De används bara inuti temat.
@@ -251,7 +251,7 @@ Byggd i `app/product/[id].tsx` med delar i `components/product/` (SaveButton, Fa
 - **Nedre menyn (brief 49, 50):** flikraden 56 hög (`tabBar.rowHeight`), **ikon 28** (`tabBar.iconSize`, en lokal siffra, synlig glyf ca 20; 32 i brief 50, 24 innan, `iconSize.lg` oförändrad), ikon → etikett 3, sidomarginal **18** (`tabBar.sideInset`; 28 i brief 49, 8 innan) så att de fyra flikarna (80 breda, jämnt fördelade) samlas. Etikettblockets underkant **36 från skärmkanten** med safe area nedtill (`tabBar.labelBottom`), **24** utan safe area (`tabBar.labelBottomNoInset`). Raden räknas från etiketten, så en större ikon växer uppåt: med ikon 28 ligger radens underkant 34,5 (22,5 utan safe area). Kantblurren nedtill är oförändrad (128, samma stopp). Skärmarnas nedre utrymme: `tabBarSpace(insets.bottom)` = radens avstånd + 56 + 8 (98,5 resp. 86,5 med ikon 28).
 
 ## 8l. Hitta, sök och dialog (brief 53)
-- **Fältet "Fråga eller sök"** (`AskBar`, Hem, Hitta och Sökresultat): tryckbart fält, inte en inmatning. 56 högt (`control.fieldHeight`), pill (`radius.full`), `surfaceRaised`, stjärna 20 till vänster, mikrofon 24 till höger (bara ikon i Fas 0), platshållare `body` i `textSecondary`. Tryck öppnar sökläget.
+- **Fältet "Fråga eller sök"** (`AskBar`, Hem, Hitta och Sökresultat): tryckbart fält, inte en inmatning. 56 högt (`control.fieldHeight`), pill (`radius.full`), `surfaceRaised`, `find` (förstoringsglas + stjärna) 20 till vänster, `microphone` 24 till höger (brief 57) (bara ikon i Fas 0), platshållare `body` i `textSecondary`. Tryck öppnar sökläget.
 - **Sökläget:** samma fält aktivt (förstoringsglas, markör, rensa-knapp 20 rund `textSecondary` med kryss), "Avbryt" till höger. Två handlingsrader (cirkel 44 `surface` med ikon, titel `headline`, undertext `caption`): "Sök efter ”ord”" / "Visa träffar direkt" och "Fråga om ”ord”" (stjärna) / "Få hjälp att välja". Därunder "Förslag" (max 4) eller "Senaste sökningar" (max 5), rader 44 höga med litet förstoringsglas. Tonar in (`motion.searchFade`), ingen förflyttning.
 - **Sökresultat och Dialog** glider in från höger (`pushScreenOptions`) och stängs med tillbaka eller kantswipe. Bannern i Sökresultat: `surface`, `radius.card`, stjärna i cirkel 44, titel `label`, undertext `caption`, chevron.
 - **Idékort** (Hitta, Idéer för dig): liggande redaktionellt kort **240 × 160**, radie 20, text vänsterställd på bilden med förstoringsglas 16 före titeln (`EditorialCard` `titleIcon`). Tryck öppnar Sökresultat direkt.
@@ -290,5 +290,5 @@ Varje delad komponent har uttryckligen: **variant** (visuell avsikt), **size** (
 0. ~~UI-typsnitt~~ ✅ Google Sans Flex vald 2026-11-18
 1. `danger`-färg (först när fel/radera behövs)
 2. ~~Glasets exakta alfa~~ ✅ .72 enligt §0 (foto .34)
-3. Ikonbibliotek och ikonvikt (nuvarande SVG-pipeline eller en samlad ikonuppsättning)
+3. ~~Ikonbibliotek och ikonvikt~~ ✅ 2026-11-25 (brief 57): egen samlad uppsättning, SVG-filer i `assets/svg/icons/` (24 × 24, linje 1,5, runda ändar, `currentColor`) via `Icon`-komponenten. Synlig linje 1,5 i alla storlekar (`icon.stroke`). Se designsystem.md §17.
 4. Ljust temas foto-tonade ytor (hur färgtonad fotografi beter sig i ljust läge)

@@ -2,18 +2,15 @@
 // "Sök efter" (Sökresultat direkt) och "Fråga om" (Dialog med texten som
 // första fråga). Därunder förslag som matchar texten, eller senaste sökningar
 // när fältet är tomt. Nås från fältet på Hem, Hitta och Sökresultat.
-import { useEffect, useRef, useState, type ComponentRef, type ComponentType } from 'react';
+import { useEffect, useRef, useState, type ComponentRef } from 'react';
 import { Keyboard, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, control, iconSize, touchTarget } from '../theme';
-import FindIcon from '../assets/icons/FindIcon';
-import StarIcon from '../assets/icons/StarIcon';
 import CloseIcon from '../assets/icons/CloseIcon';
+import Icon, { type IconName } from '../components/Icon';
 import { searchSuggestions } from '../lib/search';
 import { addRecentSearch, loadRecentSearches } from '../lib/recentSearches';
-
-type IconProps = { color: string; size?: number };
 
 export default function SearchScreen() {
   // fromQ / fromIdea: sökläget öppnades från Sökresultat och ersatte det (brief 54).
@@ -60,7 +57,7 @@ export default function SearchScreen() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.fieldRow}>
         <View style={styles.field}>
-          <FindIcon color={colors.textSecondary} size={iconSize.md} />
+          <Icon name="search" color={colors.textSecondary} size={iconSize.md} />
           <TextInput
             ref={inputRef}
             style={styles.input}
@@ -98,13 +95,13 @@ export default function SearchScreen() {
         {trimmed ? (
           <>
             <ActionRow
-              icon={FindIcon}
+              icon="search"
               title={`Sök efter ”${trimmed}”`}
               subtitle="Visa träffar direkt"
               onPress={() => search(trimmed)}
             />
             <ActionRow
-              icon={StarIcon}
+              icon="stars"
               title={`Fråga om ”${trimmed}”`}
               subtitle="Få hjälp att välja"
               onPress={() => ask(trimmed)}
@@ -132,12 +129,12 @@ export default function SearchScreen() {
 }
 
 function ActionRow({
-  icon: Icon,
+  icon,
   title,
   subtitle,
   onPress,
 }: {
-  icon: ComponentType<IconProps>;
+  icon: IconName;
   title: string;
   subtitle: string;
   onPress: () => void;
@@ -151,7 +148,7 @@ function ActionRow({
       style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
     >
       <View style={styles.rowIcon}>
-        <Icon color={colors.textPrimary} size={iconSize.md} />
+        <Icon name={icon} color={colors.textPrimary} size={iconSize.md} />
       </View>
       <View style={styles.rowText}>
         <Text style={styles.rowTitle} numberOfLines={1}>
@@ -173,7 +170,7 @@ function TermRow({ term, onPress }: { term: string; onPress: () => void }) {
       accessibilityLabel={`Sök efter ${term}`}
       style={({ pressed }) => [styles.termRow, pressed && styles.rowPressed]}
     >
-      <FindIcon color={colors.textSecondary} size={iconSize.sm} />
+      <Icon name="search" color={colors.textSecondary} size={iconSize.sm} />
       <Text style={styles.term} numberOfLines={1}>
         {term}
       </Text>

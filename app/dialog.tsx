@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { makeStyles, useTheme, typography, fonts, spacing, radius } from '../theme';
+import { makeStyles, useTheme, typography, fonts, spacing, radius, iconSize, touchTarget } from '../theme';
 
 const SEND_HEIGHT = 40;
 const INPUT_MAX_HEIGHT = 100;
@@ -27,7 +27,7 @@ import { buildHittaSystemPrompt, SHOW_PRODUCTS_TOOL } from '../lib/kroonaSystemP
 import ProductGrid from '../components/ProductGrid';
 import TopBar from '../components/TopBar';
 import Pill from '../components/Pill';
-import BackIcon from '../assets/icons/BackIcon';
+import Icon from '../components/Icon';
 
 // Startförslag när konversationen är tom (brief 53).
 const SCOPED_STARTERS = ['Till vardagsrummet', 'Liten yta', 'Under 3 000 kr', 'Jag vet inte än'];
@@ -179,7 +179,7 @@ export default function DialogScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <TopBar left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
+      <TopBar left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
       {scope ? (
         <View style={styles.scopeRow}>
           <Pill>{scope}</Pill>
@@ -235,6 +235,7 @@ export default function DialogScreen() {
           }}
           ListEmptyComponent={
             <View style={styles.emptyState}>
+              <Icon name="stars" color={colors.textPrimary} size={iconSize.lg} />
               <Text style={styles.emptyTitle}>Vad letar du efter?</Text>
               <Text style={styles.emptyHint}>
                 {scope
@@ -271,12 +272,16 @@ export default function DialogScreen() {
             placeholderTextColor={colors.textSecondary}
             multiline
           />
+          {/* Skicka (brief 57): ikonen `send` i stället för texten "Skicka", samma inverterade yta. */}
           <TouchableOpacity
             style={[styles.sendButton, (loading || !inputText.trim()) && styles.sendButtonDisabled]}
             onPress={handleSend}
             disabled={loading || !inputText.trim()}
+            accessibilityRole="button"
+            accessibilityLabel="Skicka"
+            hitSlop={(touchTarget - SEND_HEIGHT) / 2}
           >
-            <Text style={styles.sendButtonText}>Skicka</Text>
+            <Icon name="send" color={colors.bg} size={iconSize.lg} />
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -389,16 +394,12 @@ const useStyles = makeStyles((t) => ({
     backgroundColor: t.colors.textPrimary, // vald/primär = inverterad (design.md §0)
     borderRadius: radius.card,
     borderCurve: 'continuous',
-    paddingHorizontal: spacing.lg,
     justifyContent: 'center',
     alignItems: 'center',
+    width: SEND_HEIGHT,
     height: SEND_HEIGHT,
   },
   sendButtonDisabled: {
     opacity: 0.4,
-  },
-  sendButtonText: {
-    ...typography.label,
-    color: t.colors.bg,
   },
 }));

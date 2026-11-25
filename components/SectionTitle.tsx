@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { View, Text, Pressable, StyleProp, ViewStyle } from 'react-native';
 import { makeStyles, useTheme, typography, letterSpacing, spacing, touchTarget, sectionLink, motion } from '../theme';
-import ChevronIcon from '../assets/icons/ChevronIcon';
+import Icon from './Icon';
 
 type PreOrSubHeader =
   | { preheader?: string; subheader?: never }
@@ -43,7 +43,7 @@ export default function SectionTitle({ title, preheader, subheader, icon, cta, s
           style={({ pressed }) => [styles.ctaSlot, pressed && styles.ctaPressed]}
         >
           <Text style={styles.ctaLabel}>{ctaLabel}</Text>
-          <ChevronIcon color={colors.textSecondary} size={sectionLink.chevronSize} strokeWidth={sectionLink.chevronStroke} />
+          <Icon name="chevron-right" color={colors.textSecondary} size={sectionLink.chevronSize} />
         </Pressable>
       ) : null}
     </View>

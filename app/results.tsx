@@ -12,8 +12,8 @@ import AskBar from '../components/AskBar';
 import FilterPills from '../components/FilterPills';
 import ProductGrid from '../components/ProductGrid';
 import Button from '../components/Button';
-import BackIcon from '../assets/icons/BackIcon';
 import StarIcon from '../assets/icons/StarIcon';
+import Icon from '../components/Icon';
 import ChevronIcon from '../assets/icons/ChevronIcon';
 import { getIdea } from '../data/ideas';
 import { searchProducts } from '../lib/search';
@@ -54,7 +54,7 @@ export default function ResultsScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topRow}>
-        <IconButton icon={BackIcon} tone="theme" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
+        <IconButton icon="back-arrow" tone="theme" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
         {/* Sök om (brief 54): sökläget ERSÄTTER resultatet, och den nya sökningen
             ersätter i sin tur sökläget, så att tillbaka går dit man var före
             första sökningen. "Avbryt" i sökläget återställer detta resultat. */}
@@ -94,7 +94,7 @@ export default function ResultsScreen() {
               style={({ pressed }) => [styles.banner, pressed && styles.bannerPressed]}
             >
               <View style={styles.bannerIcon}>
-                <StarIcon color={colors.textPrimary} size={iconSize.md} />
+                <Icon name="stars" color={colors.textPrimary} size={iconSize.md} />
               </View>
               <View style={styles.bannerText}>
                 <Text style={styles.bannerTitle}>Osäker på vad du behöver?</Text>

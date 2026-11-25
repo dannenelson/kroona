@@ -35,7 +35,6 @@ import SectionTitle from '../../components/SectionTitle';
 import PartnerCard from '../../components/PartnerCard';
 import ProductGrid from '../../components/ProductGrid';
 import Pill from '../../components/Pill';
-import BackIcon from '../../assets/icons/BackIcon';
 
 // Lokalt layoutmått: cover i samma proportion som övriga detaljvyer (4:5).
 const COVER_ASPECT = 4 / 5;
@@ -85,7 +84,7 @@ export default function PartnerScreen() {
   if (!retailer) {
     return (
       <View style={[styles.container, styles.empty, { paddingTop: insets.top }]}>
-        <TopBar tone="plain" left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="plain" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
         <Text style={styles.emptyText}>Återförsäljaren finns inte.</Text>
       </View>
     );
@@ -207,7 +206,7 @@ export default function PartnerScreen() {
         <Reanimated.Text numberOfLines={1} style={[styles.topTitle, { top: insets.top }, titleStyle]}>
           {retailer.name}
         </Reanimated.Text>
-        <TopBar tone="photo" left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="photo" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
       </View>
     </View>
   );

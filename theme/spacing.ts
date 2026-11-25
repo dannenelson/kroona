@@ -14,6 +14,14 @@ export const spacing = {
 export const touchTarget = 44;
 export const iconSize = { xs: 12, sm: 18, md: 20, lg: 24 } as const;
 
+/** Ikonsystemet (brief 57): `stroke` är den SYNLIGA linjen i px, lika i alla storlekar.
+ *  Icon räknar om den till ritrutan 24: strokeWidth = stroke × 24 / size. */
+export const icon = {
+  stroke: 1.5,
+  /** Ritrutan som SVG-filerna är ritade i (viewBox 24 × 24). */
+  grid: 24,
+} as const;
+
 /** Knappar (brief 33, 39): aldrig fullbredd, pill som följer innehållet.
  *  CTA minst 56 hög med sidpadding 28 (två CTA:er ryms på en rad);
  *  kompakt (t.ex. snackbarens åtgärd) 36. Fält 56 höga. */
@@ -140,10 +148,10 @@ export const pagerDots = {
   inactiveOpacityOnPhoto: 0.55,
 } as const;
 
-/** "Visa fler ›" i hyllrubriker (brief 53): chevron 14, linje 2,2, 2 mellan text och chevron. */
+/** "Visa fler ›" i hyllrubriker (brief 53, 57): `chevron-right` 14 med ikonsystemets
+ *  linje (`icon.stroke`; 2,2 i brief 53), 2 mellan text och chevron. */
 export const sectionLink = {
   chevronSize: 14,
-  chevronStroke: 2.2,
   gap: 2,
 } as const;
 

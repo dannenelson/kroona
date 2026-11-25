@@ -1,18 +1,16 @@
 import { Pressable, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useRouter } from 'expo-router';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, control, iconSize } from '../theme';
-import StarIcon from '../assets/icons/StarIcon';
-import FindIcon from '../assets/icons/FindIcon';
-import MicIcon from '../assets/icons/MicIcon';
+import Icon from './Icon';
 
 type Props = {
   /** Söktermen som visas i fältet (Sökresultat); utan den visas platshållaren. */
   value?: string;
   /** Standard: öppna sökläget (med `value` ifyllt). */
   onPress?: () => void;
-  /** Ikonen till vänster: AI-stjärnan (standard) eller förstoringsglaset
-   *  (Sökresultat, där fältet visar en sökning, brief 55). */
-  icon?: 'star' | 'search';
+  /** Ikonen till vänster (brief 57): `find` (förstoringsglas + stjärna, standard:
+   *  Hem och Hitta) eller `search` (förstoringsglas, Sökresultat, där fältet visar en sökning). */
+  icon?: 'find' | 'search';
   /** Utan egen sidomarginal (när fältet ligger i en rad med annat). */
   inline?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -20,11 +18,11 @@ type Props = {
 
 /**
  * "Fråga eller sök" (brief 53): ett tryckbart fält, inte en riktig inmatning.
- * 56 högt, stjärna till vänster, mikrofon till höger (bara ikon i Fas 0).
+ * 56 högt, sök + stjärna till vänster, mikrofon till höger (bara ikon i Fas 0).
  * Tryck öppnar sökläget (app/search.tsx), där man väljer sök eller dialog.
  * Används på Hem, Hitta och Sökresultat.
  */
-export default function AskBar({ value, onPress, icon = 'star', inline, style }: Props) {
+export default function AskBar({ value, onPress, icon = 'find', inline, style }: Props) {
   const router = useRouter();
   const { colors } = useTheme();
   const styles = useStyles();
@@ -39,15 +37,15 @@ export default function AskBar({ value, onPress, icon = 'star', inline, style }:
         accessibilityLabel={value ? `Sökning: ${value}. Ändra` : 'Fråga eller sök'}
         style={({ pressed }) => [styles.bar, pressed && styles.pressed]}
       >
-        {icon === 'search' ? (
-          <FindIcon color={colors.textSecondary} size={iconSize.md} />
-        ) : (
-          <StarIcon color={colors.textPrimary} size={iconSize.md} />
-        )}
+        <Icon
+          name={icon}
+          color={icon === 'search' ? colors.textSecondary : colors.textPrimary}
+          size={iconSize.md}
+        />
         <Text style={[styles.text, !value && styles.placeholder]} numberOfLines={1}>
           {value || 'Fråga eller sök'}
         </Text>
-        <MicIcon color={colors.textSecondary} size={iconSize.lg} />
+        <Icon name="microphone" color={colors.textSecondary} size={iconSize.lg} />
       </Pressable>
     </View>
   );

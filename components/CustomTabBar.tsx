@@ -6,20 +6,14 @@ import { makeStyles, useTheme, typography, spacing, motion, tabBar } from '../th
 import EdgeFade from './EdgeFade';
 import { usePressAnimation } from '../hooks/usePressAnimation';
 
-import HomeIcon from '../assets/icons/HomeIcon';
-import HomeIconFilled from '../assets/icons/HomeIcon_filled';
-import FeedIcon from '../assets/icons/FeedIcon';
-import FeedIconFilled from '../assets/icons/FeedIcon_filled';
-import FindIcon from '../assets/icons/FindIcon';
-import FindIconFilled from '../assets/icons/FindIcon_filled';
-import SavedIcon from '../assets/icons/SavedIcon';
-import SavedIconFilled from '../assets/icons/SavedIcon_filled';
+import Icon, { type IconName } from './Icon';
 
-const ICONS = {
-  index: { outlined: HomeIcon, filled: HomeIconFilled },
-  feed: { outlined: FeedIcon, filled: FeedIconFilled },
-  find: { outlined: FindIcon, filled: FindIconFilled },
-  saved: { outlined: SavedIcon, filled: SavedIconFilled },
+// Flikikoner (brief 57): aktiv flik = fylld, inaktiv = kontur.
+const ICONS: Record<string, IconName> = {
+  index: 'home',
+  feed: 'masonry',
+  find: 'find',
+  saved: 'folders',
 };
 
 const LABELS: Record<string, string> = {
@@ -68,8 +62,6 @@ export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTa
       <View style={styles.tabsRow}>
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
-          const iconSet = ICONS[route.name as keyof typeof ICONS];
-          const Icon = isFocused ? iconSet.filled : iconSet.outlined;
           const label = LABELS[route.name];
 
           const onPress = () => {
@@ -89,7 +81,7 @@ export default function CustomTabBar({ state, emitter, navigateToTab }: BottomTa
 
           return (
             <NavTab key={route.key} label={label} selected={isFocused} onPress={onPress}>
-              <Icon color={color} size={tabBar.iconSize} />
+              <Icon name={ICONS[route.name]} filled={isFocused} color={color} size={tabBar.iconSize} />
               <Text style={[styles.label, { color }]}>{label}</Text>
             </NavTab>
           );

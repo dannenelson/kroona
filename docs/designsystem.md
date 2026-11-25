@@ -201,15 +201,26 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **Regel (brief 52):** text på bilden bara när bilden är ett enda foto; flerbildskort (kollage) har titel (`typography.cardTitle` 14/500) och undertext (`caption` 12, `textSecondary`) under bilden, vänsterställda. `align` (`'center' | 'start'`) styr textens justering när varianten inte räcker. Cirklar i `MoreInYourStyleRow` använder `ProfileCard`.
 - **Ligger kvar men monteras inte längre på Hem:** `ContinueDialogRow`, `CollectionRow` ("Du följer"), `DiscoverBrandsRow` (logiken delas via `useDiscoverBrandTiles`), `DiscoveryMosaicCard`, `HeroRow`, `DiscoveryPreviewCard`, `CollectionCard`.
 
-## 17. SVG-filer: ikoner och logotyper (tillagt 2026-11-23, brief 45)
-- **Konvention:** nya ikoner är `.svg`-filer under `assets/svg/icons/` (24 × 24, linjeikoner med linjetjocklek 1,5 som övriga ikoner, `stroke`/`fill="currentColor"`). Logotyper ligger under `assets/logos/`. De gamla TSX-ikonerna i `assets/icons/` ersätts först när de ändå ändras.
-- **Pipeline:** Metro importerar `.svg` som React-komponent (`react-native-svg-transformer`, `metro.config.js`, typer i `types/svg.d.ts`). `.svgrrc` i roten tar bort fasta `width`/`height` (`dimensions: false`), behåller `viewBox` och byter svart (`#000`, `#000000`, `black`) mot `currentColor`. Komponenten tar då `width`, `height` och `color` (färgen ger `currentColor`). Ändras `.svgrrc` måste Metro startas med `-c`.
-- **Wrappers:** `components/KroonaLogo.tsx` (`height`, bredden från proportionen 1440:238, `color` default `textPrimary`, `trademark` default från 40 px höjd: under det beskärs viewBox till ordbilden 1378 bred så att ™ döljs, brief 46) och `components/NotificationIcon.tsx` (`size` default `iconSize.lg`, `color` default `textPrimary`; klockan ritad med linje 1,5 sedan brief 46, som övriga ikoner). Provyta: dev-sidan `app/components.tsx`.
-- **Menyikoner:** ritas i `tabBar.iconSize` **28** (brief 52; 32 i brief 50, 24 innan), en lokal storlek i nedre menyn. Övriga ikoner använder `iconSize` (24 som störst).
+## 17. Ikoner och SVG-filer (tillagt 2026-11-23, brief 45; ikonsystemet brief 57)
+- **Filer:** gränssnittsikoner är `.svg` i `assets/svg/icons/` (24 × 24, linje 1,5, runda ändar och hörn, `currentColor`). **Filnamnet utan `.svg` är ikonens namn** (`home`, `back-arrow`, `chevron-right` …). Märkesikoner (SoMe, `some-*.svg`) ligger i `assets/svg/brands/`: officiella former, fyllda, ingen linje. Logotyper ligger i `assets/logos/`. De gamla TSX-ikonerna i `assets/icons/` byts ut i senare briefar.
+- **`Icon`** (`components/Icon.tsx`): `<Icon name="search" size={iconSize.md} color={…} filled? strokeWidth? />`.
+  - `name`: typad union (`IconName`) över alla filnamn.
+  - `size`: standard `iconSize.lg` (24).
+  - `color`: standard temats `textPrimary`.
+  - `strokeWidth`: den **synliga** linjen i px, standard `icon.stroke` (1,5).
+  - Ikonen är dekorativ (dold för skärmläsare); etiketten ligger på knappen eller raden.
+- **Konstant linje:** filerna är ritade på 24-ruta, så `Icon` sätter `strokeWidth = icon.stroke × 24 / size` på roten (1,5 vid 24, 2,25 vid 16, ca 1,29 vid 28). Filernas egna `stroke-width` tas bort i `.svgrrc` (svgo `removeAttrs`), annars skulle de vinna över roten. Ändras `.svgrrc` måste Metro startas med `-c`.
+- **Fylld (`filled`):** finns `<namn>-filled.svg` används den (i dag `find-filled`, `folders-filled`, `verified-filled`). Annars fylls formerna med kod: roten får `fill` i ikonens färg och formerna ärver den, linjen ligger kvar. Fungerar för slutna former (home, masonry, bookmark, heart, star, search, send). Öppna linjer fylls också, så kodfyllning passar inte alla ikoner (t.ex. `back-arrow`, kläppen i `notification`).
+- **Register:** `components/iconRegistry.ts` (`IconName`) och `components/brandIconRegistry.ts` (`BrandIconName`) är **genererade**: en import per fil. Kör `node scripts/generate-icon-registry.js` efter att en ikon lagts till, bytt namn eller tagits bort. Ändra inte filerna för hand.
+- **Komponenter som tar en ikon:** `IconButton` (och därmed `TopBar`) tar `icon` som ett ikonnamn (`icon="back-arrow"`) eller en gammal ikonkomponent; med ett namn ger `selected` den fyllda varianten. Övriga (`Button`, `ListRow`, `SegmentedIcons`, menyer) tar än så länge gamla komponenter.
+- **Flikfältet:** `home`, `masonry`, `find`, `folders` i `tabBar.iconSize` **28**; aktiv flik `filled`, inaktiv kontur.
+- **Bestämda val (brief 57):** tillbaka = `back-arrow` (aldrig chevron-vänster), sök = `search`, AI = `stars`, fältet "Fråga eller sök" i ej valt läge = `find`, mikrofon = `microphone`, skicka = `send`, filter = `filter`, notis = `notification`, "Visa fler ›" = `chevron-right` 14.
 - **Lägga till en ny ikon:**
-  1. Exportera 24 × 24 med linje 1,5 och spara som `assets/svg/icons/<namn>.svg` (svart eller `currentColor`, ingen `style` på roten).
-  2. Importera den: `import XSvg from '../assets/svg/icons/<namn>.svg'`.
-  3. Rita `<XSvg width={size} height={size} color={colors.textPrimary} />` (eller gör en liten wrapper som `NotificationIcon` när den används på 2+ ställen).
+  1. Rita 24 × 24 med linje 1,5, runda ändar, svart eller `currentColor`, ingen `style` på roten. Spara som `assets/svg/icons/<namn>.svg` (fylld variant: `<namn>-filled.svg`).
+  2. Kör `node scripts/generate-icon-registry.js`.
+  3. Använd `<Icon name="<namn>" />`.
+- **Wrappers:** `components/KroonaLogo.tsx` (`height`, bredden från proportionen 1440:238, `color` default `textPrimary`, `trademark` default från 40 px höjd: under det beskärs viewBox till ordbilden 1378 bred så att ™ döljs, brief 46) och `components/NotificationIcon.tsx` (`Icon name="notification"`, `size` default `iconSize.lg`, `color` default `textPrimary`). Provyta: dev-sidan `app/components.tsx`.
+- **Pipeline:** Metro importerar `.svg` som React-komponent (`react-native-svg-transformer`, `metro.config.js`, typer i `types/svg.d.ts`). `.svgrrc` i roten tar bort fasta `width`/`height` (`dimensions: false`) och `stroke-width`, behåller `viewBox` och byter svart (`#000`, `#000000`, `black`) mot `currentColor`.
 
 ## 18. Logotyper: BrandLogo, logoPlate och samlingslogotyp (tillagt 2026-11-23, brief 47)
 - **Tillfälligt demomaterial:** `assets/dummy/logos/retailers/*.svg` och `assets/dummy/logos/collections/*.svg` (90 × 45-ram, transparent). Register i `data/logos.ts`: `RETAILER_LOGOS` (retailer-id → logotyp) och `COLLECTION_LOGOS` (samlings- eller områdes-id → logotyp). Filerna behåller sina egna färger (ingen `currentColor`).
@@ -218,7 +229,7 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **Samlingslogotyp på kort:** `EditorialCard` tar `logo` (vit). Den ersätter titeln, ovanpå toningen: stående centrerad, liggande vänsterställd, bredd `logo.largeShare` **65 %** (stor/liggande) / `logo.smallShare` **85 %** (liten) men högst `logo.maxHeight` **72** hög, det som binder först (brief 51; tidigare 60 / 75 % och 36). Slutvärden: stort kort 144 × 72, liggande 144 × 72, litet 127,5 × 64. Undertiteln ligger kvar; titeln blir tillgänglighetsetikett. Används i "Samlingar för dig" och "Områden" via `COLLECTION_LOGOS`.
 
 ## 19. Hitta: fält, idékort och sökläge (tillagt 2026-11-24, brief 53)
-- **AskBar** = tryckbart fält "Fråga eller sök" (56, pill, stjärna vänster, mikrofon höger). Prop `value` visar söktermen (Sökresultat), `inline` tar bort sidomarginalen. Ingen riktig inmatning; sökläget (`app/search.tsx`) har det aktiva fältet.
+- **AskBar** = tryckbart fält "Fråga eller sök" (56, pill, `find` vänster, `microphone` höger; `icon="search"` i Sökresultat, brief 57). Prop `value` visar söktermen (Sökresultat), `inline` tar bort sidomarginalen. Ingen riktig inmatning; sökläget (`app/search.tsx`) har det aktiva fältet.
 - **Idékort** = `EditorialCard` `landscape` i formatet 240 × 160 med `titleIcon` (förstoringsglas). Data i `data/ideas.ts` (`id`, `title`, `image`, `filter`; filtret har områdets form plus `newOnly`, `maxPrice`, `material`).
 - **Kategorikort** 109 × 150 och **områdeskort** (2-kolumnsgrid, 92 höga) är också `EditorialCard` med härlett format. Text på bild eftersom varje kort är ett enda foto.
 - **Sökläge:** handlingsrader "Sök efter" / "Fråga om", sedan förslag eller senaste sökningar. Se design.md §8l.

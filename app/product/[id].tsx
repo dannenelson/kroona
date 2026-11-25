@@ -42,7 +42,6 @@ import ProductCard from '../../components/ProductCard';
 import SaveButton from '../../components/product/SaveButton';
 import { FactList, type Fact } from '../../components/product/FactList';
 import OfferRow from '../../components/product/OfferRow';
-import BackIcon from '../../assets/icons/BackIcon';
 import ShareIcon from '../../assets/icons/ShareIcon';
 import type { Offer } from '../../types/catalog';
 
@@ -169,7 +168,7 @@ export default function ProductScreen() {
   if (!product || !data) {
     return (
       <View style={[styles.container, styles.empty, { paddingTop: insets.top }]}>
-        <TopBar tone="plain" left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="plain" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
         <Text style={styles.emptyText}>Produkten finns inte.</Text>
       </View>
     );
@@ -324,7 +323,7 @@ export default function ProductScreen() {
       {/* En glaston hela vägen: photo och theme skiljer sig bara lite (brief 14). */}
       <TopBar
         tone="photo"
-        left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: back }}
+        left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }}
         right={[{ icon: ShareIcon, accessibilityLabel: 'Dela', onPress: () => {} }]}
       />
     </View>

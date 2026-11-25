@@ -9,7 +9,7 @@ import { makeStyles, useTheme, typography, spacing, radius, iconSize, findCards 
 import ScreenHeader from '../../components/ScreenHeader';
 import FilterPills from '../../components/FilterPills';
 import ProductGrid from '../../components/ProductGrid';
-import StarIcon from '../../assets/icons/StarIcon';
+import Icon from '../../components/Icon';
 import { getCategory, getCategoryPills, getCategoryProducts } from '../../data/categories';
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
@@ -46,7 +46,7 @@ export default function CategoryScreen() {
               accessibilityRole="button"
               style={({ pressed }) => [styles.ask, pressed && styles.askPressed]}
             >
-              <StarIcon color={colors.textPrimary} size={iconSize.sm} />
+              <Icon name="stars" color={colors.textPrimary} size={iconSize.sm} />
               <Text style={styles.askLabel}>Fråga om {category.name}</Text>
             </Pressable>
             <Text style={styles.count}>{countLabel(shown.length)}</Text>

@@ -19,7 +19,6 @@ import EditorialCard from '../components/EditorialCard';
 import SectionTitle from '../components/SectionTitle';
 import { ALL_RETAILER_LOGO_FILES, ALL_COLLECTION_LOGO_FILES, LOGO_ASPECT } from '../data/logos';
 import { setGestureDebug, useGestureDebug } from '../utils/devGestureDebug'; // TEMP-DEBUG-GEST
-import BackIcon from '../assets/icons/BackIcon';
 import MenuIcon from '../assets/icons/MenuIcon';
 import ArchiveIcon from '../assets/icons/ArchiveIcon';
 import NewChatIcon from '../assets/icons/NewChatIcon';
@@ -76,7 +75,7 @@ export default function ComponentsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <IconButton tone="plain" icon={BackIcon} accessibilityLabel="Tillbaka" onPress={() => router.back()} />
+          <IconButton tone="plain" icon="back-arrow" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
           <Text style={styles.title}>Komponenter</Text>
           <Pill onPress={() => setScheme(scheme === 'dark' ? 'light' : 'dark')}>
             {scheme === 'dark' ? 'Ljust tema' : 'Mörkt tema'}
@@ -302,7 +301,7 @@ export default function ComponentsScreen() {
           <ImageBackground source={PHOTOS[0].source} style={styles.topBarPhoto}>
             <TopBar
               tone="photo"
-              left={{ icon: BackIcon, accessibilityLabel: 'Tillbaka', onPress: () => {} }}
+              left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => {} }}
               right={[
                 {
                   icon: BookmarkIcon,

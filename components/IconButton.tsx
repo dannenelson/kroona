@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 import { Animated, Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { useTheme, motion, radius, touchTarget, iconSize } from '../theme';
 import Glass, { useGlass, type GlassTone } from './Glass';
+import Icon, { type IconName } from './Icon';
 import { usePressAnimation } from '../hooks/usePressAnimation';
 import { usePop } from '../hooks/usePop';
 import { haptic } from '../utils/haptic';
@@ -9,8 +10,10 @@ import { haptic } from '../utils/haptic';
 type IconProps = { color: string; size?: number };
 
 type Props = {
-  icon: ComponentType<IconProps>;
-  /** Ikon i selected-state (t.ex. fyllt bokmärke). Faller tillbaka på `icon`. */
+  /** Ett namn i ikonsystemet (`Icon`, brief 57) eller en gammal ikonkomponent. */
+  icon: IconName | ComponentType<IconProps>;
+  /** Gammal ikonkomponent i selected-state (t.ex. fyllt bokmärke). Faller tillbaka på `icon`.
+   *  Med ett ikonnamn ger selected i stället `Icon filled`. */
   selectedIcon?: ComponentType<IconProps>;
   accessibilityLabel: string;
   onPress?: () => void;
@@ -31,7 +34,7 @@ type Props = {
  * disabled = 35 % opacitet. Lätt haptik vid tryck.
  */
 export default function IconButton({
-  icon: Icon,
+  icon,
   selectedIcon,
   accessibilityLabel,
   onPress,
@@ -44,7 +47,7 @@ export default function IconButton({
   const { colors, shadows } = useTheme();
   const g = useGlass(tone);
   // Vald = fylld ikon. Saknas fylld variant visas outline.
-  const ShownIcon = selected && selectedIcon ? selectedIcon : Icon;
+  const ShownIcon = typeof icon === 'string' ? null : selected && selectedIcon ? selectedIcon : icon;
   // Pop när ikonen blir fylld (inte vid avmarkering eller med reduce motion).
   const pop = usePop(selected);
 
@@ -55,7 +58,11 @@ export default function IconButton({
 
   const content = (
     <Animated.View style={{ transform: [{ scale: pop }] }}>
-      <ShownIcon color={g.content} size={iconSize.lg} />
+      {typeof icon === 'string' ? (
+        <Icon name={icon} filled={selected} color={g.content} size={iconSize.lg} />
+      ) : ShownIcon ? (
+        <ShownIcon color={g.content} size={iconSize.lg} />
+      ) : null}
     </Animated.View>
   );
   const fill = (

@@ -17,6 +17,10 @@
             "convertColors": false
           }
         }
+      },
+      {
+        "name": "removeAttrs",
+        "params": { "attrs": "stroke-width" }
       }
     ]
   }
