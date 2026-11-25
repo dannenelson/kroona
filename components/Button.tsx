@@ -1,10 +1,8 @@
-import type { ComponentType } from 'react';
 import { Animated, Pressable, Text, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, typography, fonts, spacing, radius, control, motion, iconSize } from '../theme';
 import { useCardPress } from '../hooks/useCardPress';
 import { haptic } from '../utils/haptic';
-
-type IconProps = { color: string; size?: number };
+import Icon, { type IconName } from './Icon';
 
 type Props = {
   children: string;
@@ -14,7 +12,7 @@ type Props = {
   /** cta = minst 56 hög (17/600), compact = 36 hög (t.ex. snackbarens åtgärd). */
   size?: 'cta' | 'compact';
   disabled?: boolean;
-  icon?: ComponentType<IconProps>;
+  icon?: IconName;
   accessibilityLabel?: string;
   style?: StyleProp<ViewStyle>;
 };
@@ -30,7 +28,7 @@ export default function Button({
   variant = 'primary',
   size = 'cta',
   disabled = false,
-  icon: Icon,
+  icon,
   accessibilityLabel,
   style,
 }: Props) {
@@ -64,7 +62,7 @@ export default function Button({
           press.scaleStyle,
         ]}
       >
-        {Icon ? <Icon color={tone.color} size={iconSize.md} /> : null}
+        {icon ? <Icon name={icon} color={tone.color} size={iconSize.md} /> : null}
         <Text style={textStyle} numberOfLines={1}>
           {children}
         </Text>

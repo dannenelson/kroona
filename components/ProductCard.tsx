@@ -8,15 +8,8 @@ import { useCardPress } from '../hooks/useCardPress';
 import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
-import BookmarkIcon from '../assets/icons/BookmarkIcon';
-import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
-import PlusIcon from '../assets/icons/PlusIcon';
+import Icon from './Icon';
 import { useSaveActions } from './saved/SaveSheet';
-import FollowIcon from '../assets/icons/FollowIcon';
-import ShareIcon from '../assets/icons/ShareIcon';
-import SimilarIcon from '../assets/icons/SimilarIcon';
-import StarIcon from '../assets/icons/StarIcon';
-import LeafIcon from '../assets/icons/LeafIcon';
 
 export type ProductCardSize = 'S' | 'M' | 'L';
 
@@ -113,11 +106,11 @@ export default function ProductCard({
   // Följ varumärke, Dela och Visa liknande har ingen logik i Fas 0-steget,
   // de stänger bara menyn.
   const menuItems: ContextMenuItem[] = [
-    { label: save.liked ? 'Sparad' : 'Spara', icon: save.saved ? BookmarkIconFilled : BookmarkIcon, onPress: save.quickSave },
-    { label: 'Spara i samling', icon: PlusIcon, onPress: save.openSheet },
-    { label: 'Följ varumärke', icon: FollowIcon },
-    { label: 'Dela', icon: ShareIcon },
-    { label: 'Visa liknande', icon: SimilarIcon },
+    { label: save.liked ? 'Sparad' : 'Spara', icon: 'bookmark', filled: save.saved, onPress: save.quickSave },
+    { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
+    { label: 'Följ varumärke', icon: 'user-add' },
+    { label: 'Dela', icon: 'share' },
+    { label: 'Visa liknande', icon: 'layers' },
   ];
 
   // Mäter bilden utan tryck-skalan: Pressable bär ingen transform (skalan
@@ -235,7 +228,7 @@ export default function ProductCard({
               <View style={styles.ratings}>
                 {rating !== undefined && (
                   <View style={styles.rating}>
-                    <StarIcon color={colors.textSecondary} size={typography.caption.fontSize} />
+                    <Icon name="star" filled color={colors.textSecondary} size={typography.caption.fontSize} />
                     <Text style={styles.ratingText}>{formatScore(rating)}</Text>
                     {reviewCount !== undefined && (
                       <Text style={styles.ratingCount}>({reviewCount})</Text>
@@ -244,7 +237,7 @@ export default function ProductCard({
                 )}
                 {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
                 <View style={styles.rating}>
-                  <LeafIcon color={colors.textSecondary} size={typography.caption.fontSize} />
+                  <Icon name="leaf" color={colors.textSecondary} size={typography.caption.fontSize} />
                   <Text style={styles.ratingText}>
                     {formatScore(sustainabilityScore)}
                   </Text>

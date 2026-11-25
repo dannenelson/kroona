@@ -55,6 +55,7 @@ import I_moon from '../assets/svg/icons/moon.svg';
 import I_more_horizontal from '../assets/svg/icons/more-horizontal.svg';
 import I_more_vertical from '../assets/svg/icons/more-vertical.svg';
 import I_notification from '../assets/svg/icons/notification.svg';
+import I_notification_filled from '../assets/svg/icons/notification-filled.svg';
 import I_one_column_grid from '../assets/svg/icons/one-column-grid.svg';
 import I_plus from '../assets/svg/icons/plus.svg';
 import I_redo from '../assets/svg/icons/redo.svg';
@@ -141,6 +142,7 @@ export const iconRegistry = {
   'more-horizontal': I_more_horizontal,
   'more-vertical': I_more_vertical,
   'notification': I_notification,
+  'notification-filled': I_notification_filled,
   'one-column-grid': I_one_column_grid,
   'plus': I_plus,
   'redo': I_redo,

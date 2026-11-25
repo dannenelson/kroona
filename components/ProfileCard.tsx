@@ -7,8 +7,6 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import { PARTNER_BOUNDARY_GROUP, PROFILE_BOUNDARY_GROUP } from './product/productTransition';
 import { useFollowedPeople } from '../context/FollowedPeopleContext';
 import { useLongPressMenu } from '../hooks/useLongPressMenu';
-import FollowIcon from '../assets/icons/FollowIcon';
-import ChevronIcon from '../assets/icons/ChevronIcon';
 import { makeStyles, typography, fonts, spacing, radius } from '../theme';
 import BrandLogo, { hasBrandLogo } from './BrandLogo';
 
@@ -54,10 +52,10 @@ export default function ProfileCard({ name, initial, partnerId, personId }: Prop
       ? [
           {
             label: isFollowingPerson(personId) ? 'Sluta följa' : 'Följ',
-            icon: FollowIcon,
+            icon: 'user-add',
             onPress: () => toggleFollowPerson(personId),
           },
-          { label: 'Öppna', icon: ChevronIcon, onPress: open },
+          { label: 'Öppna', icon: 'chevron-right', onPress: open },
         ]
       : [],
     radius: SIZE / 2,

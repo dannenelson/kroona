@@ -17,17 +17,16 @@ import KroonaLogo from '../components/KroonaLogo';
 import NotificationIcon from '../components/NotificationIcon';
 import EditorialCard from '../components/EditorialCard';
 import SectionTitle from '../components/SectionTitle';
+import Icon from '../components/Icon';
+import { iconRegistry, type IconName } from '../components/iconRegistry';
+import { brandIconRegistry, type BrandIconName } from '../components/brandIconRegistry';
 import { ALL_RETAILER_LOGO_FILES, ALL_COLLECTION_LOGO_FILES, LOGO_ASPECT } from '../data/logos';
 import { setGestureDebug, useGestureDebug } from '../utils/devGestureDebug'; // TEMP-DEBUG-GEST
-import MenuIcon from '../assets/icons/MenuIcon';
-import ArchiveIcon from '../assets/icons/ArchiveIcon';
-import NewChatIcon from '../assets/icons/NewChatIcon';
-import BookmarkIcon from '../assets/icons/BookmarkIcon';
-import BookmarkIconFilled from '../assets/icons/BookmarkIcon_filled';
-import HeartIcon from '../assets/icons/HeartIcon';
-import HeartIconFilled from '../assets/icons/HeartIcon_filled';
 
 const [P1, P2, P3] = PRODUCTS;
+// Alla ikoner i registren (brief 58), för granskning av systemet.
+const ICON_NAMES = Object.keys(iconRegistry) as IconName[];
+const BRAND_NAMES = Object.keys(brandIconRegistry) as BrandIconName[];
 // Ljusaste och mörkaste produktfotot (uppmätt medelluminans 0,69 resp. 0,45),
 // för att pröva läsbarheten hos glas på foto i båda teman.
 const PHOTOS = [
@@ -75,7 +74,7 @@ export default function ComponentsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <IconButton tone="plain" icon="back-arrow" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
+          <IconButton tone="plain" name="back-arrow" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
           <Text style={styles.title}>Komponenter</Text>
           <Pill onPress={() => setScheme(scheme === 'dark' ? 'light' : 'dark')}>
             {scheme === 'dark' ? 'Ljust tema' : 'Mörkt tema'}
@@ -116,6 +115,40 @@ export default function ComponentsScreen() {
             <NotificationIcon size={iconSize.md} />
             <NotificationIcon />
             <NotificationIcon color={colors.textSecondary} />
+          </View>
+        </Section>
+
+        <Section title="Ikoner (brief 57–58)">
+          <Caption>
+            Alla ikoner i registret (assets/svg/icons) i 24: kontur till vänster, fylld till höger
+            (egen -filled-fil eller kodfyllning). Synlig linje 1,5. Växla tema uppe till höger.
+          </Caption>
+          <View style={styles.iconGrid}>
+            {ICON_NAMES.map((n) => (
+              <View key={n} style={styles.iconCell}>
+                <View style={styles.iconPair}>
+                  <Icon name={n} />
+                  <Icon name={n} filled />
+                </View>
+                <Text style={styles.iconName} numberOfLines={1}>
+                  {n}
+                </Text>
+              </View>
+            ))}
+          </View>
+          <Caption>Märkesikoner (assets/svg/brands), egen form och fyllning.</Caption>
+          <View style={styles.iconGrid}>
+            {BRAND_NAMES.map((n) => {
+              const Brand = brandIconRegistry[n];
+              return (
+                <View key={n} style={styles.iconCell}>
+                  <Brand width={iconSize.lg} height={iconSize.lg} color={colors.textPrimary} />
+                  <Text style={styles.iconName} numberOfLines={1}>
+                    {n}
+                  </Text>
+                </View>
+              );
+            })}
           </View>
         </Section>
 
@@ -176,7 +209,7 @@ export default function ComponentsScreen() {
         <Section title="0 · Press (jämför)">
           <Caption>Håll in och släpp: in snabbt, ut med lätt fjäder. Ingen haptik på vanliga tryck.</Caption>
           <View style={styles.pressRow}>
-            <IconButton tone="plain" icon={BookmarkIcon} accessibilityLabel="Press, ikonknapp" onPress={() => {}} />
+            <IconButton tone="plain" name="bookmark" accessibilityLabel="Press, ikonknapp" onPress={() => {}} />
             <Pill onPress={() => {}}>Pill</Pill>
             <View style={styles.pressCard}>
               <ProductCard {...P2} size="S" menu={false} />
@@ -190,16 +223,14 @@ export default function ComponentsScreen() {
           <View style={styles.pressRow}>
             <IconButton
               tone="plain"
-              icon={BookmarkIcon}
-              selectedIcon={BookmarkIconFilled}
+              name="bookmark"
               accessibilityLabel="Spara"
               selected={demoSaved}
               onPress={() => setDemoSaved((v) => !v)}
             />
             <IconButton
               tone="plain"
-              icon={HeartIcon}
-              selectedIcon={HeartIconFilled}
+              name="heart"
               accessibilityLabel="Gilla"
               selected={demoLiked}
               onPress={() => setDemoLiked((v) => !v)}
@@ -214,8 +245,7 @@ export default function ComponentsScreen() {
                   render={(s) => (
                     <IconButton
                       tone="photo"
-                      icon={BookmarkIcon}
-                      selectedIcon={BookmarkIconFilled}
+                      name="bookmark"
                       accessibilityLabel={`Spara, ${s.label}`}
                       selected={'selected' in s}
                       disabled={'disabled' in s}
@@ -231,8 +261,7 @@ export default function ComponentsScreen() {
             render={(s) => (
               <IconButton
                 tone="plain"
-                icon={BookmarkIcon}
-                selectedIcon={BookmarkIconFilled}
+                name="bookmark"
                 accessibilityLabel={`Spara, ${s.label}`}
                 selected={'selected' in s}
                 disabled={'disabled' in s}
@@ -301,11 +330,10 @@ export default function ComponentsScreen() {
           <ImageBackground source={PHOTOS[0].source} style={styles.topBarPhoto}>
             <TopBar
               tone="photo"
-              left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => {} }}
+              left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => {} }}
               right={[
                 {
-                  icon: BookmarkIcon,
-                  selectedIcon: BookmarkIconFilled,
+                  name: 'bookmark',
                   accessibilityLabel: 'Spara',
                   selected: topSaved,
                   onPress: () => setTopSaved((v) => !v),
@@ -313,13 +341,13 @@ export default function ComponentsScreen() {
               ]}
             />
           </ImageBackground>
-          <Caption inset>Hitta · meny + arkiv och ny chatt, över ren yta</Caption>
+          <Caption inset>Två åtgärder i glaskapsel, över ren yta</Caption>
           <TopBar
             tone="plain"
-            left={{ icon: MenuIcon, accessibilityLabel: 'Meny', onPress: () => {} }}
+            left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => {} }}
             right={[
-              { icon: ArchiveIcon, accessibilityLabel: 'Arkiv', onPress: () => {} },
-              { icon: NewChatIcon, accessibilityLabel: 'Ny chatt', onPress: () => {} },
+              { name: 'share', accessibilityLabel: 'Dela', onPress: () => {} },
+              { name: 'more-horizontal', accessibilityLabel: 'Mer', onPress: () => {} },
             ]}
           />
         </Section>
@@ -440,6 +468,24 @@ const useStyles = makeStyles((t) => ({
   logoCell: {
     alignItems: 'center',
     gap: spacing.xs,
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: spacing.lg,
+  },
+  iconCell: {
+    width: '25%',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  iconPair: {
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  iconName: {
+    ...typography.micro,
+    color: t.colors.textSecondary,
   },
   logoPlate: {
     alignItems: 'center',

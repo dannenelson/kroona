@@ -185,7 +185,7 @@ export default function CollectionScreen() {
   if (!collection) {
     return (
       <View style={[styles.container, styles.empty, { paddingTop: insets.top }]}>
-        <TopBar tone="plain" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="plain" left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
         <Text style={styles.emptyText}>Samlingen finns inte.</Text>
       </View>
     );
@@ -287,7 +287,7 @@ export default function CollectionScreen() {
         <Reanimated.Text numberOfLines={1} style={[styles.topTitle, { top: insets.top }, titleStyle]}>
           {collection.name}
         </Reanimated.Text>
-        <TopBar tone="photo" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="photo" left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
       </View>
     </View>
   );

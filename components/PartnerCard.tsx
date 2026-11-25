@@ -11,10 +11,7 @@ import { type ContextMenuItem } from './ProductContextMenu';
 import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import { useSnackbar } from './Snackbar';
 import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from './product/productTransition';
-import FollowIcon from '../assets/icons/FollowIcon';
 import BrandLogo, { hasBrandLogo } from './BrandLogo';
-import ChevronIcon from '../assets/icons/ChevronIcon';
-import ShareIcon from '../assets/icons/ShareIcon';
 
 type Props = {
   id: string;
@@ -64,9 +61,9 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   // Följ använder samma toggle som den borttagna +/✓-knappen. Dela är en
   // platshållare i Fas 0 (ingen delning byggd).
   const menuItems: ContextMenuItem[] = [
-    { label: followed ? 'Sluta följa' : 'Följ', icon: FollowIcon, onPress: () => toggleFollowed(id) },
-    { label: 'Öppna', icon: ChevronIcon, onPress: open },
-    { label: 'Dela', icon: ShareIcon, onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
+    { label: followed ? 'Sluta följa' : 'Följ', icon: 'user-add', onPress: () => toggleFollowed(id) },
+    { label: 'Öppna', icon: 'chevron-right', onPress: open },
+    { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
   ];
 
   // Namn och antal följer med den lyfta kopian (samma innehåll som på kortet).

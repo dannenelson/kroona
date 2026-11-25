@@ -7,7 +7,6 @@ import { Keyboard, Pressable, ScrollView, Text, TextInput, View } from 'react-na
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, control, iconSize, touchTarget } from '../theme';
-import CloseIcon from '../assets/icons/CloseIcon';
 import Icon, { type IconName } from '../components/Icon';
 import { searchSuggestions } from '../lib/search';
 import { addRecentSearch, loadRecentSearches } from '../lib/recentSearches';
@@ -82,7 +81,7 @@ export default function SearchScreen() {
               accessibilityLabel="Rensa"
               style={styles.clear}
             >
-              <CloseIcon color={colors.bg} size={iconSize.xs} />
+              <Icon name="close" color={colors.bg} size={iconSize.xs} />
             </Pressable>
           ) : null}
         </View>

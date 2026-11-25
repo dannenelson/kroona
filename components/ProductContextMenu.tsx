@@ -5,7 +5,6 @@ import {
   useMemo,
   useRef,
   useState,
-  type ComponentType,
   type ReactNode,
 } from 'react';
 import {
@@ -23,12 +22,14 @@ import { haptic } from '../utils/haptic';
 import { useSafeAreaInsets, type EdgeInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, edgeBlur, typography, spacing, radius, motion, iconSize } from '../theme';
 import { useReduceMotion } from '../hooks/useReduceMotion';
-
-type IconProps = { color: string; size?: number };
+import Icon, { type IconName } from './Icon';
 
 export type ContextMenuItem = {
   label: string;
-  icon: ComponentType<IconProps>;
+  /** Ikonens namn i ikonsystemet (brief 58). */
+  icon: IconName;
+  /** Fylld ikon (t.ex. bokmärket när produkten är sparad). */
+  filled?: boolean;
   onPress?: () => void;
 };
 
@@ -487,7 +488,6 @@ function MenuRow({
 }) {
   const styles = useStyles();
   const { colors } = useTheme();
-  const Icon = item.icon;
   return (
     <Pressable
       accessibilityRole="menuitem"
@@ -499,7 +499,7 @@ function MenuRow({
       ]}
     >
       <Text style={styles.rowLabel}>{item.label}</Text>
-      <Icon color={colors.textPrimary} size={iconSize.md} />
+      <Icon name={item.icon} filled={item.filled} color={colors.textPrimary} size={iconSize.md} />
     </Pressable>
   );
 }

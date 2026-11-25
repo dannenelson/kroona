@@ -4,8 +4,7 @@ import { makeStyles, useTheme, typography, fonts, spacing, radius, motion, touch
 import { usePressAnimation } from '../../hooks/usePressAnimation';
 import { usePop } from '../../hooks/usePop';
 import { haptic } from '../../utils/haptic';
-import BookmarkIcon from '../../assets/icons/BookmarkIcon';
-import BookmarkIconFilled from '../../assets/icons/BookmarkIcon_filled';
+import Icon from '../Icon';
 
 /**
  * Spara-knappen på Produktdetalj (brief 13, 40, 41): tryck = snabbspar till
@@ -20,7 +19,6 @@ export default function SaveButton({ productId }: { productId: string }) {
   const { saved, quickSave, openSheet } = useSaveActions(productId);
   const press = usePressAnimation(motion.pressedScale);
   const pop = usePop(saved);
-  const Icon = saved ? BookmarkIconFilled : BookmarkIcon;
 
   return (
     <Pressable
@@ -45,7 +43,7 @@ export default function SaveButton({ productId }: { productId: string }) {
           style={[StyleSheet.absoluteFill, styles.pressed, { opacity: press.progress }]}
         />
         <Animated.View style={{ transform: [{ scale: pop }] }}>
-          <Icon color={colors.textPrimary} size={iconSize.md} />
+          <Icon name="bookmark" filled={saved} color={colors.textPrimary} size={iconSize.md} />
         </Animated.View>
         <Text style={styles.label}>Spara</Text>
       </Animated.View>

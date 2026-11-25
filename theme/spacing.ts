@@ -12,7 +12,8 @@ export const spacing = {
 } as const;
 
 export const touchTarget = 44;
-export const iconSize = { xs: 12, sm: 18, md: 20, lg: 24 } as const;
+/** Ikonrutor. `chevron` 16: chevron i rader, banner och erbjudanden (brief 58). */
+export const iconSize = { xs: 12, chevron: 16, sm: 18, md: 20, lg: 24 } as const;
 
 /** Ikonsystemet (brief 57): `stroke` är den SYNLIGA linjen i px, lika i alla storlekar.
  *  Icon räknar om den till ritrutan 24: strokeWidth = stroke × 24 / size. */

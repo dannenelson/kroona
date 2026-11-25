@@ -179,7 +179,7 @@ export default function DialogScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <TopBar left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
+      <TopBar left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
       {scope ? (
         <View style={styles.scopeRow}>
           <Pill>{scope}</Pill>

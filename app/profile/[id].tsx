@@ -53,7 +53,7 @@ export default function ProfileScreen() {
   if (!person) {
     return (
       <View style={[styles.container, styles.empty, { paddingTop: insets.top }]}>
-        <TopBar tone="plain" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="plain" left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
         <Text style={styles.emptyText}>Personen finns inte.</Text>
       </View>
     );
@@ -113,7 +113,7 @@ export default function ProfileScreen() {
         blurHeight={insets.top + edgeBlur.topExtra}
       />
       <View style={[styles.topChrome, { paddingTop: insets.top }]} pointerEvents="box-none">
-        <TopBar tone="theme" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="theme" left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
       </View>
     </View>
   );

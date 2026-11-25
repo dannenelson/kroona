@@ -1,4 +1,4 @@
-import { useId, type ComponentType, type ReactNode } from 'react';
+import { useId, type ReactNode } from 'react';
 import { Animated, Pressable, Text, View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
@@ -9,8 +9,7 @@ import { useLongPressMenu } from '../../hooks/useLongPressMenu';
 import type { ContextMenuItem } from '../ProductContextMenu';
 import { COLLECTION_BOUNDARY_GROUP } from '../product/productTransition';
 import CollectionMosaic from '../CollectionMosaic';
-
-type IconProps = { color: string; size?: number };
+import Icon, { type IconName } from '../Icon';
 
 type Props = {
   /** Route-id i Samlingsdetalj (`saved` eller en egen samlings id). */
@@ -18,7 +17,7 @@ type Props = {
   name: string;
   subtitle: string;
   /** Liten ikon före undertexten (lås för privat). */
-  subtitleIcon?: ComponentType<IconProps>;
+  subtitleIcon?: IconName;
   images: string[];
   width: number;
   /** Ersätter mosaiken (t.ex. bokmärket för Gillade produkter). */
@@ -35,7 +34,7 @@ export default function UserCollectionCard({
   id,
   name,
   subtitle,
-  subtitleIcon: SubIcon,
+  subtitleIcon,
   images,
   width,
   cover,
@@ -77,7 +76,7 @@ export default function UserCollectionCard({
               {name}
             </Text>
             <View style={styles.subRow}>
-              {SubIcon ? <SubIcon color={styles.meta.color} size={iconSize.xs} /> : null}
+              {subtitleIcon ? <Icon name={subtitleIcon} color={styles.meta.color} size={iconSize.xs} /> : null}
               <Text style={styles.meta} numberOfLines={1}>
                 {subtitle}
               </Text>

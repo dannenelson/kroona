@@ -51,7 +51,6 @@ import {
 } from '../../lib/lightboxStore';
 import PagerDots from '../../components/PagerDots';
 import IconButton from '../../components/IconButton';
-import CloseIcon from '../../assets/icons/CloseIcon';
 
 // Marginal så att en nästan-1x-zoom räknas som utzoomad.
 const ZOOM_EPSILON = 0.01;
@@ -305,7 +304,7 @@ export default function LightboxScreen() {
       </GestureDetector>
 
       <Reanimated.View style={[styles.close, { top: insets.top + spacing.sm }, chromeStyle]}>
-        <IconButton tone="dark" icon={CloseIcon} accessibilityLabel="Stäng bild" onPress={close} />
+        <IconButton tone="dark" name="close" accessibilityLabel="Stäng bild" onPress={close} />
       </Reanimated.View>
 
       <Reanimated.View style={[styles.dots, { bottom: insets.bottom + spacing.lg }, chromeStyle]}>

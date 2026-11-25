@@ -1,18 +1,17 @@
-import type { ComponentType, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Transition from 'react-native-screen-transitions';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { makeStyles, typography, fonts, spacing, listRow, iconSize } from '../theme';
 import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import type { ContextMenuItem } from './ProductContextMenu';
-
-type IconProps = { color: string; size?: number };
+import Icon, { type IconName } from './Icon';
 
 type Props = {
   title: string;
   subtitle?: string;
   /** Liten ikon före undertexten (t.ex. lås för privat). */
-  subtitleIcon?: ComponentType<IconProps>;
+  subtitleIcon?: IconName;
   /** Bild/mosaik/avatar till vänster, i `thumbSize`. */
   thumb: ReactNode;
   thumbRadius: number;
@@ -39,7 +38,7 @@ type Props = {
 export default function ListRow({
   title,
   subtitle,
-  subtitleIcon: SubIcon,
+  subtitleIcon,
   thumb,
   thumbRadius,
   compact = false,
@@ -91,7 +90,7 @@ export default function ListRow({
           </Text>
           {subtitle ? (
             <View style={styles.subRow}>
-              {SubIcon ? <SubIcon color={styles.subtitle.color} size={iconSize.xs} /> : null}
+              {subtitleIcon ? <Icon name={subtitleIcon} color={styles.subtitle.color} size={iconSize.xs} /> : null}
               <Text style={styles.subtitle} numberOfLines={1}>
                 {subtitle}
               </Text>

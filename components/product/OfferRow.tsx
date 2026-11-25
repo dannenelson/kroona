@@ -1,8 +1,8 @@
 import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
-import { makeStyles, useTheme, typography, fonts, spacing, radius, touchTarget } from '../../theme';
+import { makeStyles, useTheme, typography, fonts, spacing, radius, touchTarget, iconSize } from '../../theme';
 import { usePressAnimation } from '../../hooks/usePressAnimation';
 import { formatPrice } from '../../utils/format';
-import ChevronIcon from '../../assets/icons/ChevronIcon';
+import Icon from '../Icon';
 
 type Props = {
   initial: string;
@@ -58,7 +58,7 @@ export default function OfferRow({ initial, name, detail, price, stock, divider,
         </Text>
         <Text style={styles.stock}>{stock}</Text>
       </View>
-      <ChevronIcon color={colors.textSecondary} />
+      <Icon name="chevron-right" color={colors.textSecondary} size={iconSize.chevron} />
     </Pressable>
   );
 }

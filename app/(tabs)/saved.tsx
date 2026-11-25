@@ -45,26 +45,19 @@ import IconButton from '../../components/IconButton';
 import Button from '../../components/Button';
 import ListRow from '../../components/ListRow';
 import SegmentedIcons from '../../components/SegmentedIcons';
+import Icon, { type IconName } from '../../components/Icon';
 import CollectionMosaic from '../../components/CollectionMosaic';
 import UserCollectionCard from '../../components/saved/UserCollectionCard';
 import { useSheet } from '../../components/Sheet';
 import { useSnackbar } from '../../components/Snackbar';
 import { createCollectionStep } from '../../components/saved/CreateCollectionStep';
 import type { ContextMenuItem } from '../../components/ProductContextMenu';
-import PlusIcon from '../../assets/icons/PlusIcon';
-import BookmarkIcon from '../../assets/icons/BookmarkIcon';
-import LockIcon from '../../assets/icons/LockIcon';
-import ListIcon from '../../assets/icons/ListIcon';
-import GridIcon from '../../assets/icons/GridIcon';
-import ChevronIcon from '../../assets/icons/ChevronIcon';
-import ShareIcon from '../../assets/icons/ShareIcon';
-import FollowIcon from '../../assets/icons/FollowIcon';
 
 const TABS = ['Mina samlingar', 'Följer'] as const;
 type ViewMode = 'rows' | 'cards';
-const VIEW_MODES = [
-  { value: 'rows' as const, icon: ListIcon, label: 'Rader' },
-  { value: 'cards' as const, icon: GridIcon, label: 'Kort' },
+const VIEW_MODES: { value: ViewMode; icon: IconName; label: string }[] = [
+  { value: 'rows', icon: 'list', label: 'Rader' },
+  { value: 'cards', icon: 'grid', label: 'Kort' },
 ];
 const VIEW_MODE_KEY = '@kroona/savedViewMode';
 /** Antal rader per Följer-sektion innan "Visa alla". */
@@ -114,14 +107,14 @@ export default function SavedScreen() {
   const collectionMenu = (id: string, thumb?: string): ContextMenuItem[] => [
     {
       label: 'Öppna',
-      icon: ChevronIcon,
+      icon: 'chevron-right',
       onPress: () => router.push({ pathname: '/collection/[id]', params: { id } }),
     },
-    { label: 'Dela', icon: ShareIcon, onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: thumb }) },
+    { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: thumb }) },
   ];
   const visibility = (c: UserCollection) => ({
     subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length, 'produkt', 'produkter')}`,
-    icon: c.visibility === 'public' ? undefined : LockIcon,
+    icon: (c.visibility === 'public' ? undefined : 'lock') as IconName | undefined,
   });
   const likedSubtitle = countLabel(savedProducts.length, 'produkt', 'produkter');
 
@@ -135,7 +128,7 @@ export default function SavedScreen() {
           <Text style={styles.title} accessibilityRole="header">
             Sparat
           </Text>
-          <IconButton tone="theme" icon={PlusIcon} accessibilityLabel="Ny samling" onPress={openCreate} />
+          <IconButton tone="theme" name="plus" accessibilityLabel="Ny samling" onPress={openCreate} />
         </View>
         <TextTabs items={TABS} selected={tab} onSelect={setTab} style={styles.tabs} />
 
@@ -207,7 +200,7 @@ function LikedTile({ size, tileRadius, large = false }: { size: number; tileRadi
   const styles = useStyles();
   return (
     <View style={[styles.likedTile, { width: size, height: size, borderRadius: tileRadius }]}>
-      <BookmarkIcon color={styles.likedIcon.color} size={large ? iconSize.lg * 2 : iconSize.lg} />
+      <Icon name="bookmark" color={styles.likedIcon.color} size={large ? iconSize.lg * 2 : iconSize.lg} />
     </View>
   );
 }
@@ -241,7 +234,7 @@ function CollectionListRow({
   id: string;
   title: string;
   subtitle: string;
-  subtitleIcon?: typeof LockIcon;
+  subtitleIcon?: IconName;
   images: string[];
   menuItems: ContextMenuItem[];
   compact?: boolean;
@@ -372,10 +365,10 @@ function FollowingTab() {
               menuItems={[
                 {
                   label: 'Öppna',
-                  icon: ChevronIcon,
+                  icon: 'chevron-right',
                   onPress: () => router.push({ pathname: '/collection/[id]', params: { id: c.id } }),
                 },
-                { label: 'Sluta följa', icon: FollowIcon, onPress: () => toggleFollowed(c.id) },
+                { label: 'Sluta följa', icon: 'user-add', onPress: () => toggleFollowed(c.id) },
               ]}
             />
           );
@@ -425,10 +418,10 @@ function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subt
       menuItems={[
         {
           label: 'Öppna',
-          icon: ChevronIcon,
+          icon: 'chevron-right',
           onPress: () => router.push({ pathname: '/partner/[id]', params: { id: retailer.id } }),
         },
-        { label: 'Sluta följa', icon: FollowIcon, onPress: onUnfollow },
+        { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
       ]}
     />
   );
@@ -456,8 +449,8 @@ function AreaRow({ area, onUnfollow }: { area: Area; onUnfollow: () => void }) {
       onPress={open}
       menuImageUri={products[0]?.imageUrl}
       menuItems={[
-        { label: 'Öppna', icon: ChevronIcon, onPress: open },
-        { label: 'Sluta följa', icon: FollowIcon, onPress: onUnfollow },
+        { label: 'Öppna', icon: 'chevron-right', onPress: open },
+        { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
       ]}
     />
   );
@@ -480,10 +473,10 @@ function PersonRow({ person, onUnfollow }: { person: Person; onUnfollow: () => v
       menuItems={[
         {
           label: 'Öppna',
-          icon: ChevronIcon,
+          icon: 'chevron-right',
           onPress: () => router.push({ pathname: '/profile/[id]', params: { id: person.id } }),
         },
-        { label: 'Sluta följa', icon: FollowIcon, onPress: onUnfollow },
+        { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
       ]}
     />
   );

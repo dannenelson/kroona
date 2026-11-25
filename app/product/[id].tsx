@@ -42,7 +42,6 @@ import ProductCard from '../../components/ProductCard';
 import SaveButton from '../../components/product/SaveButton';
 import { FactList, type Fact } from '../../components/product/FactList';
 import OfferRow from '../../components/product/OfferRow';
-import ShareIcon from '../../assets/icons/ShareIcon';
 import type { Offer } from '../../types/catalog';
 
 // Lokala layoutmått: hero 4:5 (referensen 390 × 500), liknande-kort 140 × 176.
@@ -168,7 +167,7 @@ export default function ProductScreen() {
   if (!product || !data) {
     return (
       <View style={[styles.container, styles.empty, { paddingTop: insets.top }]}>
-        <TopBar tone="plain" left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar tone="plain" left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
         <Text style={styles.emptyText}>Produkten finns inte.</Text>
       </View>
     );
@@ -323,8 +322,8 @@ export default function ProductScreen() {
       {/* En glaston hela vägen: photo och theme skiljer sig bara lite (brief 14). */}
       <TopBar
         tone="photo"
-        left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }}
-        right={[{ icon: ShareIcon, accessibilityLabel: 'Dela', onPress: () => {} }]}
+        left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }}
+        right={[{ name: 'share', accessibilityLabel: 'Dela', onPress: () => {} }]}
       />
     </View>
     {/* TEMP-DEBUG-GEST: diagnosrad längst ned (bara __DEV__ + växel på dev-sidan). */}

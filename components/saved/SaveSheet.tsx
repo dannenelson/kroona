@@ -22,8 +22,7 @@ import { useSnackbar } from '../Snackbar';
 import ListRow from '../ListRow';
 import CollectionMosaic from '../CollectionMosaic';
 import { makeCreateCollectionStep } from './CreateCollectionStep';
-import CheckIcon from '../../assets/icons/CheckIcon';
-import BookmarkIcon from '../../assets/icons/BookmarkIcon';
+import Icon from '../Icon';
 
 /** Samlingar (inkl. Gillade produkter) produkten lagts till i under ett öppet kort (id → namn). */
 type Session = Map<string, string>;
@@ -128,7 +127,7 @@ function SaveList({ productId, session }: { productId: string; session: Session 
 
   const check = (on: boolean) => (
     <View style={[styles.check, on ? styles.checkOn : styles.checkOff]}>
-      {on ? <CheckIcon color={styles.checkMark.color} size={iconSize.xs + spacing.xs} /> : null}
+      {on ? <Icon name="check" color={styles.checkMark.color} size={iconSize.xs + spacing.xs} /> : null}
     </View>
   );
 
@@ -145,7 +144,7 @@ function SaveList({ productId, session }: { productId: string; session: Session 
         subtitle={countLabel(savedProducts.length)}
         thumb={
           <View style={styles.likedTile}>
-            <BookmarkIcon color={styles.likedIcon.color} size={iconSize.md} />
+            <Icon name="bookmark" color={styles.likedIcon.color} size={iconSize.md} />
           </View>
         }
         thumbRadius={radius.control}

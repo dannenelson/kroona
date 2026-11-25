@@ -12,9 +12,7 @@ import AskBar from '../components/AskBar';
 import FilterPills from '../components/FilterPills';
 import ProductGrid from '../components/ProductGrid';
 import Button from '../components/Button';
-import StarIcon from '../assets/icons/StarIcon';
 import Icon from '../components/Icon';
-import ChevronIcon from '../assets/icons/ChevronIcon';
 import { getIdea } from '../data/ideas';
 import { searchProducts } from '../lib/search';
 import { getProductsForFilter, hasUsedOffer } from '../lib/catalog';
@@ -54,7 +52,7 @@ export default function ResultsScreen() {
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.topRow}>
-        <IconButton icon="back-arrow" tone="theme" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
+        <IconButton name="back-arrow" tone="theme" accessibilityLabel="Tillbaka" onPress={() => router.back()} />
         {/* Sök om (brief 54): sökläget ERSÄTTER resultatet, och den nya sökningen
             ersätter i sin tur sökläget, så att tillbaka går dit man var före
             första sökningen. "Avbryt" i sökläget återställer detta resultat. */}
@@ -79,7 +77,7 @@ export default function ResultsScreen() {
         {all.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>Inga träffar på ”{term}”</Text>
-            <Button variant="secondary" icon={StarIcon} onPress={() => openDialog(false)}>
+            <Button variant="secondary" icon="stars" onPress={() => openDialog(false)}>
               {`Fråga om ”${term}”`}
             </Button>
           </View>
@@ -102,7 +100,7 @@ export default function ResultsScreen() {
                   Få hjälp att välja till ”{term}”
                 </Text>
               </View>
-              <ChevronIcon color={colors.textSecondary} />
+              <Icon name="chevron-right" color={colors.textSecondary} size={iconSize.chevron} />
             </Pressable>
 
             {shown.length > 0 ? (

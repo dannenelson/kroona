@@ -72,7 +72,6 @@ import {
 import EdgeFade from './EdgeFade';
 import { useReduceMotion } from '../hooks/useReduceMotion';
 import IconButton from './IconButton';
-import CloseIcon from '../assets/icons/CloseIcon';
 
 export type SheetStep = {
   /** Titel centrerad i headern. */
@@ -371,14 +370,14 @@ export function SheetProvider({ children }: { children: ReactNode }) {
                     höger. Lika breda sidor, så att titeln står still mellan stegen. */}
                 <View style={styles.headerSide}>
                   {steps.length > 1 ? (
-                    <IconButton tone="theme" icon="back-arrow" accessibilityLabel="Tillbaka" onPress={pop} />
+                    <IconButton tone="theme" name="back-arrow" accessibilityLabel="Tillbaka" onPress={pop} />
                   ) : null}
                 </View>
                 <Text style={styles.title} numberOfLines={1} accessibilityRole="header">
                   {step.title}
                 </Text>
                 <View style={styles.headerSide}>
-                  <IconButton tone="theme" icon={CloseIcon} accessibilityLabel="Stäng" onPress={close} />
+                  <IconButton tone="theme" name="close" accessibilityLabel="Stäng" onPress={close} />
                 </View>
               </View>
             </Animated.View>
@@ -548,7 +547,7 @@ function CardLayer({
           {/* Vänsterställd rubrik; tillbaka-chevron i senare steg. Ingen X. */}
           <View style={styles.cardHeader} pointerEvents="box-none">
             {depth > 1 ? (
-              <IconButton tone="theme" icon="back-arrow" accessibilityLabel="Tillbaka" onPress={onBack} />
+              <IconButton tone="theme" name="back-arrow" accessibilityLabel="Tillbaka" onPress={onBack} />
             ) : null}
             <Text style={styles.cardTitle} numberOfLines={1} accessibilityRole="header">
               {title}

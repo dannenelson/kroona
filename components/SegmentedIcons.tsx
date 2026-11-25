@@ -1,12 +1,10 @@
-import type { ComponentType } from 'react';
 import { Pressable, View } from 'react-native';
 import { makeStyles, radius, segmented, iconSize } from '../theme';
 import { haptic } from '../utils/haptic';
-
-type IconProps = { color: string; size?: number };
+import Icon, { type IconName } from './Icon';
 
 type Props<T extends string> = {
-  items: readonly { value: T; icon: ComponentType<IconProps>; label: string }[];
+  items: readonly { value: T; icon: IconName; label: string }[];
   selected: T;
   onSelect: (value: T) => void;
 };
@@ -20,7 +18,7 @@ export default function SegmentedIcons<T extends string>({ items, selected, onSe
   const styles = useStyles();
   return (
     <View style={styles.track} accessibilityRole="radiogroup">
-      {items.map(({ value, icon: Icon, label }) => {
+      {items.map(({ value, icon, label }) => {
         const active = value === selected;
         return (
           <Pressable
@@ -35,7 +33,7 @@ export default function SegmentedIcons<T extends string>({ items, selected, onSe
             }}
             style={[styles.item, active && styles.itemActive]}
           >
-            <Icon color={active ? styles.on.color : styles.off.color} size={iconSize.sm} />
+            <Icon name={icon} color={active ? styles.on.color : styles.off.color} size={iconSize.sm} />
           </Pressable>
         );
       })}

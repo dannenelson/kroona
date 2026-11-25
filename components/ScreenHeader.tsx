@@ -20,7 +20,7 @@ export default function ScreenHeader({ title, children }: Props) {
   const styles = useStyles();
   return (
     <View>
-      <TopBar left={{ icon: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
+      <TopBar left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: () => router.back() }} />
       <View style={styles.body}>
         <Text style={styles.title} accessibilityRole="header">
           {title}

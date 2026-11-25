@@ -6,7 +6,7 @@ import Glass, { type GlassTone } from './Glass';
 
 export type TopBarAction = Pick<
   ComponentProps<typeof IconButton>,
-  'icon' | 'selectedIcon' | 'accessibilityLabel' | 'onPress' | 'selected' | 'disabled'
+  'name' | 'accessibilityLabel' | 'onPress' | 'selected' | 'disabled'
 >;
 
 type Props = {

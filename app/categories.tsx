@@ -3,10 +3,10 @@
 import { Image, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, spacing, radius, listRow } from '../theme';
+import { makeStyles, useTheme, spacing, radius, listRow, iconSize } from '../theme';
 import ScreenHeader from '../components/ScreenHeader';
 import ListRow from '../components/ListRow';
-import ChevronIcon from '../assets/icons/ChevronIcon';
+import Icon from '../components/Icon';
 import { CATEGORIES, getCategoryProducts } from '../data/categories';
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
@@ -30,7 +30,7 @@ export default function CategoriesScreen() {
                 subtitle={countLabel(products.length)}
                 thumb={<Image source={{ uri: products[0]?.imageUrl ?? c.image }} style={styles.thumb} />}
                 thumbRadius={radius.card}
-                trailing={<ChevronIcon color={colors.textSecondary} />}
+                trailing={<Icon name="chevron-right" color={colors.textSecondary} size={iconSize.chevron} />}
                 onPress={() => router.push({ pathname: '/category/[id]', params: { id: c.id } })}
               />
             );
