@@ -89,7 +89,9 @@ export default function EditorialCard({
   const styles = useStyles();
   const press = useCardPress();
   const base = VARIANTS[variant];
-  const v = { ...base, centered: align ? align === 'center' : base.centered };
+  // Kort med logotyp är alltid centrerade (brief 64); vänsterställt bara för
+  // liggande kort med enbart text.
+  const v = { ...base, centered: align ? align === 'center' : Logo ? true : base.centered };
   const width = size?.width ?? v.width;
   const height = size?.height ?? v.height;
   const r = size?.radius ?? v.radius;

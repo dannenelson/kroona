@@ -1,10 +1,11 @@
-import { Pressable, View } from 'react-native';
-import { makeStyles, radius, segmented, iconSize } from '../theme';
+import { Pressable, Text, View } from 'react-native';
+import { makeStyles, typography, spacing, radius, segmented, iconSize } from '../theme';
 import { haptic } from '../utils/haptic';
 import Icon, { type IconName } from './Icon';
 
 type Props<T extends string> = {
-  items: readonly { value: T; icon: IconName; label: string }[];
+  /** Segment med ikon, eller med kort text (`text`, t.ex. "System" i Utseende, brief 64). */
+  items: readonly { value: T; label: string; icon?: IconName; text?: string }[];
   selected: T;
   onSelect: (value: T) => void;
 };
@@ -18,7 +19,7 @@ export default function SegmentedIcons<T extends string>({ items, selected, onSe
   const styles = useStyles();
   return (
     <View style={styles.track} accessibilityRole="radiogroup">
-      {items.map(({ value, icon, label }) => {
+      {items.map(({ value, icon, label, text }) => {
         const active = value === selected;
         return (
           <Pressable
@@ -31,9 +32,13 @@ export default function SegmentedIcons<T extends string>({ items, selected, onSe
               haptic.selection();
               onSelect(value);
             }}
-            style={[styles.item, active && styles.itemActive]}
+            style={[styles.item, text ? styles.itemText : null, active && styles.itemActive]}
           >
-            <Icon name={icon} color={active ? styles.on.color : styles.off.color} size={iconSize.sm} />
+            {text ? (
+              <Text style={[styles.text, active ? styles.on : styles.off]}>{text}</Text>
+            ) : icon ? (
+              <Icon name={icon} color={active ? styles.on.color : styles.off.color} size={iconSize.sm} />
+            ) : null}
           </Pressable>
         );
       })}
@@ -55,6 +60,15 @@ const useStyles = makeStyles((t) => ({
     borderRadius: radius.full,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  // Textsegment: följer textens bredd, minst ett ikonsegments.
+  itemText: {
+    width: undefined,
+    minWidth: segmented.itemWidth,
+    paddingHorizontal: spacing.md,
+  },
+  text: {
+    ...typography.label,
   },
   itemActive: {
     backgroundColor: t.colors.surfaceRaised,

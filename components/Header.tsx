@@ -1,4 +1,6 @@
 import { View, Text, Pressable, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useNotifications } from '../context/NotificationsContext';
 import { makeStyles, typography, spacing, touchTarget, iconSize, homeHeader } from '../theme';
 import { DUMMY_USER } from '../data/user';
 import Avatar from './Avatar';
@@ -20,6 +22,8 @@ export function greetingFor(date: Date): string {
  */
 export default function Header() {
   const styles = useStyles();
+  const router = useRouter();
+  const { hasUnread } = useNotifications();
   return (
     <View style={styles.wrapper}>
       <View style={styles.row}>
@@ -27,24 +31,24 @@ export default function Header() {
         <View style={[StyleSheet.absoluteFill, styles.center]} pointerEvents="none">
           <KroonaLogo height={homeHeader.logoHeight} />
         </View>
-        {/* Avatar 40 (brief 51), träffyta 44 via hitSlop. Profilskärmen för
-            användaren finns inte än (Fas 0): trycket gör ingenting. */}
+        {/* Avatar 40 (brief 51), träffyta 44 via hitSlop. Öppnar Profil, som glider
+            in från vänster (brief 64). */}
         <Pressable
           accessibilityRole="button"
           accessibilityLabel={`Profil, ${DUMMY_USER.name}`}
           hitSlop={(touchTarget - homeHeader.avatar) / 2}
-          onPress={() => {}}
+          onPress={() => router.push('/me')}
         >
           <Avatar initial={DUMMY_USER.initials} size={homeHeader.avatar} initialStyle={styles.initials} />
         </Pressable>
-        {/* Notisskärmen finns inte än (Fas 0): trycket gör ingenting. */}
+        {/* Notiser (brief 64), glider in från höger. Prick när det finns olästa. */}
         <Pressable
           style={styles.bell}
           accessibilityRole="button"
-          accessibilityLabel="Notiser"
-          onPress={() => {}}
+          accessibilityLabel={hasUnread ? 'Notiser, olästa' : 'Notiser'}
+          onPress={() => router.push('/notifications')}
         >
-          <NotificationIcon size={iconSize.lg} />
+          <NotificationIcon size={iconSize.lg} unread={hasUnread} />
         </Pressable>
       </View>
       <Text style={styles.greeting}>

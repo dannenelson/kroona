@@ -224,6 +224,34 @@ export const pushScreenOptions: BlankStackNavigationOptions = {
 };
 
 /**
+ * Från vänster (brief 64, egen profil från avataren uppe till vänster): som
+ * vanlig push men spegelvänd. Glider in från vänster och stängs med
+ * tillbakaknappen eller svep åt vänster. Minska rörelse: bara opacitet.
+ */
+export const slideFromLeftScreenOptions: BlankStackNavigationOptions = {
+  gestureEnabled: true,
+  gestureDirection: { gesture: 'horizontal-inverted', area: 'screen' },
+  gestureVelocityImpact: motion.dismissVelocityImpact,
+  screenStyleInterpolator: ({ focused, current, layouts, stackProgress }) => {
+    'worklet';
+    if (!focused) return withDepthVisibility({}, stackProgress);
+    const p = Math.min(1, Math.max(0, current.progress));
+    const reduce = reduceMotionShared.value;
+    return withDepthVisibility(
+      {
+        content: {
+          style: reduce
+            ? { opacity: p }
+            : { transform: [{ translateX: interpolate(p, [0, 1], [-layouts.screen.width, 0], 'clamp') }] },
+        },
+      },
+      stackProgress,
+    );
+  },
+  transitionSpec: { open: motion.zoomSpec.open, close: motion.zoomSpec.close },
+};
+
+/**
  * Sökläget (brief 53): tonar in över skärmen man kom från, utan förflyttning,
  * så att fältet upplevs som samma fält. Stängs med "Avbryt" (ingen gest).
  */

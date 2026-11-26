@@ -1,9 +1,13 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useColorScheme } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { darkColors, lightColors, type ColorRoles } from './colors';
 import { darkShadows, lightShadows, type Shadows } from './shadows';
 import { darkGlass, lightGlass, darkPhotoGlass, lightPhotoGlass, type Glass } from './glass';
 
 export type ColorScheme = 'dark' | 'light';
+/** Användarens val i Inställningar → Utseende (brief 64). */
+export type ThemePreference = ColorScheme | 'system';
 
 export type Theme = {
   scheme: ColorScheme;
@@ -14,7 +18,17 @@ export type Theme = {
   photoGlass: Glass;
 };
 
-type ThemeContextValue = Theme & { setScheme: (scheme: ColorScheme) => void };
+type ThemeContextValue = Theme & {
+  /** Valet: ljust, mörkt eller systemets läge. */
+  preference: ThemePreference;
+  setPreference: (preference: ThemePreference) => void;
+  /** Kortform för ett fast läge (samma som setPreference med 'light'/'dark'). */
+  setScheme: (scheme: ColorScheme) => void;
+  /** Sant när det sparade valet är inläst (undviker att fel tema blinkar vid start). */
+  ready: boolean;
+};
+
+const STORAGE_KEY = '@kroona/themePreference';
 
 export function buildTheme(scheme: ColorScheme): Theme {
   return scheme === 'dark'
@@ -24,15 +38,43 @@ export function buildTheme(scheme: ColorScheme): Theme {
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+/**
+ * Tema (brief 64): valet Ljust / Mörkt / System sparas lokalt (AsyncStorage) och
+ * gäller direkt i hela appen. System följer enhetens läge (`useColorScheme`,
+ * kräver `userInterfaceStyle: "automatic"` i app.json). Standard innan något
+ * valts: `defaultPreference` (mörkt, som tidigare).
+ */
 export function ThemeProvider({
-  initialScheme = 'dark',
+  defaultPreference = 'dark',
   children,
 }: {
-  initialScheme?: ColorScheme;
+  defaultPreference?: ThemePreference;
   children: ReactNode;
 }) {
-  const [scheme, setScheme] = useState<ColorScheme>(initialScheme);
-  const value = useMemo(() => ({ ...buildTheme(scheme), setScheme }), [scheme]);
+  const system = useColorScheme();
+  const [preference, setPreferenceState] = useState<ThemePreference>(defaultPreference);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then((raw) => {
+        if (raw === 'light' || raw === 'dark' || raw === 'system') setPreferenceState(raw);
+      })
+      .catch((error) => console.warn('Kunde inte läsa temavalet', error))
+      .finally(() => setReady(true));
+  }, []);
+
+  const setPreference = useCallback((next: ThemePreference) => {
+    setPreferenceState(next);
+    AsyncStorage.setItem(STORAGE_KEY, next).catch((error) => console.warn('Kunde inte spara temavalet', error));
+  }, []);
+
+  const scheme: ColorScheme = preference === 'system' ? (system === 'light' ? 'light' : 'dark') : preference;
+
+  const value = useMemo(
+    () => ({ ...buildTheme(scheme), preference, setPreference, setScheme: setPreference, ready }),
+    [scheme, preference, setPreference, ready],
+  );
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 

@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { View, ScrollView, Text } from 'react-native';
-import { Link } from 'expo-router';
+import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, typography, spacing } from '../../theme';
+import { makeStyles, spacing } from '../../theme';
 import Header from '../../components/Header';
 import FilterPills from '../../components/FilterPills';
 import AskBar from '../../components/AskBar';
@@ -54,13 +53,6 @@ export default function HomeScreen() {
         <AreasRow />
         <PopularCollectionsRow />
         <RecommendedProductsRow />
-        {/* Dev-länk till komponentsidan, bara i utvecklingsläge. Längst ned så att
-            den inte påverkar avståndet pillar → första hyllan. */}
-        {__DEV__ && (
-          <Link href="/components" style={styles.devLink}>
-            <Text style={styles.devLinkText}>Komponenter (dev)</Text>
-          </Link>
-        )}
       </ScrollView>
     </View>
   );
@@ -80,14 +72,5 @@ const useStyles = makeStyles((t) => ({
     flexGrow: 0,
     marginTop: spacing.xxl,
     marginBottom: spacing.xl - spacing.xxl,
-  },
-  devLink: {
-    marginTop: spacing.xxl,
-    paddingHorizontal: spacing.screenMargin,
-    paddingVertical: spacing.sm,
-  },
-  devLinkText: {
-    ...typography.caption,
-    color: t.colors.textTertiary,
   },
 }));

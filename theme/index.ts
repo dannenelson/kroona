@@ -6,5 +6,5 @@ export { radius } from './radius';
 export { darkShadows, lightShadows, photoShadows, type Shadows } from './shadows';
 export { motion } from './motion';
 export { darkGlass, lightGlass, darkPhotoGlass, lightPhotoGlass, edgeBlur, type Glass, type GlassTint } from './glass';
-export { ThemeProvider, useTheme, buildTheme, type Theme, type ColorScheme } from './ThemeProvider';
+export { ThemeProvider, useTheme, buildTheme, type Theme, type ColorScheme, type ThemePreference } from './ThemeProvider';
 export { makeStyles } from './makeStyles';

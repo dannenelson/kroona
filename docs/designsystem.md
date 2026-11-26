@@ -258,6 +258,15 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **Filter:** `lib/productFilters.ts` (`ProductFilter`, `BASE_FILTER_OPTIONS`, `filterOptionsWithAreas`, `filterProducts`), tänkt att delas med Hems pillar senare.
 - **Flödet:** `lib/followFeed.ts` (`buildFollowFeed` med frö, `getFollowedProducts`, `getInspirationProducts`, `FEED_LIMIT` 40).
 
+## 22. Tema, Profil, Notiser och Inställningar (tillagt 2026-11-26, brief 64)
+- **Tema:** `ThemeProvider` (`theme/ThemeProvider.tsx`) har valet `preference` = `light` / `dark` / `system`, sparat i AsyncStorage (`@kroona/themePreference`), standard mörkt. `system` följer enhetens läge via `useColorScheme` (kräver `userInterfaceStyle: "automatic"` i app.json). Appen visar laddvyn tills valet är inläst, så att fel tema inte blinkar vid start. `useTheme()` ger `preference`, `setPreference` och `scheme` (det läge som gäller).
+- **Utseende-växeln** i Inställningar är `SegmentedIcons` med `sun`, `moon` och textsegmentet "System" (segment kan ha `text` i stället för `icon`).
+- **Grupperade listor** (`components/GroupedList.tsx`: `GroupedSection`, `GroupedRow`): som faktalistan, rundad grupp på `surface` med hårlinjer, rader minst 52, ikon 20 vänster, värde, eget element (växel, segment) eller chevron till höger. Sektionsrubrik `label` i `textSecondary`. Används av Profil och Inställningar.
+- **Profil** (`app/me.tsx`): avatar 96 (`profileAvatar`), namn `title1`, @handle `body` mute, räknare `headline` + `label`, sedan en grupp rader. Öppnas från avataren och glider in från vänster (`slideFromLeftScreenOptions`: svep åt vänster eller tillbaka stänger; Minska rörelse: tonning).
+- **Notiser** (`app/notifications.tsx`): `ScreenHeader`, grupper Idag / Tidigare (`label`), rad med ikon i cirkel 44 (`surfaceRaised`), titel `body`, text `label` mute, tid `caption` tertiär. Tomläge med klocka, `title2` och hjälptext. Klockan på Hem visar `notification-filled` (pricken i `currentColor`) vid olästa.
+- **Inställningar** (`app/settings.tsx`): Utseende, Notiser (iOS-växlar, dummy), Om (version från app-konfigurationen), Utvecklare (Komponenter (dev), bara `__DEV__`).
+- **Kort med logotyp är alltid centrerade** (`EditorialCard`, alla tre storlekar); vänsterställt bara för liggande kort med enbart text (Fortsätt där du var).
+
 ## 14. Sheet-steg med lista (tillagt 2026-11-20, brief 36)
 - Mönster för val i en lista inuti Sheet: valfritt chip överst (bild 40 / `radius.tile`, namn, undertext, hårlinje under), sökfält (56, `radius.card`, `surface`, sökikon i `textTertiary`), lista med `ListRow` (kompakt) och **val-cirkel** till höger (`control.checkSize` 28: tom ring i `textTertiary`, vald = fylld `textPrimary` med bock i `bg`). Tryck växlar direkt utan att stänga. CTA (Button med ikon) centrerad nederst.
 - Steget sätter `swipeToClose: false` (listan skrollar) och kan ha `onClose` för en sammanfattande snackbar när lagret stängs.

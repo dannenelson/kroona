@@ -10,6 +10,7 @@ import {
   productScreenOptions,
   pushScreenOptions,
   searchScreenOptions,
+  slideFromLeftScreenOptions,
   tabsScreenOptions,
 } from '../components/product/productTransition';
 import { installReduceMotionSync } from '../lib/lightboxStore';
@@ -26,7 +27,8 @@ import {
 } from '@expo-google-fonts/google-sans-flex';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { ThemeProvider, useTheme, type ColorScheme } from '../theme';
+import { ThemeProvider, useTheme } from '../theme';
+import { NotificationsProvider } from '../context/NotificationsContext';
 import { SavedProductsProvider } from '../context/SavedProductsContext';
 import { FollowedCollectionsProvider } from '../context/FollowedCollectionsContext';
 import { UserCollectionsProvider } from '../context/UserCollectionsContext';
@@ -34,10 +36,6 @@ import { FollowedPeopleProvider } from '../context/FollowedPeopleContext';
 import { ContextMenuProvider } from '../components/ProductContextMenu';
 import { SnackbarProvider } from '../components/Snackbar';
 import { SheetProvider } from '../components/Sheet';
-
-// Aktivt tema. Byt till 'light' här för att testa ljust tema (ingen UI för
-// det än).
-const INITIAL_SCHEME: ColorScheme = 'dark';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -51,11 +49,18 @@ export default function RootLayout() {
   return (
     // GestureHandlerRootView krävs av react-native-gesture-handler (långt tryck-menyn).
     <GestureHandlerRootView style={StyleSheet.absoluteFill}>
-      <ThemeProvider initialScheme={INITIAL_SCHEME}>
-        {fontsLoaded ? <AppShell /> : <FontLoading />}
+      {/* Tema (brief 64): Ljust / Mörkt / System väljs i Inställningar och sparas lokalt. */}
+      <ThemeProvider defaultPreference="dark">
+        <ThemeGate fontsLoaded={fontsLoaded} />
       </ThemeProvider>
     </GestureHandlerRootView>
   );
+}
+
+/** Väntar på typsnitten och det sparade temavalet, så att fel tema inte blinkar vid start. */
+function ThemeGate({ fontsLoaded }: { fontsLoaded: boolean }) {
+  const { ready } = useTheme();
+  return fontsLoaded && ready ? <AppShell /> : <FontLoading />;
 }
 
 function FontLoading() {
@@ -86,6 +91,7 @@ function AppShell() {
       <UserCollectionsProvider>
       <FollowedCollectionsProvider>
       <FollowedPeopleProvider>
+      <NotificationsProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         {/* Kontextmenyn ritas ovanför alla skärmar (ingen Modal, se ProductContextMenu). */}
         <ContextMenuProvider>
@@ -114,10 +120,18 @@ function AppShell() {
               <BlankStack.Screen name="areas" options={pushScreenOptions} />
               <BlankStack.Screen name="area/[id]" options={pushScreenOptions} />
               <BlankStack.Screen name="ideas" options={pushScreenOptions} />
+              {/* Brief 64: egen profil (från avataren, glider in från vänster),
+                  notiser (från klockan, från höger), inställningar, platshållare och dev-sidan. */}
+              <BlankStack.Screen name="me" options={slideFromLeftScreenOptions} />
+              <BlankStack.Screen name="notifications" options={pushScreenOptions} />
+              <BlankStack.Screen name="settings" options={pushScreenOptions} />
+              <BlankStack.Screen name="placeholder" options={pushScreenOptions} />
+              <BlankStack.Screen name="components" options={pushScreenOptions} />
             </BlankStack>
           </SheetProvider>
           </SnackbarProvider>
         </ContextMenuProvider>
+      </NotificationsProvider>
       </FollowedPeopleProvider>
       </FollowedCollectionsProvider>
       </UserCollectionsProvider>
