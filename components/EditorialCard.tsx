@@ -13,6 +13,7 @@ import {
   overlay,
   edgeBlur,
   editorialCard,
+  spacing,
   logo as logoTokens,
 } from '../theme';
 import { LOGO_ASPECT, type LogoComponent } from '../data/logos';
@@ -42,6 +43,9 @@ type Props = {
   logo?: LogoComponent;
   /** Liten ikon före titeln, t.ex. förstoringsglas på idékort (brief 53). */
   titleIcon?: ReactNode;
+  /** Samling utan logotyp (brief 63): större titel (stor `title1`, liten `title2`)
+   *  som väger som en logotyp, och mer luft till undertiteln. */
+  prominentTitle?: boolean;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
   boundary?: { id: string; group: string };
   onPress?: () => void;
@@ -76,6 +80,7 @@ export default function EditorialCard({
   logo: Logo,
   align,
   titleIcon,
+  prominentTitle = false,
 }: Props) {
   const styles = useStyles();
   const press = useCardPress();
@@ -86,6 +91,8 @@ export default function EditorialCard({
   const r = size?.radius ?? v.radius;
   const shape = { width, height, borderRadius: r };
   const bottomRadii = { borderBottomLeftRadius: r, borderBottomRightRadius: r };
+  // Större titel: ett enda ord bryts aldrig mitt i, det krymps i stället på en rad.
+  const shrinkWord = prominentTitle && !title.trim().includes(' ');
 
   const visual = (
     <View style={[styles.card, shape]}>
@@ -130,7 +137,14 @@ export default function EditorialCard({
 
       {chip ? <View style={[styles.chip, v.small && styles.chipSmall]}>{chip}</View> : null}
 
-      <View style={[styles.text, v.small && styles.textSmall, v.centered && styles.textCentered]}>
+      <View
+        style={[
+          styles.text,
+          v.small && styles.textSmall,
+          v.centered && styles.textCentered,
+          prominentTitle && !Logo && styles.textProminent,
+        ]}
+      >
         {status ? (
           <Text style={styles.status} numberOfLines={1}>
             {status}
@@ -148,11 +162,21 @@ export default function EditorialCard({
           {titleIcon}
           <Text
             style={[
-              variant === 'portraitLarge' ? styles.titleLarge : variant === 'landscape' ? styles.titleMedium : styles.titleSmall,
+              prominentTitle
+                ? v.small
+                  ? styles.titleProminentSmall
+                  : styles.titleProminent
+                : variant === 'portraitLarge'
+                  ? styles.titleLarge
+                  : variant === 'landscape'
+                    ? styles.titleMedium
+                    : styles.titleSmall,
               v.centered && styles.centered,
               styles.titleShrink,
             ]}
-            numberOfLines={2}
+            numberOfLines={shrinkWord ? 1 : 2}
+            adjustsFontSizeToFit={shrinkWord}
+            minimumFontScale={editorialCard.prominentMinScale}
           >
             {title}
           </Text>
@@ -234,6 +258,10 @@ const useStyles = makeStyles((t) => ({
     bottom: editorialCard.padding,
     gap: 2, // lokal optisk luft: titel → undertitel
   },
+  // Samling utan logotyp: titel och undertitel hänger inte ihop (brief 63).
+  textProminent: {
+    gap: spacing.sm,
+  },
   textSmall: {
     left: editorialCard.paddingSmall,
     right: editorialCard.paddingSmall,
@@ -274,6 +302,14 @@ const useStyles = makeStyles((t) => ({
   },
   titleSmall: {
     ...typography.editorialSmall,
+    ...onPhotoText,
+  },
+  titleProminent: {
+    ...typography.title1,
+    ...onPhotoText,
+  },
+  titleProminentSmall: {
+    ...typography.title2,
     ...onPhotoText,
   },
   subtitle: {

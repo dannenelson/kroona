@@ -34,13 +34,13 @@ export default function HomeScreen() {
           paddingBottom: tabBarSpace(insets.bottom) + spacing.xxl,
         }}
       >
-        {/* Hem-toppen (brief 46): toppraden + hälsning, filterpillar, AskBar
-            (tryckbart fält "Fråga eller sök" som öppnar sökläget, brief 53).
-            Toppraden → hälsning 8 (i Header), hälsning → pillar 16, pillar → AskBar 16. */}
+        {/* Hem-toppen (brief 46, ordning brief 63): toppraden + hälsning, AskBar
+            (tryckbart fält som öppnar sökläget, brief 53), filterpillar direkt över
+            innehållet de växlar. Toppraden → hälsning 8 (i Header), sedan 16 mellan. */}
         <View style={styles.top}>
           <Header />
+          <AskBar placeholder="Vad är du intresserad av idag?" />
           <FilterPills items={FILTERS} selected={filter} onSelect={setFilter} />
-          <AskBar />
         </View>
         {/* Dev-länk till komponentsidan, bara i utvecklingsläge.
             Flyttas eller tas bort när Hem byggs om. */}

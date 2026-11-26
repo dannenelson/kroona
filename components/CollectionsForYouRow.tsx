@@ -49,6 +49,7 @@ function CollectionItem({ collection }: { collection: Collection }) {
       subtitle={`Av ${getCurator(collection).name} · ${countLabel(getCollectionProducts(collection).length)}`}
       imageUrl={collection.imageUrl}
       logo={COLLECTION_LOGOS[collection.id]}
+      prominentTitle
       boundary={{ id: boundaryId, group: COLLECTION_BOUNDARY_GROUP }}
       onPress={() => router.push({ pathname: '/collection/[id]', params: { id: collection.id, b: boundaryId } })}
     />

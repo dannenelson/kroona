@@ -82,6 +82,11 @@ export const editorialCard = {
     { strength: 0.25, maskStops: [0.4, 0.7] },
     { strength: 0.25, maskStops: [0.6, 0.9] },
   ],
+  /** Typikonen före titeln på Fortsätt-korten (brief 63). */
+  typeIcon: 16,
+  /** Större titel (samling utan logotyp, brief 63): en titel på ett ord som inte
+   *  ryms krymps hit som minst i stället för att brytas mitt i ordet. */
+  prominentMinScale: 0.7,
   /** Inre luft för texten på bilden (stor/liggande, liten). */
   padding: 16,
   paddingSmall: 12,

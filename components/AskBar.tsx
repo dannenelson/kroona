@@ -11,6 +11,8 @@ type Props = {
   /** Ikonen till vänster (brief 57): `find` (förstoringsglas + stjärna, standard:
    *  Hem och Hitta) eller `search` (förstoringsglas, Sökresultat, där fältet visar en sökning). */
   icon?: 'find' | 'search';
+  /** Platshållaren när fältet är tomt (standard "Fråga eller sök"; Hem har egen, brief 63). */
+  placeholder?: string;
   /** Utan egen sidomarginal (när fältet ligger i en rad med annat). */
   inline?: boolean;
   style?: StyleProp<ViewStyle>;
@@ -22,7 +24,7 @@ type Props = {
  * Tryck öppnar sökläget (app/search.tsx), där man väljer sök eller dialog.
  * Används på Hem, Hitta och Sökresultat.
  */
-export default function AskBar({ value, onPress, icon = 'find', inline, style }: Props) {
+export default function AskBar({ value, onPress, icon = 'find', placeholder = 'Fråga eller sök', inline, style }: Props) {
   const router = useRouter();
   const { colors } = useTheme();
   const styles = useStyles();
@@ -34,7 +36,7 @@ export default function AskBar({ value, onPress, icon = 'find', inline, style }:
       <Pressable
         onPress={open}
         accessibilityRole="search"
-        accessibilityLabel={value ? `Sökning: ${value}. Ändra` : 'Fråga eller sök'}
+        accessibilityLabel={value ? `Sökning: ${value}. Ändra` : placeholder}
         style={({ pressed }) => [styles.bar, pressed && styles.pressed]}
       >
         <Icon
@@ -43,7 +45,7 @@ export default function AskBar({ value, onPress, icon = 'find', inline, style }:
           size={iconSize.md}
         />
         <Text style={[styles.text, !value && styles.placeholder]} numberOfLines={1}>
-          {value || 'Fråga eller sök'}
+          {value || placeholder}
         </Text>
         <Icon name="microphone" color={colors.textSecondary} size={iconSize.lg} />
       </Pressable>

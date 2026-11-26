@@ -27,6 +27,7 @@ export default function AreasRow() {
             subtitle={countLabel(products.length)}
             imageUrl={products[0]?.imageUrl}
             logo={COLLECTION_LOGOS[area.id]}
+            prominentTitle
             onPress={() => openArea(router, area)}
           />
         ))}

@@ -1,7 +1,8 @@
 import { useId } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import { spacing } from '../theme';
+import { spacing, overlay, editorialCard } from '../theme';
+import Icon, { type IconName } from './Icon';
 import { useUserCollections } from '../context/UserCollectionsContext';
 import { PRODUCTS, knownProductIds } from '../data/products';
 import { COLLECTION_BOUNDARY_GROUP } from './product/productTransition';
@@ -11,6 +12,10 @@ import CollectionMosaic from './CollectionMosaic';
 import { PRODUCT_IMAGES } from '../data/productImages';
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
+
+/** Typikon före titeln (brief 63), vit på toningen. Typerna i Fas 0: dialog och
+ *  samling; sökning `search`, produkt `tag` och företag `shield` när de finns. */
+const typeIcon = (name: IconName) => <Icon name={name} color={overlay.onPhoto} size={editorialCard.typeIcon} />;
 
 /**
  * "Fortsätt där du var" (brief 43): liggande redaktionella kort. Pågående
@@ -40,6 +45,7 @@ export default function ContinueRow() {
       variant="landscape"
       status="Pågående dialog"
       title={dialog.title}
+      titleIcon={typeIcon('stars')}
       subtitle={dialog.subtitle}
       imageUrl={dialog.imageUrl}
       // Dialogen är en egen skärm sedan brief 53 (ingen sparad historik i Fas 0: öppnar tom).
@@ -51,6 +57,7 @@ export default function ContinueRow() {
         variant="landscape"
         status="Senast öppnad"
         title={lastOpenedCollection.name}
+        titleIcon={typeIcon('layers')}
         subtitle={countLabel(knownProductIds(lastOpenedCollection.productIds).length)}
         cover={<CollectionMosaic images={collectionImages} style={StyleSheet.absoluteFill} />}
         boundary={{ id: boundaryId, group: COLLECTION_BOUNDARY_GROUP }}
