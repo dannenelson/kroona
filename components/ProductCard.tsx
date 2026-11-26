@@ -226,6 +226,7 @@ export default function ProductCard({
               rating={rating}
               reviewCount={reviewCount}
               sustainabilityScore={sustainabilityScore}
+              size={isLarge ? 'L' : 'M'}
               showSave={saveButton}
             />
           )}

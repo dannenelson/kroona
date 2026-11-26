@@ -1,13 +1,14 @@
-// Produktkortets textblock (brief 68): ETT block för alla produktkort, med
-// samma textstilar i alla storlekar: namnet `body` 400 och priset `body`-storlek
-// i 600, så att pris och namn skiljer sig på samma sätt på små och stora kort.
+// Produktkortets textblock (brief 68): ETT block för alla produktkort. Stilen
+// (vikt, färg) är gemensam: namnet 400, priset 600, "kr" mindre. Storleken är
+// en variant (`size` M/L) som bara byter storlek och radhöjd: M = `body`
+// (15/22), "kr" `micro`; L = `headline`-storleken (17/22), "kr" `caption`.
 // Märket står överst. Med `showSave` (stora kort, en-kolumn i Följer) står den
 // runda spara-knappen på namnraden, överjusterad med namnet, precis som på
 // Produktdetalj (gemensam `NameWithSave`). Namnet radbryter före knappen,
 // högst två rader, sedan ellipsis.
 // Avstånd (brief 62): märke/namn/pris `productCard.textGap`, betyg `spacing.xs`.
 import { useRef, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Text, View, type TextStyle } from 'react-native';
 import { makeStyles, useTheme, typography, spacing, productCard } from '../theme';
 import { formatPrice, formatScore } from '../utils/format';
 import Icon from './Icon';
@@ -22,6 +23,8 @@ type Props = {
   rating?: number;
   reviewCount?: number;
   sustainabilityScore: number;
+  /** Storleksvariant: M (små kort) eller L (stora kort). Byter bara storlek och radhöjd. */
+  size?: 'M' | 'L';
   /** Spara-knappen på namnraden. Bara där kortet har den i dag (en-kolumn i Följer). */
   showSave?: boolean;
 };
@@ -34,10 +37,14 @@ export default function ProductCardText({
   rating,
   reviewCount,
   sustainabilityScore,
+  size = 'M',
   showSave = false,
 }: Props) {
   const { colors } = useTheme();
   const styles = useStyles();
+  const sized = TEXT_SIZES[size];
+  // Namnets stil som ett objekt (NameWithSave läser radhöjden).
+  const nameStyle: TextStyle = { ...styles.name, ...sized.name };
 
   // Betygsraden radbryts aldrig (brief 60): får den inte plats utelämnas
   // antalet omdömen. Mäts mot radens bredd och lövgruppens slut.
@@ -57,13 +64,13 @@ export default function ProductCardText({
         </Text>
         <NameWithSave
           name={name}
-          nameStyle={styles.name}
+          nameStyle={nameStyle}
           numberOfLines={2}
           productId={showSave ? id : undefined}
         />
-        <Text style={styles.price}>
+        <Text style={[styles.price, sized.price]}>
           {formatPrice(price)}
-          <Text style={styles.currency}>{' '}kr</Text>
+          <Text style={sized.currency}>{' '}kr</Text>
         </Text>
       </View>
       <View
@@ -100,6 +107,21 @@ export default function ProductCardText({
   );
 }
 
+/** Storleksvarianterna: bara storlek och radhöjd (stilen ligger i useStyles).
+ *  "kr" ≈ 70 % av prisets storlek (design.md §4): M 15 → micro 10, L 17 → caption 12. */
+const TEXT_SIZES = {
+  M: {
+    name: { fontSize: typography.body.fontSize, lineHeight: typography.body.lineHeight },
+    price: { fontSize: typography.body.fontSize, lineHeight: typography.body.lineHeight },
+    currency: { fontSize: typography.micro.fontSize },
+  },
+  L: {
+    name: { fontSize: typography.headline.fontSize, lineHeight: typography.headline.lineHeight },
+    price: { fontSize: typography.headline.fontSize, lineHeight: typography.headline.lineHeight },
+    currency: { fontSize: typography.caption.fontSize },
+  },
+} as const;
+
 const useStyles = makeStyles((t) => ({
   // 8 under bildens underkant.
   block: {
@@ -119,13 +141,7 @@ const useStyles = makeStyles((t) => ({
   },
   price: {
     ...typography.price,
-    fontSize: typography.body.fontSize,
-    lineHeight: typography.body.lineHeight,
     color: t.colors.textPrimary,
-  },
-  // "kr" ≈ 70 % av prisets storlek (design.md §4): närmaste typtoken micro 10 (67 %).
-  currency: {
-    fontSize: typography.micro.fontSize,
   },
   ratings: {
     flexDirection: 'row',

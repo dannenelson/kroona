@@ -395,9 +395,9 @@ const useStyles = makeStyles((t) => ({
     ...typography.title1,
     color: t.colors.textPrimary,
   },
-  // Mer luft mellan namn och pris: `spacing.sm` totalt (textblockets gap är `spacing.xs`).
+  // Mer luft mellan namn och pris: `spacing.md` totalt (textblockets gap är `spacing.xs`).
   priceRow: {
-    marginTop: spacing.sm - spacing.xs,
+    marginTop: spacing.md - spacing.xs,
     flexDirection: 'row',
     alignItems: 'center',
   },
