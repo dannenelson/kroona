@@ -44,6 +44,14 @@ export const control = {
   sheetFadeHeight: 48,
 } as const;
 
+/** Profil-hero (brief 65): Partner- och Samlingsdetalj. Höjden är `heightShare`
+ *  av en 4:5-cover i full bredd. Samlingslogotypen på hero är lika stor som på
+ *  stora kort (`logo.maxHeight` hög, 2:1). */
+export const profileHero = {
+  aspect: 4 / 5,
+  heightShare: 0.6,
+} as const;
+
 /** Växel (brief 64): iOS-måtten 51 × 31, reglage 27 med 2 i inre luft. */
 export const toggle = {
   width: 51,

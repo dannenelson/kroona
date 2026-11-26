@@ -14,10 +14,9 @@ import Reanimated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Transition, { useScreenAnimation } from 'react-native-screen-transitions';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay } from '../../theme';
+import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, profileHero } from '../../theme';
 import { ALL_COLLECTIONS, getCollectionProducts, getCurator } from '../../data/collections';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
 import { useSavedProducts } from '../../context/SavedProductsContext';
@@ -31,11 +30,12 @@ import TopBar from '../../components/TopBar';
 import EdgeFade from '../../components/EdgeFade';
 import TextTabs from '../../components/TextTabs';
 import ProductGrid from '../../components/ProductGrid';
-import Pill from '../../components/Pill';
+import ProfileHero from '../../components/ProfileHero';
+import SectionTitle from '../../components/SectionTitle';
+import { COLLECTION_LOGOS } from '../../data/logos';
 import type { Product } from '../../types/product';
 
 // Lokalt layoutmått: cover i samma proportion som Produktdetaljens hero (4:5).
-const COVER_ASPECT = 4 / 5;
 const ALL = 'Alla';
 const NEW = 'Nytt';
 const CATEGORY_LABEL: Record<Product['category'], string> = { kläder: 'Kläder', möbler: 'Möbler' };
@@ -155,7 +155,8 @@ export default function CollectionScreen() {
   const active = filters.find((f) => f.label === selected) ?? filters[0];
   const visible = useMemo(() => products.filter(active.match), [products, active]);
 
-  const coverHeight = width / COVER_ASPECT;
+  // Lägre cover (brief 65): `profileHero`, samma som företagsprofilen.
+  const coverHeight = (width / profileHero.aspect) * profileHero.heightShare;
   // Toppen visar namnet när covern har passerat under toppbaren (som Produktdetalj).
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = coverHeight - insets.top - barHeight;
@@ -207,59 +208,52 @@ export default function CollectionScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
         onScroll={onScroll}
       >
-        {/* Covern är målet för zoomen från samlingskortet. */}
-        <Transition.Boundary
-          id={b ?? collection.id}
-          group={COLLECTION_BOUNDARY_GROUP}
-          style={[styles.cover, { width, height: coverHeight }]}
-        >
-          {/* Parallax (brief 65): bilden glider bakom innehållet och skalas vid överscroll. */}
-          <Reanimated.View style={[{ width, height: coverHeight }, parallaxStyle]}>
-            {collection.imageUrl ? (
+        {/* Profil-hero (brief 65, gemensam med företagsprofilen): covern är målet
+            för zoomen från samlingskortet. Logotyp (om samlingen har en) eller
+            titeln, typ som undertext och Följ; inget antal i hero. */}
+        <ProfileHero
+          boundary={{ id: b ?? collection.id, group: COLLECTION_BOUNDARY_GROUP }}
+          width={width}
+          height={coverHeight}
+          parallaxStyle={parallaxStyle}
+          cover={
+            collection.imageUrl ? (
               <Image source={{ uri: collection.imageUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
             ) : (
               <CollectionMosaic
                 images={products.slice(0, 4).map((p) => p.imageUrl)}
                 style={{ width, height: coverHeight }}
               />
-            )}
-          </Reanimated.View>
-          <LinearGradient
-            colors={overlay.scrimStops.colors}
-            locations={overlay.scrimStops.locations}
-            style={styles.coverScrim}
-          >
-            <Text style={styles.coverName} numberOfLines={2}>
-              {collection.name}
-            </Text>
-          </LinearGradient>
-        </Transition.Boundary>
+            )
+          }
+          title={collection.name}
+          logo={COLLECTION_LOGOS[collection.id]}
+          subtitle={collection.detail}
+          follow={
+            collection.followable
+              ? { followed, onPress: () => toggleFollowed(collection.id) }
+              : undefined
+          }
+        />
 
         <Reanimated.View style={[styles.body, revealStyle]}>
-          {/* Metadata och åtgärd. Beskrivning saknas i datan (Collection har ingen), så den hoppas över. */}
-          <View style={styles.metaRow}>
-            <View style={styles.metaText}>
-              <Pressable
-                disabled={!curatorHref}
-                accessibilityRole={curatorHref ? 'link' : 'text'}
-                onPress={() =>
-                  curatorHref && router.push({ pathname: curatorHref.pathname, params: { id: curatorHref.id } })
-                }
-              >
-                <Text style={[styles.curator, curatorHref && styles.curatorLink]} numberOfLines={1}>
-                  Av {curatorName}
-                </Text>
-              </Pressable>
-              <Text style={styles.meta} numberOfLines={1}>
-                {products.length} produkter · {collection.detail}
+          {/* Samlingens egna uppgifter under hero (brief 65): kuratorn, i samma
+              textstil som företagsprofilens avsnitt. Beskrivning saknas i datan. */}
+          <View style={styles.textBlock}>
+            <Pressable
+              disabled={!curatorHref}
+              accessibilityRole={curatorHref ? 'link' : 'text'}
+              onPress={() =>
+                curatorHref && router.push({ pathname: curatorHref.pathname, params: { id: curatorHref.id } })
+              }
+            >
+              <Text style={styles.paragraph} numberOfLines={1}>
+                Av <Text style={curatorHref ? styles.curatorLink : undefined}>{curatorName}</Text>
               </Text>
-            </View>
-            {collection.followable && (
-              <Pill variant="filled" selected={followed} onPress={() => toggleFollowed(collection.id)}>
-                {followed ? 'Följer' : 'Följ'}
-              </Pill>
-            )}
+            </Pressable>
           </View>
+
+          <SectionTitle title="Produkter" count={products.length} style={styles.sectionTitle} />
 
           {filters.length > 1 && (
             <TextTabs
@@ -311,51 +305,26 @@ const useStyles = makeStyles((t) => ({
     color: t.colors.textSecondary,
     paddingHorizontal: spacing.screenMargin,
   },
-  cover: {
-    backgroundColor: t.colors.placeholder,
-  },
-  // Scrim mörk i båda teman (foto), namnet i fast ljus färg ovanpå.
-  coverScrim: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '45%',
-    justifyContent: 'flex-end',
-    paddingHorizontal: spacing.screenMargin,
-    paddingBottom: spacing.xl,
-  },
-  coverName: {
-    ...typography.display,
-    color: overlay.onPhoto,
-  },
   // Temats bakgrund: hero-bilden glider in bakom innehållet (parallax).
   body: {
     paddingTop: spacing.lg,
     gap: spacing.md,
     backgroundColor: t.colors.bg,
   },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
+  textBlock: {
     paddingHorizontal: spacing.screenMargin,
   },
-  metaText: {
-    flexShrink: 1,
-    gap: spacing.xs,
-  },
-  curator: {
-    ...typography.label,
+  paragraph: {
+    ...typography.body,
     color: t.colors.textSecondary,
   },
   curatorLink: {
     color: t.colors.textPrimary,
   },
-  meta: {
-    ...typography.label,
-    color: t.colors.textSecondary,
+  sectionTitle: {
+    paddingHorizontal: spacing.screenMargin,
+    paddingTop: spacing.lg,
+    marginBottom: 0,
   },
   tabs: {
     flexGrow: 0,

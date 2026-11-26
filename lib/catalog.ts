@@ -81,6 +81,17 @@ export function getRetailer(
 }
 
 /**
+ * Varumärkets profil (brief 65, tillägg): återförsäljaren av typen varumärke
+ * vars `brandName` är produktens märke. Undefined om märket saknar profil.
+ */
+export function getRetailerForBrand(
+  brand: string,
+  retailers: readonly Retailer[] = RETAILERS,
+): Retailer | undefined {
+  return retailers.find((r) => r.retailerType === 'brand' && r.brandName === brand);
+}
+
+/**
  * Produkter för en återförsäljare: för ett varumärke alla produkter med det
  * märket, för en butik eller tjänst alla produkter den har erbjudanden på.
  */

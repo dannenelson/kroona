@@ -14,10 +14,9 @@ import Reanimated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import Transition, { useScreenAnimation } from 'react-native-screen-transitions';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, overlay, logo } from '../../theme';
+import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, logo, profileHero } from '../../theme';
 import BrandLogo from '../../components/BrandLogo';
 import { getProductsForRetailer, getRetailer } from '../../lib/catalog';
 import {
@@ -36,12 +35,8 @@ import EdgeFade from '../../components/EdgeFade';
 import SectionTitle from '../../components/SectionTitle';
 import PartnerCard from '../../components/PartnerCard';
 import ProductGrid from '../../components/ProductGrid';
-import Pill from '../../components/Pill';
+import ProfileHero from '../../components/ProfileHero';
 
-// Lokala layoutmått: covern var 4:5 som övriga detaljvyer; sedan brief 65
-// är den lägre, ca 60 % av den höjden, så att innehållet kommer högre upp.
-const COVER_ASPECT = 4 / 5;
-const COVER_HEIGHT_SHARE = 0.6;
 
 export default function PartnerScreen() {
   // `b` = boundary-id för det kort man öppnade från (zoomen går från/till det).
@@ -58,7 +53,8 @@ export default function PartnerScreen() {
   // Retailer har ingen egen bild (se getRetailerCoverImage).
   const coverUrl = retailer ? getRetailerCoverImage(retailer.id) : undefined;
 
-  const coverHeight = (width / COVER_ASPECT) * COVER_HEIGHT_SHARE;
+  // Lägre cover (brief 65): `profileHero`, samma som Samlingsdetalj.
+  const coverHeight = (width / profileHero.aspect) * profileHero.heightShare;
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = coverHeight - insets.top - barHeight;
   const scrollY = useSharedValue(0);
@@ -114,43 +110,19 @@ export default function PartnerScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
         onScroll={onScroll}
       >
-        {/* Covern är målet för zoomen från varumärkeskortet. */}
-        <Transition.Boundary
-          id={b ?? retailer.id}
-          group={PARTNER_BOUNDARY_GROUP}
-          style={[styles.cover, { width, height: coverHeight }]}
-        >
-          {/* Parallax (brief 65): bilden glider bakom innehållet och skalas vid överscroll. */}
-          <Reanimated.View style={[{ width, height: coverHeight }, parallaxStyle]}>
-            {coverUrl ? (
-              <Image source={{ uri: coverUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
-            ) : null}
-          </Reanimated.View>
-          {/* Svagare, kortare toning (brief 65). Vänster: rund logotyp + namn, och
-              områdena under; höger: Följ, linjerad i botten med texten. */}
-          <LinearGradient
-            colors={overlay.heroScrimSoft.colors}
-            locations={overlay.heroScrimSoft.locations}
-            style={styles.coverScrim}
-          >
-            <View style={styles.coverText}>
-              <View style={styles.nameRow}>
-                <BrandLogo retailerId={retailer.id} initial={retailer.initial} size={logo.heroCircle} />
-                <Text style={styles.coverName} numberOfLines={2}>
-                  {retailer.name}
-                </Text>
-              </View>
-              {areas.length > 0 ? (
-                <Text style={styles.coverAreas} numberOfLines={1}>
-                  {areas.join(' · ')}
-                </Text>
-              ) : null}
-            </View>
-            <Pill variant="glass" tone="photo" selected={followed} onPress={() => toggleFollowed(followKey)}>
-              {followed ? 'Följer' : 'Följ'}
-            </Pill>
-          </LinearGradient>
-        </Transition.Boundary>
+        {/* Profil-hero (brief 65, gemensam med Samlingsdetalj): covern är målet för
+            zoomen från varumärkeskortet. Rund logotyp + namn, områden, Följ. */}
+        <ProfileHero
+          boundary={{ id: b ?? retailer.id, group: PARTNER_BOUNDARY_GROUP }}
+          width={width}
+          height={coverHeight}
+          parallaxStyle={parallaxStyle}
+          cover={coverUrl ? <Image source={{ uri: coverUrl }} style={{ width, height: coverHeight }} resizeMode="cover" /> : null}
+          title={retailer.name}
+          leading={<BrandLogo retailerId={retailer.id} initial={retailer.initial} size={logo.heroCircle} />}
+          subtitle={areas.length > 0 ? areas.join(' · ') : undefined}
+          follow={{ followed, onPress: () => toggleFollowed(followKey) }}
+        />
 
         <Reanimated.View style={[styles.body, revealStyle]}>
 
@@ -239,41 +211,6 @@ const useStyles = makeStyles((t) => ({
     ...typography.body,
     color: t.colors.textSecondary,
     paddingHorizontal: spacing.screenMargin,
-  },
-  cover: {
-    backgroundColor: t.colors.placeholder,
-  },
-  // Svagare toning (fast, mörk i båda teman), texten i fast ljus färg ovanpå.
-  // Rad: text vänster, Följ höger, linjerade i botten.
-  coverScrim: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: '60%',
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    gap: spacing.md,
-    paddingHorizontal: spacing.screenMargin,
-    paddingBottom: spacing.lg,
-  },
-  coverText: {
-    flex: 1,
-    gap: spacing.sm,
-  },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  coverName: {
-    ...typography.title1,
-    color: overlay.onPhoto,
-    flexShrink: 1,
-  },
-  coverAreas: {
-    ...typography.label,
-    color: overlay.onPhotoMuted,
   },
   // Temats bakgrund: hero-bilden glider in bakom innehållet (parallax).
   body: {

@@ -5,7 +5,7 @@
 // ägs av react-native-screen-transitions, se components/product/productTransition.ts. Delar som bara används här (erbjudanderad, faktarad, Spara-knapp)
 // bor i components/product/ tills de behövs på fler ställen.
 import { useMemo, useRef, useState } from 'react';
-import { Image, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import Reanimated, {
   Extrapolation,
   interpolate,
@@ -29,6 +29,7 @@ import {
   getProductImages,
   getNewOffers,
   getRetailer,
+  getRetailerForBrand,
   getSimilarProducts,
   getUsedOffersByService,
 } from '../../lib/catalog';
@@ -178,6 +179,8 @@ export default function ProductScreen() {
     );
   }
 
+  const brandProfile = getRetailerForBrand(product.brand);
+
   const facts: Fact[] = [
     { label: 'Hållbarhetsindex', value: `${formatScore(product.sustainabilityScore)} av 5` },
     ...(product.facts?.material ? [{ label: 'Material', value: product.facts.material }] : []),
@@ -224,7 +227,20 @@ export default function ProductScreen() {
 
         <Reanimated.View style={revealStyle}>
           <View style={styles.info}>
-            <Text style={styles.brand}>{product.brand}</Text>
+            {/* Märket öppnar varumärkets profil om det finns en (brief 65, tillägg). */}
+            {brandProfile ? (
+              <Pressable
+                accessibilityRole="link"
+                accessibilityLabel={`${product.brand}, öppna profil`}
+                hitSlop={{ top: spacing.sm, bottom: spacing.xs, left: spacing.sm, right: spacing.lg }}
+                onPress={() => router.push({ pathname: '/partner/[id]', params: { id: brandProfile.id } })}
+                style={({ pressed }) => [styles.brandLink, pressed && styles.brandPressed]}
+              >
+                <Text style={styles.brand}>{product.brand}</Text>
+              </Pressable>
+            ) : (
+              <Text style={styles.brand}>{product.brand}</Text>
+            )}
             {/* Namnet och Spara på samma rad, överjusterade; samma lösning som
                 stora produktkort (NameWithSave). */}
             <NameWithSave name={product.name} nameStyle={styles.name} productId={product.id} />
@@ -390,6 +406,12 @@ const useStyles = makeStyles((t) => ({
   brand: {
     ...typography.label,
     color: t.colors.textSecondary,
+  },
+  brandLink: {
+    alignSelf: 'flex-start',
+  },
+  brandPressed: {
+    opacity: motion.disabledOpacity,
   },
   name: {
     ...typography.title1,

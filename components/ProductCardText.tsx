@@ -8,8 +8,10 @@
 // högst två rader, sedan ellipsis.
 // Avstånd (brief 62): märke/namn/pris `productCard.textGap`, betyg `spacing.xs`.
 import { useRef, useState } from 'react';
-import { Text, View, type TextStyle } from 'react-native';
-import { makeStyles, useTheme, typography, spacing, productCard } from '../theme';
+import { Pressable, Text, View, type TextStyle } from 'react-native';
+import { useRouter } from 'expo-router';
+import { makeStyles, useTheme, typography, spacing, productCard, motion } from '../theme';
+import { getRetailerForBrand } from '../lib/catalog';
 import { formatPrice, formatScore } from '../utils/format';
 import Icon from './Icon';
 import NameWithSave from './product/NameWithSave';
@@ -45,6 +47,10 @@ export default function ProductCardText({
   const sized = TEXT_SIZES[size];
   // Namnets stil som ett objekt (NameWithSave läser radhöjden).
   const nameStyle: TextStyle = { ...styles.name, ...sized.name };
+  const router = useRouter();
+  // Märkesraden öppnar varumärkets profil om det finns en (brief 65, tillägg);
+  // trycket tas av raden och öppnar inte produkten. Annars vanlig text.
+  const brandProfile = getRetailerForBrand(brand);
 
   // Betygsraden radbryts aldrig (brief 60): får den inte plats utelämnas
   // antalet omdömen. Mäts mot radens bredd och lövgruppens slut.
@@ -59,9 +65,24 @@ export default function ProductCardText({
     <View style={styles.block}>
       {/* Märke, namn och pris tätt ihop (brief 62); betygsraden efter. */}
       <View style={styles.titleGroup}>
-        <Text style={styles.brand} numberOfLines={1}>
-          {brand}
-        </Text>
+        {brandProfile ? (
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel={`${brand}, öppna profil`}
+            // Större tryckyta än texten, men inte ned över namnet (textGap mellan raderna).
+            hitSlop={{ top: spacing.sm, bottom: productCard.textGap, left: spacing.sm, right: spacing.lg }}
+            onPress={() => router.push({ pathname: '/partner/[id]', params: { id: brandProfile.id } })}
+            style={({ pressed }) => [styles.brandLink, pressed && styles.brandPressed]}
+          >
+            <Text style={styles.brand} numberOfLines={1}>
+              {brand}
+            </Text>
+          </Pressable>
+        ) : (
+          <Text style={styles.brand} numberOfLines={1}>
+            {brand}
+          </Text>
+        )}
         <NameWithSave
           name={name}
           nameStyle={nameStyle}
@@ -134,6 +155,14 @@ const useStyles = makeStyles((t) => ({
   brand: {
     ...typography.label,
     color: t.colors.textSecondary,
+  },
+  // Bara textens bredd är tryckbar (plus hitSlop), inte hela raden.
+  brandLink: {
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
+  },
+  brandPressed: {
+    opacity: motion.disabledOpacity,
   },
   name: {
     ...typography.body,
