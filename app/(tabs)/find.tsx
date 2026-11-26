@@ -4,7 +4,7 @@
 // Alla tre hyllor har "Visa fler" (Idéer, Alla kategorier, Alla områden; brief 54).
 // Dialogen (tidigare chatten här) är en egen stackskärm: app/dialog.tsx.
 // Brief 66: hyllan "Tidigare" (senaste dialoger och sökningar, Visa fler → Arkiv).
-import { ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing, radius, findCards } from '../../theme';
@@ -33,12 +33,6 @@ export default function FindScreen() {
   const router = useRouter();
   const styles = useStyles();
   const { entries } = useArchive();
-  const { width } = useWindowDimensions();
-  const categoryWidth = Math.min(
-    findCards.category.width,
-    (width - spacing.screenMargin * 2 - spacing.gutter * (CATEGORY_LIMIT - 1)) / CATEGORY_LIMIT,
-  );
-  const categoryHeight = (categoryWidth * findCards.category.height) / findCards.category.width;
   const recent = entries.slice(0, RECENT_SHOWN);
 
   return (
@@ -92,20 +86,20 @@ export default function FindScreen() {
             cta={{ onPress: () => router.push('/categories') }}
             style={styles.sectionTitle}
           />
-          {/* Högst fyra kategorikort i datans ordning, som delar på bredden (samma
-              bildformat som findCards.category); resten i Alla kategorier. */}
-          <View style={styles.categoryRow}>
+          {/* Högst fyra kategorikort i datans ordning (109 × 150), raden rullar i
+              sidled och det fjärde syns delvis; resten i Alla kategorier. */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
             {CATEGORIES.slice(0, CATEGORY_LIMIT).map((c) => (
               <EditorialCard
                 key={c.id}
                 variant="portraitSmall"
-                size={{ width: categoryWidth, height: categoryHeight, radius: radius.editorialSmall }}
+                size={{ ...findCards.category, radius: radius.editorialSmall }}
                 title={c.name}
                 imageUrl={c.image}
                 onPress={() => router.push({ pathname: '/category/[id]', params: { id: c.id } })}
               />
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         <View style={styles.section}>
@@ -154,8 +148,7 @@ const useStyles = makeStyles((t) => ({
     gap: spacing.gutter,
   },
   categoryRow: {
-    flexDirection: 'row',
-    paddingHorizontal: spacing.screenMargin,
-    gap: spacing.gutter,
+    paddingHorizontal: findCards.categoryRowMargin,
+    gap: findCards.categoryGap,
   },
 }));

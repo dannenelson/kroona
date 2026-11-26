@@ -196,6 +196,9 @@ export const followFeed = {
 export const findCards = {
   idea: { width: 240, height: 160 },
   category: { width: 109, height: 150 },
+  /** Kategoriraden på Hitta rullar i sidled: egen sidomarginal och kortavstånd. */
+  categoryRowMargin: 20,
+  categoryGap: 12,
   areaHeight: 92,
   /** Förstoringsglaset före idékortets titel. */
   ideaIcon: 16,
