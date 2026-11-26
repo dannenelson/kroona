@@ -1,93 +1,86 @@
 # Kroona — Plan
 
-*En sida. Svarar på "vad jobbar vi med nu, och vad kommer sen". Uppdateras när något ändras, aldrig med nya idéer (de går till `idebank`). Senast: 2026-11-19.*
+*En sida. Svarar på "vad jobbar vi med nu, och vad kommer sen". Uppdateras när något ändras, aldrig med nya idéer (de går till `idebank`). Senast: 2026-11-26.*
 
 ## Mål för Fas 0 (bekräftat 2026-11-17)
 Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-minuters genomgång av hela köpresan: **Hem → Produktdetalj → Samling → Sparat**, plus Hitta och Följer.
 
-**Klart när:** de fyra tabbarna och tre detaljvyer (Produkt, Samling, Partner) är byggda på 56 dummyprodukter, i både mörkt och ljust tema, utan att API-nyckeln ligger i klienten.
+**Klart när:** de fyra tabbarna och tre detaljvyer (Produkt, Samling, Partner) är byggda på 56 dummyprodukter, i både mörkt och ljust tema, utan att API-nyckeln ligger i klienten. *(Katalogen är sedan brief 48 20 produkter med lokala bilder; flikarna, detaljvyerna och båda temana är byggda. Kvar: API-nyckeln.)*
 
 ## Nu — ett aktivt spår åt gången
 | # | Spår | Klart när |
 |---|---|---|
-| 0.1 | **Städa dokumenten** → tre levande dokument (Produkt, Design, Plan) | ✅ Skrivna och i repot. Kvar: arkivera gamla projektfiler, rätta minnet |
-| 0.2 | **Färsk repo-inventering** | ✅ Klar 2026-11-17, se "Kodläge" nedan |
-| 0.3 | **Designgrund** (tokens + komponenter, tvåskiktsmodell) | ✅ `design.md` skriven. Kvar: Claude Design-rebuild mot den |
+| 0.1–0.3 | Dokument, repo-inventering, designgrund | ✅ Klart 2026-11-17–19 |
+| 1 | **Fas 0-demot, skärm för skärm via briefer** (38–69 klara 2026-11-20–26) | Flikarna, detaljvyerna, Profil/Notiser/Inställningar och arkivet är byggda (se Kodläge). Pågår: polering via korta uppföljningar. Nästa brief väljer Daniel. |
 
-## Kodläge (inventerat 2026-11-17, commit `2ce6ed6`)
+## Kodläge (inventerat 2026-11-26, commit `08b05e0`)
 
 | Yta | Specat | Designat | Byggt |
 |---|---|---|---|
-| Hem | ✅ | 🚧 | 🟡 Gammal stil: tio sektioner, filter utan logik. Ingen hälsningshero eller glas. |
-| Följer | ✅ | ⬜ | 🟡 Grundversion (`feed.tsx`, ProductGrid) |
-| Hitta | ✅ | ⬜ | ✅ Fungerande chatt mot Claude API. Saknar länk till Produktdetalj, arkiv/ny chatt och tal. |
-| Sparat | ✅ | ⬜ | 🟡 Ny struktur byggd (brief 35): Mina samlingar \| Följer, Sparade produkter (hette Gillade produkter före brief 61), rader/kort, Följer i sektioner. Lägg till i samling och redigera kvar. |
-| Produktdetalj, Samling, Partner, Profil | ✅ | ⬜ | 🟡 Produkt- (+ lightbox), Samlings- och Partnerdetalj byggda. Profil parkerad. |
+| Hem | ✅ | ✅ | ✅ Topp med avatar (Profil), klocka (Notiser) och varierande hälsning (`lib/greetings.ts`), fältet "Vad är du intresserad av idag?", pillar (filtrerar inget än), hyllor: Fortsätt där du var (dialoger, sökningar och samling, senast använd, 240 × 160), Skapat för dig, Samlingar för dig (logotyp eller titel), Fler i din stil, Områden, Populära samlingar, Kanske intressant för dig. |
+| Följer | ✅ | ✅ | ✅ Pinterest-flöde (brief 59): följt och inspiration blandat, masonry / en kolumn, pillar som filtrerar, pull-to-refresh, tomläge. Dummylogik. |
+| Hitta | ✅ | ✅ | ✅ Sök, dialog och kategorier (brief 53–54). Hyllor Idéer, Tidigare (3 senaste) och Kategorier (fyra: Kläder, Möbler, Elektronik, Begagnat), Områden och stilar. Arkiv och Alla kategorier (3-kolumnsgrid). Dialoger och sökningar sparas lokalt och återupptas (brief 66). Kvar: jämförelse, röst. |
+| Sparat | ✅ | ✅ | ✅ Mina samlingar \| Följer, Sparade produkter, rader/kort. Egna samlingar: skapa, byt namn, redigera innehåll, ta bort (lokalt). Följ-ikoner efter typ och läge (brief 67). Kvar: ordning i samlingar, eget omslag (idébanken). |
+| Produkt-, Samlings-, Partner- och Profildetalj | ✅ | ✅ | ✅ Produktdetalj (+ lightbox, betyg under priset, rund Spara på namnraden, märket öppnar profilen). Samlings- och Partnerdetalj med gemensam hero (`ProfileHero`), parallax, antal vid rubrikerna; Partnerdetalj med områden och hållbarhet (brief 69). Profildetalj för personer (dummy). |
+| Profil, Notiser, Inställningar | ✅ | ✅ | ✅ Dummy (brief 64): egen profil, notiser med olästprick, inställningar med Ljust/Mörkt/System (sparas), dev-sidan. |
 | Onboarding | parkerad | — | — |
 
-**Fynd**
-1. **Datamodellen är den gamla.** `Product` är ett erbjudande (pris och nytt/begagnat ligger på produkten). Retailer och Offer saknas. 56 produkter finns.
-2. **Bara mörkt tema.** Ingen tema-provider, `userInterfaceStyle: dark`.
-3. **Bra utgångsläge för tokens:** bara 4 hex och 13 rgba utanför `constants/`. 20 av filerna använder redan `Colors`/`Spacing`, så migreringen till `theme/` blir liten.
-4. **Beroenden som saknas för designen:** `expo-blur` (glas) och Familjen Grotesk (Google Fonts-paket). UI-typsnitt blir Google Sans Flex (redan installerat, tillfällig grund). Animation (Reanimated/gestures) och `expo-image` är ej installerade och väntar tills en skärm behöver dem.
-5. **TypeScript:** inga fel (`tsc --noEmit`).
-6. **API-nyckeln ligger i klienten** (känd skuld). Modellnamnet i `claudeProxy.ts` (`claude-sonnet-5`) bör verifieras.
-7. **Skräp att städa:** `CardShowcase.tsx` är oanvänd, `ClusterCard` är omonterad, `test.json` i roten, och splash har vit bakgrund i en mörk app.
+**Fynd från inventeringen 2026-11-17 (läge nu)**
+1. ~~Datamodellen är den gamla~~ ✅ Produkt / Återförsäljare / Erbjudande sedan brief 12, katalogen 20 produkter sedan brief 48.
+2. ~~Bara mörkt tema~~ ✅ Ljust, mörkt och system (brief 64), `userInterfaceStyle: automatic`.
+3. ✅ Tokens i `theme/`.
+4. ✅ `expo-blur`, Familjen Grotesk och Reanimated installerade.
+5. `tsc --noEmit` utan fel.
+6. **API-nyckeln ligger i klienten** (kvar). `claude-sonnet-5` i `claudeProxy.ts` ej verifierat.
+7. Skräp kvar, se Teknisk skuld.
 
 ## Näst — i den här ordningen
-1a. ✅ **Tema** (`theme/`, typsnitt, migrering) — klart 2026-11-18, commit `d048031`. Besiktigas i Expo Go (mörkt och ljust).
-1a.5 ✅ **SDK-uppgradering 54 → 58** — klart 2026-11-18, commit `dcc94fb`. Besiktigas i Expo Go (kör `nvm use` först).
-1b. ✅ **Basskomponenter** godkända visuellt 2026-11-19 (brief 04–09, Apple-ren). Dev-sida `app/components.tsx` visar dem.
-1c. ✅ **Designriktning klar 2026-11-18: "Apple-ren"** (se design.md §0). Nästa: brief 04 (`docs/briefs/04-apple-ren-komponenter.md`) bygger om basskomponenterna (accentlösa states, TextTabs, långt tryck-meny, kantblur, squircle). Ursprunglig frågelista nedan, besvarad i design.md.
-    **Designriktning, skärmar före komponenter.** Tre hela skärmar (Hem, Produktdetalj, Samling) med riktiga foton i 2–3 stilriktningar i Claude Design. Daniel väljer visuellt. Komponenter härleds sedan från det godkända och justerar 1b. Frågor som ska avgöras här:
-    - Spara: dölj åtgärder i en meny vid långt tryck (Pinterest/Apple-mönster) i stället för en knapp per kort?
-    - Accentfärgen (guld) känns osäker. Behåll, justera eller byt?
-    - Ikonstil (hörn, linjevikt), glas och kanter i ljust läge, scrim, kortens form.
-    - Referenser: Apple, Pinterest, Spotify.
-2. **Datamodell i koden** (brief 12, `docs/briefs/12-datamodell.md`): Produkt / Återförsäljare / Erbjudande (koden speglar troligen den gamla modellen). Lägg in "följbar" för återförsäljare, samling och område.
-3. ✅ **Produktdetalj** (brief 13–18) — klar, enhetstest godkänt 2026-11-19. Hierarkirörelsen (zoom från kortet, stängning med swipe ned/kantswipe, ett steg bakom) är en del av den, se design.md §8c.
-3b. ✅ **Lightbox** på hero (brief 19) — klar i kod 2026-11-19, enhetstest av gester återstår.
-3c. ✅ **Samlingsdetalj** (brief 28) — byggd 2026-11-20, gester och zoom kräver enhetstest.
-3d. ✅ **Partnerdetalj + kurator på samlingar** (brief 29) — byggd 2026-11-20, gester kräver enhetstest.
-3e. ✅ **Sparat del 1** (brief 32) — byggd 2026-11-20.
-3f. ✅ **Sheet, Button och Snackbar + Skapa samling** (brief 33) — byggd 2026-11-20.
-3g. ✅ **Sparat-omstrukturering** (brief 35) — byggd 2026-11-20.
-3h. ✅ **Lägg till i samling** (brief 36) — byggd 2026-11-20.
-3i. ✅ **Personer i Följer + Profildetalj** (brief 37, dummy) — byggd 2026-11-20.
-3j. **Nästa:** redigera/döp om/radera samling och ta bort produkt ur samling (samlingsvyn).
-4. **Sparat** med egna samlingar och följda (AsyncStorage)
-5. **Hem** (hyllor) i ny design, sedan **Följer** (det man följer) och **Hitta** (dialog och urval). Masonry flyttar till Samlings- och Partnerdetalj.
-6. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning
+1. ✅ Tema, SDK 58, baskomponenter, designriktning "Apple-ren" (2026-11-18–19).
+2. ✅ Datamodell i koden (brief 12, katalog brief 48).
+3. ✅ Detaljvyer: Produkt (13–22, 60, 62), Samling (28, 65), Partner (29, 65, 69), Profildetalj (37).
+4. ✅ Sparat (32–42, 61, redigera egna samlingar 2026-11-26).
+5. ✅ Hem (43–51, 63), Följer (59), Hitta (53–54, 66).
+6. ✅ Profil, Notiser, Inställningar (64). Ikonsystem (56–58, 67).
+7. **Demo-redo:** API-nyckel bakom proxy, telefonbygge för visning, enhetstest av gester (zoom, swipe, lightbox, långt tryck, växlar).
+8. **Spec v1.20:** gå igenom `docs/spec-forslag.md` med Daniel (beslut B1–B3).
 
 ## Teknisk skuld (ingen brådska, men inte glömd)
 - `npm audit`: 54 sårbarheter (1 kritisk). Kolla om den kritiska gäller något som hamnar i appen. Kör inte `audit fix --force`.
-- `@react-navigation/native` och `bottom-tabs` ligger kvar i `package.json` men används inte. Kan tas bort.
+- `@react-navigation/native` och `bottom-tabs` ligger kvar i `package.json` men används inte direkt. Kan tas bort.
 - `react-native-svg-transformer` hittar Metro-konfigen bara på ett visst ställe i `node_modules`. Kraschar Metro efter en framtida installation behövs en egen transformer.
-- API-nyckeln i klienten, `claude-sonnet-5` i `claudeProxy.ts` ska verifieras, `test.json`, oanvända `CardShowcase` och `ClusterCard`.
+- API-nyckeln i klienten, `claude-sonnet-5` i `claudeProxy.ts` ska verifieras, `test.json` i roten.
+- Oanvända komponenter: `CardShowcase`, `ClusterCard`, `ContinueDialogRow`, `DiscoveryPreviewCard`, `DiscoveryMosaicCard`, `HeroRow`, `DiscoverBrandsRow` (bara dess hook används), `CollectionRow`.
+- Vågkantkoden i `EdgeFade`/`theme/glass.ts` och dev-växlarna (avskriven 2026-11-19).
+- `TEMP-DEBUG-GEST` (gestdiagnos bakom `__DEV__`) i `app/product/[id].tsx` och dev-sidan: ta bort när gesterna är godkända på enhet.
+- Tokens `success`/`warning`/`successSubtle` används bara av dialogen, `CardShowcase` och `ClusterCard`.
+- `app.json` saknar `scheme` (varning från Linking i Metro).
+- Oanvänd import `Image` i `app/product/[id].tsx`.
+- `ProductGrid` lägger varannan produkt i varje kolumn (inte kortaste kolumn, som Följers masonry).
+- Fem produkter har tillfälligt långa testnamn (`// TESTDATA` i `data/products.ts`).
+- Expo Gos lagring delas mellan utvecklingsservrar: testdata och temaval från tester kan synas i Daniels app (rensas efter varje test).
 
 ## Senare — Fas 1 och framåt (byggs inte i Fas 0)
 Supabase-projekt och schema (collections, collection_items, follows) · konton · följa andra användare och Profildetalj · riktig personalisering · tracking och provision · första riktiga återförsäljaren · admin för handlare · DPP
 
 ## Öppna beslut
 - [x] Mål och "klart när" bekräftade (2026-11-17)
-- [ ] Hosting: Supabase i Fas 1, och proxyn för API-nyckeln i 0.6 eller tidigare?
+- [ ] Hosting: Supabase i Fas 1, och proxyn för API-nyckeln före demo?
 - [ ] Schemajämförelse (researchloggen) före Fas 1
 - [x] "Område" = kategori eller stil med kurerat innehåll (2026-11-18)
 - [x] Filterstil: text-flikar med understrykning (2026-11-18). Pillar behålls med annan funktion, se design.md avsnitt 11
 - [ ] Ljust glas över ren yta syns inte: använd surface + kant + skugga där, glas bara över foto?
-- [x] FilterPills 36 px: försvinner som problem när filter blir text-flikar (44 px höga)
 - [x] Pillens funktion: byter innehåll överst på Hem. Text-flikar filtrerar i listor (2026-11-18)
-- [ ] Ljust foto-glas ser fel ut över mörka bilder i ljust tema (Daniel, 2026-11-18). Pausat, tweakas visuellt senare. Idéer: lägre alfa med mörk tint, eller tunn scrim bakom glaset.
-- [x] Vågig toppkant: avskriven 2026-11-19 (Daniel). iOS-blur klipps hårt av mask och gav en synlig kant trots tre försök (brief 08, 10, 11). Rak EdgeFade gäller. Kvar att städa: vågkoden i EdgeFade/theme och växlarna på dev-sidan.
-- [ ] Sidan bakom syns ett steg (godkänt 2026-11-19). Kantswipe: inget att ändra på utseendet.
-- [ ] Rensa vågkant-koden och dev-växlarna (EdgeFade, `theme/glass.ts`, dev-sidan).
+- [ ] Ljust foto-glas över mörka bilder i ljust tema (Daniel, 2026-11-18). Pausat, bedöms på enhet.
+- [x] Vågig toppkant: avskriven 2026-11-19. Kvar att städa (se Teknisk skuld).
+- [x] Toppen på sidor med bild överst: bara blur, svag statusfältstint i mörkt läge (2026-11-26, design.md §3).
 - [ ] Ersätt iOS native top edge effect på flikskärmarna (`scrollEdgeEffects.top: 'hidden'`) med egen EdgeFade.
-- [ ] Tokens `success`/`warning`/`successSubtle`: används bara av Hitta, CardShowcase och ClusterCard. Städas med dem.
-- [ ] Initialkrock "AV" (Ateljé Väst / Andra Varvet).
-- [ ] Ljust foto-glas över mörk bild bedöms på enhet.
+- [ ] Initialkrock "AV" (Ateljé Väst / Andra Varvet) — gäller den gamla katalogen, troligen inaktuell.
 - [ ] Looken A i Claude Design saknar Produktdetalj-avvikelserna (design.md §8b).
-- [ ] Hitta: hur ser dialog med urval och jämförelse ut? (designfråga när Hitta är på tur)
-- [ ] Ska ia-karta och wireframes justeras till de nya flikrollerna?
+- [ ] Hitta: hur ser urval och jämförelse ut i dialogen?
+- [x] ia-karta och wireframes justerade till flikrollerna (2026-11-26).
+- [ ] Spec v1.20: hållbarhetsindex när data saknas (dölj eller "Ej redovisat"), betyg, Elektronik som kategori (`docs/spec-forslag.md`, B1–B3).
+- [ ] Fyllda former i `company-add`/`company-check` (avsiktligt eller rita om som linjer?), rapport 67.
+- [ ] Ska förvalt följda områden (`defaultFollowed`) användas? I dag följs alla Kroona-samlingar förvalt men inga områden.
 
 ## Spelregler
 1. **Ett spår åt gången.** Nytt spår startar när det gamla är klart eller uttryckligen pausat.
