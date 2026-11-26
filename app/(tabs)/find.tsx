@@ -20,7 +20,10 @@ import { useArchive } from '../../context/ArchiveContext';
 import ArchiveRow from '../../components/ArchiveRow';
 
 // Hyllan Tidigare visar så många poster; resten i Arkiv.
-const RECENT_SHOWN = 4;
+const RECENT_SHOWN = 3;
+
+// Kategorihyllan visar högst så många kort.
+const CATEGORY_LIMIT = 4;
 
 // Hittas grid visar sex områden; resten nås via "Visa fler" (Alla områden, brief 54).
 const AREA_LIMIT = 6;
@@ -83,8 +86,10 @@ export default function FindScreen() {
             cta={{ onPress: () => router.push('/categories') }}
             style={styles.sectionTitle}
           />
-          <View style={styles.categoryRow}>
-            {CATEGORIES.map((c) => (
+          {/* Högst fyra kategorikort, i datans ordning; resten i Alla kategorier.
+              Rullar i sidled om fyra inte ryms. */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryRow}>
+            {CATEGORIES.slice(0, CATEGORY_LIMIT).map((c) => (
               <EditorialCard
                 key={c.id}
                 variant="portraitSmall"
@@ -94,7 +99,7 @@ export default function FindScreen() {
                 onPress={() => router.push({ pathname: '/category/[id]', params: { id: c.id } })}
               />
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         <View style={styles.section}>

@@ -10,6 +10,8 @@ import type { UserCollection } from '../types/catalog';
 const STORAGE_KEY = '@kroona/userCollections';
 /** Senast öppnade egna samling (brief 43, hyllan "Fortsätt där du var" på Hem). */
 const LAST_OPENED_KEY = '@kroona/lastOpenedCollection';
+/** När den senast öppnades (ms), för ordningen i "Fortsätt där du var". Saknas för äldre data. */
+const LAST_OPENED_AT_KEY = '@kroona/lastOpenedCollectionAt';
 
 /** Id för "Sparade produkter" i routes (`/collection/saved`, samma vy som samlingar). */
 export const ALL_SAVED_ID = 'saved';
@@ -27,6 +29,8 @@ type UserCollectionsContextValue = {
   removeProductFromCollection: (collectionId: string, productId: string) => void;
   /** Senast öppnade egna samling, om den finns kvar (brief 43). */
   lastOpenedCollection: UserCollection | undefined;
+  /** Tidpunkt (ms) då den senast öppnades; 0 om den öppnades innan tiden sparades. */
+  lastOpenedAt: number;
   /** Anropas när en egen samling öppnas i Samlingsdetalj. */
   markCollectionOpened: (collectionId: string) => void;
 };
@@ -37,6 +41,7 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
   const [collections, setCollections] = useState<UserCollection[]>([]);
   const [isHydrated, setIsHydrated] = useState(false);
   const [lastOpenedId, setLastOpenedId] = useState<string | null>(null);
+  const [lastOpenedAt, setLastOpenedAt] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -44,6 +49,7 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
         if (raw) setCollections(JSON.parse(raw));
         setLastOpenedId(await AsyncStorage.getItem(LAST_OPENED_KEY));
+        setLastOpenedAt(Number(await AsyncStorage.getItem(LAST_OPENED_AT_KEY)) || 0);
       } catch (error) {
         console.warn('Kunde inte läsa egna samlingar från AsyncStorage', error);
       } finally {
@@ -91,10 +97,13 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
   const getUserCollection = (id: string) => collections.find((c) => c.id === id);
 
   const markCollectionOpened = useCallback((collectionId: string) => {
+    const at = Date.now();
     setLastOpenedId(collectionId);
-    AsyncStorage.setItem(LAST_OPENED_KEY, collectionId).catch((error) =>
-      console.warn('Kunde inte spara senast öppnade samling', error),
-    );
+    setLastOpenedAt(at);
+    AsyncStorage.multiSet([
+      [LAST_OPENED_KEY, collectionId],
+      [LAST_OPENED_AT_KEY, String(at)],
+    ]).catch((error) => console.warn('Kunde inte spara senast öppnade samling', error));
   }, []);
 
   return (
@@ -106,6 +115,7 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
         addProductToCollection,
         removeProductFromCollection,
         lastOpenedCollection: lastOpenedId ? collections.find((c) => c.id === lastOpenedId) : undefined,
+        lastOpenedAt,
         markCollectionOpened,
       }}
     >
