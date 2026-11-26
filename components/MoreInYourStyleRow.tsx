@@ -4,6 +4,7 @@ import { RETAILERS } from '../data/retailers';
 import { PEOPLE } from '../data/people';
 import { useFollowedPeople } from '../context/FollowedPeopleContext';
 import { useDiscoverBrandTiles } from './DiscoverBrandsRow';
+import { hasSustainability } from './partner/SustainabilitySection';
 import SectionTitle from './SectionTitle';
 import ProfileCard from './ProfileCard';
 
@@ -17,6 +18,8 @@ type Circle =
  * här. Varumärkena väljs som i DiscoverBrandsRow (i din följda stil, inte redan
  * följda); personerna är de du inte följer än. Tryck öppnar Partnerdetalj
  * respektive profil. Hyllan döljs om inget finns.
+ * Brief 69: företag med hållbarhetsdata (DUMMYDATA, i dag Återbruket och
+ * Budrummet) ligger först, så att hållbarhetssektionen går att hitta i demot.
  */
 export default function MoreInYourStyleRow() {
   const brandTiles = useDiscoverBrandTiles();
@@ -36,8 +39,12 @@ export default function MoreInYourStyleRow() {
     personId: p.id,
   }));
 
-  // Blanda: varannan varumärke, varannan person, resten sist.
-  const circles: Circle[] = [];
+  const withSustainability: Circle[] = RETAILERS.filter(hasSustainability)
+    .filter((r) => !brands.some((b) => b.kind === 'brand' && b.partnerId === r.id))
+    .map((r) => ({ kind: 'brand', key: `r-${r.id}`, name: r.name, initial: r.initial, partnerId: r.id }));
+
+  // Först företag med hållbarhetsdata, sedan varannan varumärke, varannan person, resten sist.
+  const circles: Circle[] = [...withSustainability];
   for (let i = 0; i < Math.max(brands.length, people.length); i++) {
     if (brands[i]) circles.push(brands[i]);
     if (people[i]) circles.push(people[i]);
