@@ -138,6 +138,8 @@ export const tabBar = {
 /** Hem-toppen (brief 46, 49, 51): toppraden 44, avatar 40, logotyp 12 (™ visas från 40),
  *  filterpillar 36. */
 export const homeHeader = {
+  /** Hälsningen krymps hellre än bryts (en rad); minsta skala för de längsta raderna. */
+  greetingMinScale: 0.7,
   rowHeight: 44,
   avatar: 40, // 32 före brief 51
   logoHeight: 12,

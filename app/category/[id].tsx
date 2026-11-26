@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, typography, spacing, radius, iconSize, findCards } from '../../theme';
+import EdgeFade from '../../components/EdgeFade';
 import ScreenHeader from '../../components/ScreenHeader';
 import FilterPills from '../../components/FilterPills';
 import ProductGrid from '../../components/ProductGrid';
@@ -37,8 +38,9 @@ export default function CategoryScreen() {
   const shown = products.filter(active.match);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}>
+    <View style={styles.container}>
+      {/* Innehållet skrollar bakom statusfältet under den gemensamma kantblurren (EdgeFade). */}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + spacing.xxl }}>
         <ScreenHeader title={category.name}>
           <View style={styles.actionRow}>
             <Pressable
@@ -66,6 +68,7 @@ export default function CategoryScreen() {
           <ProductGrid products={shown} compact />
         </View>
       </ScrollView>
+      <EdgeFade position="top" />
     </View>
   );
 }

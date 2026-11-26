@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, spacing, radius, findCards } from '../theme';
 import { CATEGORIES } from '../data/categories';
+import EdgeFade from '../components/EdgeFade';
 import ScreenHeader from '../components/ScreenHeader';
 import EditorialCard from '../components/EditorialCard';
 
@@ -23,8 +24,9 @@ export default function CategoriesScreen() {
   const cardWidth = (width - spacing.screenMargin * 2 - spacing.gutter * (COLUMNS - 1)) / COLUMNS;
   const cardHeight = (cardWidth * findCards.category.height) / findCards.category.width;
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}>
+    <View style={styles.container}>
+      {/* Innehållet skrollar bakom statusfältet under den gemensamma kantblurren (EdgeFade). */}
+      <ScrollView contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + spacing.xxl }}>
         <ScreenHeader title="Kategorier" />
         <View style={styles.grid}>
           {SORTED.map((c) => (
@@ -39,6 +41,7 @@ export default function CategoriesScreen() {
           ))}
         </View>
       </ScrollView>
+      <EdgeFade position="top" />
     </View>
   );
 }

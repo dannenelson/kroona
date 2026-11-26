@@ -3,6 +3,7 @@
 import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, spacing } from '../theme';
+import EdgeFade from '../components/EdgeFade';
 import ScreenHeader from '../components/ScreenHeader';
 import AreaGrid from '../components/AreaGrid';
 
@@ -10,13 +11,15 @@ export default function AreasScreen() {
   const insets = useSafeAreaInsets();
   const styles = useStyles();
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}>
+    <View style={styles.container}>
+      {/* Innehållet skrollar bakom statusfältet under den gemensamma kantblurren (EdgeFade). */}
+      <ScrollView contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + spacing.xxl }}>
         <ScreenHeader title="Områden och stilar" />
         <View style={styles.grid}>
           <AreaGrid />
         </View>
       </ScrollView>
+      <EdgeFade position="top" />
     </View>
   );
 }

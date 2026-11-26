@@ -3,17 +3,11 @@ import { useRouter } from 'expo-router';
 import { useNotifications } from '../context/NotificationsContext';
 import { makeStyles, typography, spacing, touchTarget, iconSize, homeHeader } from '../theme';
 import { DUMMY_USER } from '../data/user';
+import { sessionGreetingFor } from '../lib/greetings';
 import Avatar from './Avatar';
 import KroonaLogo from './KroonaLogo';
 import NotificationIcon from './NotificationIcon';
 
-/** "God morgon" 05–11, "God eftermiddag" 12–17, annars "God kväll". */
-export function greetingFor(date: Date): string {
-  const h = date.getHours();
-  if (h >= 5 && h < 12) return 'God morgon';
-  if (h >= 12 && h < 18) return 'God eftermiddag';
-  return 'God kväll';
-}
 
 /**
  * Hem-toppen (brief 46): toppraden 44 med avatar (initialer), Kroona-logotypen
@@ -51,8 +45,10 @@ export default function Header() {
           <NotificationIcon size={iconSize.lg} unread={hasUnread} />
         </Pressable>
       </View>
-      <Text style={styles.greeting}>
-        {greetingFor(new Date())}, {DUMMY_USER.name}
+      {/* Varierande hälsning (lib/greetings.ts), samma hela sessionen; alltid en rad,
+          en lång rad krymps hellre än bryts. */}
+      <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={homeHeader.greetingMinScale}>
+        {sessionGreetingFor(DUMMY_USER.name)}
       </Text>
     </View>
   );

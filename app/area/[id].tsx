@@ -7,6 +7,7 @@ import { ScrollView, Text, View } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, typography, spacing } from '../../theme';
+import EdgeFade from '../../components/EdgeFade';
 import ScreenHeader from '../../components/ScreenHeader';
 import ProductGrid from '../../components/ProductGrid';
 import Pill from '../../components/Pill';
@@ -35,8 +36,9 @@ export default function AreaScreen() {
   const followed = isFollowed(area.id);
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}>
+    <View style={styles.container}>
+      {/* Innehållet skrollar bakom statusfältet under den gemensamma kantblurren (EdgeFade). */}
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingTop: insets.top, paddingBottom: insets.bottom + spacing.xxl }}>
         <ScreenHeader title={area.name}>
           <Text style={styles.description}>{area.description}</Text>
           <View style={styles.metaRow}>
@@ -50,6 +52,7 @@ export default function AreaScreen() {
           <ProductGrid products={products} compact />
         </View>
       </ScrollView>
+      <EdgeFade position="top" />
     </View>
   );
 }
