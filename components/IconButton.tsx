@@ -11,6 +11,9 @@ type Props = {
   name: IconName;
   accessibilityLabel: string;
   onPress?: () => void;
+  /** Valfritt långt tryck (t.ex. Spara → "Spara i …"), med lätt haptik. */
+  onLongPress?: () => void;
+  accessibilityHint?: string;
   selected?: boolean;
   disabled?: boolean;
   /** 'theme', 'photo' eller 'plain', se Glass. */
@@ -31,6 +34,8 @@ export default function IconButton({
   name,
   accessibilityLabel,
   onPress,
+  onLongPress,
+  accessibilityHint,
   selected = false,
   disabled = false,
   tone = 'theme',
@@ -62,12 +67,22 @@ export default function IconButton({
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
       accessibilityState={{ selected, disabled }}
       disabled={disabled}
       onPress={() => {
         haptic.light();
         onPress?.();
       }}
+      delayLongPress={motion.longPressMs}
+      onLongPress={
+        onLongPress
+          ? () => {
+              haptic.light();
+              onLongPress();
+            }
+          : undefined
+      }
       onPressIn={press.onPressIn}
       onPressOut={press.onPressOut}
       style={[

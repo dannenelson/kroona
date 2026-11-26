@@ -225,7 +225,14 @@ export default function ProductScreen() {
         <Reanimated.View style={revealStyle}>
           <View style={styles.info}>
             <Text style={styles.brand}>{product.brand}</Text>
-            <Text style={styles.name}>{product.name}</Text>
+            {/* Namnet och Spara på samma rad, överjusterade (brief 69). Namnet
+                radbryter före knappen och går aldrig under den. */}
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{product.name}</Text>
+              <View style={styles.save}>
+                <SaveButton productId={product.id} />
+              </View>
+            </View>
             <View style={styles.priceRow}>
               <View style={styles.priceBlock}>
                 {data.lowest !== undefined && (
@@ -237,7 +244,6 @@ export default function ProductScreen() {
                 )}
                 {data.lowestIsUsed && <Text style={styles.usedTag}>Begagnat</Text>}
               </View>
-              <SaveButton productId={product.id} />
             </View>
             {/* Betyg direkt under namn och pris (brief 62), samma dämpade stil som
                 på produktkortet. Inget betyg: ingen rad. Inte tryckbart i Fas 0. */}
@@ -252,7 +258,7 @@ export default function ProductScreen() {
             )}
           </View>
 
-          <SectionTitle title="Hållbarhet" style={styles.sectionTitle} />
+          <SectionTitle title="Hållbarhet" style={[styles.sectionTitle, styles.firstSectionTitle]} />
           <FactList facts={facts} />
 
           {data.used.length > 0 && (
@@ -390,17 +396,25 @@ const useStyles = makeStyles((t) => ({
     ...typography.label,
     color: t.colors.textSecondary,
   },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
   name: {
     ...typography.title1,
     color: t.colors.textPrimary,
+    flex: 1,
+    minWidth: 0,
+  },
+  // Knappen (44) är högre än en namnrad (30): överskottet hänger ned bredvid
+  // priset i stället för att göra namnraden högre.
+  save: {
+    marginBottom: typography.title1.lineHeight - touchTarget,
   },
   priceRow: {
-    marginTop: spacing.md,
     flexDirection: 'row',
-    flexWrap: 'wrap',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
   },
   priceBlock: {
     flexDirection: 'row',
@@ -443,6 +457,10 @@ const useStyles = makeStyles((t) => ({
     paddingHorizontal: spacing.screenMargin,
     paddingTop: spacing.xxl,
     paddingBottom: spacing.sm,
+  },
+  // Hållbarhet direkt efter textblocket: tätare än mellan sektionerna (brief 69).
+  firstSectionTitle: {
+    paddingTop: spacing.xl,
   },
   group: {
     marginHorizontal: spacing.screenMargin,

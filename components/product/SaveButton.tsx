@@ -1,74 +1,24 @@
 import { useSaveActions } from '../saved/SaveSheet';
-import { Animated, Pressable, StyleSheet, Text } from 'react-native';
-import { makeStyles, useTheme, typography, fonts, spacing, radius, motion, touchTarget, iconSize } from '../../theme';
-import { usePressAnimation } from '../../hooks/usePressAnimation';
-import { usePop } from '../../hooks/usePop';
-import { haptic } from '../../utils/haptic';
-import Icon from '../Icon';
+import IconButton from '../IconButton';
 
 /**
- * Spara-knappen på Produktdetalj (brief 13, 40, 41): tryck = snabbspar till
- * Sparade produkter, långt tryck = kortet "Spara i …" (useSaveActions).
- * Bokmärke, fyllt när produkten ligger i Sparade produkter eller någon samling; ytan
- * inverteras inte (beslutad avvikelse från designen). Pop vid sparande,
- * lätt haptik, animerad press. Använder befintliga SavedProductsContext.
+ * Spara-knappen på Produktdetalj (brief 13, 40, 41, 69): rund ikonknapp med
+ * bara bokmärket, samma storlek och glasstil som toppens tillbaka/dela
+ * (`IconButton`, 44). Står på raden med produktnamnet. Tryck = snabbspar till
+ * Sparade produkter (snackbar enligt brief 61), långt tryck = kortet
+ * "Spara i …" (useSaveActions). Bokmärket är fyllt när produkten ligger i
+ * Sparade produkter eller någon samling, med pop och lätt haptik.
  */
 export default function SaveButton({ productId }: { productId: string }) {
-  const { colors } = useTheme();
-  const styles = useStyles();
-  const { saved, quickSave, openSheet } = useSaveActions(productId);
-  const press = usePressAnimation(motion.pressedScale);
-  const pop = usePop(saved);
-
+  const { saved, inSavedProducts, quickSave, openSheet } = useSaveActions(productId);
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityState={{ selected: saved }}
-      accessibilityLabel={saved ? 'Spara, sparad' : 'Spara'}
+    <IconButton
+      name="bookmark"
+      selected={saved}
+      accessibilityLabel={inSavedProducts ? 'Sparad' : 'Spara'}
       accessibilityHint="Håll in för att spara i en samling"
-      onPress={() => {
-        haptic.light();
-        quickSave();
-      }}
-      delayLongPress={motion.longPressMs}
-      onLongPress={() => {
-        haptic.light();
-        openSheet();
-      }}
-      onPressIn={press.onPressIn}
-      onPressOut={press.onPressOut}
-    >
-      <Animated.View style={[styles.button, press.scaleStyle]}>
-        <Animated.View
-          style={[StyleSheet.absoluteFill, styles.pressed, { opacity: press.progress }]}
-        />
-        <Animated.View style={{ transform: [{ scale: pop }] }}>
-          <Icon name="bookmark" filled={saved} color={colors.textPrimary} size={iconSize.md} />
-        </Animated.View>
-        <Text style={styles.label}>Spara</Text>
-      </Animated.View>
-    </Pressable>
+      onPress={quickSave}
+      onLongPress={openSheet}
+    />
   );
 }
-
-const useStyles = makeStyles((t) => ({
-  button: {
-    minHeight: touchTarget,
-    paddingLeft: spacing.md,
-    paddingRight: spacing.lg,
-    borderRadius: radius.full,
-    overflow: 'hidden',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    backgroundColor: t.colors.surfaceRaised,
-  },
-  pressed: {
-    backgroundColor: t.colors.pressed,
-  },
-  label: {
-    ...typography.body,
-    fontFamily: fonts.ui500,
-    color: t.colors.textPrimary,
-  },
-}));
