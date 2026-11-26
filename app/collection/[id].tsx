@@ -25,6 +25,7 @@ import { ALL_SAVED_ID, ALL_SAVED_NAME, useUserCollections } from '../../context/
 import { PRODUCTS } from '../../data/products';
 import CollectionMosaic from '../../components/CollectionMosaic';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
+import { useParallaxHero } from '../../hooks/useParallaxHero';
 import { COLLECTION_BOUNDARY_GROUP } from '../../components/product/productTransition';
 import TopBar from '../../components/TopBar';
 import EdgeFade from '../../components/EdgeFade';
@@ -162,6 +163,7 @@ export default function CollectionScreen() {
   const onScroll = useAnimatedScrollHandler((e) => {
     scrollY.value = e.contentOffset.y;
   });
+  const parallaxStyle = useParallaxHero(scrollY, coverHeight);
   const titleStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollY.value, [threshold - spacing.xl, threshold], [0, 1], Extrapolation.CLAMP),
   }));
@@ -211,14 +213,17 @@ export default function CollectionScreen() {
           group={COLLECTION_BOUNDARY_GROUP}
           style={[styles.cover, { width, height: coverHeight }]}
         >
-          {collection.imageUrl ? (
-            <Image source={{ uri: collection.imageUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
-          ) : (
-            <CollectionMosaic
-              images={products.slice(0, 4).map((p) => p.imageUrl)}
-              style={{ width, height: coverHeight }}
-            />
-          )}
+          {/* Parallax (brief 65): bilden glider bakom innehållet och skalas vid överscroll. */}
+          <Reanimated.View style={[{ width, height: coverHeight }, parallaxStyle]}>
+            {collection.imageUrl ? (
+              <Image source={{ uri: collection.imageUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
+            ) : (
+              <CollectionMosaic
+                images={products.slice(0, 4).map((p) => p.imageUrl)}
+                style={{ width, height: coverHeight }}
+              />
+            )}
+          </Reanimated.View>
           <LinearGradient
             colors={overlay.scrimStops.colors}
             locations={overlay.scrimStops.locations}
@@ -324,9 +329,11 @@ const useStyles = makeStyles((t) => ({
     ...typography.display,
     color: overlay.onPhoto,
   },
+  // Temats bakgrund: hero-bilden glider in bakom innehållet (parallax).
   body: {
     paddingTop: spacing.lg,
     gap: spacing.md,
+    backgroundColor: t.colors.bg,
   },
   metaRow: {
     flexDirection: 'row',

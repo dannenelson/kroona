@@ -32,6 +32,19 @@ export const RETAILER_LOGOS: Record<string, LogoComponent> = {
   'store-royal-design': RoyalDesign,
 };
 
+/**
+ * Hur stor del av 90 × 45-ramen logotypens längsta synliga sida tar (brief 65),
+ * uppmätt ur filernas banor. BrandLogo skalar ramen så att den synliga
+ * logotypen blir lika stor oavsett hur mycket luft filen har.
+ */
+export const RETAILER_LOGO_FILL: Record<string, number> = {
+  'brand-filippa-k': 0.59,
+  'brand-hm': 0.5,
+  'brand-lindex': 0.89,
+  'store-nordic-nest': 0.72,
+  'store-royal-design': 0.98,
+};
+
 /** Samling eller område (id) → vit logotyp som ersätter titeln på kort. */
 export const COLLECTION_LOGOS: Record<string, LogoComponent> = {
   '2': ScandinaviskDesign, // Skandinavisk stil

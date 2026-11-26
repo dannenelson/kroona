@@ -138,6 +138,12 @@ export const overlay = {
     ] as [string, string, ...string[]],
     locations: [0, 0.4, 0.65, 1] as [number, number, ...number[]],
   },
+  /** Svagare toning på Partnerdetaljens lägre hero (brief 65): kortare och
+   *  mjukare än scrimStops, slutar på 70 % (text på den är fortfarande vit). */
+  heroScrimSoft: {
+    colors: ['rgba(14,16,20,0)', 'rgba(14,16,20,0.35)', 'rgba(14,16,20,0.7)'] as [string, string, ...string[]],
+    locations: [0, 0.45, 1] as [number, number, ...number[]],
+  },
   /** Platta bakom återförsäljarlogotyper (brief 47): samma mörka yta i båda
    *  teman (ink850), eftersom flera logotyper är vita. Kant vit 12 %. */
   logoPlate: raw.ink850,

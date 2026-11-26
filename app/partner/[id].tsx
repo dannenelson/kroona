@@ -28,6 +28,8 @@ import {
 } from '../../data/collections';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
+import { useParallaxHero } from '../../hooks/useParallaxHero';
+import { getRetailerAreas } from '../../lib/retailerAreas';
 import { PARTNER_BOUNDARY_GROUP } from '../../components/product/productTransition';
 import TopBar from '../../components/TopBar';
 import EdgeFade from '../../components/EdgeFade';
@@ -36,8 +38,10 @@ import PartnerCard from '../../components/PartnerCard';
 import ProductGrid from '../../components/ProductGrid';
 import Pill from '../../components/Pill';
 
-// Lokalt layoutmått: cover i samma proportion som övriga detaljvyer (4:5).
+// Lokala layoutmått: covern var 4:5 som övriga detaljvyer; sedan brief 65
+// är den lägre, ca 60 % av den höjden, så att innehållet kommer högre upp.
 const COVER_ASPECT = 4 / 5;
+const COVER_HEIGHT_SHARE = 0.6;
 
 export default function PartnerScreen() {
   // `b` = boundary-id för det kort man öppnade från (zoomen går från/till det).
@@ -54,13 +58,14 @@ export default function PartnerScreen() {
   // Retailer har ingen egen bild (se getRetailerCoverImage).
   const coverUrl = retailer ? getRetailerCoverImage(retailer.id) : undefined;
 
-  const coverHeight = width / COVER_ASPECT;
+  const coverHeight = (width / COVER_ASPECT) * COVER_HEIGHT_SHARE;
   const barHeight = touchTarget + spacing.sm * 2;
   const threshold = coverHeight - insets.top - barHeight;
   const scrollY = useSharedValue(0);
   const onScroll = useAnimatedScrollHandler((e) => {
     scrollY.value = e.contentOffset.y;
   });
+  const parallaxStyle = useParallaxHero(scrollY, coverHeight);
   const titleStyle = useAnimatedStyle(() => ({
     opacity: interpolate(scrollY.value, [threshold - spacing.xl, threshold], [0, 1], Extrapolation.CLAMP),
   }));
@@ -93,6 +98,8 @@ export default function PartnerScreen() {
   // Följ-målet är varumärket ({ kind: 'retailer' }), se getRetailerFollowKey.
   const followKey = getRetailerFollowKey(retailer.id);
   const followed = isFollowed(followKey);
+  // Områden härleds ur företagets produkter (lib/retailerAreas.ts).
+  const areas = getRetailerAreas(retailer.id);
   const presence = [
     ...(retailer.presence.online ? ['E-handel'] : []),
     ...(retailer.presence.stores.length > 0 ? [`Butiker: ${retailer.presence.stores.join(', ')}`] : []),
@@ -113,31 +120,39 @@ export default function PartnerScreen() {
           group={PARTNER_BOUNDARY_GROUP}
           style={[styles.cover, { width, height: coverHeight }]}
         >
-          {coverUrl ? (
-            <Image source={{ uri: coverUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
-          ) : null}
+          {/* Parallax (brief 65): bilden glider bakom innehållet och skalas vid överscroll. */}
+          <Reanimated.View style={[{ width, height: coverHeight }, parallaxStyle]}>
+            {coverUrl ? (
+              <Image source={{ uri: coverUrl }} style={{ width, height: coverHeight }} resizeMode="cover" />
+            ) : null}
+          </Reanimated.View>
+          {/* Svagare, kortare toning (brief 65). Vänster: rund logotyp + namn, och
+              områdena under; höger: Följ, linjerad i botten med texten. */}
           <LinearGradient
-            colors={overlay.scrimStops.colors}
-            locations={overlay.scrimStops.locations}
+            colors={overlay.heroScrimSoft.colors}
+            locations={overlay.heroScrimSoft.locations}
             style={styles.coverScrim}
           >
-            {/* Logotyp på platta ovanför namnet, om varumärket har en (brief 47). */}
-            <BrandLogo retailerId={retailer.id} size={logo.headerCircle} />
-            <Text style={styles.coverName} numberOfLines={2}>
-              {retailer.name}
-            </Text>
+            <View style={styles.coverText}>
+              <View style={styles.nameRow}>
+                <BrandLogo retailerId={retailer.id} initial={retailer.initial} size={logo.heroCircle} />
+                <Text style={styles.coverName} numberOfLines={2}>
+                  {retailer.name}
+                </Text>
+              </View>
+              {areas.length > 0 ? (
+                <Text style={styles.coverAreas} numberOfLines={1}>
+                  {areas.join(' · ')}
+                </Text>
+              ) : null}
+            </View>
+            <Pill variant="glass" tone="photo" selected={followed} onPress={() => toggleFollowed(followKey)}>
+              {followed ? 'Följer' : 'Följ'}
+            </Pill>
           </LinearGradient>
         </Transition.Boundary>
 
         <Reanimated.View style={[styles.body, revealStyle]}>
-          <View style={styles.metaRow}>
-            <Text style={styles.meta} numberOfLines={1}>
-              {products.length} produkter
-            </Text>
-            <Pill variant="filled" selected={followed} onPress={() => toggleFollowed(followKey)}>
-              {followed ? 'Följer' : 'Följ'}
-            </Pill>
-          </View>
 
           <SectionTitle
             title={
@@ -169,7 +184,7 @@ export default function PartnerScreen() {
 
           {collections.length > 0 && (
             <>
-              <SectionTitle title="Samlingar" style={styles.sectionTitle} />
+              <SectionTitle title="Samlingar" count={collections.length} style={styles.sectionTitle} />
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shelf}>
                 {collections.map((c) => (
                   <PartnerCard
@@ -188,7 +203,7 @@ export default function PartnerScreen() {
 
           {products.length > 0 && (
             <>
-              <SectionTitle title="Alla produkter" style={styles.sectionTitle} />
+              <SectionTitle title="Produkter" count={products.length} style={styles.sectionTitle} />
               <View style={styles.grid}>
                 <ProductGrid products={products} compact />
               </View>
@@ -228,37 +243,42 @@ const useStyles = makeStyles((t) => ({
   cover: {
     backgroundColor: t.colors.placeholder,
   },
-  // Scrim mörk i båda teman (foto), namnet i fast ljus färg ovanpå.
+  // Svagare toning (fast, mörk i båda teman), texten i fast ljus färg ovanpå.
+  // Rad: text vänster, Följ höger, linjerade i botten.
   coverScrim: {
     position: 'absolute',
     left: 0,
     right: 0,
     bottom: 0,
-    height: '45%',
-    justifyContent: 'flex-end',
-    alignItems: 'flex-start',
+    height: '60%',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     gap: spacing.md,
     paddingHorizontal: spacing.screenMargin,
-    paddingBottom: spacing.xl,
+    paddingBottom: spacing.lg,
   },
-  coverName: {
-    ...typography.display,
-    color: overlay.onPhoto,
+  coverText: {
+    flex: 1,
+    gap: spacing.sm,
   },
-  body: {
-    paddingTop: spacing.lg,
-  },
-  metaRow: {
+  nameRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     gap: spacing.md,
-    paddingHorizontal: spacing.screenMargin,
   },
-  meta: {
-    ...typography.label,
-    color: t.colors.textSecondary,
+  coverName: {
+    ...typography.title1,
+    color: overlay.onPhoto,
     flexShrink: 1,
+  },
+  coverAreas: {
+    ...typography.label,
+    color: overlay.onPhotoMuted,
+  },
+  // Temats bakgrund: hero-bilden glider in bakom innehållet (parallax).
+  body: {
+    paddingTop: spacing.sm,
+    backgroundColor: t.colors.bg,
   },
   sectionTitle: {
     paddingHorizontal: spacing.screenMargin,

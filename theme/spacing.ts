@@ -99,16 +99,18 @@ export const editorialCard = {
   chipAvatar: 20,
 } as const;
 
-/** Logotyper (brief 47). Återförsäljare: logotypen tar `plateShare` av plattans
- *  bredd. Samlingar på EditorialCard: `largeShare` / `smallShare` av kortets
+/** Logotyper (brief 47). Återförsäljare: logotypens längsta SYNLIGA sida tar
+ *  `plateShare` av cirkelns diameter / plattans bredd (brief 65, uppmätt per fil). Samlingar på EditorialCard: `largeShare` / `smallShare` av kortets
  *  bredd, högst `maxHeight` hög. */
 export const logo = {
   plateShare: 0.6,
   largeShare: 0.65, // brief 51 (0,6 i brief 47)
   smallShare: 0.85, // brief 51 (0,75 i brief 47)
   maxHeight: 72, // brief 51 (36 i brief 47)
-  /** Logotypcirkeln i Partnerdetaljens huvud. */
+  /** Logotypcirkeln i Partnerdetaljens huvud (före brief 65). */
   headerCircle: 64,
+  /** Logotypcirkeln bredvid namnet på Partnerdetaljens hero (brief 65). */
+  heroCircle: 48,
 } as const;
 
 /** Nedre menyn (brief 46, 49, 50). Etikettblockets underkant ligger `labelBottom`

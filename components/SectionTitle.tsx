@@ -17,10 +17,12 @@ type IconOrCta =
 
 type Props = {
   title: string;
+  /** Antal i dämpad text efter rubriken, t.ex. "Samlingar · 4" (brief 65). */
+  count?: number;
   style?: StyleProp<ViewStyle>;
 } & PreOrSubHeader & IconOrCta;
 
-export default function SectionTitle({ title, preheader, subheader, icon, cta, style }: Props) {
+export default function SectionTitle({ title, count, preheader, subheader, icon, cta, style }: Props) {
   const styles = useStyles();
   const { colors } = useTheme();
   const ctaLabel = cta?.label ?? 'Visa fler';
@@ -30,6 +32,7 @@ export default function SectionTitle({ title, preheader, subheader, icon, cta, s
         {preheader ? <Text style={styles.preheader}>{preheader}</Text> : null}
         <Text style={styles.title} accessibilityRole="header">
           {title}
+          {count !== undefined ? <Text style={styles.count}>{` · ${count}`}</Text> : null}
         </Text>
         {subheader ? <Text style={styles.subheader}>{subheader}</Text> : null}
       </View>
@@ -71,6 +74,10 @@ const useStyles = makeStyles((t) => ({
     ...typography.title2,
     color: t.colors.textPrimary,
     letterSpacing: 0.3, // lokal optisk spärrning
+  },
+  // Antalet efter rubriken: samma storlek, dämpad (brief 65).
+  count: {
+    color: t.colors.textSecondary,
   },
   subheader: {
     ...typography.caption,

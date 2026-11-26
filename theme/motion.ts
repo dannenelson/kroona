@@ -45,6 +45,8 @@ export const motion = {
   sheetCard: { dismissDistance: 80, snapVelocity: 800, flyOut: 200 },
   /** Produktdetalj: informationen tonas in under övergångens sista del (progress 0,75 → 1). */
   detailRevealFrom: 0.75,
+  /** Parallax på hero (Samlings- och Partnerdetalj, brief 65): bilden rör sig så här mycket av scrollen. */
+  parallax: 0.5,
   /** Hierarkirörelsen (spik brief 18): zoomens fjädrar, bibliotekets
    *  Specs.Zoom-värden (öppna lugnt, stäng med kort efterfjädring). */
   zoomSpec: {
