@@ -4,13 +4,14 @@
 // notiser i Fas 0). Om visar versionen. Utvecklare har dev-sidan
 // "Komponenter (dev)", som bara nås härifrån.
 import { useState } from 'react';
-import { ScrollView, Switch, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, spacing, type ThemePreference } from '../theme';
 import ScreenHeader from '../components/ScreenHeader';
 import SegmentedIcons from '../components/SegmentedIcons';
+import Toggle from '../components/Toggle';
 import { GroupedRow, GroupedSection } from '../components/GroupedList';
 
 const APPEARANCE: { value: ThemePreference; label: string; icon?: 'sun' | 'moon'; text?: string }[] = [
@@ -57,7 +58,7 @@ export default function SettingsScreen() {
                 key={s.key}
                 label={s.label}
                 trailing={
-                  <Switch
+                  <Toggle
                     accessibilityLabel={s.label}
                     value={toggles[s.key]}
                     onValueChange={(on) => setToggles((prev) => ({ ...prev, [s.key]: on }))}

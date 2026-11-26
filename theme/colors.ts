@@ -57,6 +57,12 @@ export type ColorRoles = {
   sheetCardScrim: string;
   /** Inre kantlinje på bildkort med text på bilden (brief 43): vit 12 % / mörk 10 %. */
   imageEdge: string;
+  /** Växel (Switch) på: spåret i textfärg, som vald pill (inverterad). */
+  switchTrackOn: string;
+  /** Växel av: spåret i upphöjd yta. */
+  switchTrackOff: string;
+  /** Reglaget när växeln är på: motsatt färg mot spåret (bakgrunden). Av: `textPrimary`. */
+  switchThumbOn: string;
   success: string;
   successSubtle: string;
   warning: string;
@@ -79,6 +85,9 @@ export const darkColors: ColorRoles = {
   sheetCard: 'rgba(31,34,39,0.96)', // ink850 vid 0,96
   sheetCardScrim: 'rgba(8,9,11,0.60)',
   imageEdge: 'rgba(255,255,255,0.12)',
+  switchTrackOn: raw.paper50,
+  switchTrackOff: raw.ink700,
+  switchThumbOn: raw.ink900,
   success: raw.green,
   successSubtle: raw.greenNight,
   warning: raw.amber,
@@ -102,6 +111,9 @@ export const lightColors: ColorRoles = {
   sheetCard: 'rgba(255,255,255,0.96)', // white vid 0,96
   sheetCardScrim: 'rgba(21,23,27,0.40)',
   imageEdge: 'rgba(21,23,27,0.10)',
+  switchTrackOn: raw.ink900,
+  switchTrackOff: raw.paper100,
+  switchThumbOn: raw.paper50,
   success: raw.greenDeep,
   successSubtle: raw.greenMist,
   warning: raw.amberDeep,

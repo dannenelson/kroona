@@ -44,6 +44,14 @@ export const control = {
   sheetFadeHeight: 48,
 } as const;
 
+/** Växel (brief 64): iOS-måtten 51 × 31, reglage 27 med 2 i inre luft. */
+export const toggle = {
+  width: 51,
+  height: 31,
+  thumb: 27,
+  inset: 2,
+} as const;
+
 /** Listrader (brief 35): samlingsrad 76 hög med 56-thumb, följ-rad 64 med 48. */
 export const listRow = {
   height: 76,
