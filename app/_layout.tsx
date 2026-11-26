@@ -29,6 +29,7 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider, useTheme } from '../theme';
 import { NotificationsProvider } from '../context/NotificationsContext';
+import { ArchiveProvider } from '../context/ArchiveContext';
 import { SavedProductsProvider } from '../context/SavedProductsContext';
 import { FollowedCollectionsProvider } from '../context/FollowedCollectionsContext';
 import { UserCollectionsProvider } from '../context/UserCollectionsContext';
@@ -92,6 +93,7 @@ function AppShell() {
       <FollowedCollectionsProvider>
       <FollowedPeopleProvider>
       <NotificationsProvider>
+      <ArchiveProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         {/* Kontextmenyn ritas ovanför alla skärmar (ingen Modal, se ProductContextMenu). */}
         <ContextMenuProvider>
@@ -127,10 +129,13 @@ function AppShell() {
               <BlankStack.Screen name="settings" options={pushScreenOptions} />
               <BlankStack.Screen name="placeholder" options={pushScreenOptions} />
               <BlankStack.Screen name="components" options={pushScreenOptions} />
+              {/* Brief 66: Arkiv över tidigare dialoger och sökningar (från Hitta). */}
+              <BlankStack.Screen name="archive" options={pushScreenOptions} />
             </BlankStack>
           </SheetProvider>
           </SnackbarProvider>
         </ContextMenuProvider>
+      </ArchiveProvider>
       </NotificationsProvider>
       </FollowedPeopleProvider>
       </FollowedCollectionsProvider>

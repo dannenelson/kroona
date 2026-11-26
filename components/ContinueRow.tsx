@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { spacing, overlay, editorialCard } from '../theme';
 import Icon, { type IconName } from './Icon';
 import { useUserCollections } from '../context/UserCollectionsContext';
+import { useArchive } from '../context/ArchiveContext';
+import type { ArchivedDialog } from '../lib/archive';
 import { PRODUCTS, knownProductIds } from '../data/products';
 import { COLLECTION_BOUNDARY_GROUP } from './product/productTransition';
 import SectionTitle from './SectionTitle';
@@ -18,21 +20,21 @@ const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
 const typeIcon = (name: IconName) => <Icon name={name} color={overlay.onPhoto} size={editorialCard.typeIcon} />;
 
 /**
- * "Fortsätt där du var" (brief 43): liggande redaktionella kort. Pågående
- * dialog (statisk dummy, som tidigare ContinueDialogRow: Hitta sparar inga
- * konversationer i Fas 0) och senast öppnade egna samling, om en finns.
- * Hyllan döljs om inget finns att visa.
+ * "Fortsätt där du var" (brief 43): liggande redaktionella kort. Senaste
+ * sparade dialogen (arkivet, brief 66; öppnas med hela historiken och kan
+ * fortsätta) och senast öppnade egna samling, om de finns. Hyllan döljs om
+ * inget finns att visa.
  */
 export default function ContinueRow() {
   const router = useRouter();
   const { lastOpenedCollection } = useUserCollections();
+  const { entries } = useArchive();
+  const lastDialog = entries.find((e): e is ArchivedDialog => e.kind === 'dialog');
   const boundaryId = `${lastOpenedCollection?.id}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
 
-  const dialog = {
-    title: 'Vinterjacka, hållbar, runt 2000 kr',
-    subtitle: 'Fortsätt dialogen',
-    imageUrl: PRODUCT_IMAGES.ponchoKnit,
-  };
+  // Bilden: första produkten dialogen visat, annars en neutral produktbild.
+  const dialogProductId = lastDialog?.messages.flatMap((m) => m.productIds ?? [])[0];
+  const dialogImage = PRODUCTS.find((p) => p.id === dialogProductId)?.imageUrl ?? PRODUCT_IMAGES.ponchoKnit;
 
   const collectionImages = (lastOpenedCollection?.productIds ?? [])
     .map((id) => PRODUCTS.find((p) => p.id === id)?.imageUrl)
@@ -40,17 +42,19 @@ export default function ContinueRow() {
     .slice(0, 4);
 
   const cards = [
-    <EditorialCard
-      key="dialog"
-      variant="landscape"
-      status="Pågående dialog"
-      title={dialog.title}
-      titleIcon={typeIcon('stars')}
-      subtitle={dialog.subtitle}
-      imageUrl={dialog.imageUrl}
-      // Dialogen är en egen skärm sedan brief 53 (ingen sparad historik i Fas 0: öppnar tom).
-      onPress={() => router.push('/dialog')}
-    />,
+    lastDialog ? (
+      <EditorialCard
+        key="dialog"
+        variant="landscape"
+        status="Pågående dialog"
+        title={lastDialog.title}
+        titleIcon={typeIcon('stars')}
+        subtitle="Fortsätt dialogen"
+        imageUrl={dialogImage}
+        // Återupptar den sparade dialogen (brief 66).
+        onPress={() => router.push({ pathname: '/dialog', params: { id: lastDialog.id } })}
+      />
+    ) : null,
     lastOpenedCollection ? (
       <EditorialCard
         key="collection"

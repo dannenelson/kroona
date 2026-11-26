@@ -3,6 +3,7 @@
 // Sökresultat direkt och kategorierna leder till kategorivyn (brief 54).
 // Alla tre hyllor har "Visa fler" (Idéer, Alla kategorier, Alla områden; brief 54).
 // Dialogen (tidigare chatten här) är en egen stackskärm: app/dialog.tsx.
+// Brief 66: hyllan "Tidigare" (senaste dialoger och sökningar, Visa fler → Arkiv).
 import { ScrollView, Text, View } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +16,11 @@ import AreaGrid from '../../components/AreaGrid';
 import { tabBarSpace } from '../../components/CustomTabBar';
 import { IDEAS } from '../../data/ideas';
 import { CATEGORIES } from '../../data/categories';
+import { useArchive } from '../../context/ArchiveContext';
+import ArchiveRow from '../../components/ArchiveRow';
+
+// Hyllan Tidigare visar så många poster; resten i Arkiv.
+const RECENT_SHOWN = 4;
 
 // Hittas grid visar sex områden; resten nås via "Visa fler" (Alla områden, brief 54).
 const AREA_LIMIT = 6;
@@ -23,6 +29,8 @@ export default function FindScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const styles = useStyles();
+  const { entries } = useArchive();
+  const recent = entries.slice(0, RECENT_SHOWN);
 
   return (
     <View style={styles.container}>
@@ -35,9 +43,9 @@ export default function FindScreen() {
             Hitta
           </Text>
           <View style={styles.field}>
-            <AskBar inline />
+            <AskBar inline placeholder="Ställ en fråga eller sök" />
             <Text style={styles.help}>
-              Sök på ett ord, eller beskriv vad du behöver, till exempel en bröllopspresent.
+              Sök efter en produkt eller berätta vad du behöver, till exempel en present till en kollega.
             </Text>
           </View>
         </View>
@@ -54,6 +62,20 @@ export default function FindScreen() {
             ))}
           </ScrollView>
         </View>
+
+        {/* Tidigare (brief 66): de senaste posterna ur arkivet, nyast först. */}
+        {recent.length > 0 ? (
+          <View style={styles.section}>
+            <SectionTitle
+              title="Tidigare"
+              cta={{ onPress: () => router.push('/archive') }}
+              style={styles.sectionTitle}
+            />
+            {recent.map((e) => (
+              <ArchiveRow key={e.id} entry={e} />
+            ))}
+          </View>
+        ) : null}
 
         <View style={styles.section}>
           <SectionTitle

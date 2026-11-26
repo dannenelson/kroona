@@ -2,14 +2,17 @@
 // "Sök efter" (Sökresultat direkt) och "Fråga om" (Dialog med texten som
 // första fråga). Därunder förslag som matchar texten, eller senaste sökningar
 // när fältet är tomt. Nås från fältet på Hem, Hitta och Sökresultat.
-import { useEffect, useRef, useState, type ComponentRef } from 'react';
+import { useRef, useState, type ComponentRef } from 'react';
 import { Keyboard, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { makeStyles, useTheme, typography, fonts, spacing, radius, control, iconSize, touchTarget } from '../theme';
 import Icon, { type IconName } from '../components/Icon';
 import { searchSuggestions } from '../lib/search';
-import { addRecentSearch, loadRecentSearches } from '../lib/recentSearches';
+import { useArchive } from '../context/ArchiveContext';
+
+/** Så många senaste sökningar visas i sökläget (arkivet har fler, brief 66). */
+const RECENT_SHOWN = 5;
 
 export default function SearchScreen() {
   // fromQ / fromIdea: sökläget öppnades från Sökresultat och ersatte det (brief 54).
@@ -20,18 +23,16 @@ export default function SearchScreen() {
   const styles = useStyles();
   const inputRef = useRef<ComponentRef<typeof TextInput>>(null);
   const [text, setText] = useState(typeof q === 'string' ? q : '');
-  const [recent, setRecent] = useState<string[]>([]);
   const trimmed = text.trim();
-
-  useEffect(() => {
-    loadRecentSearches().then(setRecent);
-  }, []);
+  // Senaste sökningar ur arkivet (brief 66, samma lagring som Hitta och Arkiv).
+  const { entries, addSearch } = useArchive();
+  const recent = entries.flatMap((e) => (e.kind === 'search' ? [e.query] : [])).slice(0, RECENT_SHOWN);
 
   // Sökläget ersätter sig självt med målet, så att tillbaka leder dit man kom ifrån.
   const search = (term: string) => {
     const t = term.trim();
     if (!t) return;
-    addRecentSearch(t);
+    addSearch(t);
     Keyboard.dismiss();
     router.replace({ pathname: '/results', params: { q: t } });
   };
@@ -62,7 +63,7 @@ export default function SearchScreen() {
             style={styles.input}
             value={text}
             onChangeText={setText}
-            placeholder="Fråga eller sök"
+            placeholder="Ställ en fråga eller sök"
             placeholderTextColor={colors.textSecondary}
             selectionColor={colors.textPrimary}
             autoFocus

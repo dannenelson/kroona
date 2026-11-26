@@ -2,6 +2,9 @@
 // stackskärm utan flikfält. Params: `query` (första frågan, skickas
 // automatiskt) och `scope` (valfri avgränsning: kategori eller sökterm, visas
 // som pill och läggs i systemprompten). Inget namn på AI:n visas i UI.
+// Arkiv (brief 66): dialogen sparas lokalt när den fått minst ett svar och
+// uppdateras efter varje svar; `id` öppnar en sparad dialog med hela
+// historiken, och den kan fortsätta.
 import { Component, ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -28,6 +31,7 @@ import ProductGrid from '../components/ProductGrid';
 import TopBar from '../components/TopBar';
 import Pill from '../components/Pill';
 import Icon from '../components/Icon';
+import { useArchive } from '../context/ArchiveContext';
 
 // Startförslag när konversationen är tom (brief 53).
 const SCOPED_STARTERS = ['Till vardagsrummet', 'Liten yta', 'Under 3 000 kr', 'Jag vet inte än'];
@@ -103,8 +107,29 @@ export default function DialogScreen() {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const params = useLocalSearchParams<{ query?: string; scope?: string }>();
-  const scope = typeof params.scope === 'string' && params.scope.trim() ? params.scope.trim() : undefined;
+  const params = useLocalSearchParams<{ query?: string; scope?: string; id?: string }>();
+  const { getDialog, saveDialog, ready: archiveReady } = useArchive();
+  // Dialogens id i arkivet: ny dialog får ett eget, återupptagen behåller sitt.
+  const dialogId = useRef(`d-${genId()}`);
+  // Senast sparade/inlästa meddelandelista: en återupptagen dialog flyttas
+  // inte upp i listan förrän något nytt sagts.
+  const lastSaved = useRef<ChatMessage[] | null>(null);
+  const [resumedScope, setResumedScope] = useState<string | undefined>();
+  // Återuppta (brief 66): när `id` och arkivet finns, läs in historik och avgränsning en gång.
+  const resumedId = useRef<string | null>(null);
+  useEffect(() => {
+    const id = typeof params.id === 'string' ? params.id : undefined;
+    if (!id || !archiveReady || resumedId.current === id) return;
+    const saved = getDialog(id);
+    if (!saved) return;
+    resumedId.current = id;
+    dialogId.current = saved.id;
+    lastSaved.current = saved.messages;
+    setResumedScope(saved.scope);
+    setMessages(saved.messages);
+  }, [params.id, archiveReady, getDialog]);
+  const scopeParam = typeof params.scope === 'string' && params.scope.trim() ? params.scope.trim() : undefined;
+  const scope = resumedScope ?? scopeParam;
   const autoSentQuery = useRef<string | null>(null);
 
   const systemPrompt = useMemo(() => buildHittaSystemPrompt(scope), [scope]);
@@ -159,6 +184,17 @@ export default function DialogScreen() {
       setLoading(false);
     }
   };
+
+  // Spara i arkivet när dialogen har minst ett svar, och efter varje nytt svar.
+  // Titeln är första frågan. Laddningsraden och felrader räknas inte som svar.
+  useEffect(() => {
+    if (messages === lastSaved.current) return;
+    if (!messages.some((m) => m.role === 'assistant')) return;
+    const first = messages.find((m) => m.role === 'user');
+    if (!first) return;
+    lastSaved.current = messages;
+    saveDialog({ kind: 'dialog', id: dialogId.current, title: first.text, messages, scope, at: Date.now() });
+  }, [messages]);
 
   const handleSend = () => sendMessage(inputText);
 
