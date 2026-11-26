@@ -7,7 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { RefreshControl, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, useTheme, typography, spacing, touchTarget, followFeed } from '../../theme';
+import { makeStyles, useTheme, typography, spacing, touchTarget, followFeed, productCard } from '../../theme';
 import { tabBarSpace } from '../../components/CustomTabBar';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
 import { useFollowedPeople } from '../../context/FollowedPeopleContext';
@@ -45,7 +45,8 @@ const CARD_TEXT_HEIGHT =
   typography.body.lineHeight * 2 +
   typography.body.lineHeight +
   typography.caption.lineHeight +
-  spacing.xs * 3;
+  productCard.textGap * 2 +
+  spacing.xs;
 
 export default function FeedScreen() {
   const insets = useSafeAreaInsets();

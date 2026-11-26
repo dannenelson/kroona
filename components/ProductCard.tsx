@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
 import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
-import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion, touchTarget, iconSize } from '../theme';
+import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion, touchTarget, iconSize, productCard } from '../theme';
 import { haptic } from '../utils/haptic';
 import { useCardPress } from '../hooks/useCardPress';
 import { formatPrice, formatScore } from '../utils/format';
@@ -231,16 +231,19 @@ export default function ProductCard({
           {!isSmall && (
             <View style={saveButton ? styles.infoRow : styles.info}>
               <View style={styles.infoText}>
-                <Text style={styles.brand} numberOfLines={1}>
-                  {brand}
-                </Text>
-                <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
-                  {name}
-                </Text>
-                <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
-                  {formatPrice(price)}
-                  <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
-                </Text>
+                {/* Märke, namn och pris tätt ihop (brief 62); betygsraden efter. */}
+                <View style={styles.titleGroup}>
+                  <Text style={styles.brand} numberOfLines={1}>
+                    {brand}
+                  </Text>
+                  <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
+                    {name}
+                  </Text>
+                  <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
+                    {formatPrice(price)}
+                    <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
+                  </Text>
+                </View>
                 <View
                   style={styles.ratings}
                   onLayout={(e) => {
@@ -358,14 +361,18 @@ const useStyles = makeStyles((t) => ({
     flex: 1,
     gap: spacing.xs,
   },
-  // Bokmärket: 44-yta, ikonens högerkant linjerar med bildens högerkant.
+  titleGroup: {
+    gap: productCard.textGap,
+  },
+  // Bokmärket: 44-yta, ikonens högerkant linjerar med bildens högerkant och
+  // ikonens överkant med textblockets överkant (top-aligned, brief 62).
   save: {
     width: touchTarget,
     height: touchTarget,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: -(touchTarget - iconSize.lg) / 2,
-    marginTop: -(touchTarget - iconSize.lg) / 2 + spacing.xs,
+    marginTop: -(touchTarget - iconSize.lg) / 2,
   },
   savePressed: {
     opacity: motion.disabledOpacity,

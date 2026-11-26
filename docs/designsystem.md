@@ -177,6 +177,8 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - Kundbetyg: `★ 4,8 (312)`
 - Hållbarhetsbetyg: löv-ikon + värde, t.ex. `🍃 4,2`
 
+**Produktkortets textblock (brief 62):** märke, namn och pris ligger tätt i en grupp (`productCard.textGap` 2 mellan raderna utöver radhöjden), betygsraden följer med `spacing.xs`. Med spara-knapp (`saveButton`, en-kolumn i Följer) står textkolumnen till vänster och bokmärket till höger, båda överjusterade: ikonens överkant linjerar med märkesradens överkant och dess högerkant med bildens. Smala masonry-kort utan knapp har samma täta avstånd. Produktdetalj visar betyget direkt under namn och pris (se `design.md` §4).
+
 ## 12. Button, Sheet och Snackbar (tillagt 2026-11-20, brief 33)
 - **Regel:** knappar är aldrig fullbreddsrader (utom rader i listor). CTA är en pill som följer sitt innehåll, centrerad, minst 56 hög, 17/600. Primär = ljus yta, sekundär = tonad yta. Gäller hela appen framöver.
 - **Button** (`components/Button.tsx`): `variant` primary/secondary, `size` cta (≥ 56) / compact (36), `disabled`, valfri `icon`. Tryckrespons som korten.

@@ -12,6 +12,12 @@ export const spacing = {
 } as const;
 
 export const touchTarget = 44;
+
+/** Produktkortets textblock (brief 62): märke, namn och pris sitter tätt,
+ *  2 px mellan raderna utöver radhöjden (utanför 4-punktsskalan med avsikt). */
+export const productCard = {
+  textGap: 2,
+} as const;
 /** Ikonrutor. `chevron` 16: chevron i rader, banner och erbjudanden (brief 58). */
 export const iconSize = { xs: 12, chevron: 16, sm: 18, md: 20, lg: 24 } as const;
 

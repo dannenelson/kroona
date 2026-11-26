@@ -22,7 +22,7 @@ import { PRODUCT_BOUNDARY_GROUP } from '../../components/product/productTransiti
 import HeroPager from '../../components/product/HeroPager';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, typography, spacing, radius, touchTarget, edgeBlur, motion } from '../../theme';
+import { makeStyles, useTheme, typography, spacing, radius, touchTarget, edgeBlur, motion } from '../../theme';
 import { PRODUCTS } from '../../data/products';
 import {
   getLowestPrice,
@@ -42,6 +42,7 @@ import ProductCard from '../../components/ProductCard';
 import SaveButton from '../../components/product/SaveButton';
 import { FactList, type Fact } from '../../components/product/FactList';
 import OfferRow from '../../components/product/OfferRow';
+import Icon from '../../components/Icon';
 import type { Offer } from '../../types/catalog';
 
 // Lokala layoutmått: hero 4:5 (referensen 390 × 500), liknande-kort 140 × 176.
@@ -50,7 +51,7 @@ const SIMILAR_WIDTH = 140;
 const SIMILAR_IMAGE_HEIGHT = 176;
 
 /** " (128 omdömen)" / " (1 omdöme)", tomt utan antal. */
-const reviewsLabel = (n?: number) => (n === undefined ? '' : ` (${n} ${n === 1 ? 'omdöme' : 'omdömen'})`);
+const reviewsLabel = (n: number) => `(${n} ${n === 1 ? 'omdöme' : 'omdömen'})`;
 
 const STOCK_LABEL: Record<Offer['stock'], string> = {
   in_stock: 'I lager',
@@ -65,6 +66,7 @@ export default function ProductScreen() {
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = useStyles();
+  const { colors } = useTheme();
   const snackbar = useSnackbar();
 
   const product = PRODUCTS.find((p) => p.id === id);
@@ -177,10 +179,6 @@ export default function ProductScreen() {
   }
 
   const facts: Fact[] = [
-    // Betyg (brief 60) direkt ovanför hållbarhet; ingen rad när produkten saknar betyg.
-    ...(product.rating !== undefined
-      ? [{ label: 'Betyg', value: `${formatScore(product.rating)} av 5${reviewsLabel(product.reviewCount)}` }]
-      : []),
     { label: 'Hållbarhetsindex', value: `${formatScore(product.sustainabilityScore)} av 5` },
     ...(product.facts?.material ? [{ label: 'Material', value: product.facts.material }] : []),
     ...(product.facts?.madeIn ? [{ label: 'Tillverkad i', value: product.facts.madeIn }] : []),
@@ -241,6 +239,17 @@ export default function ProductScreen() {
               </View>
               <SaveButton productId={product.id} />
             </View>
+            {/* Betyg direkt under namn och pris (brief 62), samma dämpade stil som
+                på produktkortet. Inget betyg: ingen rad. Inte tryckbart i Fas 0. */}
+            {product.rating !== undefined && (
+              <View style={styles.rating}>
+                <Icon name="star" color={colors.textSecondary} size={typography.caption.fontSize} />
+                <Text style={styles.ratingText}>{formatScore(product.rating)}</Text>
+                {product.reviewCount !== undefined && (
+                  <Text style={styles.ratingCount}>{reviewsLabel(product.reviewCount)}</Text>
+                )}
+              </View>
+            )}
           </View>
 
           <SectionTitle title="Hållbarhet" style={styles.sectionTitle} />
@@ -412,6 +421,19 @@ const useStyles = makeStyles((t) => ({
   // "kr" ≈ 70 % av priset (design.md §4): närmaste typtoken är label (13 av 20).
   currency: {
     fontSize: typography.label.fontSize,
+  },
+  rating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+  },
+  ratingText: {
+    ...typography.caption,
+    color: t.colors.textSecondary,
+  },
+  ratingCount: {
+    ...typography.caption,
+    color: t.colors.textTertiary,
   },
   usedTag: {
     ...typography.caption,
