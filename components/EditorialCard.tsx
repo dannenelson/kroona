@@ -1,4 +1,4 @@
-import type { ComponentType, ReactElement, ReactNode } from 'react';
+import { useEffect, useState, type ComponentType, type ReactElement, type ReactNode } from 'react';
 import { Animated, Image, Pressable, StyleSheet, Text, View, type ViewProps } from 'react-native';
 import Transition from 'react-native-screen-transitions';
 import { BlurView } from 'expo-blur';
@@ -13,6 +13,7 @@ import {
   overlay,
   edgeBlur,
   editorialCard,
+  spacing,
   logo as logoTokens,
 } from '../theme';
 import { LOGO_ASPECT, type LogoComponent } from '../data/logos';
@@ -42,8 +43,8 @@ type Props = {
   logo?: LogoComponent;
   /** Liten ikon före titeln, t.ex. förstoringsglas på idékort (brief 53). */
   titleIcon?: ReactNode;
-  /** Samling utan logotyp (brief 63): större titel (stor `title1`, liten `title2`)
-   *  som väger som en logotyp och tar logotypens yta, centrerad kring dess mittpunkt. */
+  /** Samling utan logotyp (brief 63): större titel (stor 28/32 `screenTitle`,
+   *  liten `title1` 26/30) som väger som en logotyp, och mer luft till undertiteln. */
   prominentTitle?: boolean;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
   boundary?: { id: string; group: string };
@@ -90,13 +91,22 @@ export default function EditorialCard({
   const r = size?.radius ?? v.radius;
   const shape = { width, height, borderRadius: r };
   const bottomRadii = { borderBottomLeftRadius: r, borderBottomRightRadius: r };
-  // Större titel: ett enda ord bryts aldrig mitt i, det krymps i stället på en rad.
-  const shrinkWord = prominentTitle && !title.trim().includes(' ');
-  // Logotypytan (90 × 45-filer, 2:1): ca 65 % (stor) / 85 % (liten) av kortets
-  // bredd, högst `logo.maxHeight` hög. Samma yta tas av den större titeln.
-  const logoShare = v.small ? logoTokens.smallShare : logoTokens.largeShare;
-  const logoWidth = Math.min(width * logoShare, logoTokens.maxHeight * LOGO_ASPECT);
-  const logoHeight = Math.min((width * logoShare) / LOGO_ASPECT, logoTokens.maxHeight);
+  // Större titel: ett ord som inte ryms bryts aldrig mitt i. Bryts en rad mitt i
+  // ett ord (raden slutar inte med mellanslag) krymps titeln stegvis, högst till
+  // `editorialCard.prominentMinScale` (70 %). Mäts om när titeln eller kortet ändras.
+  const [titleScale, setTitleScale] = useState(1);
+  useEffect(() => setTitleScale(1), [title, width, variant]);
+  const prominentBase = v.small ? styles.titleProminentSmall : styles.titleProminent;
+  const prominentSized = {
+    fontSize: prominentBase.fontSize * titleScale,
+    lineHeight: prominentBase.lineHeight * titleScale,
+  };
+  const onProminentLayout = (lines: { text: string }[]) => {
+    const brokenWord = lines.slice(0, -1).some((l) => !/\s$/.test(l.text));
+    if (brokenWord && titleScale > editorialCard.prominentMinScale) {
+      setTitleScale(Math.max(editorialCard.prominentMinScale, titleScale - editorialCard.prominentScaleStep));
+    }
+  };
 
   const visual = (
     <View style={[styles.card, shape]}>
@@ -146,6 +156,7 @@ export default function EditorialCard({
           styles.text,
           v.small && styles.textSmall,
           v.centered && styles.textCentered,
+          prominentTitle && !Logo && styles.textProminent,
         ]}
       >
         {status ? (
@@ -154,24 +165,19 @@ export default function EditorialCard({
           </Text>
         ) : null}
         {Logo ? (
-          <Logo width={logoWidth} height={logoHeight} style={!v.centered && styles.logoStart} />
+          // Logotypen: ca 60 % (stor) / 75 % (liten) av kortets bredd, högst 36 hög.
+          <Logo
+            width={Math.min(width * (v.small ? logoTokens.smallShare : logoTokens.largeShare), logoTokens.maxHeight * LOGO_ASPECT)}
+            height={Math.min((width * (v.small ? logoTokens.smallShare : logoTokens.largeShare)) / LOGO_ASPECT, logoTokens.maxHeight)}
+            style={!v.centered && styles.logoStart}
+          />
         ) : (
-        // Större titel (samling utan logotyp): tar logotypens yta och står kring
-        // dess vertikala mittpunkt; två rader växer lika mycket uppåt som nedåt.
-        <View
-          style={[
-            styles.titleRow,
-            v.centered && styles.titleRowCentered,
-            prominentTitle && [styles.titleSlot, { height: logoHeight }],
-          ]}
-        >
+        <View style={[styles.titleRow, v.centered && styles.titleRowCentered]}>
           {titleIcon}
           <Text
             style={[
               prominentTitle
-                ? v.small
-                  ? styles.titleProminentSmall
-                  : styles.titleProminent
+                ? [prominentBase, prominentSized]
                 : variant === 'portraitLarge'
                   ? styles.titleLarge
                   : variant === 'landscape'
@@ -180,9 +186,8 @@ export default function EditorialCard({
               v.centered && styles.centered,
               styles.titleShrink,
             ]}
-            numberOfLines={shrinkWord ? 1 : 2}
-            adjustsFontSizeToFit={shrinkWord}
-            minimumFontScale={editorialCard.prominentMinScale}
+            numberOfLines={2}
+            onTextLayout={prominentTitle ? (e) => onProminentLayout(e.nativeEvent.lines) : undefined}
           >
             {title}
           </Text>
@@ -264,6 +269,10 @@ const useStyles = makeStyles((t) => ({
     bottom: editorialCard.padding,
     gap: 2, // lokal optisk luft: titel → undertitel
   },
+  // Samling utan logotyp: titel och undertitel hänger inte ihop (brief 63).
+  textProminent: {
+    gap: spacing.sm,
+  },
   textSmall: {
     left: editorialCard.paddingSmall,
     right: editorialCard.paddingSmall,
@@ -276,10 +285,6 @@ const useStyles = makeStyles((t) => ({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6, // lokal optisk luft: ikon → titel (brief 53)
-  },
-  // Fast höjd som logotypen; innehållet centreras (och flödar lika åt båda håll).
-  titleSlot: {
-    alignSelf: 'stretch',
   },
   titleRowCentered: {
     justifyContent: 'center',
@@ -310,12 +315,13 @@ const useStyles = makeStyles((t) => ({
     ...typography.editorialSmall,
     ...onPhotoText,
   },
+  // Ett steg över `title1`: närmaste steg i skalan är 28/32 (`screenTitle`, samma familj och vikt).
   titleProminent: {
-    ...typography.title1,
+    ...typography.screenTitle,
     ...onPhotoText,
   },
   titleProminentSmall: {
-    ...typography.title2,
+    ...typography.title1,
     ...onPhotoText,
   },
   subtitle: {
