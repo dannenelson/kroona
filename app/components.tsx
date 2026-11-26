@@ -25,7 +25,22 @@ import { setGestureDebug, useGestureDebug } from '../utils/devGestureDebug'; // 
 
 const [P1, P2, P3] = PRODUCTS;
 // Alla ikoner i registren (brief 58), för granskning av systemet.
-const ICON_NAMES = Object.keys(iconRegistry) as IconName[];
+// Ikongalleriet: -filled-filerna visas som fylld halva bredvid sin ikon, inte som egna rutor.
+const ICON_NAMES = (Object.keys(iconRegistry) as IconName[]).filter((n) => !n.endsWith('-filled'));
+// Ikoner som ska ha fylld version (docs/ikonlista.md): egen -filled-fil
+// (find, folders, notification, verified) eller godkänd kodfyllning för stängda
+// former (flikarna home och masonry, bookmark, heart, star). Övriga visas bara som linje.
+const FILLED_ICONS = new Set<IconName>([
+  'find',
+  'folders',
+  'notification',
+  'verified',
+  'home',
+  'masonry',
+  'bookmark',
+  'heart',
+  'star',
+]);
 const BRAND_NAMES = Object.keys(brandIconRegistry) as BrandIconName[];
 // Ljusaste och mörkaste produktfotot (uppmätt medelluminans 0,69 resp. 0,45),
 // för att pröva läsbarheten hos glas på foto i båda teman.
@@ -120,15 +135,16 @@ export default function ComponentsScreen() {
 
         <Section title="Ikoner (brief 57–58)">
           <Caption>
-            Alla ikoner i registret (assets/svg/icons) i 24: kontur till vänster, fylld till höger
-            (egen -filled-fil eller kodfyllning). Synlig linje 1,5. Växla tema uppe till höger.
+            Alla ikoner i registret (assets/svg/icons) i 24, synlig linje 1,5. Fylld version till
+            höger bara för ikoner som ska ha en (egen -filled-fil eller godkänd kodfyllning enligt
+            ikonlistan). Växla tema uppe till höger.
           </Caption>
           <View style={styles.iconGrid}>
             {ICON_NAMES.map((n) => (
               <View key={n} style={styles.iconCell}>
                 <View style={styles.iconPair}>
                   <Icon name={n} />
-                  <Icon name={n} filled />
+                  {FILLED_ICONS.has(n) ? <Icon name={n} filled /> : null}
                 </View>
                 <Text style={styles.iconName} numberOfLines={1}>
                   {n}
