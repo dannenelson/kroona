@@ -1,4 +1,4 @@
-import { useEffect, useState, type ComponentType, type ReactElement, type ReactNode } from 'react';
+import type { ComponentType, ReactElement, ReactNode } from 'react';
 import { Animated, Image, Pressable, StyleSheet, Text, View, type ViewProps } from 'react-native';
 import Transition from 'react-native-screen-transitions';
 import { BlurView } from 'expo-blur';
@@ -8,6 +8,7 @@ import { useCardPress } from '../hooks/useCardPress';
 import {
   makeStyles,
   typography,
+  letterSpacing,
   fonts,
   radius,
   overlay,
@@ -17,6 +18,7 @@ import {
   logo as logoTokens,
 } from '../theme';
 import { LOGO_ASPECT, type LogoComponent } from '../data/logos';
+import { softHyphenate } from '../lib/softHyphenate';
 
 // Paketets klasstyper passar inte React 19:s JSX-typer (samma som i EdgeFade).
 const MaskedView = MaskedViewClass as unknown as ComponentType<ViewProps & { maskElement: ReactElement }>;
@@ -43,8 +45,9 @@ type Props = {
   logo?: LogoComponent;
   /** Liten ikon före titeln, t.ex. förstoringsglas på idékort (brief 53). */
   titleIcon?: ReactNode;
-  /** Samling utan logotyp (brief 63): större titel (stor 28/32 `screenTitle`,
-   *  liten `title1` 26/30) som väger som en logotyp, och mer luft till undertiteln. */
+  /** Samling/område utan logotyp: större titel som väger som en logotyp, och mer
+   *  luft till undertiteln. Stort kort `display` 34/38 (700) med tät spärrning,
+   *  litet kort `title2` 20/24. Max två rader, mjuka bindestreck (softHyphenate). */
   prominentTitle?: boolean;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
   boundary?: { id: string; group: string };
@@ -91,22 +94,9 @@ export default function EditorialCard({
   const r = size?.radius ?? v.radius;
   const shape = { width, height, borderRadius: r };
   const bottomRadii = { borderBottomLeftRadius: r, borderBottomRightRadius: r };
-  // Större titel: ett ord som inte ryms bryts aldrig mitt i. Bryts en rad mitt i
-  // ett ord (raden slutar inte med mellanslag) krymps titeln stegvis, högst till
-  // `editorialCard.prominentMinScale` (70 %). Mäts om när titeln eller kortet ändras.
-  const [titleScale, setTitleScale] = useState(1);
-  useEffect(() => setTitleScale(1), [title, width, variant]);
-  const prominentBase = v.small ? styles.titleProminentSmall : styles.titleProminent;
-  const prominentSized = {
-    fontSize: prominentBase.fontSize * titleScale,
-    lineHeight: prominentBase.lineHeight * titleScale,
-  };
-  const onProminentLayout = (lines: { text: string }[]) => {
-    const brokenWord = lines.slice(0, -1).some((l) => !/\s$/.test(l.text));
-    if (brokenWord && titleScale > editorialCard.prominentMinScale) {
-      setTitleScale(Math.max(editorialCard.prominentMinScale, titleScale - editorialCard.prominentScaleStep));
-    }
-  };
+  // Större titel: samma storlek på alla kort av samma typ, ingen skalning. Långa
+  // sammansatta ord avstavas på sammansättningsgränsen (mjuka bindestreck).
+  const shownTitle = prominentTitle ? softHyphenate(title) : title;
 
   const visual = (
     <View style={[styles.card, shape]}>
@@ -177,7 +167,9 @@ export default function EditorialCard({
           <Text
             style={[
               prominentTitle
-                ? [prominentBase, prominentSized]
+                ? v.small
+                  ? styles.titleProminentSmall
+                  : styles.titleProminent
                 : variant === 'portraitLarge'
                   ? styles.titleLarge
                   : variant === 'landscape'
@@ -187,9 +179,8 @@ export default function EditorialCard({
               styles.titleShrink,
             ]}
             numberOfLines={2}
-            onTextLayout={prominentTitle ? (e) => onProminentLayout(e.nativeEvent.lines) : undefined}
           >
-            {title}
+            {shownTitle}
           </Text>
         </View>
         )}
@@ -315,13 +306,14 @@ const useStyles = makeStyles((t) => ({
     ...typography.editorialSmall,
     ...onPhotoText,
   },
-  // Ett steg över `title1`: närmaste steg i skalan är 28/32 (`screenTitle`, samma familj och vikt).
+  // Stora kort: tydligt mer uttrycksfull än små, `display` 34/38 (700), tät spärrning.
   titleProminent: {
-    ...typography.screenTitle,
+    ...typography.display,
+    letterSpacing: letterSpacing.tight,
     ...onPhotoText,
   },
   titleProminentSmall: {
-    ...typography.title1,
+    ...typography.title2,
     ...onPhotoText,
   },
   subtitle: {

@@ -35,6 +35,8 @@ export const typography = {
 } satisfies Record<string, TypeStyle>;
 
 export const letterSpacing = {
+  /** Tät spärrning för stora titlar (samlingskort utan logotyp). */
+  tight: -0.5,
   wide: 0.5,
   caps: 1.5,
 } as const;

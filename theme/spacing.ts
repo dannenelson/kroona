@@ -84,10 +84,6 @@ export const editorialCard = {
   ],
   /** Typikonen före titeln på Fortsätt-korten (brief 63). */
   typeIcon: 16,
-  /** Större titel (samling utan logotyp, brief 63): ett ord som inte ryms krymps
-   *  stegvis (`prominentScaleStep`) hit som minst i stället för att brytas mitt i. */
-  prominentMinScale: 0.7,
-  prominentScaleStep: 0.05,
   /** Inre luft för texten på bilden (stor/liggande, liten). */
   padding: 16,
   paddingSmall: 12,
