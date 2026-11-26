@@ -46,8 +46,9 @@ type Props = {
   /** Liten ikon före titeln, t.ex. förstoringsglas på idékort (brief 53). */
   titleIcon?: ReactNode;
   /** Samling/område utan logotyp: större titel som väger som en logotyp, och mer
-   *  luft till undertiteln. Stort kort `display` 34/38 (700) med tät spärrning,
-   *  litet kort `title2` 20/24. Max två rader, mjuka bindestreck (softHyphenate). */
+   *  luft till undertiteln. Stort kort `display` 34/38 (700) med tät spärrning, max två
+   *  rader, mjuka bindestreck (softHyphenate). Litet kort `editorialSmall` 16/20, bryts
+   *  bara mellan ord, ingen ellipsis, växer uppåt från undertiteln. */
   prominentTitle?: boolean;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
   boundary?: { id: string; group: string };
@@ -96,7 +97,9 @@ export default function EditorialCard({
   const bottomRadii = { borderBottomLeftRadius: r, borderBottomRightRadius: r };
   // Större titel: samma storlek på alla kort av samma typ, ingen skalning. Långa
   // sammansatta ord avstavas på sammansättningsgränsen (mjuka bindestreck).
-  const shownTitle = prominentTitle ? softHyphenate(title) : title;
+  // Små kort: ingen avstavning, titeln bryts bara mellan ord och kapas aldrig.
+  const shownTitle = prominentTitle && !v.small ? softHyphenate(title) : title;
+  const titleLines = prominentTitle && v.small ? undefined : 2;
 
   const visual = (
     <View style={[styles.card, shape]}>
@@ -178,7 +181,7 @@ export default function EditorialCard({
               v.centered && styles.centered,
               styles.titleShrink,
             ]}
-            numberOfLines={2}
+            numberOfLines={titleLines}
           >
             {shownTitle}
           </Text>
@@ -312,8 +315,10 @@ const useStyles = makeStyles((t) => ({
     letterSpacing: letterSpacing.tight,
     ...onPhotoText,
   },
+  // Små kort: största steget där längsta ordet ("Vardagsuniform", 115 av 126 px,
+  // uppmätt) ryms på en rad. `title2` och `editorialMedium` rymmer det inte.
   titleProminentSmall: {
-    ...typography.title2,
+    ...typography.editorialSmall,
     ...onPhotoText,
   },
   subtitle: {
