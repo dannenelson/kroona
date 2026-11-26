@@ -30,32 +30,36 @@ export function useLongPressMenu({ items, imageUri, radius, renderOverlay, press
     ref.current?.measureInWindow((x, y, width, height) => done({ x, y, width, height }));
   };
 
+  // Öppnar samma meny utan långt tryck (t.ex. från en "mer"-knapp på raden).
+  const open = () => {
+    if (items.length === 0) return;
+    press?.liftForMenu();
+    measure((anchor) =>
+      contextMenu.open({
+        anchor,
+        imageSource: { uri: imageUri ?? '' },
+        imageRadius: radius,
+        liftScale: motion.liftScale,
+        renderOverlay,
+        items,
+        measure,
+        setOriginalHidden: (h) => {
+          if (!h) press?.menuClosed();
+          setHidden(h);
+        },
+      }),
+    );
+  };
+
   const gesture = usePanGesture({
     activateAfterLongPress: motion.longPressMs,
     enabled: items.length > 0,
     runOnJS: true,
     disableReanimated: true,
-    onActivate: () => {
-      press?.liftForMenu();
-      measure((anchor) =>
-        contextMenu.open({
-          anchor,
-          imageSource: { uri: imageUri ?? '' },
-          imageRadius: radius,
-          liftScale: motion.liftScale,
-          renderOverlay,
-          items,
-          measure,
-          setOriginalHidden: (h) => {
-            if (!h) press?.menuClosed();
-            setHidden(h);
-          },
-        }),
-      );
-    },
+    onActivate: open,
     onUpdate: (e) => contextMenu.move(e.absoluteX, e.absoluteY),
     onDeactivate: () => contextMenu.release(),
   });
 
-  return { gesture, ref, hidden };
+  return { gesture, ref, hidden, open };
 }

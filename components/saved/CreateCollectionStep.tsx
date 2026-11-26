@@ -7,7 +7,7 @@ import { SheetContent, useSheet, type SheetStep } from '../Sheet';
 import { useSnackbar } from '../Snackbar';
 import Button from '../Button';
 
-const MAX_NAME = 40;
+export const MAX_NAME = 40;
 
 /** Steget "Skapa samling" (brief 33), kan öppnas ensamt eller pushas i ett flöde. */
 export const createCollectionStep: SheetStep = {
@@ -160,3 +160,6 @@ const useStyles = makeStyles((t) => ({
     backgroundColor: t.colors.bg,
   },
 }));
+
+/** Namnfältets stil, delad med Byt namn (RenameCollectionStep). */
+export const useCollectionNameStyles = useStyles;

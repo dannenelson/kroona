@@ -8,7 +8,7 @@
 //   max 3 med "Visa alla" (expanderar på plats). Långt tryck: Öppna, Sluta
 //   följa. Områden döljs (ingen följ-lagring för områden än).
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
-import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Alert, Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -48,6 +48,7 @@ import SegmentedIcons from '../../components/SegmentedIcons';
 import Icon, { type IconName } from '../../components/Icon';
 import CollectionMosaic from '../../components/CollectionMosaic';
 import UserCollectionCard from '../../components/saved/UserCollectionCard';
+import { makeRenameCollectionStep } from '../../components/saved/RenameCollectionStep';
 import { useSheet } from '../../components/Sheet';
 import { useSnackbar } from '../../components/Snackbar';
 import { createCollectionStep } from '../../components/saved/CreateCollectionStep';
@@ -96,7 +97,7 @@ export default function SavedScreen() {
   const sheet = useSheet();
   const snackbar = useSnackbar();
   const { savedProducts } = useSavedProducts();
-  const { userCollections } = useUserCollections();
+  const { userCollections, deleteCollection } = useUserCollections();
   // A–Ö i svensk ordning vid visning (brief 42); Sparade produkter ligger fast först.
   const sortedCollections = useMemo(() => sortByName(userCollections, (c) => c.name), [userCollections]);
   const [tab, setTab] = useState<(typeof TABS)[number]>('Mina samlingar');
@@ -104,14 +105,29 @@ export default function SavedScreen() {
   const openCreate = () => sheet.open(createCollectionStep);
 
   const cardWidth = (width - spacing.screenMargin * 2 - spacing.gutter) / 2;
-  const collectionMenu = (id: string, thumb?: string): ContextMenuItem[] => [
+  // Redigera egna samlingar (Fas 0, lokalt): samma meny från långt tryck och
+  // från "mer"-knappen på raden. Ta bort bekräftas med systemets dialogruta.
+  const confirmDelete = (c: UserCollection) =>
+    Alert.alert(`Ta bort ${c.name}?`, 'Samlingen tas bort. Produkterna finns kvar.', [
+      { text: 'Avbryt', style: 'cancel' },
+      {
+        text: 'Ta bort',
+        style: 'destructive',
+        onPress: () => {
+          deleteCollection(c.id);
+          snackbar.show({ subject: c.name, text: 'togs bort' });
+        },
+      },
+    ]);
+  const collectionMenu = (c: UserCollection, thumb?: string): ContextMenuItem[] => [
+    { label: 'Byt namn', icon: 'edit', onPress: () => sheet.open(makeRenameCollectionStep(c.id, c.name)) },
     {
-      label: 'Öppna',
-      icon: 'chevron-right',
-      navigation: true,
-      onPress: () => router.push({ pathname: '/collection/[id]', params: { id } }),
+      label: 'Redigera innehåll',
+      icon: 'grid',
+      onPress: () => router.push({ pathname: '/collection/[id]', params: { id: c.id, edit: '1' } }),
     },
     { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: thumb }) },
+    { label: 'Ta bort samling', icon: 'trash', onPress: () => confirmDelete(c) },
   ];
   const visibility = (c: UserCollection) => ({
     subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length, 'produkt', 'produkter')}`,
@@ -152,7 +168,8 @@ export default function SavedScreen() {
                     subtitle={visibility(c).subtitle}
                     subtitleIcon={visibility(c).icon}
                     images={imagesFor(c.productIds)}
-                    menuItems={collectionMenu(c.id, imagesFor(c.productIds)[0])}
+                    menuItems={collectionMenu(c, imagesFor(c.productIds)[0])}
+                    menuButton
                   />
                 ))}
               </View>
@@ -175,7 +192,7 @@ export default function SavedScreen() {
                     subtitleIcon={visibility(c).icon}
                     images={imagesFor(c.productIds)}
                     width={cardWidth}
-                    menuItems={collectionMenu(c.id, imagesFor(c.productIds)[0])}
+                    menuItems={collectionMenu(c, imagesFor(c.productIds)[0])}
                   />
                 ))}
               </View>
@@ -230,6 +247,7 @@ function CollectionListRow({
   subtitleIcon,
   images,
   menuItems,
+  menuButton = false,
   compact = false,
 }: {
   id: string;
@@ -238,6 +256,8 @@ function CollectionListRow({
   subtitleIcon?: IconName;
   images: string[];
   menuItems: ContextMenuItem[];
+  /** "Mer"-knapp till höger som öppnar samma meny (egna samlingar). */
+  menuButton?: boolean;
   compact?: boolean;
 }) {
   const router = useRouter();
@@ -262,6 +282,7 @@ function CollectionListRow({
       onPress={() => router.push({ pathname: '/collection/[id]', params: { id, b } })}
       menuItems={menuItems}
       menuImageUri={images[0]}
+      menuButton={menuButton}
     />
   );
 }

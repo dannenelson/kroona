@@ -27,6 +27,10 @@ type UserCollectionsContextValue = {
   addProductToCollection: (collectionId: string, productId: string) => void;
   /** Tar bort en produkt ur en egen samling (Lägg till i samling, brief 36). */
   removeProductFromCollection: (collectionId: string, productId: string) => void;
+  /** Byter namn på en egen samling (tomt namn ignoreras). */
+  renameCollection: (collectionId: string, name: string) => void;
+  /** Tar bort en egen samling helt (produkterna finns kvar i katalogen). */
+  deleteCollection: (collectionId: string) => void;
   /** Senast öppnade egna samling, om den finns kvar (brief 43). */
   lastOpenedCollection: UserCollection | undefined;
   /** Tidpunkt (ms) då den senast öppnades; 0 om den öppnades innan tiden sparades. */
@@ -94,6 +98,16 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
     );
   };
 
+  const renameCollection = (collectionId: string, name: string) => {
+    const n = name.trim();
+    if (!n) return;
+    setCollections((prev) => prev.map((c) => (c.id === collectionId ? { ...c, name: n } : c)));
+  };
+
+  const deleteCollection = (collectionId: string) => {
+    setCollections((prev) => prev.filter((c) => c.id !== collectionId));
+  };
+
   const getUserCollection = (id: string) => collections.find((c) => c.id === id);
 
   const markCollectionOpened = useCallback((collectionId: string) => {
@@ -114,6 +128,8 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
         createCollection,
         addProductToCollection,
         removeProductFromCollection,
+        renameCollection,
+        deleteCollection,
         lastOpenedCollection: lastOpenedId ? collections.find((c) => c.id === lastOpenedId) : undefined,
         lastOpenedAt,
         markCollectionOpened,

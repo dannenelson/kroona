@@ -16,7 +16,7 @@ import Reanimated, {
 import Transition, { useScreenAnimation } from 'react-native-screen-transitions';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, profileHero } from '../../theme';
+import { makeStyles, typography, spacing, touchTarget, edgeBlur, motion, profileHero, listRow, radius } from '../../theme';
 import { ALL_COLLECTIONS, getCollectionProducts, getCurator } from '../../data/collections';
 import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
 import { useSavedProducts } from '../../context/SavedProductsContext';
@@ -31,6 +31,9 @@ import EdgeFade from '../../components/EdgeFade';
 import TextTabs from '../../components/TextTabs';
 import ProductGrid from '../../components/ProductGrid';
 import ProfileHero from '../../components/ProfileHero';
+import { useSnackbar } from '../../components/Snackbar';
+import Button from '../../components/Button';
+import IconButton from '../../components/IconButton';
 import SectionTitle from '../../components/SectionTitle';
 import { COLLECTION_LOGOS } from '../../data/logos';
 import type { Product } from '../../types/product';
@@ -82,17 +85,20 @@ function buildFilters(products: Product[], byBrand: boolean): Filter[] {
 
 export default function CollectionScreen() {
   // `b` = boundary-id för det kort man öppnade från (zoomen går från/till det).
-  const { id, b } = useLocalSearchParams<{ id: string; b?: string }>();
+  const { id, b, edit } = useLocalSearchParams<{ id: string; b?: string; edit?: string }>();
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = useStyles();
   const { isFollowed, toggleFollowed } = useFollowedCollections();
   const { savedProducts } = useSavedProducts();
-  const { getUserCollection, markCollectionOpened } = useUserCollections();
+  const { getUserCollection, markCollectionOpened, removeProductFromCollection } = useUserCollections();
   const userCollection = getUserCollection(id);
   // "Fortsätt där du var" på Hem visar senast öppnade egna samling (brief 43).
   const isUserCollection = !!userCollection;
+  // Redigera innehåll (egna samlingar, från menyn i Sparat): ta bort produkter, Klar avslutar.
+  const [editing, setEditing] = useState(edit === '1');
+  const snackbar = useSnackbar();
   useEffect(() => {
     if (isUserCollection) markCollectionOpened(id);
   }, [id, isUserCollection, markCollectionOpened]);
@@ -255,7 +261,49 @@ export default function CollectionScreen() {
 
           <SectionTitle title="Produkter" count={products.length} style={styles.sectionTitle} />
 
-          {filters.length > 1 && (
+          {editing && isUserCollection ? (
+            <View style={styles.editList}>
+              <View style={styles.editHeader}>
+                <Text style={styles.editHint}>Ta bort produkter ur samlingen.</Text>
+                <Button size="compact" onPress={() => setEditing(false)}>
+                  Klar
+                </Button>
+              </View>
+              {products.length === 0 ? (
+                <Text style={styles.emptyHint}>Samlingen är tom.</Text>
+              ) : (
+                products.map((p) => (
+                  <View key={p.id} style={styles.editRow}>
+                    <Image source={{ uri: p.imageUrl }} style={styles.editThumb} />
+                    <View style={styles.editText}>
+                      <Text style={styles.editBrand} numberOfLines={1}>
+                        {p.brand}
+                      </Text>
+                      <Text style={styles.editName} numberOfLines={1}>
+                        {p.name}
+                      </Text>
+                    </View>
+                    <IconButton
+                      name="trash"
+                      variant="bare"
+                      accessibilityLabel={`Ta bort ${p.name} ur samlingen`}
+                      onPress={() => {
+                        removeProductFromCollection(collection.id, p.id);
+                        snackbar.show({
+                          subject: p.name,
+                          text: 'togs bort från',
+                          object: collection.name,
+                          thumbUri: p.imageUrl,
+                        });
+                      }}
+                    />
+                  </View>
+                ))
+              )}
+            </View>
+          ) : null}
+
+          {!editing && filters.length > 1 && (
             <TextTabs
               items={filters.map((f) => f.label)}
               selected={active.label}
@@ -264,7 +312,7 @@ export default function CollectionScreen() {
             />
           )}
 
-          {products.length === 0 ? (
+          {editing && isUserCollection ? null : products.length === 0 ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyTitle}>{collection.emptyTitle}</Text>
               {collection.emptyHint ? <Text style={styles.emptyHint}>{collection.emptyHint}</Text> : null}
@@ -331,6 +379,44 @@ const useStyles = makeStyles((t) => ({
   },
   tabs: {
     flexGrow: 0,
+  },
+  editList: {
+    paddingHorizontal: spacing.screenMargin,
+    gap: spacing.sm,
+  },
+  editHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+  editHint: {
+    ...typography.label,
+    color: t.colors.textSecondary,
+    flexShrink: 1,
+  },
+  editRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  editThumb: {
+    width: listRow.compactThumb,
+    height: listRow.compactThumb,
+    borderRadius: radius.control,
+    borderCurve: 'continuous',
+    backgroundColor: t.colors.placeholder,
+  },
+  editText: {
+    flex: 1,
+  },
+  editBrand: {
+    ...typography.label,
+    color: t.colors.textSecondary,
+  },
+  editName: {
+    ...typography.body,
+    color: t.colors.textPrimary,
   },
   grid: {
     paddingHorizontal: spacing.screenMargin,

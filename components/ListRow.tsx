@@ -2,9 +2,10 @@ import type { ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Transition from 'react-native-screen-transitions';
 import { GestureDetector } from 'react-native-gesture-handler';
-import { makeStyles, typography, fonts, spacing, listRow, iconSize } from '../theme';
+import { makeStyles, typography, fonts, spacing, listRow, iconSize, touchTarget } from '../theme';
 import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import type { ContextMenuItem } from './ProductContextMenu';
+import IconButton from './IconButton';
 import Icon, { type IconName } from './Icon';
 
 type Props = {
@@ -25,6 +26,8 @@ type Props = {
   menuImageUri?: string;
   /** Element längst till höger (t.ex. val-cirkel). */
   trailing?: ReactNode;
+  /** "Mer"-knapp (more-horizontal) till höger som öppnar samma meny som långt tryck. */
+  menuButton?: boolean;
   accessibilityLabel?: string;
   /** T.ex. { checked } för valbara rader. */
   accessibilityState?: { checked?: boolean; selected?: boolean };
@@ -47,6 +50,7 @@ export default function ListRow({
   menuItems = [],
   menuImageUri,
   trailing,
+  menuButton = false,
   accessibilityLabel,
   accessibilityState,
 }: Props) {
@@ -98,6 +102,15 @@ export default function ListRow({
           ) : null}
         </View>
         {trailing}
+        {menuButton && menuItems.length > 0 ? (
+          <IconButton
+            name="more-horizontal"
+            variant="bare"
+            accessibilityLabel={`Fler val för ${title}`}
+            onPress={menu.open}
+            style={styles.moreButton}
+          />
+        ) : null}
       </Pressable>
     </GestureDetector>
   );
@@ -115,6 +128,10 @@ const useStyles = makeStyles((t) => ({
   },
   hidden: {
     opacity: 0,
+  },
+  // Ikonens kant (inte träffytans) linjerar med skärmmarginalen.
+  moreButton: {
+    marginRight: -(touchTarget - iconSize.lg) / 2,
   },
   text: {
     flex: 1,

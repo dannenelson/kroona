@@ -196,6 +196,8 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **ListRow** (`components/ListRow.tsx`): thumb till vänster (bild, mosaik eller avatar), titel 15/500 och undertext `label` med valfri liten ikon (t.ex. lås). Standard 76 hög med 56-thumb, kompakt 64 med 48-thumb (`listRow` i `theme/spacing.ts`). Tryck = `pressed`-yta (rader krymper inte). Valfri zoom från thumben (`boundary`) och kontextmeny vid långt tryck (thumben lyfts).
 - **Vy-växlare** (`components/SegmentedIcons.tsx`): segmentkontroll med ikoner (rader/kort), pill-bakgrund `surface`, aktivt segment `surfaceRaised` i text-färg, övriga mute, 38 × 30 per segment (`segmented`). Byter direkt med selection-haptik.
 - **Kontextmeny via hook:** `hooks/useLongPressMenu` delas av PartnerCard, samlingskort och listrader (en implementation).
+- **Mer-knapp på rader:** `ListRow` tar `menuButton` (more-horizontal, bare 44, ikonens kant mot marginalen) som öppnar samma meny som långt tryck (`useLongPressMenu().open`). Används på egna samlingar i Sparat.
+- **Redigera egna samlingar:** meny Byt namn (`edit`, Sheet-steg med samma namnfält som Skapa samling, tomt eller oförändrat namn går inte att spara), Redigera innehåll (`grid`, Samlingsdetalj i redigeringsläge: rad per produkt med `trash`, Klar), Dela (`share`, platshållare), Ta bort samling (`trash`, systemets dialogruta, destruktiv). Snackbar med fetstilta namn: "**<gammalt>** heter nu **<nytt>**", "**<produkt>** togs bort från **<samling>**", "**<samling>** togs bort".
 - **Menyrader (brief 61):** ikon 20 till vänster, `spacing.sm` till texten. Öppna (navigering, `navigation: true`) behåller `chevron-right` till höger och linjerar texten med de andra raderna.
 
 ## 15. Kort-sheet (tillagt 2026-11-23, brief 40)
