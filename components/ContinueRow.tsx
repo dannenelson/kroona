@@ -2,7 +2,7 @@ import { useId, type ReactNode } from 'react';
 import { View, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { spacing, overlay, editorialCard } from '../theme';
+import { spacing, overlay, editorialCard, findCards, radius } from '../theme';
 import Icon, { type IconName } from './Icon';
 import { useUserCollections } from '../context/UserCollectionsContext';
 import { useArchive } from '../context/ArchiveContext';
@@ -17,6 +17,9 @@ import CollectionMosaic from './CollectionMosaic';
 
 /** Högst så många kort. */
 const MAX_CARDS = 4;
+
+/** Mindre liggande kort: idékortets mått och radie (240 × 160, r20), ca 1,5 kort syns i bredd. */
+const CARD_SIZE = { ...findCards.idea, radius: radius.editorialMedium };
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
 
@@ -75,6 +78,7 @@ export default function ContinueRow() {
         <EditorialCard
           key={e.id}
           variant="landscape"
+          size={CARD_SIZE}
           status={isDialog ? 'Pågående dialog' : 'Senaste sökning'}
           title={isDialog ? e.title : e.query}
           titleIcon={typeIcon(isDialog ? 'stars' : 'search')}
@@ -104,6 +108,7 @@ export default function ContinueRow() {
             <EditorialCard
               key="collection"
               variant="landscape"
+              size={CARD_SIZE}
               status="Senast öppnad"
               title={lastOpenedCollection.name}
               titleIcon={typeIcon('folder')}
