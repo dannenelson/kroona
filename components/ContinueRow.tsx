@@ -80,7 +80,8 @@ export default function ContinueRow() {
           titleIcon={typeIcon(isDialog ? 'stars' : 'search')}
           subtitle={isDialog ? 'Fortsätt dialogen' : 'Visa resultat'}
           imageUrl={image}
-          cover={image ? undefined : <GradientCover seed={e.id + (isDialog ? e.title : e.query)} />}
+          // Toningen härleds ur dialogens id eller sökordet (samma sökning, samma toning).
+          cover={image ? undefined : <GradientCover seed={isDialog ? e.id : e.query.toLowerCase()} />}
           onPress={() => openEntry(e)}
         />
       ),

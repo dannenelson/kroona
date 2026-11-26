@@ -139,16 +139,18 @@ export const overlay = {
     locations: [0, 0.4, 0.65, 1] as [number, number, ...number[]],
   },
   /** Toningar för kort utan bild i "Fortsätt där du var" (uppföljning brief 66).
-   *  Fasta i båda teman (som foto), mörka nog för vit text och ikon. Väljs
+   *  Fasta i båda teman (som foto), mörka nog för vit text och ikon, låg mättnad. Väljs
    *  stabilt per post (samma id ger samma toning). Diagonal, ljusare uppe till vänster. */
   continueGradients: [
-    ['#3A4A6B', '#161C2B'],
-    ['#5A3B4E', '#1E1419'],
-    ['#2F5249', '#121E1B'],
-    ['#5B4632', '#1F1811'],
-    ['#46395F', '#17131F'],
-    ['#2E4A5C', '#101A21'],
-    ['#4F4F2E', '#1B1B10'],
+    // Mindre mättade (uppföljning brief 66): gråtoner med en svag färgton, så
+    // att de skiljer sig åt men inte drar blicken från bildkorten.
+    ['#3E4554', '#181B21'],
+    ['#4F4349', '#1D1A1C'],
+    ['#3D4B47', '#171C1B'],
+    ['#4E473E', '#1D1B18'],
+    ['#464350', '#1A191E'],
+    ['#3C4951', '#16191C'],
+    ['#49493D', '#1B1B17'],
   ] as [string, string][],
   /** Svagare toning på Partnerdetaljens lägre hero (brief 65): kortare och
    *  mjukare än scrimStops, slutar på 70 % (text på den är fortfarande vit). */

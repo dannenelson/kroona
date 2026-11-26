@@ -31,9 +31,15 @@ export const ARCHIVE_STORAGE_KEY = '@kroona/archive';
 /** Sökläget lagrade tidigare bara söktermer här (brief 53); läses in en gång. */
 export const LEGACY_RECENT_KEY = '@kroona/recentSearches';
 
-/** Nyast först, högst ARCHIVE_MAX av varje sort. */
+/** Unikt id även för poster som skapas i samma millisekund. */
+const uniqueId = (prefix: string, now: number) => `${prefix}-${now.toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
+/** Nyast först, högst ARCHIVE_MAX av varje sort, inga dubbletter av id. */
 export function normalizeArchive(entries: readonly ArchiveEntry[]): ArchiveEntry[] {
-  const sorted = [...entries].sort((a, b) => b.at - a.at);
+  const seen = new Set<string>();
+  const sorted = [...entries]
+    .sort((a, b) => b.at - a.at)
+    .filter((e) => (seen.has(e.id) ? false : (seen.add(e.id), true)));
   let searches = 0;
   let dialogs = 0;
   return sorted.filter((e) => (e.kind === 'search' ? ++searches : ++dialogs) <= ARCHIVE_MAX);
@@ -44,7 +50,7 @@ export function withSearch(entries: readonly ArchiveEntry[], query: string, now 
   const q = query.trim();
   if (!q) return [...entries];
   const rest = entries.filter((e) => !(e.kind === 'search' && e.query.toLowerCase() === q.toLowerCase()));
-  return normalizeArchive([{ kind: 'search', id: `s-${now}`, query: q, at: now }, ...rest]);
+  return normalizeArchive([{ kind: 'search', id: uniqueId('s', now), query: q, at: now }, ...rest]);
 }
 
 /** Sparar eller uppdaterar en dialog (samma id ersätts). */

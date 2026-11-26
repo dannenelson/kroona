@@ -257,7 +257,7 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 ## 19. Hitta: fält, idékort och sökläge (tillagt 2026-11-24, brief 53)
 - **AskBar** = tryckbart fält "Fråga eller sök" (56, pill, `find` vänster, `microphone` höger; `icon="search"` i Sökresultat, brief 57). Prop `value` visar söktermen (Sökresultat), `placeholder` ersätter "Fråga eller sök" (Hem: "Vad är du intresserad av idag?", brief 63), `inline` tar bort sidomarginalen. Ingen riktig inmatning; sökläget (`app/search.tsx`) har det aktiva fältet.
 - **Idékort** = `EditorialCard` `landscape` i formatet 240 × 160 med `titleIcon` (förstoringsglas). Data i `data/ideas.ts` (`id`, `title`, `image`, `filter`; filtret har områdets form plus `newOnly`, `maxPrice`, `material`).
-- **Kategorikort** (Hitta: högst 4 i en rad som rullar i sidled; Alla kategorier: rutnät 3 kolumner inom skärmmarginalen, samma bildformat, A–Ö svensk sortering) 109 × 150 och **områdeskort** (2-kolumnsgrid, 92 höga) är också `EditorialCard` med härlett format. Text på bild eftersom varje kort är ett enda foto.
+- **Kategorikort** (Hitta: högst 4 i en rad, bredden delad på fyra, högst 109; Alla kategorier: rutnät 3 kolumner inom skärmmarginalen, samma bildformat, A–Ö svensk sortering) 109 × 150 och **områdeskort** (2-kolumnsgrid, 92 höga) är också `EditorialCard` med härlett format. Text på bild eftersom varje kort är ett enda foto.
 - **Sökläge:** handlingsrader "Sök efter" / "Fråga om", sedan förslag eller senaste sökningar. Se design.md §8l.
 
 ## 20. Kategorier, områden och ScreenHeader (tillagt 2026-11-24, brief 54)

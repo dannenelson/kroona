@@ -18,7 +18,8 @@ export const IDEAS: Idea[] = [
     id: 'idea-smarta-hem-nyheter',
     title: 'Nyheter inom Smarta hem',
     image: I.speakerSmart,
-    filter: { category: 'möbler', types: ['teknik', 'belysning'], newOnly: true },
+    // Utan kategori: teknik ligger under Elektronik, belysning under Möbler.
+    filter: { types: ['teknik', 'belysning'], newOnly: true },
   },
   {
     // Briefens "Stickat i ull" gav en träff (ponchon); ersatt med läder (fyra träffar).

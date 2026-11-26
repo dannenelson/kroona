@@ -1,4 +1,4 @@
-export type ProductCategory = 'kläder' | 'möbler';
+export type ProductCategory = 'kläder' | 'möbler' | 'elektronik';
 
 export type ProductStyle =
   | 'Minimalistisk'

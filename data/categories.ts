@@ -3,12 +3,13 @@ import { PRODUCTS } from './products';
 import { PRODUCT_IMAGES as I } from './productImages';
 import { hasUsedOffer } from '../lib/catalog';
 
-// Kategorier (brief 53, 54): Kläder, Möbler och Begagnat. Begagnat är ett
+// Kategorier (brief 53, 54): Kläder, Möbler, Elektronik (uppföljning brief 66:
+// produkterna av typen teknik, tidigare under Möbler) och Begagnat. Begagnat är ett
 // skick, inte en produkttyp: alla produkter med ett begagnat erbjudande.
 // Pillarna i kategorivyn härleds ur datan och visas bara om de ger träffar.
 // Kläder saknar typ i datan (typ finns bara för möbler), så Kläder delas på kön.
 
-export type CategoryId = 'klader' | 'mobler' | 'begagnat';
+export type CategoryId = 'klader' | 'mobler' | 'elektronik' | 'begagnat';
 
 export interface CategoryPill {
   label: string;
@@ -60,6 +61,16 @@ export const CATEGORIES: Category[] = [
     })),
   },
   {
+    id: 'elektronik',
+    name: 'Elektronik',
+    image: I.speakerSmart,
+    match: (p) => p.category === 'elektronik',
+    pills: (Object.keys(TYPE_LABEL) as NonNullable<Product['type']>[]).map((t) => ({
+      label: TYPE_LABEL[t],
+      match: (p) => p.type === t,
+    })),
+  },
+  {
     id: 'begagnat',
     name: 'Begagnat',
     image: I.chairRattan,
@@ -67,6 +78,7 @@ export const CATEGORIES: Category[] = [
     pills: [
       { label: 'Kläder', match: (p) => p.category === 'kläder' },
       { label: 'Möbler', match: (p) => p.category === 'möbler' },
+      { label: 'Elektronik', match: (p) => p.category === 'elektronik' },
     ],
   },
 ];

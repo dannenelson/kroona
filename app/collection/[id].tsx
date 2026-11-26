@@ -38,7 +38,7 @@ import type { Product } from '../../types/product';
 // Lokalt layoutmått: cover i samma proportion som Produktdetaljens hero (4:5).
 const ALL = 'Alla';
 const NEW = 'Nytt';
-const CATEGORY_LABEL: Record<Product['category'], string> = { kläder: 'Kläder', möbler: 'Möbler' };
+const CATEGORY_LABEL: Record<Product['category'], string> = { kläder: 'Kläder', möbler: 'Möbler', elektronik: 'Elektronik' };
 
 type Filter = { label: string; match: (p: Product) => boolean };
 

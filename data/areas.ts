@@ -8,7 +8,8 @@ export const AREAS: Area[] = [
     kind: 'area',
     name: 'Hemmakontor',
     description: 'Stolar, bord, ljus och förvaring för att arbeta hemma.',
-    filter: { category: 'möbler', types: ['stol', 'bord', 'belysning', 'förvaring', 'teknik'] },
+    // Utan kategori: typerna räcker, och teknik ligger sedan uppföljningen av brief 66 under Elektronik.
+    filter: { types: ['stol', 'bord', 'belysning', 'förvaring', 'teknik'] },
     defaultFollowed: true,
   },
   {

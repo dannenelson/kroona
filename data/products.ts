@@ -37,7 +37,7 @@ export const CATALOG: CatalogProduct[] = [
     sustainabilityScore: 3.6,
     rating: 4.2,
     reviewCount: 312,
-    category: 'möbler',
+    category: 'elektronik', // tidigare 'möbler' (Elektronik som egen kategori)
     style: 'Urban',
     type: 'teknik',
   },
@@ -108,7 +108,7 @@ export const CATALOG: CatalogProduct[] = [
     rating: 4.1,
     reviewCount: 433,
     isNewArrival: true,
-    category: 'möbler',
+    category: 'elektronik', // tidigare 'möbler' (Elektronik som egen kategori)
     style: 'Minimalistisk',
     type: 'teknik',
   },
@@ -136,7 +136,7 @@ export const CATALOG: CatalogProduct[] = [
     sustainabilityScore: 3.4,
     rating: 4.0,
     reviewCount: 671,
-    category: 'möbler',
+    category: 'elektronik', // tidigare 'möbler' (Elektronik som egen kategori)
     style: 'Urban',
     type: 'teknik',
   },
