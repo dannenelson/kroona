@@ -31,6 +31,10 @@ type Props = {
    * Default: samma som `height`. Blurren ligger överst; toningen täcker hela höjden.
    */
   blurHeight?: number;
+  /** Jämn mörk tint över statusfältets höjd, bara i mörkt läge (läsbar vit
+   *  statustext över ljusa bilder). Jämn där texten står (övre halvan), mjuk
+   *  utgång i nedre halvan, så att ingen kant syns; slutar vid statusfältets underkant. */
+  statusTint?: boolean;
   style?: StyleProp<ViewStyle>;
 };
 
@@ -57,6 +61,7 @@ export default function EdgeFade({
   blur = true,
   shape = 'straight',
   blurHeight,
+  statusTint = false,
   style,
 }: Props) {
   // Startbredd från fönstret, så att inget behöver vänta på onLayout (brief 17).
@@ -140,6 +145,13 @@ export default function EdgeFade({
       ) : (
         blurLayers
       )}
+      {statusTint && isTop && scheme === 'dark' && insets.top > 0 ? (
+        <LinearGradient
+          colors={[overlay.statusBarTintDark, overlay.statusBarTintDark, overlay.statusBarTintDark.replace(/[\d.]+\)$/, '0)')]}
+          locations={[0, edgeBlur.statusTintSolid, 1]}
+          style={[styles.statusTint, { height: insets.top }]}
+        />
+      ) : null}
       {variant === 'clear' ? null : wave ? (
         width > 0 && (
           <MaskedView
@@ -195,6 +207,12 @@ function OrganicMask({ width, height }: { width: number; height: number }) {
 }
 
 const styles = StyleSheet.create({
+  statusTint: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
   blurZone: {
     position: 'absolute',
     left: 0,

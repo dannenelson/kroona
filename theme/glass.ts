@@ -73,6 +73,9 @@ export const lightPhotoGlass: Glass = {
 // Intensiteten räknas om från px med samma översättning som glaset
 // (ca 3,5 intensity per px blur).
 export const edgeBlur = {
+  /** Statusfältets tint (overlay.statusBarTintDark, mörkt läge): jämn ned till den här
+   *  andelen av statusfältets höjd (där texten står), sedan mjuk utgång till underkanten. */
+  statusTintSolid: 0.5,
   maxBlur: 8,
   layers: [
     // Lager med starkast blur täcker kortast sträcka.

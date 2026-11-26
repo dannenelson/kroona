@@ -191,6 +191,7 @@ export default function PartnerScreen() {
       <EdgeFade
         // Bara blur, ingen mörk toning över bilden överst (samma blurlager och styrka).
         variant="clear"
+        statusTint
         position="top"
         height={insets.top + barHeight + spacing.lg}
         blurHeight={insets.top + edgeBlur.topExtra}
