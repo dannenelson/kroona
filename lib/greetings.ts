@@ -11,7 +11,7 @@ export const GREETINGS: readonly Slot[] = [
   {
     from: 12,
     to: 17,
-    lines: ['God eftermiddag, {namn}', 'Dags för en paus, {namn}?', 'Hej {namn}, eftermiddagsinspiration?'],
+    lines: ['God eftermiddag, {namn}', 'Dags för en paus, {namn}?', 'Eftermiddagsfynd, {namn}?'],
   },
   { from: 17, to: 22, lines: ['God kväll, {namn}', 'Mysig kväll, {namn}', 'Kvällens fynd, {namn}?'] },
   { from: 22, to: 5, lines: ['Sent uppe, {namn}?', 'Nattugglan {namn}', 'Natt, {namn}'] },

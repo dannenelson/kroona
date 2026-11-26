@@ -341,9 +341,11 @@ export default function ProductScreen() {
         </Reanimated.View>
       </Transition.ScrollView>
 
-    {/* Toppen: en enda kant i temats toning (brief 15). Toningen täcker
-        titelraden; blurren ligger kvar kort bakom statusfält/Dynamic Island. */}
+    {/* Toppen: bara kantblur bakom statusfält/Dynamic Island, ingen tonad
+        övergång över bilden (tidigare temats toning, brief 15). */}
     <EdgeFade
+      // Bara blur, ingen mörk toning över bilden överst (samma blurlager och styrka).
+      variant="clear"
       position="top"
       height={insets.top + barHeight + spacing.lg}
       blurHeight={insets.top + edgeBlur.topExtra}

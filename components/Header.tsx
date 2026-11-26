@@ -45,9 +45,9 @@ export default function Header() {
           <NotificationIcon size={iconSize.lg} unread={hasUnread} />
         </Pressable>
       </View>
-      {/* Varierande hälsning (lib/greetings.ts), samma hela sessionen; alltid en rad,
-          en lång rad krymps hellre än bryts. */}
-      <Text style={styles.greeting} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={homeHeader.greetingMinScale}>
+      {/* Varierande hälsning (lib/greetings.ts), samma hela sessionen. Alla rader
+          ryms på en rad i full storlek; ett oväntat långt namn bryts, högst två rader. */}
+      <Text style={styles.greeting} numberOfLines={2}>
         {sessionGreetingFor(DUMMY_USER.name)}
       </Text>
     </View>
