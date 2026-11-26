@@ -31,9 +31,8 @@ type Props = {
    * Default: samma som `height`. Blurren ligger överst; toningen täcker hela höjden.
    */
   blurHeight?: number;
-  /** Jämn mörk tint över statusfältets höjd, bara i mörkt läge (läsbar vit
-   *  statustext över ljusa bilder). Jämn där texten står (övre halvan), mjuk
-   *  utgång i nedre halvan, så att ingen kant syns; slutar vid statusfältets underkant. */
+  /** Mörk tint bakom statusfältet, bara i mörkt läge (läsbar vit statustext över
+   *  ljusa bilder): starkast överst, lång mjuk utfasning (edgeBlur.statusTint). */
   statusTint?: boolean;
   style?: StyleProp<ViewStyle>;
 };
@@ -147,9 +146,13 @@ export default function EdgeFade({
       )}
       {statusTint && isTop && scheme === 'dark' && insets.top > 0 ? (
         <LinearGradient
-          colors={[overlay.statusBarTintDark, overlay.statusBarTintDark, overlay.statusBarTintDark.replace(/[\d.]+\)$/, '0)')]}
-          locations={[0, edgeBlur.statusTintSolid, 1]}
-          style={[styles.statusTint, { height: insets.top }]}
+          colors={
+            edgeBlur.statusTint.strength.map((k) =>
+              withAlpha(overlay.statusBarTint.color, overlay.statusBarTint.alpha * k),
+            ) as Colors
+          }
+          locations={[...edgeBlur.statusTint.locations] as Stops}
+          style={[styles.statusTint, { height: insets.top * edgeBlur.statusTint.length }]}
         />
       ) : null}
       {variant === 'clear' ? null : wave ? (

@@ -152,12 +152,9 @@ export const overlay = {
     ['#3C4951', '#16191C'],
     ['#49493D', '#1B1B17'],
   ] as [string, string][],
-  /** Jämn mörk tint bakom statusfältet över bilder, BARA i mörkt läge (vit
-   *  statustext). 32 % ink900 är (med liten marginal) det svagaste som ger vit
-   *  text minst 3:1 där statustexten står, mot den ljusaste bilden i dummydatan
-   *  (Black Studio Sneaker, nästan vit): uppmätt i simulatorn ovanpå kantblurren
-   *  3,20:1 där bandet är ljusast, 3,57:1 i medel. Ljust läge: mörk statustext, ingen tint. */
-  statusBarTintDark: 'rgba(21,23,27,0.32)',
+  /** Mörk tint bakom statusfältet över bilder, BARA i mörkt läge (vit statustext).
+   *  `alpha` är toppvärdet (överst); den fasas ut enligt edgeBlur.statusTint. */
+  statusBarTint: { color: raw.ink900, alpha: 0.32 },
   /** Svagare toning på Partnerdetaljens lägre hero (brief 65): kortare och
    *  mjukare än scrimStops, slutar på 70 % (text på den är fortfarande vit). */
   heroScrimSoft: {
