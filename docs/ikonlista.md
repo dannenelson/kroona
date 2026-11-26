@@ -32,7 +32,12 @@
 | Sök och dialog | mikrofon | `microphone` | F0 | i bruk (fältet) |
 | Sök och dialog | skicka | `send` | F0 | i bruk (dialogens skicka-knapp) |
 | Sök och dialog | filter | `filter` | F0 | fil finns, ingen plats i appen än |
-| Åtgärder | följ (av/på) | `user-add` | F0 | i bruk i menyerna, samma ikon för Följ och Sluta följa; egen vald-variant saknas |
+| Åtgärder | följ person | `user-add` | F0 | i bruk (brief 67): Följ på personer (kontextmenyn i Fler i din stil); även platshållare för Följ/Sluta följa på samlingar och områden (oförändrat mönster) |
+| Åtgärder | följer person | `user-check` | F0 | i bruk (brief 67): Sluta följa på personer (kontextmenyn när man följer, Sparat › Följer) |
+| Åtgärder | följ företag | `company-add` | F0 | i bruk (brief 67): "Följ varumärke" i produktkortets meny, Följ i varumärkeskortets meny. Två former är fyllda konturer (flaggat) |
+| Åtgärder | följer företag | `company-check` | F0 | i bruk (brief 67): Sluta följa på företag (varumärkeskortets meny, Sparat › Följer). Samma fyllda konturer som company-add |
+| Hitta | historik | `history` | F0 | i bruk (brief 67): Arkivets tomläge; rubrikerna Tidigare/Arkiv har ingen ikon |
+| Kategorier | begagnat | `recycle` | F0 | i registret (brief 67), inte i bruk: Begagnat visas utan ikon (pillar, kategorikort, etiketten "Begagnat") |
 | Åtgärder | spara (av/på) | `bookmark` | F0 | i bruk (Produktdetalj, kontextmenyn, Sparade produkter, SaveSheet), kodfylld när sparad |
 | Åtgärder | gilla | `heart` | F0 | fil finns (bara dev-sidan), kodfylld fungerar |
 | Åtgärder | dela | `share` | F0 | i bruk (Produktdetalj, menyer) |
@@ -62,6 +67,6 @@ Instagram, Pinterest, TikTok, Facebook, YouTube, X och LinkedIn: `assets/svg/bra
 | begagnat, nytt | – | saknas |
 
 ## Öppet
-- Följ (vald/följer) saknar egen ritning; `user-add` används för både Följ och Sluta följa.
+- Följ: `user-add`/`user-check` för personer och `company-add`/`company-check` för företag, efter läge (brief 67). Samlingar och områden behåller `user-add` som platshållare.
 - `notification-filled.svg`: pricken är hårdkodad `#111111` (syns inte i mörkt läge) och klockans kontur är öppen vid pricken.
 - Kodfyllning passar inte alla ikoner (rapport 58).

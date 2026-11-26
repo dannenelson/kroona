@@ -50,7 +50,7 @@ export default function ArchiveScreen() {
         <ScreenHeader title="Arkiv" />
         {entries.length === 0 ? (
           <View style={styles.empty}>
-            <Icon name="clock" color={colors.textTertiary} size={iconSize.lg * 2} />
+            <Icon name="history" color={colors.textTertiary} size={iconSize.lg * 2} />
             <Text style={styles.emptyText}>Inget här än. Dina sökningar och dialoger sparas här.</Text>
           </View>
         ) : (

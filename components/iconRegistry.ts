@@ -16,6 +16,8 @@ import I_chevron_right from '../assets/svg/icons/chevron-right.svg';
 import I_chevron_up from '../assets/svg/icons/chevron-up.svg';
 import I_clock from '../assets/svg/icons/clock.svg';
 import I_close from '../assets/svg/icons/close.svg';
+import I_company_add from '../assets/svg/icons/company-add.svg';
+import I_company_check from '../assets/svg/icons/company-check.svg';
 import I_copy from '../assets/svg/icons/copy.svg';
 import I_document_1 from '../assets/svg/icons/document-1.svg';
 import I_document_2 from '../assets/svg/icons/document-2.svg';
@@ -34,6 +36,7 @@ import I_folders_filled from '../assets/svg/icons/folders-filled.svg';
 import I_gift from '../assets/svg/icons/gift.svg';
 import I_grid from '../assets/svg/icons/grid.svg';
 import I_heart from '../assets/svg/icons/heart.svg';
+import I_history from '../assets/svg/icons/history.svg';
 import I_home from '../assets/svg/icons/home.svg';
 import I_image from '../assets/svg/icons/image.svg';
 import I_image_add from '../assets/svg/icons/image-add.svg';
@@ -58,6 +61,7 @@ import I_notification from '../assets/svg/icons/notification.svg';
 import I_notification_filled from '../assets/svg/icons/notification-filled.svg';
 import I_one_column_grid from '../assets/svg/icons/one-column-grid.svg';
 import I_plus from '../assets/svg/icons/plus.svg';
+import I_recycle from '../assets/svg/icons/recycle.svg';
 import I_redo from '../assets/svg/icons/redo.svg';
 import I_refresh_1 from '../assets/svg/icons/refresh-1.svg';
 import I_refresh_2 from '../assets/svg/icons/refresh-2.svg';
@@ -83,6 +87,7 @@ import I_trending_up from '../assets/svg/icons/trending-up.svg';
 import I_undo from '../assets/svg/icons/undo.svg';
 import I_user from '../assets/svg/icons/user.svg';
 import I_user_add from '../assets/svg/icons/user-add.svg';
+import I_user_check from '../assets/svg/icons/user-check.svg';
 import I_verified from '../assets/svg/icons/verified.svg';
 import I_verified_filled from '../assets/svg/icons/verified-filled.svg';
 import I_warning from '../assets/svg/icons/warning.svg';
@@ -103,6 +108,8 @@ export const iconRegistry = {
   'chevron-up': I_chevron_up,
   'clock': I_clock,
   'close': I_close,
+  'company-add': I_company_add,
+  'company-check': I_company_check,
   'copy': I_copy,
   'document-1': I_document_1,
   'document-2': I_document_2,
@@ -121,6 +128,7 @@ export const iconRegistry = {
   'gift': I_gift,
   'grid': I_grid,
   'heart': I_heart,
+  'history': I_history,
   'home': I_home,
   'image': I_image,
   'image-add': I_image_add,
@@ -145,6 +153,7 @@ export const iconRegistry = {
   'notification-filled': I_notification_filled,
   'one-column-grid': I_one_column_grid,
   'plus': I_plus,
+  'recycle': I_recycle,
   'redo': I_redo,
   'refresh-1': I_refresh_1,
   'refresh-2': I_refresh_2,
@@ -170,6 +179,7 @@ export const iconRegistry = {
   'undo': I_undo,
   'user': I_user,
   'user-add': I_user_add,
+  'user-check': I_user_check,
   'verified': I_verified,
   'verified-filled': I_verified_filled,
   'warning': I_warning,

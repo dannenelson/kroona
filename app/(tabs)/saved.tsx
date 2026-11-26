@@ -424,7 +424,7 @@ function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subt
           navigation: true,
           onPress: () => router.push({ pathname: '/partner/[id]', params: { id: retailer.id } }),
         },
-        { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
+        { label: 'Sluta följa', icon: 'company-check', onPress: onUnfollow },
       ]}
     />
   );
@@ -480,7 +480,7 @@ function PersonRow({ person, onUnfollow }: { person: Person; onUnfollow: () => v
           navigation: true,
           onPress: () => router.push({ pathname: '/profile/[id]', params: { id: person.id } }),
         },
-        { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
+        { label: 'Sluta följa', icon: 'user-check', onPress: onUnfollow },
       ]}
     />
   );

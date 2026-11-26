@@ -52,7 +52,8 @@ export default function ProfileCard({ name, initial, partnerId, personId }: Prop
       ? [
           {
             label: isFollowingPerson(personId) ? 'Sluta följa' : 'Följ',
-            icon: 'user-add',
+            // Person (brief 67): user-add / user-check efter läge.
+            icon: isFollowingPerson(personId) ? 'user-check' : 'user-add',
             onPress: () => toggleFollowPerson(personId),
           },
           { label: 'Öppna', icon: 'chevron-right', navigation: true, onPress: open },

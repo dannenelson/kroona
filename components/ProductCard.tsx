@@ -112,7 +112,7 @@ export default function ProductCard({
   const menuItems: ContextMenuItem[] = [
     { label: save.inSavedProducts ? 'Sparad' : 'Spara', icon: 'bookmark', filled: save.saved, onPress: save.quickSave },
     { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
-    { label: 'Följ varumärke', icon: 'user-add' },
+    { label: 'Följ varumärke', icon: 'company-add' },
     { label: 'Dela', icon: 'share' },
     { label: 'Visa liknande', icon: 'layers' },
   ];

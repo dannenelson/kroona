@@ -61,7 +61,12 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   // Följ använder samma toggle som den borttagna +/✓-knappen. Dela är en
   // platshållare i Fas 0 (ingen delning byggd).
   const menuItems: ContextMenuItem[] = [
-    { label: followed ? 'Sluta följa' : 'Följ', icon: 'user-add', onPress: () => toggleFollowed(id) },
+    {
+      label: followed ? 'Sluta följa' : 'Följ',
+      // Följ-ikon (brief 67): företag company-add/-check efter läge; samlingar som förut.
+      icon: partnerId ? (followed ? 'company-check' : 'company-add') : 'user-add',
+      onPress: () => toggleFollowed(id),
+    },
     { label: 'Öppna', icon: 'chevron-right', navigation: true, onPress: open },
     { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
   ];
