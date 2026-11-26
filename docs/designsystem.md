@@ -178,10 +178,10 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - Hållbarhetsbetyg: löv-ikon + värde, t.ex. `🍃 4,2`
 
 **Produktkortets textblock (brief 62, 68):** **en komponent**, `components/ProductCardText.tsx`, används av alla produktkort (via `ProductCard`): Hem-hyllor, Följer (masonry och en kolumn), Sökresultat, dialogens produkthylla, kategori, område, samling, Sparade produkter, partnersidan och Liknande. Enda skillnaden mellan platserna är `showSave` (spara-knappen); avstånd och typografi är desamma.
-- **Två kolumner**, 8 under bildens underkant: rad med `alignItems: 'flex-start'` (valign top), 8 mellan kolumnerna. **Vänster** (`flex: 1`, `minWidth: 0`): märke, namn, pris och betyg, vänsterjusterade mot bildens vänsterkant. **Höger** (bara med `showSave`): bokmärket i fast 24-ruta, tryckyta 44 via `hitSlop`.
-- **Linjering:** bokmärkets synliga överkant linjerar med märkesradens versaler och dess synliga högerkant med bildens högerkant (optiska justeringar `productCard.saveOffsetY` 2 och `saveOffsetX` 3, uppmätta på skärmdump).
+- **Samma textstilar i alla storlekar:** märke `label`, namn `body` 400, pris `body`-storlek i 600 med "kr" i `micro`. Stora kort har ingen egen uppsättning värden, så pris och namn skiljer sig på samma sätt på små och stora kort.
+- **Spara på namnraden** (bara med `showSave`, en-kolumn i Följer): märket överst, sedan namnet till vänster och den runda spara-knappen (`SaveButton`, glas 44, bara bokmärket) till höger, överjusterade. Samma lösning som Produktdetalj (`components/product/NameWithSave.tsx`): knappens överhöjd hänger ned bredvid priset i stället för att göra namnraden högre; knappens högerkant mot bildens.
 - **Avstånd:** märke/namn/pris `productCard.textGap` 2, betygsraden `spacing.xs` 4. Märkesraden är alltid en rad (fast radhöjd). Rader som saknas tar ingen plats.
-- **Namnregel:** namnet radbryter i vänsterkolumnen, högst två rader, sedan ellipsis, och går aldrig in under spara-knappen. Utan knapp tar vänsterkolumnen hela bredden.
+- **Namnregel:** namnet radbryter före spara-knappen, högst två rader, sedan ellipsis, och går aldrig in under knappen. Utan knapp tar namnet hela bredden.
 - Produktdetalj visar betyget direkt under namn och pris (se `design.md` §4).
 
 ## 12. Button, Sheet och Snackbar (tillagt 2026-11-20, brief 33)
@@ -252,7 +252,7 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 
 ## 21. Följer: masonry-kort och en-kolumn-kort (tillagt 2026-11-25, brief 59)
 - **Masonry-kort** = `ProductCard` M med `aspectRatio` från `masonryRatio(product)` (`lib/followFeed.ts`): produktbildens proportion avrundad till 3:4, 2:3, 4:5 eller 1:1, annars stabil från id. Två kolumner, varje kort i den kortaste (`layoutMasonry`), `followFeed.masonryRowGap` 20 i höjdled, `spacing.gutter` mellan kolumnerna.
-- **En-kolumn-kort** = `ProductCard` L i full bredd med `aspectRatio={followFeed.singleRatio}` (4:5) och **`saveButton`**: textblocket (`ProductCardText` med `showSave`) med texten till vänster och bokmärket (fyllt när sparad) till höger, se Produktkortets textblock. Tryck = snabbspar (som "Spara" i kontextmenyn), långt tryck = "Spara i …". `followFeed.singleRowGap` 28 mellan korten.
+- **En-kolumn-kort** = `ProductCard` L i full bredd med `aspectRatio={followFeed.singleRatio}` (4:5) och **`saveButton`**: textblocket (`ProductCardText` med `showSave`) med den runda spara-knappen på namnraden (fylld när sparad), se Produktkortets textblock. Tryck = snabbspar (som "Spara" i kontextmenyn), långt tryck = "Spara i …". `followFeed.singleRowGap` 28 mellan korten.
 - **Filter:** `lib/productFilters.ts` (`ProductFilter`, `BASE_FILTER_OPTIONS`, `filterOptionsWithAreas`, `filterProducts`), tänkt att delas med Hems pillar senare.
 - **Flödet:** `lib/followFeed.ts` (`buildFollowFeed` med frö, `getFollowedProducts`, `getInspirationProducts`, `FEED_LIMIT` 40).
 

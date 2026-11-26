@@ -39,7 +39,7 @@ import TopBar from '../../components/TopBar';
 import EdgeFade from '../../components/EdgeFade';
 import SectionTitle from '../../components/SectionTitle';
 import ProductCard from '../../components/ProductCard';
-import SaveButton from '../../components/product/SaveButton';
+import NameWithSave from '../../components/product/NameWithSave';
 import { FactList, type Fact } from '../../components/product/FactList';
 import OfferRow from '../../components/product/OfferRow';
 import Icon from '../../components/Icon';
@@ -225,14 +225,9 @@ export default function ProductScreen() {
         <Reanimated.View style={revealStyle}>
           <View style={styles.info}>
             <Text style={styles.brand}>{product.brand}</Text>
-            {/* Namnet och Spara på samma rad, överjusterade (brief 69). Namnet
-                radbryter före knappen och går aldrig under den. */}
-            <View style={styles.nameRow}>
-              <Text style={styles.name}>{product.name}</Text>
-              <View style={styles.save}>
-                <SaveButton productId={product.id} />
-              </View>
-            </View>
+            {/* Namnet och Spara på samma rad, överjusterade; samma lösning som
+                stora produktkort (NameWithSave). */}
+            <NameWithSave name={product.name} nameStyle={styles.name} productId={product.id} />
             <View style={styles.priceRow}>
               <View style={styles.priceBlock}>
                 {data.lowest !== undefined && (
@@ -396,23 +391,13 @@ const useStyles = makeStyles((t) => ({
     ...typography.label,
     color: t.colors.textSecondary,
   },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.md,
-  },
   name: {
     ...typography.title1,
     color: t.colors.textPrimary,
-    flex: 1,
-    minWidth: 0,
   },
-  // Knappen (44) är högre än en namnrad (30): överskottet hänger ned bredvid
-  // priset i stället för att göra namnraden högre.
-  save: {
-    marginBottom: typography.title1.lineHeight - touchTarget,
-  },
+  // Mer luft mellan namn och pris: `spacing.sm` totalt (textblockets gap är `spacing.xs`).
   priceRow: {
+    marginTop: spacing.sm - spacing.xs,
     flexDirection: 'row',
     alignItems: 'center',
   },

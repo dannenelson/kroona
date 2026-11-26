@@ -219,15 +219,14 @@ export default function ProductCard({
 
           {!isSmall && (
             <ProductCardText
+              id={id}
               brand={brand}
               name={name}
               price={price}
               rating={rating}
               reviewCount={reviewCount}
               sustainabilityScore={sustainabilityScore}
-              large={isLarge}
               showSave={saveButton}
-              save={save}
             />
           )}
         </Animated.View>

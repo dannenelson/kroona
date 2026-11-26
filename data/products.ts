@@ -44,7 +44,7 @@ export const CATALOG: CatalogProduct[] = [
   {
     id: '3',
     brand: 'Weekday',
-    name: 'Black Studio Sneaker',
+    name: 'Black Studio Sneaker i återvunnen mesh', // TESTDATA långt namn, tidigare 'Black Studio Sneaker'
     imageUrl: I.sneakerBlackStudio,
     aspectRatio: 1,
     sustainabilityScore: 3.5,
@@ -74,7 +74,7 @@ export const CATALOG: CatalogProduct[] = [
   {
     id: '5',
     brand: 'H&M',
-    name: 'Red Runner Sneaker',
+    name: 'Red Runner Sneaker med stötdämpande sula och reflexdetaljer', // TESTDATA långt namn, tidigare 'Red Runner Sneaker'
     imageUrl: I.sneakerRedRunner,
     aspectRatio: 500 / 333,
     sustainabilityScore: 3.3,
@@ -187,7 +187,7 @@ export const CATALOG: CatalogProduct[] = [
   {
     id: '13',
     brand: 'Lindex',
-    name: 'Suede Ankle Boots',
+    name: 'Suede Ankle Boots i vegetabiliskt garvad mocka med dragkedja', // TESTDATA långt namn, tidigare 'Suede Ankle Boots'
     imageUrl: I.bootsSuede,
     aspectRatio: 500 / 326,
     sustainabilityScore: 4.0,
@@ -200,7 +200,7 @@ export const CATALOG: CatalogProduct[] = [
   {
     id: '14',
     brand: 'Ekens Verkstad',
-    name: 'Bentwood Lounge Chair',
+    name: 'Bentwood Lounge Chair i böjd ek', // TESTDATA långt namn, tidigare 'Bentwood Lounge Chair'
     imageUrl: I.chairLoungeDark,
     aspectRatio: 500 / 793,
     sustainabilityScore: 4.6,
@@ -273,7 +273,7 @@ export const CATALOG: CatalogProduct[] = [
   {
     id: '19',
     brand: 'Lindex',
-    name: 'Double-breasted Blazer',
+    name: 'Double-breasted Blazer i ullblandning', // TESTDATA långt namn, tidigare 'Double-breasted Blazer'
     imageUrl: I.blazerRed,
     aspectRatio: 500 / 750,
     sustainabilityScore: 3.9,
