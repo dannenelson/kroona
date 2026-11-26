@@ -13,7 +13,6 @@ import {
   overlay,
   edgeBlur,
   editorialCard,
-  spacing,
   logo as logoTokens,
 } from '../theme';
 import { LOGO_ASPECT, type LogoComponent } from '../data/logos';
@@ -44,7 +43,7 @@ type Props = {
   /** Liten ikon före titeln, t.ex. förstoringsglas på idékort (brief 53). */
   titleIcon?: ReactNode;
   /** Samling utan logotyp (brief 63): större titel (stor `title1`, liten `title2`)
-   *  som väger som en logotyp, och mer luft till undertiteln. */
+   *  som väger som en logotyp och tar logotypens yta, centrerad kring dess mittpunkt. */
   prominentTitle?: boolean;
   /** Zoomövergång (CollectionCard-mönstret): hela kortet är källan. */
   boundary?: { id: string; group: string };
@@ -93,6 +92,11 @@ export default function EditorialCard({
   const bottomRadii = { borderBottomLeftRadius: r, borderBottomRightRadius: r };
   // Större titel: ett enda ord bryts aldrig mitt i, det krymps i stället på en rad.
   const shrinkWord = prominentTitle && !title.trim().includes(' ');
+  // Logotypytan (90 × 45-filer, 2:1): ca 65 % (stor) / 85 % (liten) av kortets
+  // bredd, högst `logo.maxHeight` hög. Samma yta tas av den större titeln.
+  const logoShare = v.small ? logoTokens.smallShare : logoTokens.largeShare;
+  const logoWidth = Math.min(width * logoShare, logoTokens.maxHeight * LOGO_ASPECT);
+  const logoHeight = Math.min((width * logoShare) / LOGO_ASPECT, logoTokens.maxHeight);
 
   const visual = (
     <View style={[styles.card, shape]}>
@@ -142,7 +146,6 @@ export default function EditorialCard({
           styles.text,
           v.small && styles.textSmall,
           v.centered && styles.textCentered,
-          prominentTitle && !Logo && styles.textProminent,
         ]}
       >
         {status ? (
@@ -151,14 +154,17 @@ export default function EditorialCard({
           </Text>
         ) : null}
         {Logo ? (
-          // Logotypen: ca 60 % (stor) / 75 % (liten) av kortets bredd, högst 36 hög.
-          <Logo
-            width={Math.min(width * (v.small ? logoTokens.smallShare : logoTokens.largeShare), logoTokens.maxHeight * LOGO_ASPECT)}
-            height={Math.min((width * (v.small ? logoTokens.smallShare : logoTokens.largeShare)) / LOGO_ASPECT, logoTokens.maxHeight)}
-            style={!v.centered && styles.logoStart}
-          />
+          <Logo width={logoWidth} height={logoHeight} style={!v.centered && styles.logoStart} />
         ) : (
-        <View style={[styles.titleRow, v.centered && styles.titleRowCentered]}>
+        // Större titel (samling utan logotyp): tar logotypens yta och står kring
+        // dess vertikala mittpunkt; två rader växer lika mycket uppåt som nedåt.
+        <View
+          style={[
+            styles.titleRow,
+            v.centered && styles.titleRowCentered,
+            prominentTitle && [styles.titleSlot, { height: logoHeight }],
+          ]}
+        >
           {titleIcon}
           <Text
             style={[
@@ -258,10 +264,6 @@ const useStyles = makeStyles((t) => ({
     bottom: editorialCard.padding,
     gap: 2, // lokal optisk luft: titel → undertitel
   },
-  // Samling utan logotyp: titel och undertitel hänger inte ihop (brief 63).
-  textProminent: {
-    gap: spacing.sm,
-  },
   textSmall: {
     left: editorialCard.paddingSmall,
     right: editorialCard.paddingSmall,
@@ -274,6 +276,10 @@ const useStyles = makeStyles((t) => ({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6, // lokal optisk luft: ikon → titel (brief 53)
+  },
+  // Fast höjd som logotypen; innehållet centreras (och flödar lika åt båda håll).
+  titleSlot: {
+    alignSelf: 'stretch',
   },
   titleRowCentered: {
     justifyContent: 'center',

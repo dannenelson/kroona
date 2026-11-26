@@ -14,7 +14,7 @@ import { PRODUCT_IMAGES } from '../data/productImages';
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
 
 /** Typikon före titeln (brief 63), vit på toningen. Typerna i Fas 0: dialog och
- *  samling; sökning `search`, produkt `tag` och företag `shield` när de finns. */
+ *  samling (`folder`); sökning `search`, produkt `tag` och företag `shield` när de finns. */
 const typeIcon = (name: IconName) => <Icon name={name} color={overlay.onPhoto} size={editorialCard.typeIcon} />;
 
 /**
@@ -57,7 +57,7 @@ export default function ContinueRow() {
         variant="landscape"
         status="Senast öppnad"
         title={lastOpenedCollection.name}
-        titleIcon={typeIcon('layers')}
+        titleIcon={typeIcon('folder')}
         subtitle={countLabel(knownProductIds(lastOpenedCollection.productIds).length)}
         cover={<CollectionMosaic images={collectionImages} style={StyleSheet.absoluteFill} />}
         boundary={{ id: boundaryId, group: COLLECTION_BOUNDARY_GROUP }}

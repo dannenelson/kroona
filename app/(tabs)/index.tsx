@@ -35,20 +35,14 @@ export default function HomeScreen() {
         }}
       >
         {/* Hem-toppen (brief 46, ordning brief 63): toppraden + hälsning, AskBar
-            (tryckbart fält som öppnar sökläget, brief 53), filterpillar direkt över
-            innehållet de växlar. Toppraden → hälsning 8 (i Header), sedan 16 mellan. */}
+            (tryckbart fält som öppnar sökläget, brief 53), sedan filterpillarna, som
+            hör till innehållet under: fält → pillar 32, pillar → första hyllan 24.
+            Toppraden → hälsning 8 (i Header), hälsning → fält 16. */}
         <View style={styles.top}>
           <Header />
           <AskBar placeholder="Vad är du intresserad av idag?" />
-          <FilterPills items={FILTERS} selected={filter} onSelect={setFilter} />
         </View>
-        {/* Dev-länk till komponentsidan, bara i utvecklingsläge.
-            Flyttas eller tas bort när Hem byggs om. */}
-        {__DEV__ && (
-          <Link href="/components" style={styles.devLink}>
-            <Text style={styles.devLinkText}>Komponenter (dev)</Text>
-          </Link>
-        )}
+        <FilterPills items={FILTERS} selected={filter} onSelect={setFilter} style={styles.pills} />
         {/* Hyllor (brief 43), uppifrån och ned. Varje hylla döljer sig själv när
             den saknar innehåll. Borttagna från Hem men kvar i filsystemet:
             ContinueDialogRow, CollectionRow ("Du följer"), DiscoverBrandsRow,
@@ -60,6 +54,13 @@ export default function HomeScreen() {
         <AreasRow />
         <PopularCollectionsRow />
         <RecommendedProductsRow />
+        {/* Dev-länk till komponentsidan, bara i utvecklingsläge. Längst ned så att
+            den inte påverkar avståndet pillar → första hyllan. */}
+        {__DEV__ && (
+          <Link href="/components" style={styles.devLink}>
+            <Text style={styles.devLinkText}>Komponenter (dev)</Text>
+          </Link>
+        )}
       </ScrollView>
     </View>
   );
@@ -73,7 +74,15 @@ const useStyles = makeStyles((t) => ({
   top: {
     gap: spacing.lg,
   },
+  // Hyllorna har `spacing.xxl` över sig; pillarna drar upp den första till
+  // `spacing.xl`, så att pillarna läses ihop med innehållet under.
+  pills: {
+    flexGrow: 0,
+    marginTop: spacing.xxl,
+    marginBottom: spacing.xl - spacing.xxl,
+  },
   devLink: {
+    marginTop: spacing.xxl,
     paddingHorizontal: spacing.screenMargin,
     paddingVertical: spacing.sm,
   },
