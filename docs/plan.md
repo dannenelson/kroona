@@ -21,7 +21,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | Hem | ✅ | 🚧 | 🟡 Gammal stil: tio sektioner, filter utan logik. Ingen hälsningshero eller glas. |
 | Följer | ✅ | ⬜ | 🟡 Grundversion (`feed.tsx`, ProductGrid) |
 | Hitta | ✅ | ⬜ | ✅ Fungerande chatt mot Claude API. Saknar länk till Produktdetalj, arkiv/ny chatt och tal. |
-| Sparat | ✅ | ⬜ | 🟡 Ny struktur byggd (brief 35): Mina samlingar \| Följer, Gillade produkter, rader/kort, Följer i sektioner. Lägg till i samling och redigera kvar. |
+| Sparat | ✅ | ⬜ | 🟡 Ny struktur byggd (brief 35): Mina samlingar \| Följer, Sparade produkter (hette Gillade produkter före brief 61), rader/kort, Följer i sektioner. Lägg till i samling och redigera kvar. |
 | Produktdetalj, Samling, Partner, Profil | ✅ | ⬜ | 🟡 Produkt- (+ lightbox), Samlings- och Partnerdetalj byggda. Profil parkerad. |
 | Onboarding | parkerad | — | — |
 

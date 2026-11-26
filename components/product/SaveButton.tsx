@@ -8,8 +8,8 @@ import Icon from '../Icon';
 
 /**
  * Spara-knappen på Produktdetalj (brief 13, 40, 41): tryck = snabbspar till
- * Gillade produkter, långt tryck = kortet "Spara i …" (useSaveActions).
- * Bokmärke, fyllt när produkten ligger i Gillade produkter eller någon samling; ytan
+ * Sparade produkter, långt tryck = kortet "Spara i …" (useSaveActions).
+ * Bokmärke, fyllt när produkten ligger i Sparade produkter eller någon samling; ytan
  * inverteras inte (beslutad avvikelse från designen). Pop vid sparande,
  * lätt haptik, animerad press. Använder befintliga SavedProductsContext.
  */

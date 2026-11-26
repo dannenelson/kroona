@@ -2,6 +2,10 @@
 // (ny ersätter gammal), syns ca 4 s, kan svepas bort nedåt. Valfri miniatyr
 // till vänster och åtgärd (t.ex. "Visa") som kompakt pill till höger.
 // Läge: centrerad, ovanför flikfältet när det syns, annars 40 px från botten.
+// Bredd (brief 61): alltid max-bredden (skärmbredd minus marginaler, högst
+// `snackbar.maxWidth`), aldrig smalare efter innehållet. Namn (`subject`,
+// `object`) i fetstil; ett långt namn kortas med ellipsis så att resten av
+// meningen alltid syns: `subject` står på en egen rad överst, `object` sist.
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Animated, Image, StyleSheet, Text, View } from 'react-native';
 import { BlurView } from 'expo-blur';
@@ -15,7 +19,12 @@ import { tabBarSpace } from './CustomTabBar';
 import Button from './Button';
 
 export type SnackbarOptions = {
+  /** Meningen (utan namnen), t.ex. "lades till i sparade produkter". */
   text: string;
+  /** Namnet som inleder meningen (t.ex. produktnamnet): fetstil, en rad, kortas med ellipsis. */
+  subject?: string;
+  /** Namnet som avslutar meningen (t.ex. samlingsnamnet): fetstil, kortas sist med ellipsis. */
+  object?: string;
   /** Miniatyr (t.ex. produktbilden) till vänster. */
   thumbUri?: string;
   /** Valfri åtgärd, t.ex. { label: 'Visa', onPress }. */
@@ -129,9 +138,21 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
               />
               <View style={[StyleSheet.absoluteFill, styles.fill]} />
               {current.thumbUri ? <Image source={{ uri: current.thumbUri }} style={styles.thumb} /> : null}
-              <Text style={styles.text} numberOfLines={2}>
-                {current.text}
-              </Text>
+              <View
+                style={styles.textBlock}
+                accessible
+                accessibilityLabel={[current.subject, current.text, current.object].filter(Boolean).join(' ')}
+              >
+                {current.subject ? (
+                  <Text style={[styles.text, styles.name]} numberOfLines={1}>
+                    {current.subject}
+                  </Text>
+                ) : null}
+                <Text style={styles.text} numberOfLines={2}>
+                  {current.text}
+                  {current.object ? <Text style={styles.name}>{` ${current.object}`}</Text> : null}
+                </Text>
+              </View>
               {current.action ? (
                 <Button
                   variant="secondary"
@@ -161,6 +182,7 @@ const useStyles = makeStyles((t) => ({
     paddingHorizontal: spacing.screenMargin,
   },
   bar: {
+    width: '100%',
     maxWidth: snackbar.maxWidth,
     flexDirection: 'row',
     alignItems: 'center',
@@ -187,11 +209,17 @@ const useStyles = makeStyles((t) => ({
     borderCurve: 'continuous',
     backgroundColor: t.colors.placeholder,
   },
+  // Fyller bredden mellan miniatyr och åtgärd, så att åtgärden alltid står längst till höger.
+  textBlock: {
+    flex: 1,
+    paddingHorizontal: spacing.xs,
+  },
+  // Resten av meningen i 400, namnen i 600, så att namnen skiljer sig tydligt.
   text: {
     ...typography.body,
-    fontFamily: fonts.ui500,
     color: t.colors.textPrimary,
-    flexShrink: 1,
-    paddingHorizontal: spacing.xs,
+  },
+  name: {
+    fontFamily: fonts.ui600,
   },
 }));

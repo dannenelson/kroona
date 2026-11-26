@@ -20,7 +20,7 @@ type Props = {
   subtitleIcon?: IconName;
   images: string[];
   width: number;
-  /** Ersätter mosaiken (t.ex. bokmärket för Gillade produkter). */
+  /** Ersätter mosaiken (t.ex. bokmärket för Sparade produkter). */
   cover?: ReactNode;
   menuItems?: ContextMenuItem[];
 };

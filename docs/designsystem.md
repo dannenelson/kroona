@@ -182,12 +182,14 @@ Gäller alla ikon-knappar och pills som sitter direkt på fotografi eller på te
 - **Button** (`components/Button.tsx`): `variant` primary/secondary, `size` cta (≥ 56) / compact (36), `disabled`, valfri `icon`. Tryckrespons som korten.
 - **Sheet** (`components/Sheet.tsx`): helskärmslager för miniflöden (flera steg med tillbaka), blur + scrim som kontextmenyn. Steg = `{ title, render, swipeToClose? }`.
 - **Snackbar** (`components/Snackbar.tsx`): enda bekräftelsekomponenten (ersatte Toast). Text, valfri miniatyr och åtgärd.
+- **Snackbar-regel (brief 61):** alltid samma bredd (max-bredden), aldrig smalare efter innehållet. Produkt- och samlingsnamn i fetstil; långa namn kortas med ellipsis så att resten av meningen alltid syns (namnet som inleder meningen på egen rad, `subject`; namnet sist, `object`). Texter: "**<produkt>** lades till i sparade produkter · Ändra", "**<produkt>** togs bort från sparade produkter", "**<produkt>** lades till i **<samling>** · Visa", "**<samling>** skapades · Visa".
 - Detaljer och tokens: `design.md` §8h.
 
 ## 13. ListRow och vy-växlare (tillagt 2026-11-20, brief 35)
 - **ListRow** (`components/ListRow.tsx`): thumb till vänster (bild, mosaik eller avatar), titel 15/500 och undertext `label` med valfri liten ikon (t.ex. lås). Standard 76 hög med 56-thumb, kompakt 64 med 48-thumb (`listRow` i `theme/spacing.ts`). Tryck = `pressed`-yta (rader krymper inte). Valfri zoom från thumben (`boundary`) och kontextmeny vid långt tryck (thumben lyfts).
 - **Vy-växlare** (`components/SegmentedIcons.tsx`): segmentkontroll med ikoner (rader/kort), pill-bakgrund `surface`, aktivt segment `surfaceRaised` i text-färg, övriga mute, 38 × 30 per segment (`segmented`). Byter direkt med selection-haptik.
 - **Kontextmeny via hook:** `hooks/useLongPressMenu` delas av PartnerCard, samlingskort och listrader (en implementation).
+- **Menyrader (brief 61):** ikon 20 till vänster, `spacing.sm` till texten. Öppna (navigering, `navigation: true`) behåller `chevron-right` till höger och linjerar texten med de andra raderna.
 
 ## 15. Kort-sheet (tillagt 2026-11-23, brief 40)
 - `presentation: 'card'` på första steget ger Sheet som **kort** (YouTube/Instagram): luft runt om, radie 28, nästan solid yta över mörk overlay, vänsterställd rubrik, ingen X (stängs med svep, overlay-tryck eller skrollgesten). Valfri `headerAction` på steget = högerställd neutral textlänk på rubrikraden (t.ex. "Ny samling", brief 41). Utan CTA har kortet ändå luft och blur nedtill.

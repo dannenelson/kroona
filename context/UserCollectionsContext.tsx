@@ -1,7 +1,8 @@
 // Egna samlingar (brief 32), samma mönster som SavedProductsContext och
 // FollowedCollectionsContext: state i minnet, AsyncStorage som lagring.
-// "Gillade produkter" (SavedProductsContext, snabbspar) är INTE en samling
-// (brief 35): en produkt kan vara både gillad och i samlingar, oberoende.
+// "Sparade produkter" (SavedProductsContext, snabbspar; hette Gillade produkter
+// före brief 61) är INTE en samling (brief 35): en produkt kan ligga både där
+// och i samlingar, oberoende.
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { UserCollection } from '../types/catalog';
@@ -10,16 +11,16 @@ const STORAGE_KEY = '@kroona/userCollections';
 /** Senast öppnade egna samling (brief 43, hyllan "Fortsätt där du var" på Hem). */
 const LAST_OPENED_KEY = '@kroona/lastOpenedCollection';
 
-/** Id för "Gillade produkter" i routes (`/collection/saved`, samma vy som samlingar). */
+/** Id för "Sparade produkter" i routes (`/collection/saved`, samma vy som samlingar). */
 export const ALL_SAVED_ID = 'saved';
-export const ALL_SAVED_NAME = 'Gillade produkter';
+export const ALL_SAVED_NAME = 'Sparade produkter';
 
 type UserCollectionsContextValue = {
   userCollections: UserCollection[];
   getUserCollection: (id: string) => UserCollection | undefined;
   /** Skapar en tom samling och returnerar dess id. */
   createCollection: (name: string, visibility: UserCollection['visibility']) => string;
-  /** Lägger till en produkt i en egen samling (oberoende av Gillade produkter).
+  /** Lägger till en produkt i en egen samling (oberoende av Sparade produkter).
    *  Används från "Lägg till i samling" (senare brief). */
   addProductToCollection: (collectionId: string, productId: string) => void;
   /** Tar bort en produkt ur en egen samling (Lägg till i samling, brief 36). */

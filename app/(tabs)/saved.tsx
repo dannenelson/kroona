@@ -1,7 +1,7 @@
 // Sparat (brief 35, wireframes.md §8, skiss "Kroona Sparat – ny struktur"):
 // det man sparat och följer.
 // - Header: "Sparat" + "+" (Sheet: Skapa samling). Flikar: Mina samlingar | Följer.
-// - Mina samlingar: "Gillade produkter" (specialrad, INTE en samling; Spara
+// - Mina samlingar: "Sparade produkter" (specialrad, INTE en samling; Spara
 //   sparar dit), avdelare, sedan egna samlingar. Rader (standard) eller kort,
 //   valet sparas lokalt. Långt tryck: Öppna, Dela.
 // - Följer: sektioner Varumärken, Personer (brief 37) och Samlingar som rader,
@@ -97,7 +97,7 @@ export default function SavedScreen() {
   const snackbar = useSnackbar();
   const { savedProducts } = useSavedProducts();
   const { userCollections } = useUserCollections();
-  // A–Ö i svensk ordning vid visning (brief 42); Gillade produkter ligger fast först.
+  // A–Ö i svensk ordning vid visning (brief 42); Sparade produkter ligger fast först.
   const sortedCollections = useMemo(() => sortByName(userCollections, (c) => c.name), [userCollections]);
   const [tab, setTab] = useState<(typeof TABS)[number]>('Mina samlingar');
   const [viewMode, setViewMode] = useViewMode();
@@ -108,6 +108,7 @@ export default function SavedScreen() {
     {
       label: 'Öppna',
       icon: 'chevron-right',
+      navigation: true,
       onPress: () => router.push({ pathname: '/collection/[id]', params: { id } }),
     },
     { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: thumb }) },
@@ -116,7 +117,7 @@ export default function SavedScreen() {
     subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length, 'produkt', 'produkter')}`,
     icon: (c.visibility === 'public' ? undefined : 'lock') as IconName | undefined,
   });
-  const likedSubtitle = countLabel(savedProducts.length, 'produkt', 'produkter');
+  const savedSubtitle = countLabel(savedProducts.length, 'produkt', 'produkter');
 
   return (
     <View style={styles.container}>
@@ -141,7 +142,7 @@ export default function SavedScreen() {
 
             {viewMode === 'rows' ? (
               <View>
-                <LikedRow subtitle={likedSubtitle} />
+                <SavedProductsRow subtitle={savedSubtitle} />
                 <View style={styles.divider} />
                 {sortedCollections.map((c) => (
                   <CollectionListRow
@@ -160,10 +161,10 @@ export default function SavedScreen() {
                 <UserCollectionCard
                   id={ALL_SAVED_ID}
                   name={ALL_SAVED_NAME}
-                  subtitle={likedSubtitle}
+                  subtitle={savedSubtitle}
                   images={[]}
                   width={cardWidth}
-                  cover={<LikedTile size={cardWidth} tileRadius={radius.collection} large />}
+                  cover={<SavedProductsTile size={cardWidth} tileRadius={radius.collection} large />}
                 />
                 {sortedCollections.map((c) => (
                   <UserCollectionCard
@@ -195,25 +196,25 @@ export default function SavedScreen() {
   );
 }
 
-/** "Gillade produkter": bokmärke i upphöjd ruta (rad 56/r14, kort kvadrat/r18), brief 41. */
-function LikedTile({ size, tileRadius, large = false }: { size: number; tileRadius: number; large?: boolean }) {
+/** "Sparade produkter": bokmärke i upphöjd ruta (rad 56/r14, kort kvadrat/r18), brief 41. */
+function SavedProductsTile({ size, tileRadius, large = false }: { size: number; tileRadius: number; large?: boolean }) {
   const styles = useStyles();
   return (
-    <View style={[styles.likedTile, { width: size, height: size, borderRadius: tileRadius }]}>
-      <Icon name="bookmark" color={styles.likedIcon.color} size={large ? iconSize.lg * 2 : iconSize.lg} />
+    <View style={[styles.savedTile, { width: size, height: size, borderRadius: tileRadius }]}>
+      <Icon name="bookmark" color={styles.savedIcon.color} size={large ? iconSize.lg * 2 : iconSize.lg} />
     </View>
   );
 }
 
-/** Specialraden "Gillade produkter" överst, med zoom till samma vy som samlingar. */
-function LikedRow({ subtitle }: { subtitle: string }) {
+/** Specialraden "Sparade produkter" överst, med zoom till samma vy som samlingar. */
+function SavedProductsRow({ subtitle }: { subtitle: string }) {
   const router = useRouter();
   const b = `${ALL_SAVED_ID}_${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   return (
     <ListRow
       title={ALL_SAVED_NAME}
       subtitle={subtitle}
-      thumb={<LikedTile size={listRow.thumb} tileRadius={radius.card} />}
+      thumb={<SavedProductsTile size={listRow.thumb} tileRadius={radius.card} />}
       thumbRadius={radius.card}
       boundary={{ id: b, group: COLLECTION_BOUNDARY_GROUP }}
       onPress={() => router.push({ pathname: '/collection/[id]', params: { id: ALL_SAVED_ID, b } })}
@@ -366,6 +367,7 @@ function FollowingTab() {
                 {
                   label: 'Öppna',
                   icon: 'chevron-right',
+                  navigation: true,
                   onPress: () => router.push({ pathname: '/collection/[id]', params: { id: c.id } }),
                 },
                 { label: 'Sluta följa', icon: 'user-add', onPress: () => toggleFollowed(c.id) },
@@ -419,6 +421,7 @@ function BrandRow({ retailer, subtitle, onUnfollow }: { retailer: Retailer; subt
         {
           label: 'Öppna',
           icon: 'chevron-right',
+          navigation: true,
           onPress: () => router.push({ pathname: '/partner/[id]', params: { id: retailer.id } }),
         },
         { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
@@ -449,7 +452,7 @@ function AreaRow({ area, onUnfollow }: { area: Area; onUnfollow: () => void }) {
       onPress={open}
       menuImageUri={products[0]?.imageUrl}
       menuItems={[
-        { label: 'Öppna', icon: 'chevron-right', onPress: open },
+        { label: 'Öppna', icon: 'chevron-right', navigation: true, onPress: open },
         { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
       ]}
     />
@@ -474,6 +477,7 @@ function PersonRow({ person, onUnfollow }: { person: Person; onUnfollow: () => v
         {
           label: 'Öppna',
           icon: 'chevron-right',
+          navigation: true,
           onPress: () => router.push({ pathname: '/profile/[id]', params: { id: person.id } }),
         },
         { label: 'Sluta följa', icon: 'user-add', onPress: onUnfollow },
@@ -527,13 +531,13 @@ const useStyles = makeStyles((t) => ({
     paddingHorizontal: spacing.screenMargin,
     paddingTop: spacing.sm,
   },
-  likedTile: {
+  savedTile: {
     alignItems: 'center',
     justifyContent: 'center',
     borderCurve: 'continuous',
     backgroundColor: t.colors.surfaceRaised,
   },
-  likedIcon: {
+  savedIcon: {
     color: t.colors.textPrimary,
   },
   thumbMosaic: {

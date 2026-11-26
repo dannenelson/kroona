@@ -55,7 +55,7 @@ export default function ProfileCard({ name, initial, partnerId, personId }: Prop
             icon: 'user-add',
             onPress: () => toggleFollowPerson(personId),
           },
-          { label: 'Öppna', icon: 'chevron-right', onPress: open },
+          { label: 'Öppna', icon: 'chevron-right', navigation: true, onPress: open },
         ]
       : [],
     radius: SIZE / 2,

@@ -62,7 +62,7 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   // platshållare i Fas 0 (ingen delning byggd).
   const menuItems: ContextMenuItem[] = [
     { label: followed ? 'Sluta följa' : 'Följ', icon: 'user-add', onPress: () => toggleFollowed(id) },
-    { label: 'Öppna', icon: 'chevron-right', onPress: open },
+    { label: 'Öppna', icon: 'chevron-right', navigation: true, onPress: open },
     { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
   ];
 

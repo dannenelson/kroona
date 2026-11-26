@@ -1,13 +1,15 @@
-// Spara (brief 40, 41, Instagram-mönstret):
-// - Tryck = snabbspar: växlar produkten i Gillade produkter, med snackbar
-//   "… sparades i Gillade produkter · Ändra" (Ändra öppnar kortet).
+// Spara (brief 40, 41, 61, Instagram-mönstret):
+// - Tryck = snabbspar: växlar produkten i Sparade produkter, med snackbar
+//   "<produkt> lades till i sparade produkter · Ändra" (Ändra öppnar kortet)
+//   och vid borttagning "<produkt> togs bort från sparade produkter".
+//   Produkt- och samlingsnamn i fetstil (Snackbar `subject`/`object`).
 // - Långt tryck (eller "Spara i samling") = kortet "Spara i …" (Sheet
 //   presentation 'card'): rubrik med länken "Ny samling" till höger, och en
-//   lista där "Gillade produkter" alltid ligger överst följt av egna samlingar
+//   lista där "Sparade produkter" alltid ligger överst följt av egna samlingar
 //   (tryck växlar direkt, flera går). Ny samling öppnar Skapa samling i samma
 //   kort; Spara där skapar samlingen och lägger produkten i den.
 // När kortet stängs visas en snackbar om produkten lagts till någonstans
-// ("<produkt> sparades i <samling>" eller "… i N samlingar"); bara
+// ("<produkt> lades till i <samling>" eller "… i N samlingar"); bara
 // borttagningar ger ingen snackbar.
 import { useRouter } from 'expo-router';
 import { View } from 'react-native';
@@ -24,12 +26,12 @@ import CollectionMosaic from '../CollectionMosaic';
 import { makeCreateCollectionStep } from './CreateCollectionStep';
 import Icon from '../Icon';
 
-/** Samlingar (inkl. Gillade produkter) produkten lagts till i under ett öppet kort (id → namn). */
+/** Samlingar (inkl. Sparade produkter) produkten lagts till i under ett öppet kort (id → namn). */
 type Session = Map<string, string>;
 
 const countLabel = (n: number) => `${n} ${n === 1 ? 'produkt' : 'produkter'}`;
 
-/** Sant om produkten ligger i Gillade produkter eller i någon egen samling (fylld Spara-ikon). */
+/** Sant om produkten ligger i Sparade produkter eller i någon egen samling (fylld Spara-ikon). */
 export function useIsSaved(productId: string) {
   const { isSaved } = useSavedProducts();
   const { userCollections } = useUserCollections();
@@ -65,15 +67,15 @@ export function useOpenSaveSheet() {
       onClose: () => {
         if (session.size === 0) return;
         const [[id, name]] = [...session.entries()];
+        const visa = { label: 'Visa', onPress: () => router.push({ pathname: '/collection/[id]', params: { id } }) };
         snackbar.show(
           session.size === 1
-            ? {
-                text: `${product.name} sparades i ${name}`,
-                thumbUri: product.imageUrl,
-                action: { label: 'Visa', onPress: () => router.push({ pathname: '/collection/[id]', params: { id } }) },
-              }
+            ? id === ALL_SAVED_ID
+              ? { subject: product.name, text: ADDED_TEXT, thumbUri: product.imageUrl, action: visa }
+              : { subject: product.name, text: 'lades till i', object: name, thumbUri: product.imageUrl, action: visa }
             : {
-                text: `${product.name} sparades i ${session.size} samlingar`,
+                subject: product.name,
+                text: `lades till i ${session.size} samlingar`,
                 thumbUri: product.imageUrl,
                 action: { label: 'Visa', onPress: () => router.navigate('/saved') },
               },
@@ -91,39 +93,45 @@ function SaveSheetStep({ productId, session }: { productId: string; session: Ses
   );
 }
 
+// Snackbar-texterna för Sparade produkter (brief 61); namnet står före i fetstil.
+const ADDED_TEXT = 'lades till i sparade produkter';
+const REMOVED_TEXT = 'togs bort från sparade produkter';
+
 /**
- * Spara-gesten (brief 41), samma på alla ställen: `quickSave` (tryck) växlar
- * produkten i Gillade produkter och visar "… sparades i Gillade produkter ·
- * Ändra" (ingen snackbar vid borttagning); `openSheet` (långt tryck) öppnar kortet.
- * `saved` = fylld bokmärkesikon (Gillade eller någon samling), `liked` = i Gillade.
+ * Spara-gesten (brief 41, 61), samma på alla ställen: `quickSave` (tryck) växlar
+ * produkten i Sparade produkter och visar "<produkt> lades till i sparade
+ * produkter · Ändra" eller "<produkt> togs bort från sparade produkter";
+ * `openSheet` (långt tryck) öppnar kortet.
+ * `saved` = fylld bokmärkesikon (Sparade produkter eller någon samling),
+ * `inSavedProducts` = i Sparade produkter.
  */
 export function useSaveActions(productId: string) {
   const snackbar = useSnackbar();
   const { isSaved, toggleSaved } = useSavedProducts();
   const openSaveSheet = useOpenSaveSheet();
   const saved = useIsSaved(productId);
-  const liked = isSaved(productId);
+  const inSavedProducts = isSaved(productId);
   const openSheet = () => openSaveSheet(productId);
   const quickSave = () => {
     toggleSaved(productId);
-    if (liked) return;
     const product = PRODUCTS.find((p) => p.id === productId);
-    snackbar.show({
-      text: `${product?.name ?? 'Produkten'} sparades i ${ALL_SAVED_NAME}`,
-      thumbUri: product?.imageUrl,
-      action: { label: 'Ändra', onPress: openSheet },
-    });
+    const subject = product?.name ?? 'Produkten';
+    snackbar.show(
+      inSavedProducts
+        ? { subject, text: REMOVED_TEXT, thumbUri: product?.imageUrl }
+        : { subject, text: ADDED_TEXT, thumbUri: product?.imageUrl, action: { label: 'Ändra', onPress: openSheet } },
+    );
   };
-  return { saved, liked, quickSave, openSheet };
+  return { saved, inSavedProducts, quickSave, openSheet };
 }
 
-/** Listan i kortet: Gillade produkter överst, sedan egna samlingar. Skrollar med kortets gest. */
+/** Listan i kortet: Sparade produkter överst, sedan egna samlingar. Skrollar med kortets gest. */
 function SaveList({ productId, session }: { productId: string; session: Session }) {
   const styles = useStyles();
   const insets = useSheetInsets();
   const { savedProducts, isSaved, toggleSaved } = useSavedProducts();
   const { userCollections, addProductToCollection, removeProductFromCollection } = useUserCollections();
-  const liked = isSaved(productId);
+  const inSavedProducts = isSaved(productId);
 
   const check = (on: boolean) => (
     <View style={[styles.check, on ? styles.checkOn : styles.checkOff]}>
@@ -143,19 +151,19 @@ function SaveList({ productId, session }: { productId: string; session: Session 
         title={ALL_SAVED_NAME}
         subtitle={countLabel(savedProducts.length)}
         thumb={
-          <View style={styles.likedTile}>
-            <Icon name="bookmark" color={styles.likedIcon.color} size={iconSize.md} />
+          <View style={styles.savedTile}>
+            <Icon name="bookmark" color={styles.savedIcon.color} size={iconSize.md} />
           </View>
         }
         thumbRadius={radius.control}
         onPress={() => {
           toggleSaved(productId);
-          if (liked) session.delete(ALL_SAVED_ID);
+          if (inSavedProducts) session.delete(ALL_SAVED_ID);
           else session.set(ALL_SAVED_ID, ALL_SAVED_NAME);
         }}
-        accessibilityLabel={`${ALL_SAVED_NAME}, ${liked ? 'tillagd' : 'inte tillagd'}`}
-        accessibilityState={{ checked: liked }}
-        trailing={check(liked)}
+        accessibilityLabel={`${ALL_SAVED_NAME}, ${inSavedProducts ? 'tillagd' : 'inte tillagd'}`}
+        accessibilityState={{ checked: inSavedProducts }}
+        trailing={check(inSavedProducts)}
       />
       {sortByName(userCollections, (c) => c.name).map((c) => {
         const added = c.productIds.includes(productId);
@@ -199,7 +207,7 @@ const useStyles = makeStyles((t) => ({
   list: {
     flex: 1,
   },
-  likedTile: {
+  savedTile: {
     width: listRow.compactThumb,
     height: listRow.compactThumb,
     borderRadius: radius.control,
@@ -208,7 +216,7 @@ const useStyles = makeStyles((t) => ({
     justifyContent: 'center',
     backgroundColor: t.colors.surfaceRaised,
   },
-  likedIcon: {
+  savedIcon: {
     color: t.colors.textPrimary,
   },
   thumb: {

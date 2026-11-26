@@ -33,7 +33,7 @@
 | Sök och dialog | skicka | `send` | F0 | i bruk (dialogens skicka-knapp) |
 | Sök och dialog | filter | `filter` | F0 | fil finns, ingen plats i appen än |
 | Åtgärder | följ (av/på) | `user-add` | F0 | i bruk i menyerna, samma ikon för Följ och Sluta följa; egen vald-variant saknas |
-| Åtgärder | spara (av/på) | `bookmark` | F0 | i bruk (Produktdetalj, kontextmenyn, Gillade, SaveSheet), kodfylld när sparad |
+| Åtgärder | spara (av/på) | `bookmark` | F0 | i bruk (Produktdetalj, kontextmenyn, Sparade produkter, SaveSheet), kodfylld när sparad |
 | Åtgärder | gilla | `heart` | F0 | fil finns (bara dev-sidan), kodfylld fungerar |
 | Åtgärder | dela | `share` | F0 | i bruk (Produktdetalj, menyer) |
 | Åtgärder | plus, check | `plus`, `check` | F0 | i bruk (Ny samling, vald samling i SaveSheet) |

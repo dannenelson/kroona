@@ -30,6 +30,9 @@ export type ContextMenuItem = {
   icon: IconName;
   /** Fylld ikon (t.ex. bokmärket när produkten är sparad). */
   filled?: boolean;
+  /** Raden navigerar (Öppna): ikonen (chevron) står till höger i stället för
+   *  till vänster, och texten linjerar med de andra radernas (brief 61). */
+  navigation?: boolean;
   onPress?: () => void;
 };
 
@@ -498,8 +501,18 @@ function MenuRow({
         (pressed || highlighted) && styles.rowPressed,
       ]}
     >
-      <Text style={styles.rowLabel}>{item.label}</Text>
-      <Icon name={item.icon} filled={item.filled} color={colors.textPrimary} size={iconSize.md} />
+      {/* Ikon 20 till vänster (brief 61); navigeringsrader får en tom plats där i stället. */}
+      {item.navigation ? (
+        <View style={styles.iconSlot} />
+      ) : (
+        <Icon name={item.icon} filled={item.filled} color={colors.textPrimary} size={iconSize.md} />
+      )}
+      <Text style={styles.rowLabel} numberOfLines={1}>
+        {item.label}
+      </Text>
+      {item.navigation ? (
+        <Icon name={item.icon} color={colors.textPrimary} size={iconSize.md} />
+      ) : null}
     </Pressable>
   );
 }
@@ -543,7 +556,10 @@ const useStyles = makeStyles((t) => ({
     paddingHorizontal: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  iconSlot: {
+    width: iconSize.md,
   },
   rowDivider: {
     borderTopWidth: StyleSheet.hairlineWidth,
@@ -555,5 +571,6 @@ const useStyles = makeStyles((t) => ({
   rowLabel: {
     ...typography.body,
     color: t.colors.textPrimary,
+    flex: 1,
   },
 }));

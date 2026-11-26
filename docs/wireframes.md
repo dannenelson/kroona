@@ -17,7 +17,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 1. Hero-bild — produktens kanoniska bild
 2. Varumärke + produktnamn
 3. Hållbarhetsindex — fullt utfällt, oförändrat oavsett erbjudande
-4. Spara-knapp (bokmärke, fyllt när sparad), primär position: tryck = snabbspar till Gillade produkter, långt tryck = kortet "Spara i …" (brief 41)
+4. Spara-knapp (bokmärke, fyllt när sparad), primär position: tryck = snabbspar till Sparade produkter, långt tryck = kortet "Spara i …" (brief 41)
 5. **"Finns begagnad hos"** — begagnat-erbjudanden, visas FÖRE nytt. Rad: tjänst, prisläge ("Fast pris: X kr" eller "Auktion, bud från X kr"), länk ut.
 6. **"Köp hos"** — nytt-erbjudanden: AF-namn, pris, lager, geografi. Sortering, default pris. Påverkar aldrig begagnat-listan.
 7. Liknande produkter — horisontell rad
@@ -120,7 +120,7 @@ Chatt med två dialoglägen och produktkort inline. Roll: bolla och få ett urva
 1. Header — "Sparat" + **"+"** uppe till höger (öppnar Sheet: Skapa samling). Ersätter "Ny samling"-kortet.
 2. Flikar överst: **Mina samlingar | Följer**.
 3. **Mina samlingar:**
-   - **"Gillade produkter"** som egen specialrad överst: *inte* en samling. Hjärtat sparar dit, och en produkt kan vara både gillad och i en samling.
+   - **"Sparade produkter"** (hette Gillade produkter före brief 61) som egen specialrad överst: *inte* en samling. Bokmärket sparar dit, och en produkt kan ligga både där och i en samling.
    - Egna samlingar som **rader** (standard) eller **kort** (växlare). Mosaikomslag av de fyra första produkterna, namn, antal, Privat/Publik.
 4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Personer** (brief 37, dummy), **Samlingar**, **Områden**.
 5. Bekräftelser via Snackbar ("<produkt> sparades i <samling> · Visa").
@@ -132,13 +132,13 @@ Att öppna en samling leder till Samlingsdetalj ("Av dig", N produkter · Privat
 ---
 
 ## 8b. Spara i … (kort-sheet) — ✅ Byggd (brief 40–41, ersätter Lägg till i samling från brief 36–39)
-**Spara-flödet (Instagram-mönstret):** tryck på Spara (bokmärke) = snabbspar till Gillade produkter, med snackbar "… sparades i Gillade produkter · **Ändra**" (Ändra öppnar kortet, så att långt tryck blir upptäckbart). **Långt tryck** på Spara, menyvalet **"Spara i samling"** eller Ändra öppnar kortet. Ingen snackbar vid borttagning.
+**Spara-flödet (Instagram-mönstret):** tryck på Spara (bokmärke) = snabbspar till Sparade produkter, med snackbar "**<produkt>** lades till i sparade produkter · **Ändra**" (Ändra öppnar kortet, så att långt tryck blir upptäckbart). Nytt tryck tar bort den: "**<produkt>** togs bort från sparade produkter" (brief 61). **Långt tryck** på Spara, menyvalet **"Spara i samling"** eller Ändra öppnar kortet; när det stängs "**<produkt>** lades till i **<samling>** · Visa".
 
 1. Kort med luft runt om över mörk overlay; öppnas på 2/3 av skärmhöjden, växer till full höjd när man skrollar upp, krymper och stängs när man drar ned på listans topp (eller trycker på overlayen)
 2. Rubrik "Spara i …" (vänsterställd) och högerställd textlänk **"Ny samling"** (neutral) → Skapa samling i samma kort (full höjd, chevron tillbaka); Spara skapar samlingen med produkten i, kortet stängs
-3. Lista: **Gillade produkter** alltid överst (bokmärke, antal), sedan egna samlingar (mosaik 48, namn, "Privat/Publik · N produkter"), val-cirkel till höger; tryck växlar direkt, flera går
+3. Lista: **Sparade produkter** alltid överst (bokmärke, antal), sedan egna samlingar (mosaik 48, namn, "Privat/Publik · N produkter"), val-cirkel till höger; tryck växlar direkt, flera går
 4. Ingen CTA nedtill (blur kvar), ingen produktchip, sök eller X
-5. Tomt läge: bara raden Gillade produkter; länken Ny samling finns kvar
+5. Tomt läge: bara raden Sparade produkter; länken Ny samling finns kvar
 
 Vid stängning, om något lagts till: snackbar "<produkt> sparades i <samling> · Visa" eller "… i N samlingar · Visa" (→ Sparat). Bara borttagningar: ingen snackbar.
 ---

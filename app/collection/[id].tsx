@@ -1,7 +1,7 @@
 // Samlingsdetalj (brief 28, wireframes.md §2): innehållet i en kuraterad
 // samling (data/collections.ts: Kroona-teman och varumärkens kollektioner).
 // Nås från temakorten på Hem (CollectionRow), Samlingar-hyllan på
-// Partnerdetalj och Sparat ("Gillade produkter" med id `saved` och egna samlingar,
+// Partnerdetalj och Sparat ("Sparade produkter" med id `saved` och egna samlingar,
 // brief 32). Ligger i rotens stack som Produktdetalj, med samma hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
 // kantswipe stänger (collectionScreenOptions i components/product/productTransition.ts).
 import { useEffect, useMemo, useState } from 'react';
@@ -41,12 +41,12 @@ const CATEGORY_LABEL: Record<Product['category'], string> = { kläder: 'Kläder'
 
 type Filter = { label: string; match: (p: Product) => boolean };
 
-/** Det skärmen visar, oavsett om samlingen är kuraterad, egen eller "Gillade produkter". */
+/** Det skärmen visar, oavsett om samlingen är kuraterad, egen eller "Sparade produkter". */
 type CollectionView = {
   id: string;
   name: string;
   products: Product[];
-  /** Kuraterade samlingar har en bild; egna och "Gillade produkter" visar mosaik. */
+  /** Kuraterade samlingar har en bild; egna och "Sparade produkter" visar mosaik. */
   imageUrl?: string;
   curatorName: string;
   /** Kuratorns sida: Partnerdetalj (varumärke) eller profil (person). */
@@ -96,7 +96,7 @@ export default function CollectionScreen() {
     if (isUserCollection) markCollectionOpened(id);
   }, [id, isUserCollection, markCollectionOpened]);
 
-  // "Gillade produkter" (id `saved`, ingen samling men samma vy), en egen samling eller en kuraterad.
+  // "Sparade produkter" (id `saved`, ingen samling men samma vy), en egen samling eller en kuraterad.
   const collection = useMemo<CollectionView | undefined>(() => {
     if (id === ALL_SAVED_ID) {
       return {
@@ -107,7 +107,7 @@ export default function CollectionScreen() {
         detail: 'Privat',
         followable: false,
         byBrand: false,
-        emptyTitle: 'Inga gillade produkter än',
+        emptyTitle: 'Inga sparade produkter än',
         emptyHint: 'Tryck på Spara på en produkt för att spara den här.',
       };
     }

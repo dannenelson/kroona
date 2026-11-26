@@ -50,7 +50,9 @@ function CreateCollectionStep({ onSaved }: { onSaved?: (id: string, name: string
     }
     sheet.close();
     snackbar.show({
-      text: `${trimmed} skapades`,
+      // Samlingsnamnet i fetstil, kortas med ellipsis (brief 61).
+      subject: trimmed,
+      text: 'skapades',
       action: { label: 'Visa', onPress: () => router.push({ pathname: '/collection/[id]', params: { id } }) },
     });
   };

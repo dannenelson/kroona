@@ -43,7 +43,7 @@ type Props = {
   // osv.) och skickas in med spread. Slås ihop sist enligt kontraktet.
   containerStyle?: StyleProp<ViewStyle>;
   /** Spara-knapp (bokmärke) till höger om texten, en-kolumnsflödet i Följer (brief 59).
-   *  Tryck = snabbspar till Gillade (som "Spara" i menyn), långt tryck = "Spara i …". */
+   *  Tryck = snabbspar till Sparade produkter (som "Spara" i menyn), långt tryck = "Spara i …". */
   saveButton?: boolean;
 };
 
@@ -78,9 +78,9 @@ export default function ProductCard({
 }: Props) {
   const { colors } = useTheme();
   const styles = useStyles();
-  // Spara (brief 41): "Spara" = snabbspar till Gillade produkter ("Sparad" när
+  // Spara (brief 41): "Spara" = snabbspar till Sparade produkter ("Sparad" när
   // den ligger där), "Spara i samling" = kortet "Spara i …". Fyllt bokmärke när
-  // produkten ligger i Gillade produkter eller i någon samling.
+  // produkten ligger i Sparade produkter eller i någon samling.
   const save = useSaveActions(id);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
@@ -121,7 +121,7 @@ export default function ProductCard({
   // Följ varumärke, Dela och Visa liknande har ingen logik i Fas 0-steget,
   // de stänger bara menyn.
   const menuItems: ContextMenuItem[] = [
-    { label: save.liked ? 'Sparad' : 'Spara', icon: 'bookmark', filled: save.saved, onPress: save.quickSave },
+    { label: save.inSavedProducts ? 'Sparad' : 'Spara', icon: 'bookmark', filled: save.saved, onPress: save.quickSave },
     { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
     { label: 'Följ varumärke', icon: 'user-add' },
     { label: 'Dela', icon: 'share' },
@@ -250,7 +250,8 @@ export default function ProductCard({
                 >
                   {rating !== undefined && (
                     <View style={styles.rating}>
-                      <Icon name="star" filled color={colors.textSecondary} size={typography.caption.fontSize} />
+                      {/* Kontur som lövet (brief 61), inte fylld. */}
+                      <Icon name="star" color={colors.textSecondary} size={typography.caption.fontSize} />
                       <Text style={styles.ratingText}>{formatScore(rating)}</Text>
                       {reviewCount !== undefined && countFits && (
                         <Text style={styles.ratingCount}>({reviewCount})</Text>
@@ -281,7 +282,7 @@ export default function ProductCard({
                   }}
                   onLongPress={save.openSheet}
                   accessibilityRole="button"
-                  accessibilityLabel={save.liked ? 'Sparad' : 'Spara'}
+                  accessibilityLabel={save.inSavedProducts ? 'Sparad' : 'Spara'}
                   accessibilityState={{ selected: save.saved }}
                   style={({ pressed }) => [styles.save, pressed && styles.savePressed]}
                 >

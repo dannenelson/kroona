@@ -130,7 +130,7 @@ export const segmented = {
   gap: 2,
 } as const;
 
-/** Snackbar (brief 33): bredd följer innehållet upp till maxWidth, miniatyr 40,
+/** Snackbar (brief 33, 61): alltid full bredd (skärmbredd minus marginaler) upp till maxWidth, miniatyr 40,
  *  40 px från botten när flikfältet inte syns. */
 export const snackbar = {
   maxWidth: 350,
