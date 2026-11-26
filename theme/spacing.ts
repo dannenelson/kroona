@@ -17,6 +17,12 @@ export const touchTarget = 44;
  *  2 px mellan raderna utöver radhöjden (utanför 4-punktsskalan med avsikt). */
 export const productCard = {
   textGap: 2,
+  /** Optisk justering (brief 68): flyttar spara-knappens 24-ruta så att
+   *  bokmärkets synliga överkant linjerar med märkesradens versalhöjd. */
+  saveOffsetY: 2,
+  /** Optisk justering (brief 68): bokmärket har ca 3 px luft till höger i sin
+   *  24-ruta; rutan skjuts ut så att den synliga kanten linjerar med bildens. */
+  saveOffsetX: 3,
 } as const;
 /** Ikonrutor. `chevron` 16: chevron i rader, banner och erbjudanden (brief 58). */
 export const iconSize = { xs: 12, chevron: 16, sm: 18, md: 20, lg: 24 } as const;

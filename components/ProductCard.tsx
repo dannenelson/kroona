@@ -3,13 +3,11 @@ import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
 import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
-import { makeStyles, useTheme, overlay, typography, letterSpacing, spacing, radius, motion, touchTarget, iconSize, productCard } from '../theme';
-import { haptic } from '../utils/haptic';
+import { makeStyles, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
 import { useCardPress } from '../hooks/useCardPress';
-import { formatPrice, formatScore } from '../utils/format';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
-import Icon from './Icon';
+import ProductCardText from './ProductCardText';
 import { useSaveActions } from './saved/SaveSheet';
 
 export type ProductCardSize = 'S' | 'M' | 'L';
@@ -76,7 +74,6 @@ export default function ProductCard({
   containerStyle,
   saveButton = false,
 }: Props) {
-  const { colors } = useTheme();
   const styles = useStyles();
   // Spara (brief 41): "Spara" = snabbspar till Sparade produkter ("Sparad" när
   // den ligger där), "Spara i samling" = kortet "Spara i …". Fyllt bokmärke när
@@ -109,14 +106,6 @@ export default function ProductCard({
   const isSmall = size === 'S';
   const isLarge = size === 'L';
 
-  // Betygsraden radbryts aldrig (brief 60): får den inte plats på ett smalt
-  // kort utelämnas antalet omdömen. Mäts mot radens bredd och lövgruppens slut.
-  const [countFits, setCountFits] = useState(true);
-  const ratingsRow = useRef({ width: 0, leafEnd: 0 });
-  const checkRatingsFit = () => {
-    const { width, leafEnd } = ratingsRow.current;
-    if (countFits && width > 0 && leafEnd > width + 0.5) setCountFits(false);
-  };
 
   // Följ varumärke, Dela och Visa liknande har ingen logik i Fas 0-steget,
   // de stänger bara menyn.
@@ -229,70 +218,17 @@ export default function ProductCard({
           )}
 
           {!isSmall && (
-            <View style={saveButton ? styles.infoRow : styles.info}>
-              <View style={styles.infoText}>
-                {/* Märke, namn och pris tätt ihop (brief 62); betygsraden efter. */}
-                <View style={styles.titleGroup}>
-                  <Text style={styles.brand} numberOfLines={1}>
-                    {brand}
-                  </Text>
-                  <Text style={isLarge ? styles.nameLarge : styles.name} numberOfLines={2}>
-                    {name}
-                  </Text>
-                  <Text style={[styles.price, isLarge ? styles.priceLarge : styles.priceMedium]}>
-                    {formatPrice(price)}
-                    <Text style={isLarge ? styles.currencyLarge : styles.currency}>{' '}kr</Text>
-                  </Text>
-                </View>
-                <View
-                  style={styles.ratings}
-                  onLayout={(e) => {
-                    ratingsRow.current.width = e.nativeEvent.layout.width;
-                    checkRatingsFit();
-                  }}
-                >
-                  {rating !== undefined && (
-                    <View style={styles.rating}>
-                      {/* Kontur som lövet (brief 61), inte fylld. */}
-                      <Icon name="star" color={colors.textSecondary} size={typography.caption.fontSize} />
-                      <Text style={styles.ratingText}>{formatScore(rating)}</Text>
-                      {reviewCount !== undefined && countFits && (
-                        <Text style={styles.ratingCount}>({reviewCount})</Text>
-                      )}
-                    </View>
-                  )}
-                  {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
-                  <View
-                    style={styles.rating}
-                    onLayout={(e) => {
-                      const { x, width } = e.nativeEvent.layout;
-                      ratingsRow.current.leafEnd = x + width;
-                      checkRatingsFit();
-                    }}
-                  >
-                    <Icon name="leaf" color={colors.textSecondary} size={typography.caption.fontSize} />
-                    <Text style={styles.ratingText}>
-                      {formatScore(sustainabilityScore)}
-                    </Text>
-                  </View>
-                </View>
-              </View>
-              {saveButton && (
-                <Pressable
-                  onPress={() => {
-                    haptic.light();
-                    save.quickSave();
-                  }}
-                  onLongPress={save.openSheet}
-                  accessibilityRole="button"
-                  accessibilityLabel={save.inSavedProducts ? 'Sparad' : 'Spara'}
-                  accessibilityState={{ selected: save.saved }}
-                  style={({ pressed }) => [styles.save, pressed && styles.savePressed]}
-                >
-                  <Icon name="bookmark" filled={save.saved} color={colors.textPrimary} size={iconSize.lg} />
-                </Pressable>
-              )}
-            </View>
+            <ProductCardText
+              brand={brand}
+              name={name}
+              price={price}
+              rating={rating}
+              reviewCount={reviewCount}
+              sustainabilityScore={sustainabilityScore}
+              large={isLarge}
+              showSave={saveButton}
+              save={save}
+            />
           )}
         </Animated.View>
       </Pressable>
@@ -347,86 +283,5 @@ const useStyles = makeStyles((t) => ({
     ...typography.micro,
     color: overlay.onPhoto, // på foto: fast vit i båda teman
     letterSpacing: letterSpacing.wide,
-  },
-  info: {
-    paddingTop: spacing.sm,
-  },
-  infoRow: {
-    paddingTop: spacing.sm,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.sm,
-  },
-  infoText: {
-    flex: 1,
-    gap: spacing.xs,
-  },
-  titleGroup: {
-    gap: productCard.textGap,
-  },
-  // Bokmärket: 44-yta, ikonens högerkant linjerar med bildens högerkant och
-  // ikonens överkant med textblockets överkant (top-aligned, brief 62).
-  save: {
-    width: touchTarget,
-    height: touchTarget,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: -(touchTarget - iconSize.lg) / 2,
-    marginTop: -(touchTarget - iconSize.lg) / 2,
-  },
-  savePressed: {
-    opacity: motion.disabledOpacity,
-  },
-  brand: {
-    ...typography.label,
-    color: t.colors.textSecondary,
-  },
-  name: {
-    ...typography.body,
-    color: t.colors.textPrimary,
-  },
-  nameLarge: {
-    ...typography.headline,
-    color: t.colors.textPrimary,
-  },
-  price: {
-    ...typography.price,
-    color: t.colors.textPrimary,
-  },
-  priceMedium: {
-    fontSize: typography.body.fontSize,
-    lineHeight: typography.body.lineHeight,
-  },
-  priceLarge: {
-    fontSize: typography.headline.fontSize,
-    lineHeight: typography.headline.lineHeight,
-  },
-  // "kr" ≈ 70 % av prisets storlek (design.md §4), närmaste typtoken:
-  // M 15 → micro 10 (67 %), L 17 → caption 12 (71 %).
-  currency: {
-    fontSize: typography.micro.fontSize,
-  },
-  currencyLarge: {
-    fontSize: typography.caption.fontSize,
-  },
-  ratings: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'nowrap',
-    overflow: 'hidden',
-    gap: spacing.md,
-  },
-  rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-  },
-  ratingText: {
-    ...typography.caption,
-    color: t.colors.textSecondary,
-  },
-  ratingCount: {
-    ...typography.caption,
-    color: t.colors.textTertiary,
   },
 }));
