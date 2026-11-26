@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import Transition from 'react-native-screen-transitions';
 import { PRODUCT_BOUNDARY_GROUP } from './product/productTransition';
 import { Animated, StyleSheet, View, Text, Pressable, Image, type LayoutChangeEvent, type StyleProp, type ViewStyle } from 'react-native';
-import { makeStyles, overlay, typography, letterSpacing, spacing, radius, motion } from '../theme';
+import { makeStyles, overlay, typography, letterSpacing, spacing, radius, motion, productCard } from '../theme';
 import { useCardPress } from '../hooks/useCardPress';
 import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
@@ -191,7 +191,16 @@ export default function ProductCard({
       <Pressable
         ref={cardRef}
         collapsable={false}
-        onLayout={press.onLayout}
+        onLayout={(e) => {
+          press.onLayout(e);
+          // Skydd: ett kort som hamnar på minsta bredden får ingen bredd av sin
+          // förälder (t.ex. en rad som krymper till innehållet). Ge föräldern en bredd.
+          if (__DEV__ && !isSmall && e.nativeEvent.layout.width <= productCard.minWidth) {
+            console.warn(
+              `[ProductCard] "${name}" är bara ${Math.round(e.nativeEvent.layout.width)} pt bred: föräldern saknar troligen bredd (fast bredd eller flex i en container med bredd).`,
+            );
+          }
+        }}
         accessibilityRole="button"
         accessibilityLabel={`${brand} ${name}`}
         accessibilityHint={menu ? 'Håll in för fler val' : undefined}
@@ -202,6 +211,7 @@ export default function ProductCard({
         onPressOut={press.onPressOut}
         style={StyleSheet.flatten([
           styles.card,
+          !isSmall && styles.cardMinWidth,
           featured && styles.cardFeatured,
           disabled && styles.disabled,
           containerStyle,
@@ -244,6 +254,10 @@ export default function ProductCard({
 const useStyles = makeStyles((t) => ({
   card: {
     flex: 1,
+  },
+  // Skydd mot kort utan bredd (dialogbuggen): aldrig smalare än productCard.minWidth.
+  cardMinWidth: {
+    minWidth: productCard.minWidth,
   },
   cardFeatured: {
     flex: 0,

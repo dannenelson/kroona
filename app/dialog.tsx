@@ -239,28 +239,37 @@ export default function DialogScreen() {
             }
 
             const products = resolveProducts(item.productIds);
+            // Svar med produkter tar hela bredden, så att produktkorten får en
+            // bredd (raden krymper annars till bubblans innehåll, och vid tom
+            // text till bara bubblans padding). Bubblan behåller sin max-bredd.
+            const withProducts = products.length > 0;
+            const hasText = item.text.trim().length > 0;
 
             return (
               <View
                 style={[
                   styles.messageRow,
                   item.role === 'user' ? styles.messageRowUser : styles.messageRowAssistant,
+                  withProducts && styles.messageRowWithProducts,
                 ]}
               >
-                <View
-                  style={[
-                    styles.bubble,
-                    item.role === 'user' && styles.bubbleUser,
-                    item.role === 'assistant' && styles.bubbleAssistant,
-                    item.role === 'error' && styles.bubbleError,
-                  ]}
-                >
-                  <Text
-                    style={[styles.bubbleText, item.role === 'error' && styles.bubbleTextError]}
+                {hasText || !withProducts ? (
+                  <View
+                    style={[
+                      styles.bubble,
+                      item.role === 'user' && styles.bubbleUser,
+                      item.role === 'assistant' && styles.bubbleAssistant,
+                      item.role === 'error' && styles.bubbleError,
+                      withProducts && styles.bubbleInWideRow,
+                    ]}
                   >
-                    {item.text}
-                  </Text>
-                </View>
+                    <Text
+                      style={[styles.bubbleText, item.role === 'error' && styles.bubbleTextError]}
+                    >
+                      {item.text}
+                    </Text>
+                  </View>
+                ) : null}
                 {products.length > 0 && (
                   <ProductGridErrorBoundary>
                     <ProductGrid products={products} compact />
@@ -372,6 +381,16 @@ const useStyles = makeStyles((t) => ({
   },
   messageRowAssistant: {
     alignSelf: 'flex-start',
+  },
+  // Svar med produktkort: hela bredden (korten behöver en bredd att dela på).
+  messageRowWithProducts: {
+    alignSelf: 'stretch',
+    maxWidth: '100%',
+  },
+  // Bubblan i en sådan rad behåller pratbubblans vänsterställning och max-bredd.
+  bubbleInWideRow: {
+    alignSelf: 'flex-start',
+    maxWidth: '82%',
   },
   bubble: {
     borderRadius: radius.card,

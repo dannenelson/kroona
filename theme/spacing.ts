@@ -17,6 +17,9 @@ export const touchTarget = 44;
  *  2 px mellan raderna utöver radhöjden (utanför 4-punktsskalan med avsikt). */
 export const productCard = {
   textGap: 2,
+  /** Skydd: minsta bredd för kort i storlek M/L. Smalaste avsiktliga kort är 140
+   *  (Liknande, Hem-hyllan); under det saknar föräldern bredd (varnas i __DEV__). */
+  minWidth: 120,
 } as const;
 /** Ikonrutor. `chevron` 16: chevron i rader, banner och erbjudanden (brief 58). */
 export const iconSize = { xs: 12, chevron: 16, sm: 18, md: 20, lg: 24 } as const;
