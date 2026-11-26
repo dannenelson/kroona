@@ -1,4 +1,5 @@
 import type { Retailer } from '../types/catalog';
+import { CERTIFICATIONS } from './certifications';
 
 // Återförsäljare (brief 12, gallrade i brief 48). DUMMYDATA (Fas 0): varumärken
 // har sina riktiga namn men bara platshållartext (inga sakpåståenden om riktiga
@@ -6,6 +7,9 @@ import type { Retailer } from '../types/catalog';
 // andrahandstjänsterna är påhittade. Varje återförsäljare har minst en produkt.
 // Hem- och teknikprodukternas märken (Sonora, Ljusverket, Ekens Verkstad,
 // Nordform) är påhittade och har ingen egen återförsäljarsida: de säljs via butikerna.
+// Hållbarhet (brief 69): bara på de påhittade andrahandstjänsterna, så att inga
+// påståenden görs om riktiga bolag. Återbruket har allt, Budrummet bara index,
+// övriga inget (ingen hållbarhetssektion).
 const demoBrand = (name: string) => ({
   description: `Demotext: beskrivning av ${name} läggs in tillsammans med varumärket.`,
   values: 'Demotext: värdegrund läggs in tillsammans med varumärket.',
@@ -95,6 +99,14 @@ export const RETAILERS: Retailer[] = [
     values: 'Demotext: värdegrund saknas (påhittad aktör).',
     presence: { online: true, stores: ['Uppsala'] },
     initial: 'ÅB',
+    // DUMMYDATA (brief 69): påhittad hållbarhet för en påhittad aktör.
+    sustainabilityIndex: 4.4,
+    certifications: [CERTIFICATIONS.svanen, CERTIFICATIONS.oekoTex],
+    initiatives: [
+      { id: 'ab-retur', title: 'Återtag av kläder', description: 'Lämna kläder i butiken, de säljs vidare.' },
+      { id: 'ab-frakt', title: 'Klimatneutral frakt', description: 'Cykelbud i Uppsala, övrigt kompenserat.' },
+      { id: 'ab-lagning', title: 'Lagning på plats', description: 'Enklare lagning innan varorna säljs.' },
+    ],
   },
   {
     id: 'sh-budrummet',
@@ -105,5 +117,7 @@ export const RETAILERS: Retailer[] = [
     values: 'Demotext: värdegrund saknas (påhittad aktör).',
     presence: { online: true, stores: [] },
     initial: 'BR',
+    // DUMMYDATA (brief 69): bara index, för att visa en kort hållbarhetssektion.
+    sustainabilityIndex: 3.7,
   },
 ];

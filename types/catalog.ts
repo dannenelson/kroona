@@ -46,6 +46,21 @@ export interface CatalogProduct {
 
 export type RetailerType = 'brand' | 'store' | 'secondhand';
 
+/** Certifikat (brief 69): namn, valfri utfärdare och en rads förklaring. */
+export interface Certification {
+  id: string;
+  name: string;
+  issuer?: string;
+  description: string;
+}
+
+/** Hållbart initiativ (brief 69): kort titel och en rads beskrivning. */
+export interface SustainabilityInitiative {
+  id: string;
+  title: string;
+  description: string;
+}
+
 /** Den som säljer eller står bakom varumärket. Det man följer och det Partnerdetalj visar. */
 export interface Retailer {
   id: string;
@@ -61,6 +76,12 @@ export interface Retailer {
   initial: string;
   /** Förvald följd i demot (bara data, logiken byggs senare). */
   defaultFollowed?: boolean;
+  /** Hållbarhetsindex 1–5, samma skala som produkternas `sustainabilityScore` (brief 69). */
+  sustainabilityIndex?: number;
+  /** Certifikat (brief 69). */
+  certifications?: Certification[];
+  /** Hållbara initiativ (brief 69). */
+  initiatives?: SustainabilityInitiative[];
 }
 
 export type OfferCondition = 'new' | 'used';

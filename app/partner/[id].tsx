@@ -36,6 +36,7 @@ import SectionTitle from '../../components/SectionTitle';
 import PartnerCard from '../../components/PartnerCard';
 import ProductGrid from '../../components/ProductGrid';
 import ProfileHero from '../../components/ProfileHero';
+import SustainabilitySection from '../../components/partner/SustainabilitySection';
 
 
 export default function PartnerScreen() {
@@ -140,6 +141,9 @@ export default function PartnerScreen() {
             <Text style={styles.paragraph}>{retailer.description}</Text>
             <Text style={styles.paragraph}>{retailer.values}</Text>
           </View>
+
+          {/* Hållbarhet (brief 69): index, certifikat, initiativ; döljs utan data. */}
+          <SustainabilitySection retailer={retailer} titleStyle={styles.sectionTitle} />
 
           {presence.length > 0 && (
             <>
