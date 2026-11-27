@@ -9,6 +9,7 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import ProductCardText from './ProductCardText';
 import { useSaveActions } from './saved/SaveSheet';
+import { useBrandFollowItem } from '../hooks/useBrandFollowItem';
 
 export type ProductCardSize = 'S' | 'M' | 'L';
 
@@ -107,12 +108,13 @@ export default function ProductCard({
   const isLarge = size === 'L';
 
 
-  // Följ varumärke, Dela och Visa liknande har ingen logik i Fas 0-steget,
-  // de stänger bara menyn.
+  // Följ <märke> (brief 72) bara när märket har en profil. Dela och Visa
+  // liknande har ingen logik ännu, de stänger bara menyn.
+  const followItem = useBrandFollowItem(brand);
   const menuItems: ContextMenuItem[] = [
     { label: save.inSavedProducts ? 'Sparad' : 'Spara', icon: 'bookmark', filled: save.saved, onPress: save.quickSave },
     { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
-    { label: 'Följ varumärke', icon: 'company-add' },
+    ...(followItem ? [followItem] : []),
     { label: 'Dela', icon: 'share' },
     { label: 'Visa liknande', icon: 'layers' },
   ];

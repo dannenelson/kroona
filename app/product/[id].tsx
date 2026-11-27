@@ -46,8 +46,7 @@ import { useOpenIndexSheet } from '../../components/SustainabilityIndexSheet';
 import { useAnchoredMenu } from '../../components/AnchoredMenu';
 import type { ContextMenuItem } from '../../components/ProductContextMenu';
 import { useSaveActions } from '../../components/saved/SaveSheet';
-import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
-import { getRetailerFollowKey } from '../../data/collections';
+import { useBrandFollowItem } from '../../hooks/useBrandFollowItem';
 import OfferRow from '../../components/product/OfferRow';
 import Icon from '../../components/Icon';
 import type { Offer } from '../../types/catalog';
@@ -75,7 +74,6 @@ export default function ProductScreen() {
   const anchoredMenu = useAnchoredMenu();
   // Mer-menyn (brief 71): samma val som kortets kontextmeny utom Spara.
   const save = useSaveActions(id ?? '');
-  const { isFollowed, toggleFollowed } = useFollowedCollections();
   const scrollRef = useRef<any>(null);
   // Liknande-sektionens läge i innehållet (för "Visa liknande").
   const similarY = useRef<number | null>(null);
@@ -87,6 +85,7 @@ export default function ProductScreen() {
   const snackbar = useSnackbar();
 
   const product = PRODUCTS.find((p) => p.id === id);
+  const followItem = useBrandFollowItem(product?.brand ?? '');
   const heroHeight = width / HERO_ASPECT;
   // Toppen byter till nedscrollat läge när hero har passerat under toppbaren.
   const barHeight = touchTarget + spacing.sm * 2;
@@ -196,24 +195,14 @@ export default function ProductScreen() {
   }
 
   const brandProfile = getRetailerForBrand(product.brand);
-  const followKey = brandProfile ? getRetailerFollowKey(brandProfile.id) : null;
-  const brandFollowed = followKey ? isFollowed(followKey) : false;
 
   // Mer-menyn förankrad vid knappen (brief 70–71). Knappens läge i toppbaren
   // (TopBar: skärmmarginal, spacing.sm över, 44 × 44).
   const openMoreMenu = () => {
     const items: ContextMenuItem[] = [
       { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
-      // Följ bara när märket har en profil; ikonen följer läget (brief 67).
-      ...(followKey
-        ? [
-            {
-              label: brandFollowed ? 'Sluta följa varumärke' : 'Följ varumärke',
-              icon: brandFollowed ? 'company-check' : 'company-add',
-              onPress: () => toggleFollowed(followKey),
-            } satisfies ContextMenuItem,
-          ]
-        : []),
+      // Följ <märke> bara när märket har en profil (brief 71–72).
+      ...(followItem ? [followItem] : []),
       // Dela är en platshållare i Fas 0 (samma som övriga menyer).
       { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare' }) },
       ...(data.similar.length > 0
