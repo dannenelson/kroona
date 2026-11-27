@@ -111,3 +111,4 @@ J.Lindeberg (varm intro) · RevolutionRace · Nordic Nest · Adtraction. Vinkel:
 ## Fas 1+ (beslutat, ej i Fas 0)
 - **Kommentarer på produkter** (2026-11-27): användare kan kommentera, andra ger tumme upp/ner (hjälpsam eller inte), profilen visar antal bidrag. Inte betyg. Betygens datakälla (bara bekräftade köp eller alla) är öppen. I Fas 0 finns dummybetyg.
 - **Elektronik** är en testkategori; fler kategorier öppnas senare.
+- **Antal följare** (brief 74, 2026-11-27): i Fas 0 är antalet på samlingar, företagsprofiler och personer dummydata (`followers`, +1 lokalt när användaren följer). Riktig följarräkning och följarlistor är Fas 1+.

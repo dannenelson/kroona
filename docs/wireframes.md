@@ -39,8 +39,8 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 ## 2. Samlingsdetalj (tema/stil/egen samling) — ✅ Byggd (brief 28, gemensam hero brief 65 med tillägg)
 **Nås från:** samlingskort på Hem och i Följer, och egna samlingar i Sparat. Samma vy för alla.
 
-1. **Hero** (`ProfileHero`, samma som Partnerdetalj): lägre cover (60 % av 4:5) med parallax, svag toning; längst ned vänster **logotyp** (samlingar med logotyp) eller **titel**, undertext (typ, t.ex. "Tema"/"Kollektion"/"Privat"), höger **Följ/Följer** (inte för egna samlingar). Inget antal i hero.
-2. Under hero: "Av <kurator>" (länk till Partner- eller Profildetalj; "Av dig" för egna).
+1. **Hero** (`ProfileHero`, samma som Partnerdetalj): lägre cover (60 % av 4:5) med parallax, svag toning; längst ned vänster **logotyp** (samlingar med logotyp) eller **titel**, raden **"vad av vem"** (brief 74: "Tema av Kroona", "Kollektion av <företag>", "Samling av <person>", "Privat samling av dig" med lås, "Publik samling av dig"; tryckbar till kuratorns profil), höger **Följ/Följer** och under den **"<N> följare"** (dummy, +1 när du följer; inte för egna samlingar). Uppe till höger **⋯**: egen samling Byt namn, Redigera innehåll, Dela, Ta bort samling; andras Följ/Sluta följa <namn>, Dela.
+2. (Raden "Av <kurator>" under hero är borttagen i brief 74.)
 3. "Produkter · N", text-flikar (Alla, kategorier, stilar, Nytt) och produktgrid.
 4. **Egen samling, redigeringsläge** (från menyn i Sparat): rad per produkt med papperskorg, Klar avslutar.
 
@@ -51,7 +51,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 ## 3. Partnerdetalj (varumärke/återförsäljare) — ✅ Byggd (brief 29, 48, 65, 69)
 **Nås från:** varumärkescirklar, PartnerCard, kuratorraden, märket på Produktdetalj. Varumärken, butiker och andrahandstjänster.
 
-1. **Hero** (`ProfileHero`): lägre cover med parallax, svag toning; vänster **rund logotyp + namn** (initialer om logotyp saknas), under **områden** ("Kläder · Skandinavisk stil · Vintage", härledda ur produkterna); höger **Följ/Följer**.
+1. **Hero** (`ProfileHero`): lägre cover med parallax, svag toning; vänster **rund logotyp + namn** (initialer om logotyp saknas), under **områden** ("Kläder · Skandinavisk stil · Vintage", härledda ur produkterna); höger **Följ/Följer** och under den **"<N> följare"** (brief 74, dummy, +1 när du följer). Uppe till höger **⋯**: Följ/Sluta följa <namn>, Dela (brief 74).
 2. "Om varumärket" / "Om butiken" / "Om tjänsten": beskrivning och värdegrund
 3. **Hållbarhet** (brief 69–70, alltid): Hållbarhetsindex som faktarad (tryck öppnar "Så räknar vi"), eller **"Ej redovisat"** med en neutral rad när index saknas; certifikat som chips (tryck öppnar kort med förklaring) och hållbara initiativ som lista, var för sig bara när de finns.
 4. Finns: e-handel, butiker och var
@@ -65,7 +65,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 ## 4. Profildetalj (person) — ✅ Fas 0 dummy (brief 37)
 **Beslut 2026-11-20 (Daniel):** personer går att följa. I Fas 0 med dummypersoner och lokal följ-lagring; riktig social funktion (konton, följarlistor, feed från personer, notiser, skapa profil) är Fas 1+.
 
-**Nås från:** Följer → Personer i Sparat, kuratorraden "Av <person>" i Samlingsdetalj, ProfileCard (med person). Personernas samlingar syns under "Populära samlingar" på Hem.
+**Nås från:** Följer → Personer i Sparat, raden "Samling av <person>" i Samlingsdetaljens hero, ProfileCard (med person). Personernas samlingar syns under "Populära samlingar" på Hem.
 
 1. Avatar (96, initialer), zoommål från raden/kortet
 2. Namn, @handle, "N följare · M samlingar"
