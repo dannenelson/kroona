@@ -40,6 +40,7 @@ import I_history from '../assets/svg/icons/history.svg';
 import I_home from '../assets/svg/icons/home.svg';
 import I_image from '../assets/svg/icons/image.svg';
 import I_image_add from '../assets/svg/icons/image-add.svg';
+import I_images from '../assets/svg/icons/images.svg';
 import I_info from '../assets/svg/icons/info.svg';
 import I_layers from '../assets/svg/icons/layers.svg';
 import I_leaf from '../assets/svg/icons/leaf.svg';
@@ -62,6 +63,7 @@ import I_notification from '../assets/svg/icons/notification.svg';
 import I_notification_filled from '../assets/svg/icons/notification-filled.svg';
 import I_one_column_grid from '../assets/svg/icons/one-column-grid.svg';
 import I_plus from '../assets/svg/icons/plus.svg';
+import I_product from '../assets/svg/icons/product.svg';
 import I_recycle from '../assets/svg/icons/recycle.svg';
 import I_redo from '../assets/svg/icons/redo.svg';
 import I_refresh_1 from '../assets/svg/icons/refresh-1.svg';
@@ -133,6 +135,7 @@ export const iconRegistry = {
   'home': I_home,
   'image': I_image,
   'image-add': I_image_add,
+  'images': I_images,
   'info': I_info,
   'layers': I_layers,
   'leaf': I_leaf,
@@ -155,6 +158,7 @@ export const iconRegistry = {
   'notification-filled': I_notification_filled,
   'one-column-grid': I_one_column_grid,
   'plus': I_plus,
+  'product': I_product,
   'recycle': I_recycle,
   'redo': I_redo,
   'refresh-1': I_refresh_1,

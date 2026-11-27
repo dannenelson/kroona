@@ -125,7 +125,7 @@ export default function ProductCard({
       ? [
           {
             label: 'Visa liknande',
-            icon: 'layers',
+            icon: 'images',
             onPress: () =>
               router.push({ pathname: '/product/[id]', params: { id, b: boundaryId, scrollTo: 'similar' } }),
           } satisfies ContextMenuItem,

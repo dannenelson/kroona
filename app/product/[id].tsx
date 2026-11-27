@@ -219,7 +219,7 @@ export default function ProductScreen() {
         ? [
             {
               label: 'Visa liknande',
-              icon: 'layers',
+              icon: 'images',
               onPress: scrollToSimilar,
             } satisfies ContextMenuItem,
           ]
