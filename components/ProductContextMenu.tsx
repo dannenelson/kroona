@@ -67,8 +67,8 @@ type ContextMenuApi = {
 };
 
 // Lokala mått från referensen "Kroona Looken A": menybredd 250, rad 46.
-const MENU_WIDTH = 250;
-const ROW_HEIGHT = 46;
+export const MENU_WIDTH = 250;
+export const ROW_HEIGHT = 46;
 // Så långt fingret måste röra sig innan det räknas som drag (iOS: ca 10 pt).
 const DRAG_SLOP = spacing.sm;
 
@@ -478,7 +478,8 @@ function MenuOverlay({
   );
 }
 
-function MenuRow({
+/** En menyrad (ikon till vänster, brief 61), delad med AnchoredMenu. */
+export function MenuRow({
   item,
   first,
   highlighted,

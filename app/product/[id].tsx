@@ -43,6 +43,7 @@ import ProductCard from '../../components/ProductCard';
 import NameWithSave from '../../components/product/NameWithSave';
 import { FactList, indexFact, type Fact } from '../../components/product/FactList';
 import { useOpenIndexSheet } from '../../components/SustainabilityIndexSheet';
+import { useAnchoredMenu } from '../../components/AnchoredMenu';
 import OfferRow from '../../components/product/OfferRow';
 import Icon from '../../components/Icon';
 import type { Offer } from '../../types/catalog';
@@ -67,6 +68,21 @@ export default function ProductScreen() {
   const router = useRouter();
   // "Så räknar vi" (brief 70): tryck på indexraden.
   const openIndexSheet = useOpenIndexSheet();
+  const anchoredMenu = useAnchoredMenu();
+  // Knappens läge i toppbaren (TopBar: skärmmarginal, spacing.sm över, 44 × 44).
+  const openMoreMenu = () =>
+    anchoredMenu.open({
+      anchor: {
+        x: width - spacing.screenMargin - touchTarget,
+        y: insets.top + spacing.sm,
+        width: touchTarget,
+        height: touchTarget,
+      },
+      items: [
+        // Dela är en platshållare i Fas 0 (samma som övriga menyer).
+        { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare' }) },
+      ],
+    });
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = useStyles();
@@ -365,7 +381,8 @@ export default function ProductScreen() {
       <TopBar
         tone="photo"
         left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }}
-        right={[{ name: 'share', accessibilityLabel: 'Dela', onPress: () => {} }]}
+        // Mer-meny förankrad vid knappen (brief 70), ersätter Dela-knappen.
+        right={[{ name: 'more-horizontal', accessibilityLabel: 'Fler val', onPress: openMoreMenu }]}
       />
     </View>
     {/* TEMP-DEBUG-GEST: diagnosrad längst ned (bara __DEV__ + växel på dev-sidan). */}

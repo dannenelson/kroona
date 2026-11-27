@@ -1,6 +1,6 @@
 # Kroona — Plan
 
-*En sida. Svarar på "vad jobbar vi med nu, och vad kommer sen". Uppdateras när något ändras, aldrig med nya idéer (de går till `idebank`). Senast: 2026-11-26.*
+*En sida. Svarar på "vad jobbar vi med nu, och vad kommer sen". Uppdateras när något ändras, aldrig med nya idéer (de går till `idebank`). Senast: 2026-11-27.*
 
 ## Mål för Fas 0 (bekräftat 2026-11-17)
 Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-minuters genomgång av hela köpresan: **Hem → Produktdetalj → Samling → Sparat**, plus Hitta och Följer.
@@ -11,7 +11,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | # | Spår | Klart när |
 |---|---|---|
 | 0.1–0.3 | Dokument, repo-inventering, designgrund | ✅ Klart 2026-11-17–19 |
-| 1 | **Fas 0-demot, skärm för skärm via briefer** (38–69 klara 2026-11-20–26) | Flikarna, detaljvyerna, Profil/Notiser/Inställningar och arkivet är byggda (se Kodläge). Pågår: polering via korta uppföljningar. Nästa brief väljer Daniel. |
+| 1 | **Fas 0-demot, skärm för skärm via briefer** (38–70 klara 2026-11-20–27) | Flikarna, detaljvyerna, Profil/Notiser/Inställningar och arkivet är byggda (se Kodläge). Pågår: polering via korta uppföljningar. Nästa brief väljer Daniel. |
 
 ## Kodläge (inventerat 2026-11-26, commit `08b05e0`)
 
@@ -21,7 +21,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | Följer | ✅ | ✅ | ✅ Pinterest-flöde (brief 59): följt och inspiration blandat, masonry / en kolumn, pillar som filtrerar, pull-to-refresh, tomläge. Dummylogik. |
 | Hitta | ✅ | ✅ | ✅ Sök, dialog och kategorier (brief 53–54). Hyllor Idéer, Tidigare (3 senaste) och Kategorier (fyra: Kläder, Möbler, Elektronik, Begagnat), Områden och stilar. Arkiv och Alla kategorier (3-kolumnsgrid). Dialoger och sökningar sparas lokalt och återupptas (brief 66). Kvar: jämförelse, röst. |
 | Sparat | ✅ | ✅ | ✅ Mina samlingar \| Följer, Sparade produkter, rader/kort. Egna samlingar: skapa, byt namn, redigera innehåll, ta bort (lokalt). Följ-ikoner efter typ och läge (brief 67). Kvar: ordning i samlingar, eget omslag (idébanken). |
-| Produkt-, Samlings-, Partner- och Profildetalj | ✅ | ✅ | ✅ Produktdetalj (+ lightbox, betyg under priset, rund Spara på namnraden, märket öppnar profilen). Samlings- och Partnerdetalj med gemensam hero (`ProfileHero`), parallax, antal vid rubrikerna; Partnerdetalj med områden och hållbarhet (brief 69). Profildetalj för personer (dummy). |
+| Produkt-, Samlings-, Partner- och Profildetalj | ✅ | ✅ | ✅ Produktdetalj (+ lightbox, betyg under priset, rund Spara på namnraden, märket öppnar profilen). Samlings- och Partnerdetalj med gemensam hero (`ProfileHero`), parallax, antal vid rubrikerna; Partnerdetalj med områden och hållbarhet (brief 69; "Ej redovisat" och "Så räknar vi" brief 70). Mer-meny (⋯) förankrad vid knappen på Produktdetalj och i Sparat (brief 70). Profildetalj för personer (dummy). |
 | Profil, Notiser, Inställningar | ✅ | ✅ | ✅ Dummy (brief 64): egen profil, notiser med olästprick, inställningar med Ljust/Mörkt/System (sparas), dev-sidan. |
 | Onboarding | parkerad | — | — |
 
@@ -78,7 +78,7 @@ Supabase-projekt och schema (collections, collection_items, follows) · konton �
 - [ ] Looken A i Claude Design saknar Produktdetalj-avvikelserna (design.md §8b).
 - [ ] Hitta: hur ser urval och jämförelse ut i dialogen?
 - [x] ia-karta och wireframes justerade till flikrollerna (2026-11-26).
-- [ ] Spec v1.20: hållbarhetsindex när data saknas (dölj eller "Ej redovisat"), betyg, Elektronik som kategori (`docs/spec-forslag.md`, B1–B3).
+- [x] Hållbarhetsindex när data saknas: "Ej redovisat" (Daniel 2026-11-27, brief 70). Övriga Spec-punkter i `docs/spec-forslag.md`.
 - [ ] Fyllda former i `company-add`/`company-check` (avsiktligt eller rita om som linjer?), rapport 67.
 - [ ] Ska förvalt följda områden (`defaultFollowed`) användas? I dag följs alla Kroona-samlingar förvalt men inga områden.
 

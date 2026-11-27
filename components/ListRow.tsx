@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useRef, type ComponentRef, type ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
 import Transition from 'react-native-screen-transitions';
 import { GestureDetector } from 'react-native-gesture-handler';
@@ -6,6 +6,7 @@ import { makeStyles, typography, fonts, spacing, listRow, iconSize, touchTarget 
 import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import type { ContextMenuItem } from './ProductContextMenu';
 import IconButton from './IconButton';
+import { useAnchoredMenu } from './AnchoredMenu';
 import Icon, { type IconName } from './Icon';
 
 type Props = {
@@ -55,6 +56,8 @@ export default function ListRow({
   accessibilityState,
 }: Props) {
   const styles = useStyles();
+  const anchoredMenu = useAnchoredMenu();
+  const moreRef = useRef<ComponentRef<typeof View>>(null);
   const menu = useLongPressMenu({
     items: menuItems,
     imageUri: menuImageUri,
@@ -103,13 +106,19 @@ export default function ListRow({
         </View>
         {trailing}
         {menuButton && menuItems.length > 0 ? (
-          <IconButton
-            name="more-horizontal"
-            variant="bare"
-            accessibilityLabel={`Fler val för ${title}`}
-            onPress={menu.open}
-            style={styles.moreButton}
-          />
+          // Förankrad meny vid knappen (brief 70); långt tryck på raden behåller lyftet.
+          <View ref={moreRef} collapsable={false} style={styles.moreButton}>
+            <IconButton
+              name="more-horizontal"
+              variant="bare"
+              accessibilityLabel={`Fler val för ${title}`}
+              onPress={() =>
+                moreRef.current?.measureInWindow((x, y, width, height) =>
+                  anchoredMenu.open({ anchor: { x, y, width, height }, items: menuItems }),
+                )
+              }
+            />
+          </View>
         ) : null}
       </Pressable>
     </GestureDetector>

@@ -37,6 +37,7 @@ import { FollowedPeopleProvider } from '../context/FollowedPeopleContext';
 import { ContextMenuProvider } from '../components/ProductContextMenu';
 import { SnackbarProvider } from '../components/Snackbar';
 import { SheetProvider } from '../components/Sheet';
+import { AnchoredMenuProvider } from '../components/AnchoredMenu';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -99,6 +100,8 @@ function AppShell() {
         <ContextMenuProvider>
           {/* Bekräftelser (snackbar, brief 33) ovanför alla skärmar och lager. */}
           <SnackbarProvider>
+          {/* Förankrad meny vid knappar (⋯, brief 70), ovanför skärmar och sheets. */}
+          <AnchoredMenuProvider>
           {/* Helskärmslager för miniflöden (Sheet, brief 33). */}
           <SheetProvider>
             {/* Spik (brief 18): blank stack från react-native-screen-transitions.
@@ -133,6 +136,7 @@ function AppShell() {
               <BlankStack.Screen name="archive" options={pushScreenOptions} />
             </BlankStack>
           </SheetProvider>
+          </AnchoredMenuProvider>
           </SnackbarProvider>
         </ContextMenuProvider>
       </ArchiveProvider>

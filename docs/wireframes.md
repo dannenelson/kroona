@@ -24,6 +24,8 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 
 **Byggd (brief 13), beslutade avvikelser från designen (Looken A):** hållbarhetsindex som siffra ("4,2 av 5") i faktatabellen · prisläge (Fast pris / Auktion, bud från) på begagnade rader · ingen sorteringskontroll i "Köp hos", pris stigande · inga pricksidor på hero (en bild per produkt) · Spara = fylld ikon och "Sparad", ingen inverterad yta · priset överst = "Från lägsta pris" (med "Begagnat" om lägst är begagnat). Tryck på en erbjudanderad ger haptik och en toast ("Du skulle nu gå till …"), ingen utlänk i Fas 0.
 
+**Sedan brief 70:** toppbarens högra knapp är **mer (⋯)** med en förankrad meny (Dela, platshållare). Hållbarhetsindexet är tryckbart och öppnar **"Så räknar vi"** (fyra delposter, exempeldata); saknas index visas "Ej redovisat".
+
 **Sedan brief 60–65:** märke (tryckbart till varumärkets profil om den finns), namn och **rund Spara-knapp** (bokmärke, samma glas som tillbaka/dela) på namnraden, pris, **betyg** direkt under ("☆ 4,1 (12 omdömen)"), sedan Hållbarhet (Hållbarhetsindex och fakta). Toppen: bara kantblur, svag statusfältstint i mörkt läge.
 
 **Beslut:** Nytt/Begagnat ligger på Erbjudande. Flera begagnat-erbjudanden samtidigt. Prisläge undviker missvisande låga startbud. Begagnat före nytt.
@@ -49,7 +51,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 
 1. **Hero** (`ProfileHero`): lägre cover med parallax, svag toning; vänster **rund logotyp + namn** (initialer om logotyp saknas), under **områden** ("Kläder · Skandinavisk stil · Vintage", härledda ur produkterna); höger **Följ/Följer**.
 2. "Om varumärket" / "Om butiken" / "Om tjänsten": beskrivning och värdegrund
-3. **Hållbarhet** (brief 69, bara när data finns): Hållbarhetsindex som faktarad, certifikat som chips (tryck öppnar kort med förklaring), hållbara initiativ som lista. Utan data ingen sektion.
+3. **Hållbarhet** (brief 69–70, alltid): Hållbarhetsindex som faktarad (tryck öppnar "Så räknar vi"), eller **"Ej redovisat"** med en neutral rad när index saknas; certifikat som chips (tryck öppnar kort med förklaring) och hållbara initiativ som lista, var för sig bara när de finns.
 4. Finns: e-handel, butiker och var
 5. **Samlingar · N**: hylla med kollektioner
 6. **Produkter · N**: produktgrid
@@ -124,7 +126,7 @@ Varumärkesidentitet täcks av Partnerdetalj.
 
 **Byggt (brief 35, Personer brief 37, Områden brief 54):** allt ovan. Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Följer: "Sluta följa" med följ-ikon efter typ (företag `company-check`, person `user-check`, brief 67). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). Spara från produkt: se §8b (brief 40).
 
-**Redigera egna samlingar (2026-11-26, lokalt):** långt tryck eller **mer-knappen** (more-horizontal) på raden → **Byt namn** (namnfält, tomt går inte), **Redigera innehåll** (Samlingsdetalj i redigeringsläge), **Dela** (platshållare), **Ta bort samling** (systemets bekräftelse, destruktiv). Snackbar med fetstilta namn. **Ej byggt:** ändra ordning, eget omslag (idébanken).
+**Redigera egna samlingar (2026-11-26, lokalt):** långt tryck (lyfter tumnageln) eller **mer-knappen** (more-horizontal, förankrad meny vid knappen sedan brief 70) på raden → **Byt namn** (namnfält, tomt går inte), **Redigera innehåll** (Samlingsdetalj i redigeringsläge), **Dela** (platshållare), **Ta bort samling** (systemets bekräftelse, destruktiv). Snackbar med fetstilta namn. **Ej byggt:** ändra ordning, eget omslag (idébanken).
 
 Att öppna en samling leder till Samlingsdetalj ("Av dig", ingen Följ). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
 
