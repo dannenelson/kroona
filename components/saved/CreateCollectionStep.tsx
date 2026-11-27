@@ -84,21 +84,43 @@ function CreateCollectionStep({ onSaved }: { onSaved?: (id: string, name: string
         accessibilityLabel="Namn på samlingen"
         style={[styles.input, focused && styles.inputFocused]}
       />
-      <View style={styles.toggleRow}>
-        <View style={styles.toggleText}>
-          <Text style={styles.toggleTitle}>Håll samlingen privat</Text>
-          <Text style={styles.toggleHint}>Bara du ser den. En publik samling kan andra se och följa.</Text>
-        </View>
-        <Switch
-          value={isPrivate}
-          onValueChange={setIsPrivate}
-          accessibilityLabel="Håll samlingen privat"
-          trackColor={{ false: styles.trackOff.backgroundColor, true: styles.trackOn.backgroundColor }}
-          thumbColor={styles.thumb.backgroundColor}
-          ios_backgroundColor={styles.trackOff.backgroundColor}
-        />
-      </View>
+      <PrivateToggleRow value={isPrivate} onChange={setIsPrivate} />
     </SheetContent>
+  );
+}
+
+/**
+ * Raden "Håll samlingen privat" med växel, delad av Skapa och Redigera
+ * (brief 75). `locked` = på och går inte att ändra, med egen hjälptext.
+ */
+export function PrivateToggleRow({
+  value,
+  onChange,
+  locked = false,
+  hint = 'Bara du ser den. En publik samling kan andra se och följa.',
+}: {
+  value: boolean;
+  onChange: (value: boolean) => void;
+  locked?: boolean;
+  hint?: string;
+}) {
+  const styles = useStyles();
+  return (
+    <View style={styles.toggleRow}>
+      <View style={styles.toggleText}>
+        <Text style={styles.toggleTitle}>Håll samlingen privat</Text>
+        <Text style={styles.toggleHint}>{hint}</Text>
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        disabled={locked}
+        accessibilityLabel="Håll samlingen privat"
+        trackColor={{ false: styles.trackOff.backgroundColor, true: styles.trackOn.backgroundColor }}
+        thumbColor={styles.thumb.backgroundColor}
+        ios_backgroundColor={styles.trackOff.backgroundColor}
+      />
+    </View>
   );
 }
 
@@ -161,5 +183,5 @@ const useStyles = makeStyles((t) => ({
   },
 }));
 
-/** Namnfältets stil, delad med Byt namn (RenameCollectionStep). */
+/** Namnfältets stil, delad med Redigera (EditCollectionStep). */
 export const useCollectionNameStyles = useStyles;

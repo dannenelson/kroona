@@ -1,4 +1,5 @@
-// Menyn för en egen samling (Fas 0, lokalt): Byt namn, Redigera innehåll, Dela,
+// Menyn för en egen samling (Fas 0, lokalt): Redigera (namn och synlighet, brief 75),
+// Redigera innehåll, Dela,
 // Ta bort samling. Delas av Sparat (långt tryck och mer-knappen på raden) och
 // ⋯-menyn på Samlingsdetalj (brief 74), så att flödena bara finns på ett ställe.
 // Ta bort bekräftas med systemets dialogruta och följs av en snackbar.
@@ -7,7 +8,7 @@ import { useRouter } from 'expo-router';
 import { useUserCollections } from '../context/UserCollectionsContext';
 import { useSheet } from '../components/Sheet';
 import { useSnackbar } from '../components/Snackbar';
-import { makeRenameCollectionStep } from '../components/saved/RenameCollectionStep';
+import { makeEditCollectionStep } from '../components/saved/EditCollectionStep';
 import type { ContextMenuItem } from '../components/ProductContextMenu';
 import type { UserCollection } from '../types/catalog';
 
@@ -41,7 +42,7 @@ export function useUserCollectionMenu(): (c: UserCollection, options?: Options) 
     ]);
 
   return (c, { thumbUri, onEditContent, onDeleted } = {}) => [
-    { label: 'Byt namn', icon: 'edit', onPress: () => sheet.open(makeRenameCollectionStep(c.id, c.name)) },
+    { label: 'Redigera', icon: 'edit', onPress: () => sheet.open(makeEditCollectionStep(c)) },
     {
       label: 'Redigera innehåll',
       icon: 'grid',

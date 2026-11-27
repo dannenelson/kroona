@@ -27,8 +27,11 @@ type UserCollectionsContextValue = {
   addProductToCollection: (collectionId: string, productId: string) => void;
   /** Tar bort en produkt ur en egen samling (Lägg till i samling, brief 36). */
   removeProductFromCollection: (collectionId: string, productId: string) => void;
-  /** Byter namn på en egen samling (tomt namn ignoreras). */
-  renameCollection: (collectionId: string, name: string) => void;
+  /** Redigerar namn och/eller synlighet (brief 75; tomt namn ignoreras). */
+  updateCollection: (
+    collectionId: string,
+    changes: { name?: string; visibility?: UserCollection['visibility'] },
+  ) => void;
   /** Tar bort en egen samling helt (produkterna finns kvar i katalogen). */
   deleteCollection: (collectionId: string) => void;
   /** Senast öppnade egna samling, om den finns kvar (brief 43). */
@@ -98,10 +101,16 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
     );
   };
 
-  const renameCollection = (collectionId: string, name: string) => {
-    const n = name.trim();
-    if (!n) return;
-    setCollections((prev) => prev.map((c) => (c.id === collectionId ? { ...c, name: n } : c)));
+  const updateCollection = (
+    collectionId: string,
+    { name, visibility }: { name?: string; visibility?: UserCollection['visibility'] },
+  ) => {
+    const n = name?.trim();
+    setCollections((prev) =>
+      prev.map((c) =>
+        c.id === collectionId ? { ...c, ...(n ? { name: n } : null), ...(visibility ? { visibility } : null) } : c,
+      ),
+    );
   };
 
   const deleteCollection = (collectionId: string) => {
@@ -128,7 +137,7 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
         createCollection,
         addProductToCollection,
         removeProductFromCollection,
-        renameCollection,
+        updateCollection,
         deleteCollection,
         lastOpenedCollection: lastOpenedId ? collections.find((c) => c.id === lastOpenedId) : undefined,
         lastOpenedAt,
