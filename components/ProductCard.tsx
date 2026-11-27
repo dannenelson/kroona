@@ -10,6 +10,7 @@ import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import ProductCardText from './ProductCardText';
 import { useSaveActions } from './saved/SaveSheet';
 import { useSnackbar } from './Snackbar';
+import { getSimilarProducts } from '../lib/catalog';
 import { useBrandFollowItem } from '../hooks/useBrandFollowItem';
 
 export type ProductCardSize = 'S' | 'M' | 'L';
@@ -82,6 +83,7 @@ export default function ProductCard({
   // produkten ligger i Sparade produkter eller i någon samling.
   const save = useSaveActions(id);
   const snackbar = useSnackbar();
+  const hasSimilar = useMemo(() => getSimilarProducts(id).length > 0, [id]);
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
   // Standard: öppna Produktdetalj, där kortets bild zoomar till heron (brief 13,
@@ -111,15 +113,24 @@ export default function ProductCard({
 
 
   // Följ <märke> (brief 72) bara när märket har en profil. Dela är en
-  // platshållare (samma snackbar som övriga Dela-val). Visa liknande har
-  // ingen logik ännu, det stänger bara menyn.
+  // platshållare (samma snackbar som övriga Dela-val). Visa liknande öppnar
+  // Produktdetalj scrollad till Liknande (`scrollTo=similar`), bara när raden finns.
   const followItem = useBrandFollowItem(brand);
   const menuItems: ContextMenuItem[] = [
     { label: save.inSavedProducts ? 'Sparad' : 'Spara', icon: 'bookmark', filled: save.saved, onPress: save.quickSave },
     { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
     ...(followItem ? [followItem] : []),
     { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
-    { label: 'Visa liknande', icon: 'layers' },
+    ...(hasSimilar
+      ? [
+          {
+            label: 'Visa liknande',
+            icon: 'layers',
+            onPress: () =>
+              router.push({ pathname: '/product/[id]', params: { id, b: boundaryId, scrollTo: 'similar' } }),
+          } satisfies ContextMenuItem,
+        ]
+      : []),
   ];
 
   // Mäter bilden utan tryck-skalan: Pressable bär ingen transform (skalan

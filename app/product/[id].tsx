@@ -67,7 +67,8 @@ const STOCK_LABEL: Record<Offer['stock'], string> = {
 
 export default function ProductScreen() {
   // `b` = boundary-id för det kort man öppnade från (zoomen går från/till det).
-  const { id, b } = useLocalSearchParams<{ id: string; b?: string }>();
+  // `scrollTo=similar` (brief 72): öppnad via "Visa liknande" i kortmenyn.
+  const { id, b, scrollTo } = useLocalSearchParams<{ id: string; b?: string; scrollTo?: 'similar' }>();
   const router = useRouter();
   // "Så räknar vi" (brief 70): tryck på indexraden.
   const openIndexSheet = useOpenIndexSheet();
@@ -78,6 +79,7 @@ export default function ProductScreen() {
   // Liknande-sektionens läge i innehållet (för "Visa liknande").
   const similarY = useRef<number | null>(null);
   const bodyY = useRef(0);
+  const scrolledToSimilar = useRef(false);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = useStyles();
@@ -196,6 +198,14 @@ export default function ProductScreen() {
 
   const brandProfile = getRetailerForBrand(product.brand);
 
+  // Scrollar så att rubriken Liknande hamnar under toppbaren (mer-menyn och
+  // `scrollTo=similar` från kortmenyn). När innehållet är kort stannar det vid botten.
+  const scrollToSimilar = () =>
+    similarY.current !== null &&
+    scrollRef.current?.scrollTo({
+      y: Math.max(0, bodyY.current + similarY.current - insets.top - barHeight),
+    });
+
   // Mer-menyn förankrad vid knappen (brief 70–71). Knappens läge i toppbaren
   // (TopBar: skärmmarginal, spacing.sm över, 44 × 44).
   const openMoreMenu = () => {
@@ -210,12 +220,7 @@ export default function ProductScreen() {
             {
               label: 'Visa liknande',
               icon: 'layers',
-              // Scrollar så att rubriken Liknande hamnar under toppbaren.
-              onPress: () =>
-                similarY.current !== null &&
-                scrollRef.current?.scrollTo({
-                  y: Math.max(0, bodyY.current + similarY.current - insets.top - barHeight),
-                }),
+              onPress: scrollToSimilar,
             } satisfies ContextMenuItem,
           ]
         : []),
@@ -381,7 +386,16 @@ export default function ProductScreen() {
           )}
 
           {data.similar.length > 0 && (
-            <View onLayout={(e) => (similarY.current = e.nativeEvent.layout.y)}>
+            <View
+              onLayout={(e) => {
+                similarY.current = e.nativeEvent.layout.y;
+                // Från kortmenyn: scrolla en gång när öppningen är klar (brief 72).
+                if (scrollTo === 'similar' && !scrolledToSimilar.current) {
+                  scrolledToSimilar.current = true;
+                  setTimeout(scrollToSimilar, motion.duration.slow);
+                }
+              }}
+            >
               <SectionTitle title="Liknande" style={styles.sectionTitle} />
               <ScrollView
                 horizontal
