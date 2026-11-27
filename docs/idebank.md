@@ -17,3 +17,4 @@ Idéer som inte är prioriterade än. Flytta till `plan.md` när de ska byggas.
 - **Kommentarer på produkter** (2026-11-27, Fas 1+): användare kommenterar produkter, andra ger tumme upp/ner (hjälpsam eller inte), profilen visar antal bidrag. Uppmuntrar användare att bygga profiler. Kräver konton och moderering.
 - **Betygens datakälla** (2026-11-27, Fas 1+): bara bekräftade köp, eller alla? Öppet. Ett tomt betygsfält är inte önskvärt.
 - **Certifikat och initiativ per produkt** (2026-11-27): hur de ska visas på företag och produkt är öppet. Hållbarhetsindexet får en sheet "Så räknar vi" (brief 70).
+- **Önskelistor med delning och reservation** (2026-11-27, Fas 1+): delas med andra användare, visas hos mottagaren under "Delas med dig", mottagare reserverar produkter, andra inbjudna ser reservationer, ägaren ser dem inte. Lik GoWish. Se spec-forslag.md B5.

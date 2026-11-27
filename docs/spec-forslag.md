@@ -23,6 +23,8 @@
 3. **Elektronik är en testkategori** i demot och öppnas för fler kategorier senare. Ingen Spec-ändring utöver att kategorierna inte är låsta till kläder och möbler.
 4. **Spara och mer-meny** (produktkort): inga synliga CTA:er i gridar, bara långt tryck (Pinterest-stil). På Produktdetalj ersätter mer-knappen (⋯) Dela, och Dela flyttas in i menyn. Se brief 70.
 
+5. **Samlingar och Önskelistor** (Daniel, 2026-11-27). Två typer av egna listor. **Samling** (som idag): spara och kategorisera produkter man är intresserad av, privat eller publik. **Önskelista**: alltid privat, men kan delas med andra användare. Mottagarna ser den under "Delas med dig" (arbetsnamn). Mottagare kan **se och reservera** produkter i någon annans önskelista, och andra inbjudna ser vad som är reserverat. **Ägaren ser inte vad som är reserverat** (som GoWish, så att överraskningen bevaras). Det här kräver konton, inbjudningar och synk och är därför **Fas 1+**. I Fas 0 byggs bara typen (Samling/Önskelista), att redigera en samling (namn och Privat/Publik) och Önskelistor som alltid privata, lokalt (brief 75). Spec: lägg till som Fas 1+-krav (Spec nämner redan önskelistor som "senare"), och flytta fram dem i prioritet.
+
 ## C. Orört i Spec (stämmer)
 
 Affärsmodell (CPA, server-side tracking), vision och positionering, begagnat före nytt, Produkt/Återförsäljare/Erbjudande, Fas 1-kraven (konto, tracking, provision, säkerhetsskuld med API-nyckel i klienten).
