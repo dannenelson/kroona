@@ -10,6 +10,7 @@ import { useCardPress } from '../hooks/useCardPress';
 import { type ContextMenuItem } from './ProductContextMenu';
 import { useLongPressMenu } from '../hooks/useLongPressMenu';
 import { useSnackbar } from './Snackbar';
+import { useFollowToggle } from '../hooks/useFollowToggle';
 import { COLLECTION_BOUNDARY_GROUP, PARTNER_BOUNDARY_GROUP } from './product/productTransition';
 import BrandLogo, { hasBrandLogo } from './BrandLogo';
 
@@ -44,6 +45,7 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
   const styles = useStyles();
   const router = useRouter();
   const snackbar = useSnackbar();
+  const followToggle = useFollowToggle();
   // Unikt boundary-id per kortinstans (samma mönster som ProductCard), så att
   // zoomen till Samlings-/Partnerdetalj går från/till exakt det här kortet.
   const instanceKey = useId().replace(/[^a-zA-Z0-9]/g, '');
@@ -65,7 +67,15 @@ export default function PartnerCard({ id, name, tag, itemCount, imageUrl, varian
       label: followed ? 'Sluta följa' : 'Följ',
       // Följ-ikon (brief 67): företag company-add/-check efter läge; samlingar som förut.
       icon: partnerId ? (followed ? 'company-check' : 'company-add') : 'user-add',
-      onPress: () => toggleFollowed(id),
+      // Bekräftas med följ-snackbaren (brief 73); samlingens omslag som miniatyr,
+      // varumärken utan (logotypen är vektor).
+      onPress: () =>
+        followToggle({
+          followed,
+          name,
+          toggle: () => toggleFollowed(id),
+          thumbUri: partnerId ? undefined : imageUrl,
+        }),
     },
     { label: 'Öppna', icon: 'chevron-right', navigation: true, onPress: open },
     { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },

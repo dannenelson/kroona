@@ -7,6 +7,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import { PARTNER_BOUNDARY_GROUP, PROFILE_BOUNDARY_GROUP } from './product/productTransition';
 import { useFollowedPeople } from '../context/FollowedPeopleContext';
 import { useLongPressMenu } from '../hooks/useLongPressMenu';
+import { useFollowToggle } from '../hooks/useFollowToggle';
 import { makeStyles, typography, fonts, spacing, radius } from '../theme';
 import BrandLogo, { hasBrandLogo } from './BrandLogo';
 
@@ -30,6 +31,7 @@ export default function ProfileCard({ name, initial, partnerId, personId }: Prop
   const styles = useStyles();
   const router = useRouter();
   const { isFollowingPerson, toggleFollowPerson } = useFollowedPeople();
+  const followToggle = useFollowToggle();
   // Samma tryckrespons som produktkorten (krympning, ingen opacitet).
   const press = useCardPress();
   const targetId = partnerId ?? personId;
@@ -54,7 +56,13 @@ export default function ProfileCard({ name, initial, partnerId, personId }: Prop
             label: isFollowingPerson(personId) ? 'Sluta följa' : 'Följ',
             // Person (brief 67): user-add / user-check efter läge.
             icon: isFollowingPerson(personId) ? 'user-check' : 'user-add',
-            onPress: () => toggleFollowPerson(personId),
+            // Bekräftas med följ-snackbaren (brief 73), utan miniatyr.
+            onPress: () =>
+              followToggle({
+                followed: isFollowingPerson(personId),
+                name,
+                toggle: () => toggleFollowPerson(personId),
+              }),
           },
           { label: 'Öppna', icon: 'chevron-right', navigation: true, onPress: open },
         ]

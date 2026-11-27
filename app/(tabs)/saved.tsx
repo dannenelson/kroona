@@ -51,6 +51,7 @@ import UserCollectionCard from '../../components/saved/UserCollectionCard';
 import { makeRenameCollectionStep } from '../../components/saved/RenameCollectionStep';
 import { useSheet } from '../../components/Sheet';
 import { useSnackbar } from '../../components/Snackbar';
+import { useFollowToggle } from '../../hooks/useFollowToggle';
 import { createCollectionStep } from '../../components/saved/CreateCollectionStep';
 import type { ContextMenuItem } from '../../components/ProductContextMenu';
 
@@ -293,6 +294,8 @@ function FollowingTab() {
   const router = useRouter();
   const { followedCollectionIds, toggleFollowed } = useFollowedCollections();
   const { followedPeopleIds, toggleFollowPerson } = useFollowedPeople();
+  // "Sluta följa" ligger i radernas meny: bekräftas med följ-snackbaren (brief 73).
+  const followToggle = useFollowToggle();
   const people = useMemo(
     () => sortByName(followedPeopleIds.map(getPerson).filter((p): p is Person => !!p), (p) => p.name),
     [followedPeopleIds],
@@ -353,7 +356,9 @@ function FollowingTab() {
                   ? countLabel(nCollections, 'samling', 'samlingar')
                   : countLabel(getProductsForRetailer(r.id).length, 'produkt', 'produkter')
               }
-              onUnfollow={() => toggleFollowed(getRetailerFollowKey(r.id))}
+              onUnfollow={() =>
+                followToggle({ followed: true, name: r.name, toggle: () => toggleFollowed(getRetailerFollowKey(r.id)) })
+              }
             />
           );
         }}
@@ -361,12 +366,24 @@ function FollowingTab() {
       <Section
         title="Personer"
         items={people}
-        render={(p) => <PersonRow key={p.id} person={p} onUnfollow={() => toggleFollowPerson(p.id)} />}
+        render={(p) => (
+          <PersonRow
+            key={p.id}
+            person={p}
+            onUnfollow={() => followToggle({ followed: true, name: p.name, toggle: () => toggleFollowPerson(p.id) })}
+          />
+        )}
       />
       <Section
         title="Områden"
         items={areas}
-        render={(a) => <AreaRow key={a.id} area={a} onUnfollow={() => toggleFollowed(a.id)} />}
+        render={(a) => (
+          <AreaRow
+            key={a.id}
+            area={a}
+            onUnfollow={() => followToggle({ followed: true, name: a.name, toggle: () => toggleFollowed(a.id) })}
+          />
+        )}
       />
       <Section
         title="Samlingar"
@@ -391,7 +408,17 @@ function FollowingTab() {
                   navigation: true,
                   onPress: () => router.push({ pathname: '/collection/[id]', params: { id: c.id } }),
                 },
-                { label: 'Sluta följa', icon: 'user-add', onPress: () => toggleFollowed(c.id) },
+                {
+                  label: 'Sluta följa',
+                  icon: 'user-add',
+                  onPress: () =>
+                    followToggle({
+                      followed: true,
+                      name: c.name,
+                      toggle: () => toggleFollowed(c.id),
+                      thumbUri: c.imageUrl ?? images[0],
+                    }),
+                },
               ]}
             />
           );
