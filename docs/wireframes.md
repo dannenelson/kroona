@@ -24,9 +24,11 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 
 **Byggd (brief 13), beslutade avvikelser från designen (Looken A):** hållbarhetsindex som siffra ("4,2 av 5") i faktatabellen · prisläge (Fast pris / Auktion, bud från) på begagnade rader · ingen sorteringskontroll i "Köp hos", pris stigande · inga pricksidor på hero (en bild per produkt) · Spara = fylld ikon och "Sparad", ingen inverterad yta · priset överst = "Från lägsta pris" (med "Begagnat" om lägst är begagnat). Tryck på en erbjudanderad ger haptik och en toast ("Du skulle nu gå till …"), ingen utlänk i Fas 0.
 
-**Sedan brief 70–71:** toppbarens högra knapp är **mer (⋯)** med en förankrad meny: Spara i samling, Följ/Sluta följa varumärke (när märket har profil), Dela (platshållare), Visa liknande (scrollar till Liknande). Inget Spara-val, bokmärket på namnraden finns. Produkter utan index (testdata 4, 5, 7) visar "Ej redovisat" och inget löv på korten. Hållbarhetsindexet är tryckbart och öppnar **"Så räknar vi"** (fyra delposter, exempeldata); saknas index visas "Ej redovisat".
+**Sedan brief 70–71:** toppbarens högra knapp är **mer (⋯)** med en förankrad meny: Spara i samling, Följ/Sluta följa varumärke (när märket har profil), Dela (platshållare), Visa liknande (scrollar till Liknande). Följ/Sluta följa i menyn bekräftas med snackbaren "Du följer <märke>" / "Du följer inte längre <märke>" (brief 73). Inget Spara-val, bokmärket på namnraden finns. Produkter utan index (testdata 4, 5, 7) visar "Ej redovisat" och inget löv på korten. Hållbarhetsindexet är tryckbart och öppnar **"Så räknar vi"** (fyra delposter, exempeldata); saknas index visas "Ej redovisat".
 
 **Sedan brief 60–65:** märke (tryckbart till varumärkets profil om den finns), namn och **rund Spara-knapp** (bokmärke, samma glas som tillbaka/dela) på namnraden, pris, **betyg** direkt under ("☆ 4,1 (12 omdömen)"), sedan Hållbarhet (Hållbarhetsindex och fakta). Toppen: bara kantblur, svag statusfältstint i mörkt läge.
+
+**Sedan brief 73:** rubrikerna har en liten ikon framför texten: Hållbarhet (löv), Finns begagnad hos (återvinning), Köp hos (kasse), Liknande (bilder).
 
 **Beslut:** Nytt/Begagnat ligger på Erbjudande. Flera begagnat-erbjudanden samtidigt. Prisläge undviker missvisande låga startbud. Begagnat före nytt.
 **Öppet:** signal på produktkort för "finns begagnad". Hur begagnat inhämtas (integration eller manuellt i Fas 0).
@@ -55,6 +57,8 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 4. Finns: e-handel, butiker och var
 5. **Samlingar · N**: hylla med kollektioner
 6. **Produkter · N**: produktgrid
+
+**Sedan brief 73:** rubrikerna har en liten ikon framför texten: Om … (info), Hållbarhet (löv), Finns (kartnål), Samlingar (mappar), Produkter (produkt). Följ-pillen i hero får ingen snackbar; den byter själv till "Följer".
 
 ---
 
