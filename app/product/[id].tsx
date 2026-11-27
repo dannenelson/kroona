@@ -44,6 +44,10 @@ import NameWithSave from '../../components/product/NameWithSave';
 import { FactList, indexFact, type Fact } from '../../components/product/FactList';
 import { useOpenIndexSheet } from '../../components/SustainabilityIndexSheet';
 import { useAnchoredMenu } from '../../components/AnchoredMenu';
+import type { ContextMenuItem } from '../../components/ProductContextMenu';
+import { useSaveActions } from '../../components/saved/SaveSheet';
+import { useFollowedCollections } from '../../context/FollowedCollectionsContext';
+import { getRetailerFollowKey } from '../../data/collections';
 import OfferRow from '../../components/product/OfferRow';
 import Icon from '../../components/Icon';
 import type { Offer } from '../../types/catalog';
@@ -69,20 +73,13 @@ export default function ProductScreen() {
   // "Så räknar vi" (brief 70): tryck på indexraden.
   const openIndexSheet = useOpenIndexSheet();
   const anchoredMenu = useAnchoredMenu();
-  // Knappens läge i toppbaren (TopBar: skärmmarginal, spacing.sm över, 44 × 44).
-  const openMoreMenu = () =>
-    anchoredMenu.open({
-      anchor: {
-        x: width - spacing.screenMargin - touchTarget,
-        y: insets.top + spacing.sm,
-        width: touchTarget,
-        height: touchTarget,
-      },
-      items: [
-        // Dela är en platshållare i Fas 0 (samma som övriga menyer).
-        { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare' }) },
-      ],
-    });
+  // Mer-menyn (brief 71): samma val som kortets kontextmeny utom Spara.
+  const save = useSaveActions(id ?? '');
+  const { isFollowed, toggleFollowed } = useFollowedCollections();
+  const scrollRef = useRef<any>(null);
+  // Liknande-sektionens läge i innehållet (för "Visa liknande").
+  const similarY = useRef<number | null>(null);
+  const bodyY = useRef(0);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = useStyles();
@@ -199,6 +196,51 @@ export default function ProductScreen() {
   }
 
   const brandProfile = getRetailerForBrand(product.brand);
+  const followKey = brandProfile ? getRetailerFollowKey(brandProfile.id) : null;
+  const brandFollowed = followKey ? isFollowed(followKey) : false;
+
+  // Mer-menyn förankrad vid knappen (brief 70–71). Knappens läge i toppbaren
+  // (TopBar: skärmmarginal, spacing.sm över, 44 × 44).
+  const openMoreMenu = () => {
+    const items: ContextMenuItem[] = [
+      { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
+      // Följ bara när märket har en profil; ikonen följer läget (brief 67).
+      ...(followKey
+        ? [
+            {
+              label: brandFollowed ? 'Sluta följa varumärke' : 'Följ varumärke',
+              icon: brandFollowed ? 'company-check' : 'company-add',
+              onPress: () => toggleFollowed(followKey),
+            } satisfies ContextMenuItem,
+          ]
+        : []),
+      // Dela är en platshållare i Fas 0 (samma som övriga menyer).
+      { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare' }) },
+      ...(data.similar.length > 0
+        ? [
+            {
+              label: 'Visa liknande',
+              icon: 'layers',
+              // Scrollar så att rubriken Liknande hamnar under toppbaren.
+              onPress: () =>
+                similarY.current !== null &&
+                scrollRef.current?.scrollTo({
+                  y: Math.max(0, bodyY.current + similarY.current - insets.top - barHeight),
+                }),
+            } satisfies ContextMenuItem,
+          ]
+        : []),
+    ];
+    anchoredMenu.open({
+      anchor: {
+        x: width - spacing.screenMargin - touchTarget,
+        y: insets.top + spacing.sm,
+        width: touchTarget,
+        height: touchTarget,
+      },
+      items,
+    });
+  };
 
   const facts: Fact[] = [
     // "Ej redovisat" om index saknas (brief 70; i dummydatan har alla produkter ett).
@@ -219,6 +261,7 @@ export default function ProductScreen() {
       {/* Transition.ScrollView samordnar scrollen med stängningsgesten:
           drag nedåt tar bara över när innehållet är överst. Studsar som vanligt. */}
       <Transition.ScrollView
+        ref={scrollRef}
         showsVerticalScrollIndicator={false}
         scrollEventThrottle={16}
         // Exakt 0 överst (ingen automatisk inset).
@@ -247,7 +290,7 @@ export default function ProductScreen() {
           />
         </Transition.Boundary>
 
-        <Reanimated.View style={revealStyle}>
+        <Reanimated.View style={revealStyle} onLayout={(e) => (bodyY.current = e.nativeEvent.layout.y)}>
           <View style={styles.info}>
             {/* Märket öppnar varumärkets profil om det finns en (brief 65, tillägg). */}
             {brandProfile ? (
@@ -345,7 +388,7 @@ export default function ProductScreen() {
           )}
 
           {data.similar.length > 0 && (
-            <>
+            <View onLayout={(e) => (similarY.current = e.nativeEvent.layout.y)}>
               <SectionTitle title="Liknande" style={styles.sectionTitle} />
               <ScrollView
                 horizontal
@@ -358,7 +401,7 @@ export default function ProductScreen() {
                   </View>
                 ))}
               </ScrollView>
-            </>
+            </View>
           )}
         </Reanimated.View>
       </Transition.ScrollView>
