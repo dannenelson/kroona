@@ -52,7 +52,7 @@ export default function SustainabilitySection({ retailer, titleStyle, indexSeed 
 
   return (
     <View>
-      <SectionTitle title="Hållbarhet" style={titleStyle} />
+      <SectionTitle title="Hållbarhet" leadingIcon="leaf" style={titleStyle} />
       <View style={styles.parts}>
         <FactList
           facts={[

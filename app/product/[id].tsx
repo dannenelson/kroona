@@ -332,12 +332,12 @@ export default function ProductScreen() {
             )}
           </View>
 
-          <SectionTitle title="Hållbarhet" style={[styles.sectionTitle, styles.firstSectionTitle]} />
+          <SectionTitle title="Hållbarhet" leadingIcon="leaf" style={[styles.sectionTitle, styles.firstSectionTitle]} />
           <FactList facts={facts} />
 
           {data.used.length > 0 && (
             <>
-              <SectionTitle title="Finns begagnad hos" style={styles.sectionTitle} />
+              <SectionTitle title="Finns begagnad hos" leadingIcon="recycle" style={styles.sectionTitle} />
               <View style={styles.group}>
                 {data.used
                   .flatMap((group) => group.offers.map((offer) => ({ group, offer })))
@@ -364,7 +364,7 @@ export default function ProductScreen() {
 
           {data.fresh.length > 0 && (
             <>
-              <SectionTitle title="Köp hos" style={styles.sectionTitle} />
+              <SectionTitle title="Köp hos" leadingIcon="shopping-bag" style={styles.sectionTitle} />
               <View style={styles.group}>
                 {data.fresh.map((offer, i) => {
                   const retailer = getRetailer(offer.retailerId);
@@ -396,7 +396,7 @@ export default function ProductScreen() {
                 }
               }}
             >
-              <SectionTitle title="Liknande" style={styles.sectionTitle} />
+              <SectionTitle title="Liknande" leadingIcon="images" style={styles.sectionTitle} />
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}

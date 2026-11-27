@@ -135,6 +135,7 @@ export default function PartnerScreen() {
                   ? 'Om butiken'
                   : 'Om tjänsten'
             }
+            leadingIcon="info"
             style={styles.sectionTitle}
           />
           <View style={styles.textBlock}>
@@ -147,7 +148,7 @@ export default function PartnerScreen() {
 
           {presence.length > 0 && (
             <>
-              <SectionTitle title="Finns" style={styles.sectionTitle} />
+              <SectionTitle title="Finns" leadingIcon="map-pin" style={styles.sectionTitle} />
               <View style={styles.textBlock}>
                 {presence.map((line) => (
                   <Text key={line} style={styles.paragraph}>
@@ -160,7 +161,7 @@ export default function PartnerScreen() {
 
           {collections.length > 0 && (
             <>
-              <SectionTitle title="Samlingar" count={collections.length} style={styles.sectionTitle} />
+              <SectionTitle title="Samlingar" leadingIcon="folders" count={collections.length} style={styles.sectionTitle} />
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.shelf}>
                 {collections.map((c) => (
                   <PartnerCard
@@ -179,7 +180,7 @@ export default function PartnerScreen() {
 
           {products.length > 0 && (
             <>
-              <SectionTitle title="Produkter" count={products.length} style={styles.sectionTitle} />
+              <SectionTitle title="Produkter" leadingIcon="product" count={products.length} style={styles.sectionTitle} />
               <View style={styles.grid}>
                 <ProductGrid products={products} compact />
               </View>
