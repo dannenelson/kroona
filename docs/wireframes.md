@@ -24,7 +24,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 
 **Byggd (brief 13), beslutade avvikelser från designen (Looken A):** hållbarhetsindex som siffra ("4,2 av 5") i faktatabellen · prisläge (Fast pris / Auktion, bud från) på begagnade rader · ingen sorteringskontroll i "Köp hos", pris stigande · inga pricksidor på hero (en bild per produkt) · Spara = fylld ikon och "Sparad", ingen inverterad yta · priset överst = "Från lägsta pris" (med "Begagnat" om lägst är begagnat). Tryck på en erbjudanderad ger haptik och en toast ("Du skulle nu gå till …"), ingen utlänk i Fas 0.
 
-**Sedan brief 70:** toppbarens högra knapp är **mer (⋯)** med en förankrad meny (Dela, platshållare). Hållbarhetsindexet är tryckbart och öppnar **"Så räknar vi"** (fyra delposter, exempeldata); saknas index visas "Ej redovisat".
+**Sedan brief 70–71:** toppbarens högra knapp är **mer (⋯)** med en förankrad meny: Spara i samling, Följ/Sluta följa varumärke (när märket har profil), Dela (platshållare), Visa liknande (scrollar till Liknande). Inget Spara-val, bokmärket på namnraden finns. Produkter utan index (testdata 4, 5, 7) visar "Ej redovisat" och inget löv på korten. Hållbarhetsindexet är tryckbart och öppnar **"Så räknar vi"** (fyra delposter, exempeldata); saknas index visas "Ej redovisat".
 
 **Sedan brief 60–65:** märke (tryckbart till varumärkets profil om den finns), namn och **rund Spara-knapp** (bokmärke, samma glas som tillbaka/dela) på namnraden, pris, **betyg** direkt under ("☆ 4,1 (12 omdömen)"), sedan Hållbarhet (Hållbarhetsindex och fakta). Toppen: bara kantblur, svag statusfältstint i mörkt läge.
 
@@ -142,6 +142,8 @@ Att öppna en samling leder till Samlingsdetalj ("Av dig", ingen Följ). Att öp
 5. Tomt läge: bara raden Sparade produkter; länken Ny samling finns kvar
 
 Vid stängning, om något lagts till: snackbar "**<produkt>** lades till i **<samling>** · Visa" eller "… lades till i N samlingar · Visa" (→ Sparat). Bara borttagningar: ingen snackbar.
+
+**Plus/minus-märke (brief 71):** snackbarens produktminiatyr får ett litet runt märke överst till höger: plus när produkten lades till (sparade produkter, samling, N samlingar), minus när den togs bort (sparade produkter, eller ur en samling i Redigera innehåll). Kort pop när snackbaren visas.
 ---
 
 ## 9. Profil, Notiser och Inställningar — ✅ Fas 0 dummy (brief 64)
