@@ -41,7 +41,7 @@ import EdgeFade from '../../components/EdgeFade';
 import SectionTitle from '../../components/SectionTitle';
 import ProductCard from '../../components/ProductCard';
 import NameWithSave from '../../components/product/NameWithSave';
-import { FactList, type Fact } from '../../components/product/FactList';
+import { FactList, indexFact, type Fact } from '../../components/product/FactList';
 import OfferRow from '../../components/product/OfferRow';
 import Icon from '../../components/Icon';
 import type { Offer } from '../../types/catalog';
@@ -182,7 +182,8 @@ export default function ProductScreen() {
   const brandProfile = getRetailerForBrand(product.brand);
 
   const facts: Fact[] = [
-    { label: 'Hållbarhetsindex', value: `${formatScore(product.sustainabilityScore)} av 5` },
+    // "Ej redovisat" om index saknas (brief 70; i dummydatan har alla produkter ett).
+    indexFact(product.sustainabilityScore, 'Produkten saknar redovisning av hållbarhet.'),
     ...(product.facts?.material ? [{ label: 'Material', value: product.facts.material }] : []),
     ...(product.facts?.madeIn ? [{ label: 'Tillverkad i', value: product.facts.madeIn }] : []),
     ...(product.facts?.certification

@@ -2,14 +2,14 @@
 // Produktdetalj: rubriken "Hållbarhet" och indexet som faktarad ("4,4 av 5",
 // samma FactList och skala 1–5). Under: certifikat som chips (tryck öppnar ett
 // kort med namn, utfärdare och förklaring) och hållbara initiativ som en
-// grupperad lista. Varje del döljs utan data; utan data alls ritas ingenting.
+// grupperad lista. Sektionen visas alltid (brief 70): saknas index står
+// "Ej redovisat" med en neutral rad; certifikat och initiativ döljs var för sig.
 // DUMMYDATA i Fas 0: ingen verifiering, inga länkar ut, inget beräknat index.
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from 'react-native';
 import { makeStyles, useTheme, typography, spacing, radius, iconSize, touchTarget } from '../../theme';
 import type { Certification, Retailer } from '../../types/catalog';
-import { formatScore } from '../../utils/format';
 import { haptic } from '../../utils/haptic';
-import { FactList } from '../product/FactList';
+import { FactList, indexFact } from '../product/FactList';
 import { SheetContent, useSheet } from '../Sheet';
 import SectionTitle from '../SectionTitle';
 import Icon from '../Icon';
@@ -29,7 +29,6 @@ export default function SustainabilitySection({ retailer, titleStyle }: Props) {
   const { colors } = useTheme();
   const sheet = useSheet();
   const { sustainabilityIndex, certifications = [], initiatives = [] } = retailer;
-  if (!hasSustainability(retailer)) return null;
 
   const openCertification = (c: Certification) => {
     haptic.light();
@@ -51,9 +50,7 @@ export default function SustainabilitySection({ retailer, titleStyle }: Props) {
     <View>
       <SectionTitle title="Hållbarhet" style={titleStyle} />
       <View style={styles.parts}>
-        {sustainabilityIndex !== undefined ? (
-          <FactList facts={[{ label: 'Hållbarhetsindex', value: `${formatScore(sustainabilityIndex)} av 5` }]} />
-        ) : null}
+        <FactList facts={[indexFact(sustainabilityIndex, 'Företaget har inte redovisat sin hållbarhet.')]} />
 
         {certifications.length > 0 ? (
           <View style={styles.part}>
