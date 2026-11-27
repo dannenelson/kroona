@@ -23,6 +23,8 @@ export interface Collection {
   kind: 'collection';
   /** Förvald följd i demot (bara data, logiken byggs senare). */
   defaultFollowed?: boolean;
+  /** DUMMYDATA (brief 74): antal följare exklusive användaren. Riktig räkning är Fas 1+. */
+  followers: number;
   name: string;
   tag: string;
   imageUrl: string;
@@ -35,6 +37,7 @@ const img = (id: string) => PRODUCTS_BY_ID[id];
 export const COLLECTIONS: Collection[] = [
   {
     id: '1',
+    followers: 1720, // DUMMYDATA
     kind: 'collection',
     defaultFollowed: true,
     name: 'J.Lindeberg',
@@ -45,6 +48,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: '4',
+    followers: 2050, // DUMMYDATA
     kind: 'collection',
     name: 'Filippa K',
     tag: 'Varumärke',
@@ -54,6 +58,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: '2',
+    followers: 8420, // DUMMYDATA
     kind: 'collection',
     defaultFollowed: true,
     name: 'Skandinavisk stil',
@@ -64,6 +69,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: '3',
+    followers: 6310, // DUMMYDATA
     kind: 'collection',
     name: 'Urban stil',
     tag: 'Tema',
@@ -74,6 +80,7 @@ export const COLLECTIONS: Collection[] = [
   // Kroonas redaktionella samlingar med logotyp (brief 48, logotyper i data/logos.ts).
   {
     id: 'k-smarta-hem',
+    followers: 4980, // DUMMYDATA
     kind: 'collection',
     name: 'Smarta hem',
     tag: 'Tema',
@@ -83,6 +90,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: 'k-gaming-deluxe',
+    followers: 3760, // DUMMYDATA
     kind: 'collection',
     name: 'Gaming Deluxe',
     tag: 'Tema',
@@ -92,6 +100,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: 'k-handla-hallbart',
+    followers: 7150, // DUMMYDATA
     kind: 'collection',
     name: 'Handla hållbart',
     tag: 'Tema',
@@ -102,6 +111,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: 'k-second-hand',
+    followers: 5640, // DUMMYDATA
     kind: 'collection',
     name: 'Second Hand',
     tag: 'Tema',
@@ -112,6 +122,7 @@ export const COLLECTIONS: Collection[] = [
   },
   {
     id: 'k-second-life',
+    followers: 4230, // DUMMYDATA
     kind: 'collection',
     name: 'Second Life',
     tag: 'Tema',
@@ -128,6 +139,7 @@ export const COLLECTIONS: Collection[] = [
 export const RETAILER_COLLECTIONS: Collection[] = [
   {
     id: 'jl-sneakers',
+    followers: 940, // DUMMYDATA
     kind: 'collection',
     name: 'Sneakers',
     tag: 'Kollektion',
@@ -137,6 +149,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
   {
     id: 'fk-host',
+    followers: 1240, // DUMMYDATA
     kind: 'collection',
     name: 'Höstgarderob',
     tag: 'Kollektion',
@@ -146,6 +159,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
   {
     id: 'fk-vaskor',
+    followers: 860, // DUMMYDATA
     kind: 'collection',
     name: 'Väskor',
     tag: 'Kollektion',
@@ -155,6 +169,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
   {
     id: 'wd-urban',
+    followers: 730, // DUMMYDATA
     kind: 'collection',
     name: 'Urban vardag',
     tag: 'Kollektion',
@@ -164,6 +179,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
   {
     id: 'hm-sommar',
+    followers: 1510, // DUMMYDATA
     kind: 'collection',
     name: 'Sommarfavoriter',
     tag: 'Kollektion',
@@ -173,6 +189,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
   {
     id: 'lx-host',
+    followers: 620, // DUMMYDATA
     kind: 'collection',
     name: 'Höst i stan',
     tag: 'Kollektion',
@@ -182,6 +199,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
   {
     id: 'nn-vardagsrum',
+    followers: 480, // DUMMYDATA
     kind: 'collection',
     name: 'Vardagsrummet',
     tag: 'Kollektion',
@@ -191,6 +209,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
   },
   {
     id: 'rd-klassiker',
+    followers: 390, // DUMMYDATA
     kind: 'collection',
     name: 'Designklassiker',
     tag: 'Kollektion',
@@ -205,6 +224,7 @@ export const RETAILER_COLLECTIONS: Collection[] = [
 export const PEOPLE_COLLECTIONS: Collection[] = [
   {
     id: 'pc-maja-ull',
+    followers: 312, // DUMMYDATA
     kind: 'collection',
     name: 'Höstlook i ull och mocka',
     tag: 'Samling',
@@ -214,6 +234,7 @@ export const PEOPLE_COLLECTIONS: Collection[] = [
   },
   {
     id: 'pc-maja-fynd',
+    followers: 184, // DUMMYDATA
     kind: 'collection',
     name: 'Bästa begagnade fynden',
     tag: 'Samling',
@@ -223,6 +244,7 @@ export const PEOPLE_COLLECTIONS: Collection[] = [
   },
   {
     id: 'pc-oskar-hem',
+    followers: 257, // DUMMYDATA
     kind: 'collection',
     name: 'Litet hem, stora favoriter',
     tag: 'Samling',
@@ -232,6 +254,7 @@ export const PEOPLE_COLLECTIONS: Collection[] = [
   },
   {
     id: 'pc-sara-urban',
+    followers: 143, // DUMMYDATA
     kind: 'collection',
     name: 'Urban på budget',
     tag: 'Samling',

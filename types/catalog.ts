@@ -77,6 +77,8 @@ export interface Retailer {
   initial: string;
   /** Förvald följd i demot (bara data, logiken byggs senare). */
   defaultFollowed?: boolean;
+  /** DUMMYDATA (brief 74): antal följare exklusive användaren. Riktig räkning är Fas 1+. */
+  followers: number;
   /** Hållbarhetsindex 1–5, samma skala som produkternas `sustainabilityScore` (brief 69). */
   sustainabilityIndex?: number;
   /** Certifikat (brief 69). */

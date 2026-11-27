@@ -22,6 +22,7 @@ const demoStore = (name: string) => ({
 export const RETAILERS: Retailer[] = [
   {
     id: 'brand-j-lindeberg',
+    followers: 2860, // DUMMYDATA
     kind: 'retailer',
     name: 'J.Lindeberg',
     retailerType: 'brand',
@@ -33,6 +34,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'brand-filippa-k',
+    followers: 3410, // DUMMYDATA
     kind: 'retailer',
     name: 'Filippa K',
     retailerType: 'brand',
@@ -44,6 +46,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'brand-weekday',
+    followers: 2140, // DUMMYDATA
     kind: 'retailer',
     name: 'Weekday',
     retailerType: 'brand',
@@ -54,6 +57,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'brand-hm',
+    followers: 4870, // DUMMYDATA
     kind: 'retailer',
     name: 'H&M',
     retailerType: 'brand',
@@ -64,6 +68,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'brand-lindex',
+    followers: 1930, // DUMMYDATA
     kind: 'retailer',
     name: 'Lindex',
     retailerType: 'brand',
@@ -74,6 +79,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'store-nordic-nest',
+    followers: 1560, // DUMMYDATA
     kind: 'retailer',
     name: 'Nordic Nest',
     retailerType: 'store',
@@ -83,6 +89,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'store-royal-design',
+    followers: 1280, // DUMMYDATA
     kind: 'retailer',
     name: 'Royal Design',
     retailerType: 'store',
@@ -92,6 +99,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'sh-aterbruket',
+    followers: 412, // DUMMYDATA
     kind: 'retailer',
     name: 'Återbruket',
     retailerType: 'secondhand',
@@ -110,6 +118,7 @@ export const RETAILERS: Retailer[] = [
   },
   {
     id: 'sh-budrummet',
+    followers: 268, // DUMMYDATA
     kind: 'retailer',
     name: 'Budrummet',
     retailerType: 'secondhand',

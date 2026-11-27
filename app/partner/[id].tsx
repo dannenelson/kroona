@@ -122,7 +122,12 @@ export default function PartnerScreen() {
           title={retailer.name}
           leading={<BrandLogo retailerId={retailer.id} initial={retailer.initial} size={logo.heroCircle} />}
           subtitle={areas.length > 0 ? areas.join(' · ') : undefined}
-          follow={{ followed, onPress: () => toggleFollowed(followKey) }}
+          follow={{
+            followed,
+            onPress: () => toggleFollowed(followKey),
+            // Dummyantalet + 1 när användaren följer (brief 74).
+            count: retailer.followers + (followed ? 1 : 0),
+          }}
         />
 
         <Reanimated.View style={[styles.body, revealStyle]}>

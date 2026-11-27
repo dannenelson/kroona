@@ -60,6 +60,8 @@ type CollectionView = {
   curatorHref?: { pathname: '/partner/[id]' | '/profile/[id]'; id: string };
   /** Bara kuraterade samlingar kan följas (egna har ingen Följ-knapp). */
   followable: boolean;
+  /** DUMMYDATA: följare exklusive användaren (kuraterade samlingar). */
+  followers: number;
   byBrand: boolean;
   emptyTitle: string;
   emptyHint: string;
@@ -114,6 +116,7 @@ export default function CollectionScreen() {
         byline: 'Privat samling av dig',
         private: true,
         followable: false,
+        followers: 0,
         byBrand: false,
         emptyTitle: 'Inga sparade produkter än',
         emptyHint: 'Tryck på Spara på en produkt för att spara den här.',
@@ -129,6 +132,7 @@ export default function CollectionScreen() {
         byline: userCollection.visibility === 'public' ? 'Publik samling av dig' : 'Privat samling av dig',
         private: userCollection.visibility !== 'public',
         followable: false,
+        followers: 0,
         byBrand: false,
         emptyTitle: 'Samlingen är tom',
         emptyHint: 'Produkter du lägger här visas i den här samlingen.',
@@ -156,6 +160,7 @@ export default function CollectionScreen() {
           ? { pathname: '/profile/[id]', id: curator.personId }
           : undefined,
       followable: true,
+      followers: c.followers,
       byBrand: c.filter.type === 'brand',
       emptyTitle: 'Samlingen är tom',
       emptyHint: '',
@@ -249,7 +254,12 @@ export default function CollectionScreen() {
           }
           follow={
             collection.followable
-              ? { followed, onPress: () => toggleFollowed(collection.id) }
+              ? {
+                  followed,
+                  onPress: () => toggleFollowed(collection.id),
+                  // Dummyantalet + 1 när användaren följer (brief 74).
+                  count: collection.followers + (followed ? 1 : 0),
+                }
               : undefined
           }
         />

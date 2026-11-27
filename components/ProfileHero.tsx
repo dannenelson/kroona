@@ -3,7 +3,8 @@
 // svagare toning (`overlay.heroScrimSoft`). Längst ner på toningen: vänster
 // innehållet (valfritt `leading` som logotypcirkel + namn, eller en
 // samlingslogotyp i stället för namnet, och en undertext), höger Följ,
-// linjerad i botten. Coverns Boundary är zoommålet.
+// linjerad i botten. Coverns Boundary är zoommålet. Under Följ: antal följare
+// (brief 74), i samma textstil som undertexten och på samma baslinje.
 // Brief 74: undertexten kan ha en liten ikon före (lås för privat samling) och
 // vara tryckbar (kuratorns profil på Samlingsdetalj).
 import type { ReactNode } from 'react';
@@ -15,6 +16,7 @@ import { makeStyles, typography, spacing, overlay, motion, iconSize, logo as log
 import { LOGO_ASPECT, type LogoComponent } from '../data/logos';
 import Pill from './Pill';
 import Icon, { type IconName } from './Icon';
+import { formatFollowers } from '../utils/format';
 
 type Props = {
   boundary: { id: string; group: string };
@@ -36,7 +38,7 @@ type Props = {
   /** Gör undertexten tryckbar (t.ex. kuratorns profil). */
   onSubtitlePress?: () => void;
   /** Följ-knappen till höger; utelämnas för det som inte går att följa. */
-  follow?: { followed: boolean; onPress: () => void };
+  follow?: { followed: boolean; onPress: () => void; /** Visat antal följare (inkl. användaren). */ count?: number };
 };
 
 export default function ProfileHero({
@@ -96,9 +98,16 @@ export default function ProfileHero({
           ) : null}
         </View>
         {follow ? (
-          <Pill variant="glass" tone="photo" selected={follow.followed} onPress={follow.onPress}>
-            {follow.followed ? 'Följer' : 'Följ'}
-          </Pill>
+          <View style={styles.followBlock}>
+            <Pill variant="glass" tone="photo" selected={follow.followed} onPress={follow.onPress}>
+              {follow.followed ? 'Följer' : 'Följ'}
+            </Pill>
+            {follow.count !== undefined ? (
+              <Text style={styles.subtitle} numberOfLines={1}>
+                {formatFollowers(follow.count)}
+              </Text>
+            ) : null}
+          </View>
         ) : null}
       </LinearGradient>
     </Transition.Boundary>
@@ -139,6 +148,11 @@ const useStyles = makeStyles((t) => ({
   },
   logo: {
     alignSelf: 'flex-start',
+  },
+  // Följ och antal under, högerställda; antalet ligger på undertextens baslinje.
+  followBlock: {
+    alignItems: 'flex-end',
+    gap: spacing.sm,
   },
   // Ikon (12) 4 px före texten, centrerad mot raden.
   subtitleRow: {
