@@ -5,7 +5,7 @@
 // brief 32). Ligger i rotens stack som Produktdetalj, med samma hierarkirörelse: kortets bild zoomar till covern, drag nedåt överst och
 // kantswipe stänger (collectionScreenOptions i components/product/productTransition.ts).
 import { useEffect, useMemo, useState } from 'react';
-import { Image, Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Text, View, useWindowDimensions } from 'react-native';
 import Reanimated, {
   Extrapolation,
   interpolate,
@@ -52,11 +52,12 @@ type CollectionView = {
   products: Product[];
   /** Kuraterade samlingar har en bild; egna och "Sparade produkter" visar mosaik. */
   imageUrl?: string;
-  curatorName: string;
-  /** Kuratorns sida: Partnerdetalj (varumärke) eller profil (person). */
+  /** Raden "vad av vem" i hero (brief 74), t.ex. "Kollektion av Filippa K". */
+  byline: string;
+  /** Lås före raden för egna privata samlingar. */
+  private: boolean;
+  /** Kuratorns sida: Partnerdetalj (varumärke) eller profil (person). Raden är tryckbar bara då. */
   curatorHref?: { pathname: '/partner/[id]' | '/profile/[id]'; id: string };
-  /** Andra metadataraden efter antal produkter (tag, eller Privat/Publik). */
-  detail: string;
   /** Bara kuraterade samlingar kan följas (egna har ingen Följ-knapp). */
   followable: boolean;
   byBrand: boolean;
@@ -110,8 +111,8 @@ export default function CollectionScreen() {
         id,
         name: ALL_SAVED_NAME,
         products: savedProducts,
-        curatorName: 'dig',
-        detail: 'Privat',
+        byline: 'Privat samling av dig',
+        private: true,
         followable: false,
         byBrand: false,
         emptyTitle: 'Inga sparade produkter än',
@@ -125,8 +126,8 @@ export default function CollectionScreen() {
         products: userCollection.productIds
           .map((pid) => PRODUCTS.find((p) => p.id === pid))
           .filter((p): p is Product => !!p),
-        curatorName: 'dig',
-        detail: userCollection.visibility === 'public' ? 'Publik' : 'Privat',
+        byline: userCollection.visibility === 'public' ? 'Publik samling av dig' : 'Privat samling av dig',
+        private: userCollection.visibility !== 'public',
         followable: false,
         byBrand: false,
         emptyTitle: 'Samlingen är tom',
@@ -142,13 +143,18 @@ export default function CollectionScreen() {
       name: c.name,
       products: getCollectionProducts(c),
       imageUrl: c.imageUrl,
-      curatorName: curator.name,
+      // Kroona = tema, företag = kollektion, person = samling (brief 74).
+      byline: curator.retailerId
+        ? `Kollektion av ${curator.name}`
+        : curator.personId
+          ? `Samling av ${curator.name}`
+          : 'Tema av Kroona',
+      private: false,
       curatorHref: curator.retailerId
         ? { pathname: '/partner/[id]', id: curator.retailerId }
         : curator.personId
           ? { pathname: '/profile/[id]', id: curator.personId }
           : undefined,
-      detail: c.tag,
       followable: true,
       byBrand: c.filter.type === 'brand',
       emptyTitle: 'Samlingen är tom',
@@ -201,7 +207,7 @@ export default function CollectionScreen() {
   }
 
   const followed = isFollowed(collection.id);
-  const { curatorHref, curatorName } = collection;
+  const { curatorHref } = collection;
 
   return (
     <View style={styles.container}>
@@ -214,9 +220,9 @@ export default function CollectionScreen() {
         contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxxl }}
         onScroll={onScroll}
       >
-        {/* Profil-hero (brief 65, gemensam med företagsprofilen): covern är målet
+        {/* Profil-hero (brief 65, 74; gemensam med företagsprofilen): covern är målet
             för zoomen från samlingskortet. Logotyp (om samlingen har en) eller
-            titeln, typ som undertext och Följ; inget antal i hero. */}
+            titeln, raden "vad av vem" (tryckbar till kuratorn) och Följ. */}
         <ProfileHero
           boundary={{ id: b ?? collection.id, group: COLLECTION_BOUNDARY_GROUP }}
           width={width}
@@ -234,7 +240,13 @@ export default function CollectionScreen() {
           }
           title={collection.name}
           logo={COLLECTION_LOGOS[collection.id]}
-          subtitle={collection.detail}
+          subtitle={collection.byline}
+          subtitleIcon={collection.private ? 'lock' : undefined}
+          onSubtitlePress={
+            curatorHref
+              ? () => router.push({ pathname: curatorHref.pathname, params: { id: curatorHref.id } })
+              : undefined
+          }
           follow={
             collection.followable
               ? { followed, onPress: () => toggleFollowed(collection.id) }
@@ -243,22 +255,6 @@ export default function CollectionScreen() {
         />
 
         <Reanimated.View style={[styles.body, revealStyle]}>
-          {/* Samlingens egna uppgifter under hero (brief 65): kuratorn, i samma
-              textstil som företagsprofilens avsnitt. Beskrivning saknas i datan. */}
-          <View style={styles.textBlock}>
-            <Pressable
-              disabled={!curatorHref}
-              accessibilityRole={curatorHref ? 'link' : 'text'}
-              onPress={() =>
-                curatorHref && router.push({ pathname: curatorHref.pathname, params: { id: curatorHref.id } })
-              }
-            >
-              <Text style={styles.paragraph} numberOfLines={1}>
-                Av <Text style={curatorHref ? styles.curatorLink : undefined}>{curatorName}</Text>
-              </Text>
-            </Pressable>
-          </View>
-
           <SectionTitle title="Produkter" count={products.length} style={styles.sectionTitle} />
 
           {editing && isUserCollection ? (
@@ -362,16 +358,6 @@ const useStyles = makeStyles((t) => ({
     paddingTop: spacing.lg,
     gap: spacing.md,
     backgroundColor: t.colors.bg,
-  },
-  textBlock: {
-    paddingHorizontal: spacing.screenMargin,
-  },
-  paragraph: {
-    ...typography.body,
-    color: t.colors.textSecondary,
-  },
-  curatorLink: {
-    color: t.colors.textPrimary,
   },
   sectionTitle: {
     paddingHorizontal: spacing.screenMargin,

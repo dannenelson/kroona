@@ -3,15 +3,18 @@
 // svagare toning (`overlay.heroScrimSoft`). Längst ner på toningen: vänster
 // innehållet (valfritt `leading` som logotypcirkel + namn, eller en
 // samlingslogotyp i stället för namnet, och en undertext), höger Följ,
-// linjerad i botten. Inget antal i hero. Coverns Boundary är zoommålet.
+// linjerad i botten. Coverns Boundary är zoommålet.
+// Brief 74: undertexten kan ha en liten ikon före (lås för privat samling) och
+// vara tryckbar (kuratorns profil på Samlingsdetalj).
 import type { ReactNode } from 'react';
-import { Text, View } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 import Reanimated from 'react-native-reanimated';
 import Transition from 'react-native-screen-transitions';
 import { LinearGradient } from 'expo-linear-gradient';
-import { makeStyles, typography, spacing, overlay, logo as logoTokens } from '../theme';
+import { makeStyles, typography, spacing, overlay, motion, iconSize, logo as logoTokens } from '../theme';
 import { LOGO_ASPECT, type LogoComponent } from '../data/logos';
 import Pill from './Pill';
+import Icon, { type IconName } from './Icon';
 
 type Props = {
   boundary: { id: string; group: string };
@@ -26,8 +29,12 @@ type Props = {
   logo?: LogoComponent;
   /** Före namnet, t.ex. företagets runda logotyp. */
   leading?: ReactNode;
-  /** Rad under namnet, t.ex. företagets områden eller samlingens typ. */
+  /** Rad under namnet, t.ex. företagets områden eller "Kollektion av Filippa K". */
   subtitle?: string;
+  /** Liten ikon före undertexten, t.ex. `lock` för privat samling. */
+  subtitleIcon?: IconName;
+  /** Gör undertexten tryckbar (t.ex. kuratorns profil). */
+  onSubtitlePress?: () => void;
   /** Följ-knappen till höger; utelämnas för det som inte går att följa. */
   follow?: { followed: boolean; onPress: () => void };
 };
@@ -42,6 +49,8 @@ export default function ProfileHero({
   logo: Logo,
   leading,
   subtitle,
+  subtitleIcon,
+  onSubtitlePress,
   follow,
 }: Props) {
   const styles = useStyles();
@@ -72,9 +81,18 @@ export default function ProfileHero({
             </View>
           )}
           {subtitle ? (
-            <Text style={styles.subtitle} numberOfLines={1}>
-              {subtitle}
-            </Text>
+            <Pressable
+              disabled={!onSubtitlePress}
+              onPress={onSubtitlePress}
+              accessibilityRole={onSubtitlePress ? 'link' : 'text'}
+              hitSlop={spacing.sm}
+              style={({ pressed }) => [styles.subtitleRow, pressed && styles.pressed]}
+            >
+              {subtitleIcon ? <Icon name={subtitleIcon} size={iconSize.xs} color={overlay.onPhotoMuted} /> : null}
+              <Text style={styles.subtitle} numberOfLines={1}>
+                {subtitle}
+              </Text>
+            </Pressable>
           ) : null}
         </View>
         {follow ? (
@@ -122,8 +140,19 @@ const useStyles = makeStyles((t) => ({
   logo: {
     alignSelf: 'flex-start',
   },
+  // Ikon (12) 4 px före texten, centrerad mot raden.
+  subtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: spacing.xs,
+  },
   subtitle: {
     ...typography.label,
     color: overlay.onPhotoMuted,
+    flexShrink: 1,
+  },
+  pressed: {
+    opacity: motion.pressedOpacity,
   },
 }));
