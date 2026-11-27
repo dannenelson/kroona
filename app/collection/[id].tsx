@@ -26,7 +26,11 @@ import CollectionMosaic from '../../components/CollectionMosaic';
 import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useParallaxHero } from '../../hooks/useParallaxHero';
 import { COLLECTION_BOUNDARY_GROUP } from '../../components/product/productTransition';
-import TopBar from '../../components/TopBar';
+import TopBar, { topBarRightAnchor } from '../../components/TopBar';
+import { useAnchoredMenu } from '../../components/AnchoredMenu';
+import type { ContextMenuItem } from '../../components/ProductContextMenu';
+import { useFollowToggle } from '../../hooks/useFollowToggle';
+import { useUserCollectionMenu } from '../../hooks/useUserCollectionMenu';
 import EdgeFade from '../../components/EdgeFade';
 import TextTabs from '../../components/TextTabs';
 import ProductGrid from '../../components/ProductGrid';
@@ -102,6 +106,9 @@ export default function CollectionScreen() {
   // Redigera innehåll (egna samlingar, från menyn i Sparat): ta bort produkter, Klar avslutar.
   const [editing, setEditing] = useState(edit === '1');
   const snackbar = useSnackbar();
+  const anchoredMenu = useAnchoredMenu();
+  const followToggle = useFollowToggle();
+  const userCollectionMenu = useUserCollectionMenu();
   useEffect(() => {
     if (isUserCollection) markCollectionOpened(id);
   }, [id, isUserCollection, markCollectionOpened]);
@@ -213,6 +220,30 @@ export default function CollectionScreen() {
 
   const followed = isFollowed(collection.id);
   const { curatorHref } = collection;
+
+  // ⋯-meny uppe till höger (brief 74), förankrad vid knappen. Egen samling: samma
+  // val och flöden som i Sparat (Redigera innehåll växlar läge här, Ta bort går
+  // tillbaka). Andras samlingar: Följ/Sluta följa <namn> (med följ-snackbaren)
+  // och Dela (platshållare). "Sparade produkter" har ingen meny (som i Sparat).
+  const thumbUri = collection.imageUrl ?? products[0]?.imageUrl;
+  const menuItems: ContextMenuItem[] = userCollection
+    ? userCollectionMenu(userCollection, {
+        thumbUri,
+        onEditContent: () => setEditing(true),
+        onDeleted: back,
+      })
+    : collection.followable
+      ? [
+          {
+            label: followed ? `Sluta följa ${collection.name}` : `Följ ${collection.name}`,
+            icon: 'user-add',
+            onPress: () =>
+              followToggle({ followed, name: collection.name, toggle: () => toggleFollowed(collection.id), thumbUri }),
+          },
+          { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri }) },
+        ]
+      : [];
+  const openMenu = () => anchoredMenu.open({ anchor: topBarRightAnchor(width, insets.top), items: menuItems });
 
   return (
     <View style={styles.container}>
@@ -344,7 +375,15 @@ export default function CollectionScreen() {
         <Reanimated.Text numberOfLines={1} style={[styles.topTitle, { top: insets.top }, titleStyle]}>
           {collection.name}
         </Reanimated.Text>
-        <TopBar tone="photo" left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar
+          tone="photo"
+          left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }}
+          right={
+            menuItems.length > 0
+              ? [{ name: 'more-horizontal', accessibilityLabel: 'Fler val', onPress: openMenu }]
+              : []
+          }
+        />
       </View>
     </View>
   );

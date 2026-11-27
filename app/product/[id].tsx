@@ -36,7 +36,7 @@ import {
 import { formatPrice, formatScore } from '../../utils/format';
 import { haptic } from '../../utils/haptic';
 import { useSnackbar } from '../../components/Snackbar';
-import TopBar from '../../components/TopBar';
+import TopBar, { topBarRightAnchor } from '../../components/TopBar';
 import EdgeFade from '../../components/EdgeFade';
 import SectionTitle from '../../components/SectionTitle';
 import ProductCard from '../../components/ProductCard';
@@ -225,15 +225,7 @@ export default function ProductScreen() {
           ]
         : []),
     ];
-    anchoredMenu.open({
-      anchor: {
-        x: width - spacing.screenMargin - touchTarget,
-        y: insets.top + spacing.sm,
-        width: touchTarget,
-        height: touchTarget,
-      },
-      items,
-    });
+    anchoredMenu.open({ anchor: topBarRightAnchor(width, insets.top), items });
   };
 
   const facts: Fact[] = [

@@ -30,7 +30,10 @@ import { useReduceMotion } from '../../hooks/useReduceMotion';
 import { useParallaxHero } from '../../hooks/useParallaxHero';
 import { getRetailerAreas } from '../../lib/retailerAreas';
 import { PARTNER_BOUNDARY_GROUP } from '../../components/product/productTransition';
-import TopBar from '../../components/TopBar';
+import TopBar, { topBarRightAnchor } from '../../components/TopBar';
+import { useAnchoredMenu } from '../../components/AnchoredMenu';
+import { useSnackbar } from '../../components/Snackbar';
+import { useFollowToggle } from '../../hooks/useFollowToggle';
 import EdgeFade from '../../components/EdgeFade';
 import SectionTitle from '../../components/SectionTitle';
 import PartnerCard from '../../components/PartnerCard';
@@ -47,6 +50,9 @@ export default function PartnerScreen() {
   const { width } = useWindowDimensions();
   const styles = useStyles();
   const { isFollowed, toggleFollowed } = useFollowedCollections();
+  const anchoredMenu = useAnchoredMenu();
+  const snackbar = useSnackbar();
+  const followToggle = useFollowToggle();
 
   const retailer = getRetailer(id);
   const products = useMemo(() => (retailer ? getProductsForRetailer(retailer.id) : []), [retailer]);
@@ -97,6 +103,21 @@ export default function PartnerScreen() {
   const followed = isFollowed(followKey);
   // Områden härleds ur företagets produkter (lib/retailerAreas.ts).
   const areas = getRetailerAreas(retailer.id);
+  // ⋯-meny uppe till höger (brief 74), förankrad vid knappen: Följ/Sluta följa
+  // <namn> (följ-snackbaren, eftersom det är ett menyval) och Dela (platshållare).
+  // Medvetet kort; fylls på senare.
+  const openMenu = () =>
+    anchoredMenu.open({
+      anchor: topBarRightAnchor(width, insets.top),
+      items: [
+        {
+          label: followed ? `Sluta följa ${retailer.name}` : `Följ ${retailer.name}`,
+          icon: followed ? 'company-check' : 'company-add',
+          onPress: () => followToggle({ followed, name: retailer.name, toggle: () => toggleFollowed(followKey) }),
+        },
+        { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: coverUrl }) },
+      ],
+    });
   const presence = [
     ...(retailer.presence.online ? ['E-handel'] : []),
     ...(retailer.presence.stores.length > 0 ? [`Butiker: ${retailer.presence.stores.join(', ')}`] : []),
@@ -206,7 +227,11 @@ export default function PartnerScreen() {
         <Reanimated.Text numberOfLines={1} style={[styles.topTitle, { top: insets.top }, titleStyle]}>
           {retailer.name}
         </Reanimated.Text>
-        <TopBar tone="photo" left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }} />
+        <TopBar
+          tone="photo"
+          left={{ name: 'back-arrow', accessibilityLabel: 'Tillbaka', onPress: back }}
+          right={[{ name: 'more-horizontal', accessibilityLabel: 'Fler val', onPress: openMenu }]}
+        />
       </View>
     </View>
   );

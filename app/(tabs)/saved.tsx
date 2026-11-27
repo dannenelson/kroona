@@ -8,7 +8,7 @@
 //   max 3 med "Visa alla" (expanderar på plats). Långt tryck: Öppna, Sluta
 //   följa. Områden döljs (ingen följ-lagring för områden än).
 import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
-import { Alert, Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Image, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -48,10 +48,9 @@ import SegmentedIcons from '../../components/SegmentedIcons';
 import Icon, { type IconName } from '../../components/Icon';
 import CollectionMosaic from '../../components/CollectionMosaic';
 import UserCollectionCard from '../../components/saved/UserCollectionCard';
-import { makeRenameCollectionStep } from '../../components/saved/RenameCollectionStep';
 import { useSheet } from '../../components/Sheet';
-import { useSnackbar } from '../../components/Snackbar';
 import { useFollowToggle } from '../../hooks/useFollowToggle';
+import { useUserCollectionMenu } from '../../hooks/useUserCollectionMenu';
 import { createCollectionStep } from '../../components/saved/CreateCollectionStep';
 import type { ContextMenuItem } from '../../components/ProductContextMenu';
 
@@ -96,9 +95,8 @@ export default function SavedScreen() {
   const styles = useStyles();
   const router = useRouter();
   const sheet = useSheet();
-  const snackbar = useSnackbar();
   const { savedProducts } = useSavedProducts();
-  const { userCollections, deleteCollection } = useUserCollections();
+  const { userCollections } = useUserCollections();
   // A–Ö i svensk ordning vid visning (brief 42); Sparade produkter ligger fast först.
   const sortedCollections = useMemo(() => sortByName(userCollections, (c) => c.name), [userCollections]);
   const [tab, setTab] = useState<(typeof TABS)[number]>('Mina samlingar');
@@ -107,29 +105,9 @@ export default function SavedScreen() {
 
   const cardWidth = (width - spacing.screenMargin * 2 - spacing.gutter) / 2;
   // Redigera egna samlingar (Fas 0, lokalt): samma meny från långt tryck och
-  // från "mer"-knappen på raden. Ta bort bekräftas med systemets dialogruta.
-  const confirmDelete = (c: UserCollection) =>
-    Alert.alert(`Ta bort ${c.name}?`, 'Samlingen tas bort. Produkterna finns kvar.', [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Ta bort',
-        style: 'destructive',
-        onPress: () => {
-          deleteCollection(c.id);
-          snackbar.show({ subject: c.name, text: 'togs bort' });
-        },
-      },
-    ]);
-  const collectionMenu = (c: UserCollection, thumb?: string): ContextMenuItem[] => [
-    { label: 'Byt namn', icon: 'edit', onPress: () => sheet.open(makeRenameCollectionStep(c.id, c.name)) },
-    {
-      label: 'Redigera innehåll',
-      icon: 'grid',
-      onPress: () => router.push({ pathname: '/collection/[id]', params: { id: c.id, edit: '1' } }),
-    },
-    { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: thumb }) },
-    { label: 'Ta bort samling', icon: 'trash', onPress: () => confirmDelete(c) },
-  ];
+  // från "mer"-knappen på raden, delad med ⋯ på Samlingsdetalj (brief 74).
+  const userCollectionMenu = useUserCollectionMenu();
+  const collectionMenu = (c: UserCollection, thumb?: string) => userCollectionMenu(c, { thumbUri: thumb });
   const visibility = (c: UserCollection) => ({
     subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length, 'produkt', 'produkter')}`,
     icon: (c.visibility === 'public' ? undefined : 'lock') as IconName | undefined,

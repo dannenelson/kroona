@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 import { View, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
-import { useTheme, spacing, radius } from '../theme';
+import { useTheme, spacing, radius, touchTarget } from '../theme';
 import IconButton from './IconButton';
 import Glass, { type GlassTone } from './Glass';
 
@@ -18,6 +18,19 @@ type Props = {
   tone?: GlassTone;
   style?: StyleProp<ViewStyle>;
 };
+
+/**
+ * Var den högra (ensamma) knappen ligger på skärmen, för menyer förankrade vid
+ * den (AnchoredMenu, brief 70): skärmmarginal, spacing.sm under safe area, 44 × 44.
+ */
+export function topBarRightAnchor(screenWidth: number, safeTop: number) {
+  return {
+    x: screenWidth - spacing.screenMargin - touchTarget,
+    y: safeTop + spacing.sm,
+    width: touchTarget,
+    height: touchTarget,
+  };
+}
 
 /**
  * Delad toppbar (designsystem.md §8). Fast struktur: navigation till vänster,
