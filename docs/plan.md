@@ -11,7 +11,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | # | Spår | Klart när |
 |---|---|---|
 | 0.1–0.3 | Dokument, repo-inventering, designgrund | ✅ Klart 2026-11-17–19 |
-| 1 | **Fas 0-demot, skärm för skärm via briefer** (38–74 klara 2026-11-20–27) | Flikarna, detaljvyerna, Profil/Notiser/Inställningar och arkivet är byggda (se Kodläge). Pågår: polering via korta uppföljningar. Nästa brief väljer Daniel. |
+| 1 | **Fas 0-demot, skärm för skärm via briefer** (38–75 klara 2026-11-20–27) | Flikarna, detaljvyerna, Profil/Notiser/Inställningar och arkivet är byggda (se Kodläge). Pågår: polering via korta uppföljningar. Nästa brief väljer Daniel. |
 
 ## Kodläge (inventerat 2026-11-26, commit `08b05e0`)
 
@@ -20,7 +20,7 @@ Ett demo i telefonen som Daniel kan visa en pilotpartner och som håller i en 5-
 | Hem | ✅ | ✅ | ✅ Topp med avatar (Profil), klocka (Notiser) och varierande hälsning (`lib/greetings.ts`), fältet "Vad är du intresserad av idag?", pillar (filtrerar inget än), hyllor: Fortsätt där du var (dialoger, sökningar och samling, senast använd, 240 × 160), Skapat för dig, Samlingar för dig (logotyp eller titel), Fler i din stil, Områden, Populära samlingar, Kanske intressant för dig. |
 | Följer | ✅ | ✅ | ✅ Pinterest-flöde (brief 59): följt och inspiration blandat, masonry / en kolumn, pillar som filtrerar, pull-to-refresh, tomläge. Dummylogik. |
 | Hitta | ✅ | ✅ | ✅ Sök, dialog och kategorier (brief 53–54). Hyllor Idéer, Tidigare (3 senaste) och Kategorier (fyra: Kläder, Möbler, Elektronik, Begagnat), Områden och stilar. Arkiv och Alla kategorier (3-kolumnsgrid). Dialoger och sökningar sparas lokalt och återupptas (brief 66). Kvar: jämförelse, röst. |
-| Sparat | ✅ | ✅ | ✅ Mina samlingar \| Följer, Sparade produkter, rader/kort. Egna samlingar: skapa, byt namn, redigera innehåll, ta bort (lokalt). Följ-ikoner efter typ och läge (brief 67). Kvar: ordning i samlingar, eget omslag (idébanken). |
+| Sparat | ✅ | ✅ | ✅ Mina samlingar \| Följer, Sparade produkter, rader/kort. Egna listor: Samlingar och Önskelistor (brief 75) i var sin sektion; skapa med typval, redigera namn och Privat/Publik, redigera innehåll, ta bort (lokalt). Följ-ikoner efter typ och läge (brief 67). Kvar: ordning i samlingar, eget omslag (idébanken). |
 | Produkt-, Samlings-, Partner- och Profildetalj | ✅ | ✅ | ✅ Produktdetalj (+ lightbox, betyg under priset, rund Spara på namnraden, märket öppnar profilen). Samlings- och Partnerdetalj med gemensam hero (`ProfileHero`), parallax, antal vid rubrikerna; Partnerdetalj med områden och hållbarhet (brief 69; "Ej redovisat" och "Så räknar vi" brief 70). Mer-meny (⋯) förankrad vid knappen på Produktdetalj och i Sparat (brief 70; Produktdetaljs val brief 71). Produkter kan sakna hållbarhetsindex ("Ej redovisat", tre testprodukter) och snackbaren har plus/minus-märke på miniatyren (brief 71). Produktkortets meny: Följ <märke>, Dela (platshållare) och Visa liknande fungerar (brief 72). Följ via meny bekräftas med snackbar, Visa liknande har ikonen `images`, och rubrikerna på Produkt- och Partnerdetalj har ikoner (brief 73). Samlingsdetaljens hero som företagsprofilens med "vad av vem", antal följare (dummy) under Följ och ⋯-meny på Samlings- och Partnerdetalj (brief 74). Profildetalj för personer (dummy). |
 | Profil, Notiser, Inställningar | ✅ | ✅ | ✅ Dummy (brief 64): egen profil, notiser med olästprick, inställningar med Ljust/Mörkt/System (sparas), dev-sidan. |
 | Onboarding | parkerad | — | — |

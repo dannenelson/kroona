@@ -43,6 +43,7 @@ Nästan varje kort i alla flikar pekar mot en detaljvy, så detaljvyerna wirefra
 2. (Raden "Av <kurator>" under hero är borttagen i brief 74.)
 3. "Produkter · N", text-flikar (Alla, kategorier, stilar, Nytt) och produktgrid.
 4. **Egen samling, redigeringsläge** (från menyn i Sparat): rad per produkt med papperskorg, Klar avslutar.
+5. **Önskelista** (brief 75): heroraden "Önskelista av dig" med gåva, ingen Följ och inget antal; ⋯ som för egna samlingar (Redigera = bara namn, "Ta bort önskelista"); tomläge "Önskelistan är tom".
 
 **Ej byggt:** beskrivning (saknas i datan), ändra ordning, eget omslag.
 
@@ -125,14 +126,17 @@ Varumärkesidentitet täcks av Partnerdetalj.
 3. **Mina samlingar:**
    - **"Sparade produkter"** (hette Gillade produkter före brief 61) som egen specialrad överst: *inte* en samling. Bokmärket sparar dit, och en produkt kan ligga både där och i en samling.
    - Egna samlingar som **rader** (standard) eller **kort** (växlare). Mosaikomslag av de fyra första produkterna, namn, antal, Privat/Publik.
+   - **Två sektioner (brief 75):** **Samlingar** och **Önskelistor** (den senare bara när det finns minst en). Önskelistor visar gåva och "Önskelista · N produkter". "N samlingar" räknar bara Samlingar.
 4. **Följer** i sektioner, var och en med "Visa alla": **Varumärken**, **Personer** (brief 37, dummy), **Samlingar**, **Områden**.
 5. Bekräftelser via Snackbar med fetstilta namn ("**<produkt>** lades till i **<samling>** · Visa", brief 61).
 
 **Byggt (brief 35, Personer brief 37, Områden brief 54):** allt ovan. Rader: mosaikthumb 56/r14, "Privat · N produkter" med lås / "Publik · N produkter"; kortvy 2 kolumner; vy-valet sparas lokalt; "N samlingar" räknar bara egna. Följer: Varumärken (avatar 48, "N samlingar"), Samlingar (mosaik 48, "Av Kroona/<varumärke>"), max 3 + "Visa alla" som expanderar på plats. Följer: "Sluta följa" med följ-ikon efter typ (företag `company-check`, person `user-check`, brief 67). Tomlägen med wrap-knapp ("Skapa samling", "Utforska" → Hitta). Spara från produkt: se §8b (brief 40).
 
-**Redigera egna samlingar (2026-11-26, lokalt):** långt tryck (lyfter tumnageln) eller **mer-knappen** (more-horizontal, förankrad meny vid knappen sedan brief 70) på raden → **Byt namn** (namnfält, tomt går inte), **Redigera innehåll** (Samlingsdetalj i redigeringsläge), **Dela** (platshållare), **Ta bort samling** (systemets bekräftelse, destruktiv). Snackbar med fetstilta namn. **Ej byggt:** ändra ordning, eget omslag (idébanken).
+**Redigera egna samlingar (2026-11-26, lokalt):** långt tryck (lyfter tumnageln) eller **mer-knappen** (more-horizontal, förankrad meny vid knappen sedan brief 70) på raden → **Redigera** (brief 75: namn och "Håll samlingen privat"; önskelistor bara namn; tomt eller oförändrat går inte), **Redigera innehåll** (Samlingsdetalj i redigeringsläge), **Dela** (platshållare), **Ta bort samling** (systemets bekräftelse, destruktiv). Snackbar med fetstilta namn. **Ej byggt:** ändra ordning, eget omslag (idébanken).
 
-Att öppna en samling leder till Samlingsdetalj ("Av dig", ingen Följ). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
+**Skapa (brief 75):** "+" öppnar Skapa samling med typvalet **Samling | Önskelista** överst; Önskelista ger rubriken "Skapa önskelista" och växeln "Håll privat" på och låst ("Önskelistor är alltid privata. Du kan dela dem med andra senare."). Delning är Fas 1+.
+
+Att öppna en samling leder till Samlingsdetalj ("Privat/Publik samling av dig" eller "Önskelista av dig", ingen Följ). Att öppna ett varumärke leder till Partnerdetalj. Lagras lokalt i Fas 0.
 
 ---
 
@@ -141,7 +145,7 @@ Att öppna en samling leder till Samlingsdetalj ("Av dig", ingen Följ). Att öp
 
 1. Kort med luft runt om över mörk overlay; öppnas på 2/3 av skärmhöjden, växer till full höjd när man skrollar upp, krymper och stängs när man drar ned på listans topp (eller trycker på overlayen)
 2. Rubrik "Spara i …" (vänsterställd) och högerställd textlänk **"Ny samling"** (neutral) → Skapa samling i samma kort (full höjd, chevron tillbaka); Spara skapar samlingen med produkten i, kortet stängs
-3. Lista: **Sparade produkter** alltid överst (bokmärke, antal), sedan egna samlingar (mosaik 48, namn, "Privat/Publik · N produkter"), val-cirkel till höger; tryck växlar direkt, flera går
+3. Lista: **Sparade produkter** alltid överst (bokmärke, antal), sedan egna samlingar (mosaik 48, namn, "Privat/Publik · N produkter") och önskelistor (gåva, "Önskelista · N produkter"), med en liten etikett "Samlingar" / "Önskelistor" före varje grupp när båda finns (brief 75); val-cirkel till höger; tryck växlar direkt, flera går
 4. Ingen CTA nedtill (blur kvar), ingen produktchip, sök eller X
 5. Tomt läge: bara raden Sparade produkter; länken Ny samling finns kvar
 
