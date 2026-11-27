@@ -166,6 +166,8 @@ export const snackbar = {
   thumb: 40,
   padding: 10,
   bottomOffset: 40,
+  /** Plus/minus-märke på miniatyren (brief 71): cirkel 18 inklusive kant 1,5 i snackbarens yta, ikon 12. */
+  badge: { size: 18, icon: 12, border: 1.5 },
 } as const;
 
 /** Sidindikator (PagerDots, brief 19): cirkel 6, aktiv punkt 18 lång, avstånd 6. */

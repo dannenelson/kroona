@@ -71,12 +71,13 @@ export function useOpenSaveSheet() {
         snackbar.show(
           session.size === 1
             ? id === ALL_SAVED_ID
-              ? { subject: product.name, text: ADDED_TEXT, thumbUri: product.imageUrl, action: visa }
-              : { subject: product.name, text: 'lades till i', object: name, thumbUri: product.imageUrl, action: visa }
+              ? { subject: product.name, text: ADDED_TEXT, thumbUri: product.imageUrl, badge: 'add', action: visa }
+              : { subject: product.name, text: 'lades till i', object: name, thumbUri: product.imageUrl, badge: 'add', action: visa }
             : {
                 subject: product.name,
                 text: `lades till i ${session.size} samlingar`,
                 thumbUri: product.imageUrl,
+                badge: 'add',
                 action: { label: 'Visa', onPress: () => router.navigate('/saved') },
               },
         );
@@ -118,8 +119,8 @@ export function useSaveActions(productId: string) {
     const subject = product?.name ?? 'Produkten';
     snackbar.show(
       inSavedProducts
-        ? { subject, text: REMOVED_TEXT, thumbUri: product?.imageUrl }
-        : { subject, text: ADDED_TEXT, thumbUri: product?.imageUrl, action: { label: 'Ändra', onPress: openSheet } },
+        ? { subject, text: REMOVED_TEXT, thumbUri: product?.imageUrl, badge: 'remove' }
+        : { subject, text: ADDED_TEXT, thumbUri: product?.imageUrl, badge: 'add', action: { label: 'Ändra', onPress: openSheet } },
     );
   };
   return { saved, inSavedProducts, quickSave, openSheet };

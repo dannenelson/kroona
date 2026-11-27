@@ -17,6 +17,7 @@ import { useReduceMotion } from '../hooks/useReduceMotion';
 import { haptic } from '../utils/haptic';
 import { tabBarSpace } from './CustomTabBar';
 import Button from './Button';
+import Icon from './Icon';
 
 export type SnackbarOptions = {
   /** Meningen (utan namnen), t.ex. "lades till i sparade produkter". */
@@ -27,6 +28,8 @@ export type SnackbarOptions = {
   object?: string;
   /** Miniatyr (t.ex. produktbilden) till vänster. */
   thumbUri?: string;
+  /** Märke på miniatyren (brief 71): plus när en produkt lades till, minus när den togs bort. Kräver `thumbUri`. */
+  badge?: 'add' | 'remove';
   /** Valfri åtgärd, t.ex. { label: 'Visa', onPress }. */
   action?: { label: string; onPress: () => void };
 };
@@ -48,7 +51,7 @@ const TAB_PATHS = new Set(['/', '/feed', '/find', '/saved']);
 
 export function SnackbarProvider({ children }: { children: ReactNode }) {
   const styles = useStyles();
-  const { scheme, shadows } = useTheme();
+  const { scheme, shadows, colors } = useTheme();
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const reduceMotion = useReduceMotion();
@@ -56,6 +59,8 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
   // 0 = dold, 1 = synlig. Svepet nedåt läggs ovanpå som egen förflyttning.
   const shown = useRef(new Animated.Value(0)).current;
   const drag = useRef(new Animated.Value(0)).current;
+  // Märkets pop (1 → popScale → 1, som usePop) när snackbaren visas.
+  const badgePop = useRef(new Animated.Value(1)).current;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const hide = useCallback(() => {
@@ -83,10 +88,18 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
       } else {
         Animated.spring(shown, { toValue: 1, ...motion.spring, useNativeDriver: true }).start();
       }
+      badgePop.setValue(1);
+      if (options.badge && options.thumbUri && !reduceMotion) {
+        Animated.sequence([
+          Animated.delay(motion.duration.fast),
+          Animated.timing(badgePop, { toValue: motion.popScale, duration: motion.popIn, useNativeDriver: true }),
+          Animated.spring(badgePop, { toValue: 1, ...motion.popSpring, useNativeDriver: true }),
+        ]).start();
+      }
       haptic.success();
       timer.current = setTimeout(hide, motion.snackbar.duration);
     },
-    [drag, hide, reduceMotion, shown],
+    [badgePop, drag, hide, reduceMotion, shown],
   );
 
   // Svep nedåt: följer fingret, släpp efter `dismissDistance` döljer, annars tillbaka.
@@ -137,7 +150,22 @@ export function SnackbarProvider({ children }: { children: ReactNode }) {
                 style={[StyleSheet.absoluteFill, styles.shape]}
               />
               <View style={[StyleSheet.absoluteFill, styles.fill]} />
-              {current.thumbUri ? <Image source={{ uri: current.thumbUri }} style={styles.thumb} /> : null}
+              {current.thumbUri ? (
+                <View>
+                  <Image source={{ uri: current.thumbUri }} style={styles.thumb} />
+                  {current.badge ? (
+                    // Plus/minus i övre högra hörnet, halvt utanför (brief 71). Inverterat som vald
+                    // pill. Dekor: meningen säger redan "lades till" / "togs bort".
+                    <Animated.View style={[styles.badge, { transform: [{ scale: badgePop }] }]}>
+                      <Icon
+                        name={current.badge === 'add' ? 'plus' : 'minus'}
+                        color={colors.bg}
+                        size={snackbar.badge.icon}
+                      />
+                    </Animated.View>
+                  ) : null}
+                </View>
+              ) : null}
               <View
                 style={styles.textBlock}
                 accessible
@@ -208,6 +236,19 @@ const useStyles = makeStyles((t) => ({
     borderRadius: radius.tile,
     borderCurve: 'continuous',
     backgroundColor: t.colors.placeholder,
+  },
+  badge: {
+    position: 'absolute',
+    top: -snackbar.badge.size / 2,
+    right: -snackbar.badge.size / 2,
+    width: snackbar.badge.size,
+    height: snackbar.badge.size,
+    borderRadius: radius.full,
+    borderWidth: snackbar.badge.border,
+    borderColor: t.colors.surface,
+    backgroundColor: t.colors.textPrimary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   // Fyller bredden mellan miniatyr och åtgärd, så att åtgärden alltid står längst till höger.
   textBlock: {

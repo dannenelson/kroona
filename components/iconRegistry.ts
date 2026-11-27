@@ -54,6 +54,7 @@ import I_masonry from '../assets/svg/icons/masonry.svg';
 import I_maximize from '../assets/svg/icons/maximize.svg';
 import I_message from '../assets/svg/icons/message.svg';
 import I_microphone from '../assets/svg/icons/microphone.svg';
+import I_minus from '../assets/svg/icons/minus.svg';
 import I_moon from '../assets/svg/icons/moon.svg';
 import I_more_horizontal from '../assets/svg/icons/more-horizontal.svg';
 import I_more_vertical from '../assets/svg/icons/more-vertical.svg';
@@ -146,6 +147,7 @@ export const iconRegistry = {
   'maximize': I_maximize,
   'message': I_message,
   'microphone': I_microphone,
+  'minus': I_minus,
   'moon': I_moon,
   'more-horizontal': I_more_horizontal,
   'more-vertical': I_more_vertical,

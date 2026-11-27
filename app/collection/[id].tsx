@@ -294,6 +294,7 @@ export default function CollectionScreen() {
                           text: 'togs bort från',
                           object: collection.name,
                           thumbUri: p.imageUrl,
+                          badge: 'remove',
                         });
                       }}
                     />
