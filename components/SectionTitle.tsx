@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { View, Text, Pressable, StyleProp, ViewStyle } from 'react-native';
-import { makeStyles, useTheme, typography, letterSpacing, spacing, touchTarget, sectionLink, motion, iconSize } from '../theme';
+import { makeStyles, useTheme, typography, letterSpacing, spacing, touchTarget, sectionLink, sectionTitleIcon, motion, iconSize } from '../theme';
 import Icon, { type IconName } from './Icon';
 
 type PreOrSubHeader =
@@ -32,7 +32,7 @@ export default function SectionTitle({ title, count, leadingIcon, preheader, sub
   const { colors } = useTheme();
   const ctaLabel = cta?.label ?? 'Visa fler';
   return (
-    <View style={[styles.wrapper, style]}>
+    <View style={[styles.wrapper, leadingIcon && styles.wrapperWithIcon, style]}>
       <View style={styles.textBlock}>
         {preheader ? <Text style={styles.preheader}>{preheader}</Text> : null}
         <View style={styles.titleRow}>
@@ -77,6 +77,10 @@ const useStyles = makeStyles((t) => ({
     gap: spacing.md,
     marginBottom: spacing.md,
   },
+  // Rubrik med ikon: tätare till innehållet (8 i stället för 12).
+  wrapperWithIcon: {
+    marginBottom: sectionTitleIcon.marginBottom,
+  },
   textBlock: {
     flex: 1,
   },
@@ -87,12 +91,12 @@ const useStyles = makeStyles((t) => ({
     textTransform: 'uppercase',
     marginBottom: spacing.xs,
   },
-  // Ikon + rubrik (brief 73): spacing.sm emellan, toppställda så att ikonen
+  // Ikon + rubrik (brief 73): 6 emellan, toppställda så att ikonen
   // ligger mot första raden om rubriken bryts.
   titleRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: spacing.sm,
+    gap: sectionTitleIcon.gap,
   },
   leadingIcon: {
     height: typography.title2.lineHeight,

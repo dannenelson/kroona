@@ -187,6 +187,14 @@ export const sectionLink = {
   gap: 2,
 } as const;
 
+/** Sektionsrubrik med ledande ikon (brief 73, justerat 2026-11-27): 6 mellan ikon
+ *  och text (utanför 4-punktsskalan med avsikt) och tätare till innehållet under
+ *  (`spacing.sm` i stället för `spacing.md`). Gäller bara rubriker med ikon. */
+export const sectionTitleIcon = {
+  gap: 6,
+  marginBottom: spacing.sm,
+} as const;
+
 /** Följer (brief 59): masonry 2 kolumner (`spacing.gutter` emellan) med 20 mellan
  *  korten i höjdled; en kolumn med kort i full bredd och 28 mellan. */
 export const followFeed = {
