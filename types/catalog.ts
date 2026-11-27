@@ -25,7 +25,8 @@ export interface CatalogProduct {
   imageUrl: string;
   aspectRatio?: number;
   featured?: boolean;
-  sustainabilityScore: number;
+  /** Hållbarhetsindex 1–5. Saknas = "Ej redovisat" (brief 71): inget löv på kort. */
+  sustainabilityScore?: number;
   /** Kundbetyg 0–5 med en decimal (brief 60). Saknas = inget betyg visas. */
   rating?: number;
   /** Antal omdömen bakom betyget. */

@@ -243,9 +243,13 @@ export default function ProductScreen() {
   };
 
   const facts: Fact[] = [
-    // "Ej redovisat" om index saknas (brief 70; i dummydatan har alla produkter ett).
-    indexFact(product.sustainabilityScore, 'Produkten saknar redovisning av hållbarhet.', () =>
-      openIndexSheet(product.sustainabilityScore, product.id),
+    // "Ej redovisat" om index saknas (brief 70–71), då ingen "Så räknar vi".
+    indexFact(
+      product.sustainabilityScore,
+      'Produkten saknar redovisning av hållbarhet.',
+      product.sustainabilityScore !== undefined
+        ? () => openIndexSheet(product.sustainabilityScore!, product.id)
+        : undefined,
     ),
     ...(product.facts?.material ? [{ label: 'Material', value: product.facts.material }] : []),
     ...(product.facts?.madeIn ? [{ label: 'Tillverkad i', value: product.facts.madeIn }] : []),

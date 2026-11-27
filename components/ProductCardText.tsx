@@ -22,7 +22,8 @@ type Props = {
   price: number;
   rating?: number;
   reviewCount?: number;
-  sustainabilityScore: number;
+  /** Saknas = inget löv (brief 71). */
+  sustainabilityScore?: number;
   /** Storleksvariant: M (små kort) eller L (stora kort). Byter bara storlek och radhöjd. */
   size?: 'M' | 'L';
   /** Spara-knappen på namnraden. Bara där kortet har den i dag (en-kolumn i Följer). */
@@ -75,6 +76,8 @@ export default function ProductCardText({
           <Text style={sized.currency}>{' '}kr</Text>
         </Text>
       </View>
+      {/* Utan betyg och index (brief 71) ritas ingen betygsrad. */}
+      {(rating !== undefined || sustainabilityScore !== undefined) && (
       <View
         style={styles.ratings}
         onLayout={(e) => {
@@ -83,7 +86,19 @@ export default function ProductCardText({
         }}
       >
         {rating !== undefined && (
-          <View style={styles.rating}>
+          <View
+            style={styles.rating}
+            // Utan löv är betyget sista gruppen och mäts i stället (brief 71).
+            onLayout={
+              sustainabilityScore === undefined
+                ? (e) => {
+                    const { x, width } = e.nativeEvent.layout;
+                    ratingsRow.current.leafEnd = x + width;
+                    checkRatingsFit();
+                  }
+                : undefined
+            }
+          >
             {/* Kontur som lövet (brief 61), inte fylld. */}
             <Icon name="star" color={colors.textSecondary} size={typography.caption.fontSize} />
             <Text style={styles.ratingText}>{formatScore(rating)}</Text>
@@ -92,19 +107,23 @@ export default function ProductCardText({
             )}
           </View>
         )}
-        {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning. */}
-        <View
-          style={styles.rating}
-          onLayout={(e) => {
-            const { x, width } = e.nativeEvent.layout;
-            ratingsRow.current.leafEnd = x + width;
-            checkRatingsFit();
-          }}
-        >
-          <Icon name="leaf" color={colors.textSecondary} size={typography.caption.fontSize} />
-          <Text style={styles.ratingText}>{formatScore(sustainabilityScore)}</Text>
-        </View>
+        {/* Hållbarhet visas neutralt (textSecondary), inte med success/warning.
+            Utan index inget löv (brief 71). */}
+        {sustainabilityScore !== undefined && (
+          <View
+            style={styles.rating}
+            onLayout={(e) => {
+              const { x, width } = e.nativeEvent.layout;
+              ratingsRow.current.leafEnd = x + width;
+              checkRatingsFit();
+            }}
+          >
+            <Icon name="leaf" color={colors.textSecondary} size={typography.caption.fontSize} />
+            <Text style={styles.ratingText}>{formatScore(sustainabilityScore)}</Text>
+          </View>
+        )}
       </View>
+      )}
     </View>
   );
 }

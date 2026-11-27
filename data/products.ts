@@ -61,7 +61,7 @@ export const CATALOG: CatalogProduct[] = [
     name: 'Brass Pendant Set',
     imageUrl: I.lampsBrass,
     aspectRatio: 500 / 750,
-    sustainabilityScore: 4.4,
+    // TESTDATA (brief 71): saknar hållbarhetsindex, tidigare 4.4
     rating: 3.9,
     reviewCount: 204,
     isNewArrival: true,
@@ -77,7 +77,7 @@ export const CATALOG: CatalogProduct[] = [
     name: 'Red Runner Sneaker med stötdämpande sula och reflexdetaljer', // TESTDATA långt namn, tidigare 'Red Runner Sneaker'
     imageUrl: I.sneakerRedRunner,
     aspectRatio: 500 / 333,
-    sustainabilityScore: 3.3,
+    // TESTDATA (brief 71): saknar hållbarhetsindex, tidigare 3.3
     category: 'kläder',
     style: 'Sportig',
     gender: 'unisex',
@@ -104,7 +104,7 @@ export const CATALOG: CatalogProduct[] = [
     name: 'Smart Speaker',
     imageUrl: I.speakerSmart,
     aspectRatio: 500 / 750,
-    sustainabilityScore: 3.4,
+    // TESTDATA (brief 71): saknar hållbarhetsindex, tidigare 3.4
     rating: 4.1,
     reviewCount: 433,
     isNewArrival: true,

@@ -13,7 +13,7 @@ function formatProductLine(p: Product): string {
       ? [p.gender, p.ageGroup].filter(Boolean).join(', ')
       : [p.type, p.material].filter(Boolean).join(', ');
   const status = p.isUsed ? 'begagnad' : p.isNew ? 'ny' : '';
-  return `${p.id}|${p.brand}|${p.name}|${p.price} kr|${p.category}|${p.style}|${attrs}|${status}|hållbarhet ${p.sustainabilityScore}`;
+  return `${p.id}|${p.brand}|${p.name}|${p.price} kr|${p.category}|${p.style}|${attrs}|${status}|hållbarhet ${p.sustainabilityScore ?? 'ej redovisat'}`;
 }
 
 function buildCatalogBlock(): string {

@@ -18,7 +18,7 @@ type Props = {
   name: string;
   price: number;
   imageUrl: string;
-  sustainabilityScore: number;
+  sustainabilityScore?: number;
   isNew?: boolean;
   isUsed?: boolean;
   featured?: boolean;
