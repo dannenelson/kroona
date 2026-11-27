@@ -143,7 +143,7 @@ export default function PartnerScreen() {
           </View>
 
           {/* Hållbarhet (brief 69–70): alltid; "Ej redovisat" utan index, certifikat och initiativ bara när de finns. */}
-          <SustainabilitySection retailer={retailer} titleStyle={styles.sectionTitle} />
+          <SustainabilitySection retailer={retailer} indexSeed={retailer.id} titleStyle={styles.sectionTitle} />
 
           {presence.length > 0 && (
             <>

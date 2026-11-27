@@ -42,6 +42,7 @@ import SectionTitle from '../../components/SectionTitle';
 import ProductCard from '../../components/ProductCard';
 import NameWithSave from '../../components/product/NameWithSave';
 import { FactList, indexFact, type Fact } from '../../components/product/FactList';
+import { useOpenIndexSheet } from '../../components/SustainabilityIndexSheet';
 import OfferRow from '../../components/product/OfferRow';
 import Icon from '../../components/Icon';
 import type { Offer } from '../../types/catalog';
@@ -64,6 +65,8 @@ export default function ProductScreen() {
   // `b` = boundary-id för det kort man öppnade från (zoomen går från/till det).
   const { id, b } = useLocalSearchParams<{ id: string; b?: string }>();
   const router = useRouter();
+  // "Så räknar vi" (brief 70): tryck på indexraden.
+  const openIndexSheet = useOpenIndexSheet();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const styles = useStyles();
@@ -183,7 +186,9 @@ export default function ProductScreen() {
 
   const facts: Fact[] = [
     // "Ej redovisat" om index saknas (brief 70; i dummydatan har alla produkter ett).
-    indexFact(product.sustainabilityScore, 'Produkten saknar redovisning av hållbarhet.'),
+    indexFact(product.sustainabilityScore, 'Produkten saknar redovisning av hållbarhet.', () =>
+      openIndexSheet(product.sustainabilityScore, product.id),
+    ),
     ...(product.facts?.material ? [{ label: 'Material', value: product.facts.material }] : []),
     ...(product.facts?.madeIn ? [{ label: 'Tillverkad i', value: product.facts.madeIn }] : []),
     ...(product.facts?.certification

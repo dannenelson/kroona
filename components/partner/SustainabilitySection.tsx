@@ -12,10 +12,13 @@ import { haptic } from '../../utils/haptic';
 import { FactList, indexFact } from '../product/FactList';
 import { SheetContent, useSheet } from '../Sheet';
 import SectionTitle from '../SectionTitle';
+import { useOpenIndexSheet } from '../SustainabilityIndexSheet';
 import Icon from '../Icon';
 
 type Props = {
   retailer: Pick<Retailer, 'sustainabilityIndex' | 'certifications' | 'initiatives'>;
+  /** Frö för "Så räknar vi" (företagets id), så att delposterna är stabila. */
+  indexSeed?: string;
   /** Rubrikens stil, samma som skärmens övriga avsnitt. */
   titleStyle?: StyleProp<ViewStyle>;
 };
@@ -24,10 +27,11 @@ export function hasSustainability({ sustainabilityIndex, certifications, initiat
   return sustainabilityIndex !== undefined || !!certifications?.length || !!initiatives?.length;
 }
 
-export default function SustainabilitySection({ retailer, titleStyle }: Props) {
+export default function SustainabilitySection({ retailer, titleStyle, indexSeed = '' }: Props) {
   const styles = useStyles();
   const { colors } = useTheme();
   const sheet = useSheet();
+  const openIndexSheet = useOpenIndexSheet();
   const { sustainabilityIndex, certifications = [], initiatives = [] } = retailer;
 
   const openCertification = (c: Certification) => {
@@ -50,7 +54,15 @@ export default function SustainabilitySection({ retailer, titleStyle }: Props) {
     <View>
       <SectionTitle title="Hållbarhet" style={titleStyle} />
       <View style={styles.parts}>
-        <FactList facts={[indexFact(sustainabilityIndex, 'Företaget har inte redovisat sin hållbarhet.')]} />
+        <FactList
+          facts={[
+            indexFact(
+              sustainabilityIndex,
+              'Företaget har inte redovisat sin hållbarhet.',
+              sustainabilityIndex !== undefined ? () => openIndexSheet(sustainabilityIndex, indexSeed) : undefined,
+            ),
+          ]}
+        />
 
         {certifications.length > 0 ? (
           <View style={styles.part}>
