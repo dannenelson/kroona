@@ -14,3 +14,6 @@ Idéer som inte är prioriterade än. Flytta till `plan.md` när de ska byggas.
 - **Elektronik-pill i Följer** (2026-11-26): Följer har pillar för Alla, Kläder, Möbler, Begagnat och följda områden, men ingen för Elektronik.
 - **Ångra i snackbarerna** (brief 61, 2026-11-26): fanns inte sedan tidigare; överväg på sikt.
 - **Kai som namn på AI:n** (2026-11-25): arbetsnamn för röstdialogen, könsneutralt. Kontrollera varumärke, uttal på svenska och engelska och betydelse innan det visas. Aldrig "Fråga Kroona".
+- **Kommentarer på produkter** (2026-11-27, Fas 1+): användare kommenterar produkter, andra ger tumme upp/ner (hjälpsam eller inte), profilen visar antal bidrag. Uppmuntrar användare att bygga profiler. Kräver konton och moderering.
+- **Betygens datakälla** (2026-11-27, Fas 1+): bara bekräftade köp, eller alla? Öppet. Ett tomt betygsfält är inte önskvärt.
+- **Certifikat och initiativ per produkt** (2026-11-27): hur de ska visas på företag och produkt är öppet. Hållbarhetsindexet får en sheet "Så räknar vi" (brief 70).

@@ -43,10 +43,10 @@ Hem är det som är relevant nu, Följer är det man följer. Fliken hette Flöd
 - **Nytt (Köp hos):** sorterbart, default pris.
 - **Hållbarhet** informerar och dömer aldrig. Data visas neutralt.
 - **Tillbaka-knappen** går alltid till skärmen man kom från.
-- **Produktkort** (briefer 62, 68): textblocket är en komponent i två kolumner (text vänster, knapp höger, båda överjusterade); märke, namn och pris tätt, betyg på egen rad ("★ 4,7 (312)"); namnet radbryter före knappen (max 2 rader). Företagsnamnet är inte klickbart på korten. På Produktdetalj står betyget direkt under namn och pris, märket öppnar företagets profil om den finns, och Spara är en rund ikonknapp på namnraden.
-- **Spara på kort i gridar** ligger i kontextmenyn (mer-knapp eller långt tryck), som Pinterest. Stora kort i en-kolumnsvyn i Följer och Produktdetalj har bokmärkesknapp på namnraden.
+- **Produktkort** (briefer 62, 68): textblocket är en komponent i två kolumner (text vänster, knapp höger, båda överjusterade); märke, namn och pris tätt, betyg på egen rad, tillsammans med hållbarhet ("★ 4,7 (312)" och lövet); namnet radbryter före knappen (max 2 rader). Företagsnamnet är inte klickbart på korten. På Produktdetalj står betyget direkt under namn och pris, märket öppnar företagets profil om den finns, och Spara är en rund ikonknapp på namnraden.
+- **Spara på kort i gridar** ligger i kontextmenyn, som Pinterest, öppnad med långt tryck (bilden lyfts, bakgrunden suddas). Inga synliga CTA:er i gridar. På Produktdetalj ersätter en mer-knapp (⋯) Dela, och Dela ligger i dess meny. Mer-knappen öppnar en vanlig kontextmeny förankrad vid knappen, utan lyft bild och blur (beslutat 2026-11-27, brief 70; gäller även mer-knappen på egna samlingar i Sparat). Stora kort i en-kolumnsvyn i Följer och Produktdetalj har bokmärkesknapp på namnraden.
 - **Kategorier** i demot: Kläder, Möbler, Elektronik (teknikprodukterna, sedan uppföljningen av brief 66) och Begagnat.
-- **Hållbarhet på företag** (brief 69, dummy): hållbarhetsindex (samma skala som produkter), certifikat och hållbara initiativ visas på företagsprofilen om de finns; saknas uppgifter visas ingen sektion. Se `docs/spec-forslag.md` (Spec §9 säger att företag utan redovisning visas med tomt index).
+- **Hållbarhet på företag** (brief 69, dummy): hållbarhetsindex (samma skala som produkter), certifikat och hållbara initiativ visas på företagsprofilen. **Beslutat 2026-11-27:** företag utan uppgifter visas som "Ej redovisat" (inte dolt), som incitament till transparens, i linje med Spec §9 (byggs i brief 70). Tryck på indexet (produkt och företag) öppnar en sheet som visar hur siffran räknats fram. Se `docs/spec-forslag.md` B1.
 - **Navigation till detaljvyer** (Produkt, Samling, Partner): öppnas med zoom från källelementet och stängs med swipe ned, kantswipe eller tillbaka-knappen till föregående skärm. Alla produktkort öppnar Produktdetalj, och man kommer alltid tillbaka till exakt den plats man kom från (se design.md §8c).
 - **Egna samlingar** byggs i Fas 0 med lokal lagring (AsyncStorage).
 - **Område** = kategori eller stil med kurerat innehåll (t.ex. Hemmakontor, Skandinavisk stil).
@@ -80,7 +80,7 @@ Typer i `types/catalog.ts`, data i `data/`, urvalsfunktioner i `lib/catalog.ts`.
 
 **Samling ↔ varumärke (Daniel, 2026-11-20, brief 29):** en samling är en kuraterad produktuppsättning med en kurator: Kroona (teman, editorial som Spotify-spellistor), ett varumärke (kollektioner) eller en användare (egna samlingar, senare). Ett varumärke är en egen entitet (`Retailer`, `brand`) med en egen sida, Partnerdetalj, som bär varumärkets kollektioner och alla dess produkter. Att varumärken skapar samlingar själva är Fas 1+; i Fas 0 är kollektionerna dummydata (`RETAILER_COLLECTIONS`, 2 vardera för J.Lindeberg och Filippa K). Varumärkes-filtersamlingarna J.Lindeberg och Filippa K i `COLLECTIONS` finns kvar tills Hem/Följer omarbetas (Följer, personalisering och följ-lagringen bygger på dem); kort för dem öppnar Partnerdetalj, och följ av varumärket använder deras id som nyckel (`getRetailerFollowKey`).
 
-**Dummydata:** se Katalogen (brief 48). Förvalda följda: områdena Hemmakontor och Mjukt hem, varumärkena J.Lindeberg och Filippa K. Fem produkter har tillfälligt långa testnamn (märkta `// TESTDATA` i `data/products.ts`).
+**Dummydata:** se Katalogen (brief 48). Förvalt följt i koden: alla Kroona-samlingar, inklusive varumärkesfiltersamlingarna J.Lindeberg och Filippa K. Inga områden är förvalt följda (`defaultFollowed` på områden används inte); om Hemmakontor och Mjukt hem ska vara det är ett öppet beslut (se `plan.md`). Fem produkter har tillfälligt långa testnamn (märkta `// TESTDATA` i `data/products.ts`).
 
 **Bakåtkompatibilitet:** `PRODUCTS` (kortformatet `Product` i `types/product.ts`) härleds med `toCardProduct` (`lib/cardProduct.ts`): `price` = lägsta nya pris, annars lägsta begagnade · `isUsed` = inga nya erbjudanden (bara begagnat) · `isNew` = `isNewArrival` · `material` = `facts.material`. Befintliga komponenter och skärmar läser samma fält som förut och är oförändrade.
 
@@ -107,3 +107,7 @@ J.Lindeberg (varm intro) · RevolutionRace · Nordic Nest · Adtraction. Vinkel:
 - **"Konto från dag ett"** är ett Fas 1-krav. Fas 0 har inget konto eller backend.
 - **Onboarding (5 steg)** är medvetet parkerad och inte planerad i Fas 0.
 - **Flikarnas roller ändrades 2026-11-18.** Tidigare: Hem känt, Flöde upptäckt med masonry. Nu: Hem hyllor, Följer (hette Flöde till brief 44) följda. Wireframes, ia-karta och Spec bör justeras vid tillfälle.
+
+## Fas 1+ (beslutat, ej i Fas 0)
+- **Kommentarer på produkter** (2026-11-27): användare kan kommentera, andra ger tumme upp/ner (hjälpsam eller inte), profilen visar antal bidrag. Inte betyg. Betygens datakälla (bara bekräftade köp eller alla) är öppen. I Fas 0 finns dummybetyg.
+- **Elektronik** är en testkategori; fler kategorier öppnas senare.
