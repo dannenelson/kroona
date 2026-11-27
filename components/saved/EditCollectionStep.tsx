@@ -1,7 +1,8 @@
 // Redigera en egen samling (brief 75, ersätter Byt namn): Sheet-steg med samma
 // namnfält som Skapa samling och raden "Håll samlingen privat", förinställd
 // efter samlingens läge. Spara är avstängt när namnet är tomt eller inget har
-// ändrats; Avbryt = stäng lagret (X). Typen går inte att ändra.
+// ändrats; Avbryt = stäng lagret (X). Typen går inte att ändra; en önskelista
+// är alltid privat och har bara namnfältet.
 // Snackbar (fetstilta namn): namnbyte "<gammalt> heter nu <nytt>", annars
 // "<namn> är nu privat/publik". Ändras båda visas snackbaren för namnet.
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import type { UserCollection } from '../../types/catalog';
 
 export function makeEditCollectionStep(collection: UserCollection): SheetStep {
   return {
-    title: 'Redigera samling',
+    title: collection.kind === 'wishlist' ? 'Redigera önskelista' : 'Redigera samling',
     render: () => <EditCollectionStep collection={collection} />,
   };
 }
@@ -29,6 +30,7 @@ function EditCollectionStep({ collection }: { collection: UserCollection }) {
   const [isPrivate, setIsPrivate] = useState(collection.visibility === 'private');
   const [focused, setFocused] = useState(false);
   const trimmed = name.trim();
+  const wishlist = collection.kind === 'wishlist';
   const visibility: UserCollection['visibility'] = isPrivate ? 'private' : 'public';
   const nameChanged = trimmed !== collection.name;
   const visibilityChanged = visibility !== collection.visibility;
@@ -54,13 +56,13 @@ function EditCollectionStep({ collection }: { collection: UserCollection }) {
       }
     >
       <Text style={styles.label} nativeID="edit-collection-label">
-        Namn på samlingen
+        {wishlist ? 'Namn på önskelistan' : 'Namn på samlingen'}
       </Text>
       <TextInput
         value={name}
         onChangeText={setName}
         maxLength={MAX_NAME}
-        placeholder="Min samling"
+        placeholder={wishlist ? 'Min önskelista' : 'Min samling'}
         placeholderTextColor={styles.placeholder.color}
         returnKeyType="done"
         onSubmitEditing={save}
@@ -68,10 +70,10 @@ function EditCollectionStep({ collection }: { collection: UserCollection }) {
         onBlur={() => setFocused(false)}
         selectionColor={styles.input.color}
         accessibilityLabelledBy="edit-collection-label"
-        accessibilityLabel="Namn på samlingen"
+        accessibilityLabel={wishlist ? 'Namn på önskelistan' : 'Namn på samlingen'}
         style={[styles.input, focused && styles.inputFocused]}
       />
-      <PrivateToggleRow value={isPrivate} onChange={setIsPrivate} />
+      {wishlist ? null : <PrivateToggleRow value={isPrivate} onChange={setIsPrivate} />}
     </SheetContent>
   );
 }

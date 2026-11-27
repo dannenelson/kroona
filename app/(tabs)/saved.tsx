@@ -98,7 +98,15 @@ export default function SavedScreen() {
   const { savedProducts } = useSavedProducts();
   const { userCollections } = useUserCollections();
   // A–Ö i svensk ordning vid visning (brief 42); Sparade produkter ligger fast först.
-  const sortedCollections = useMemo(() => sortByName(userCollections, (c) => c.name), [userCollections]);
+  // Två sektioner (brief 75): Samlingar och Önskelistor, var och en bara när den har innehåll.
+  const groups = useMemo(() => {
+    const sorted = sortByName(userCollections, (c) => c.name);
+    return [
+      { title: 'Samlingar', items: sorted.filter((c) => c.kind === 'collection') },
+      { title: 'Önskelistor', items: sorted.filter((c) => c.kind === 'wishlist') },
+    ].filter((g) => g.items.length > 0);
+  }, [userCollections]);
+  const collectionCount = userCollections.filter((c) => c.kind === 'collection').length;
   const [tab, setTab] = useState<(typeof TABS)[number]>('Mina samlingar');
   const [viewMode, setViewMode] = useViewMode();
   const openCreate = () => sheet.open(createCollectionStep);
@@ -108,10 +116,15 @@ export default function SavedScreen() {
   // från "mer"-knappen på raden, delad med ⋯ på Samlingsdetalj (brief 74).
   const userCollectionMenu = useUserCollectionMenu();
   const collectionMenu = (c: UserCollection, thumb?: string) => userCollectionMenu(c, { thumbUri: thumb });
-  const visibility = (c: UserCollection) => ({
-    subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length, 'produkt', 'produkter')}`,
-    icon: (c.visibility === 'public' ? undefined : 'lock') as IconName | undefined,
-  });
+  // Önskelista: gåva och "Önskelista · N" i stället för lås och Privat (alltid privat, brief 75).
+  const visibility = (c: UserCollection) => {
+    const n = countLabel(knownProductIds(c.productIds).length, 'produkt', 'produkter');
+    if (c.kind === 'wishlist') return { subtitle: `Önskelista · ${n}`, icon: 'gift' as IconName };
+    return {
+      subtitle: `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${n}`,
+      icon: (c.visibility === 'public' ? undefined : 'lock') as IconName | undefined,
+    };
+  };
   const savedSubtitle = countLabel(savedProducts.length, 'produkt', 'produkter');
 
   return (
@@ -131,7 +144,7 @@ export default function SavedScreen() {
         {tab === 'Mina samlingar' ? (
           <>
             <View style={styles.toolbar}>
-              <Text style={styles.count}>{countLabel(userCollections.length, 'samling', 'samlingar')}</Text>
+              <Text style={styles.count}>{countLabel(collectionCount, 'samling', 'samlingar')}</Text>
               <SegmentedIcons items={VIEW_MODES} selected={viewMode} onSelect={setViewMode} />
             </View>
 
@@ -139,40 +152,54 @@ export default function SavedScreen() {
               <View>
                 <SavedProductsRow subtitle={savedSubtitle} />
                 <View style={styles.divider} />
-                {sortedCollections.map((c) => (
-                  <CollectionListRow
-                    key={c.id}
-                    id={c.id}
-                    title={c.name}
-                    subtitle={visibility(c).subtitle}
-                    subtitleIcon={visibility(c).icon}
-                    images={imagesFor(c.productIds)}
-                    menuItems={collectionMenu(c, imagesFor(c.productIds)[0])}
-                    menuButton
-                  />
+                {groups.map((g) => (
+                  <View key={g.title} style={styles.listGroup}>
+                    <ListGroupTitle title={g.title} />
+                    {g.items.map((c) => (
+                      <CollectionListRow
+                        key={c.id}
+                        id={c.id}
+                        title={c.name}
+                        subtitle={visibility(c).subtitle}
+                        subtitleIcon={visibility(c).icon}
+                        images={imagesFor(c.productIds)}
+                        menuItems={collectionMenu(c, imagesFor(c.productIds)[0])}
+                        menuButton
+                      />
+                    ))}
+                  </View>
                 ))}
               </View>
             ) : (
-              <View style={styles.grid}>
-                <UserCollectionCard
-                  id={ALL_SAVED_ID}
-                  name={ALL_SAVED_NAME}
-                  subtitle={savedSubtitle}
-                  images={[]}
-                  width={cardWidth}
-                  cover={<SavedProductsTile size={cardWidth} tileRadius={radius.collection} large />}
-                />
-                {sortedCollections.map((c) => (
+              <View>
+                <View style={styles.grid}>
                   <UserCollectionCard
-                    key={c.id}
-                    id={c.id}
-                    name={c.name}
-                    subtitle={visibility(c).subtitle}
-                    subtitleIcon={visibility(c).icon}
-                    images={imagesFor(c.productIds)}
+                    id={ALL_SAVED_ID}
+                    name={ALL_SAVED_NAME}
+                    subtitle={savedSubtitle}
+                    images={[]}
                     width={cardWidth}
-                    menuItems={collectionMenu(c, imagesFor(c.productIds)[0])}
+                    cover={<SavedProductsTile size={cardWidth} tileRadius={radius.collection} large />}
                   />
+                </View>
+                {groups.map((g) => (
+                  <View key={g.title} style={styles.cardGroup}>
+                    <ListGroupTitle title={g.title} />
+                    <View style={styles.grid}>
+                      {g.items.map((c) => (
+                        <UserCollectionCard
+                          key={c.id}
+                          id={c.id}
+                          name={c.name}
+                          subtitle={visibility(c).subtitle}
+                          subtitleIcon={visibility(c).icon}
+                          images={imagesFor(c.productIds)}
+                          width={cardWidth}
+                          menuItems={collectionMenu(c, imagesFor(c.productIds)[0])}
+                        />
+                      ))}
+                    </View>
+                  </View>
                 ))}
               </View>
             )}
@@ -188,6 +215,18 @@ export default function SavedScreen() {
           <FollowingTab />
         )}
       </ScrollView>
+    </View>
+  );
+}
+
+/** Rubrik för en grupp i Mina samlingar (brief 75), samma stil som sektionerna i Följer. */
+function ListGroupTitle({ title }: { title: string }) {
+  const styles = useStyles();
+  return (
+    <View style={styles.sectionHeader}>
+      <Text style={styles.sectionTitle} accessibilityRole="header">
+        {title}
+      </Text>
     </View>
   );
 }
@@ -548,6 +587,13 @@ const useStyles = makeStyles((t) => ({
     marginHorizontal: spacing.screenMargin,
     marginVertical: spacing.xs,
     backgroundColor: t.colors.sep,
+  },
+  // Grupperna i Mina samlingar (brief 75): luft ovanför rubriken.
+  listGroup: {
+    paddingTop: spacing.sm,
+  },
+  cardGroup: {
+    paddingTop: spacing.xl,
   },
   grid: {
     flexDirection: 'row',

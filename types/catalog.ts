@@ -145,7 +145,10 @@ export type FollowTarget = { kind: 'retailer' | 'collection' | 'area' | 'person'
  *  Kurator `{ kind: 'user', id: 'me' }` ("Av dig"). En delmängd av "Alla sparade". */
 export interface UserCollection {
   id: string;
+  /** Samling eller Önskelista (brief 75). Saknas i äldre lagrad data → 'collection'. Kan inte ändras. */
+  kind: 'collection' | 'wishlist';
   name: string;
+  /** Önskelistor är alltid 'private'. */
   visibility: 'private' | 'public';
   productIds: string[];
   /** ISO-tid. */

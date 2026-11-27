@@ -111,7 +111,7 @@ export default function ContinueRow() {
               size={CARD_SIZE}
               status="Senast öppnad"
               title={lastOpenedCollection.name}
-              titleIcon={typeIcon('folder')}
+              titleIcon={typeIcon(lastOpenedCollection.kind === 'wishlist' ? 'gift' : 'folder')}
               subtitle={countLabel(knownProductIds(lastOpenedCollection.productIds).length)}
               cover={
                 collectionImages.length > 0 ? (

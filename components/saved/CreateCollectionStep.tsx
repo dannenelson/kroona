@@ -6,8 +6,17 @@ import { useUserCollections } from '../../context/UserCollectionsContext';
 import { SheetContent, useSheet, type SheetStep } from '../Sheet';
 import { useSnackbar } from '../Snackbar';
 import Button from '../Button';
+import SegmentedIcons from '../SegmentedIcons';
+import type { UserCollection } from '../../types/catalog';
 
 export const MAX_NAME = 40;
+
+/** Typvalet överst i Skapa (brief 75). */
+const KINDS = [
+  { value: 'collection', label: 'Samling', text: 'Samling' },
+  { value: 'wishlist', label: 'Önskelista', text: 'Önskelista' },
+] as const;
+const WISHLIST_HINT = 'Önskelistor är alltid privata. Du kan dela dem med andra senare.';
 
 /** Steget "Skapa samling" (brief 33), kan öppnas ensamt eller pushas i ett flöde. */
 export const createCollectionStep: SheetStep = {
@@ -25,9 +34,10 @@ export function makeCreateCollectionStep(onSaved: (id: string, name: string) => 
 }
 
 /**
- * Namn (autofokus, max 40 tecken) och "Håll samlingen privat" (på som
- * standard). Spara skapar samlingen, stänger lagret och visar en snackbar
- * "<namn> skapades · Visa".
+ * Typ överst (brief 75: Samling | Önskelista, förvald Samling; rubriken byter
+ * till "Skapa önskelista"), namn (autofokus, max 40 tecken) och "Håll
+ * samlingen privat" (på som standard; låst på för önskelistor). Spara skapar
+ * listan, stänger lagret och visar en snackbar "<namn> skapades · Visa".
  */
 function CreateCollectionStep({ onSaved }: { onSaved?: (id: string, name: string) => void }) {
   const styles = useStyles();
@@ -36,13 +46,19 @@ function CreateCollectionStep({ onSaved }: { onSaved?: (id: string, name: string
   const snackbar = useSnackbar();
   const { createCollection } = useUserCollections();
   const [name, setName] = useState('');
+  const [kind, setKind] = useState<UserCollection['kind']>('collection');
   const [isPrivate, setIsPrivate] = useState(true);
   const [focused, setFocused] = useState(false);
   const trimmed = name.trim();
+  const wishlist = kind === 'wishlist';
+  const selectKind = (k: UserCollection['kind']) => {
+    setKind(k);
+    sheet.setTitle(k === 'wishlist' ? 'Skapa önskelista' : 'Skapa samling');
+  };
 
   const save = () => {
     if (!trimmed) return;
-    const id = createCollection(trimmed, isPrivate ? 'private' : 'public');
+    const id = createCollection(trimmed, wishlist || isPrivate ? 'private' : 'public', kind);
     if (onSaved) {
       onSaved(id, trimmed);
       sheet.close();
@@ -65,14 +81,17 @@ function CreateCollectionStep({ onSaved }: { onSaved?: (id: string, name: string
         </Button>
       }
     >
+      <View style={styles.kind}>
+        <SegmentedIcons items={KINDS} selected={kind} onSelect={selectKind} />
+      </View>
       <Text style={styles.label} nativeID="collection-name-label">
-        Namn på samlingen
+        {wishlist ? 'Namn på önskelistan' : 'Namn på samlingen'}
       </Text>
       <TextInput
         value={name}
         onChangeText={setName}
         maxLength={MAX_NAME}
-        placeholder="Min samling"
+        placeholder={wishlist ? 'Min önskelista' : 'Min samling'}
         placeholderTextColor={styles.placeholder.color}
         autoFocus
         returnKeyType="done"
@@ -81,10 +100,14 @@ function CreateCollectionStep({ onSaved }: { onSaved?: (id: string, name: string
         onBlur={() => setFocused(false)}
         selectionColor={styles.input.color}
         accessibilityLabelledBy="collection-name-label"
-        accessibilityLabel="Namn på samlingen"
+        accessibilityLabel={wishlist ? 'Namn på önskelistan' : 'Namn på samlingen'}
         style={[styles.input, focused && styles.inputFocused]}
       />
-      <PrivateToggleRow value={isPrivate} onChange={setIsPrivate} />
+      {wishlist ? (
+        <PrivateToggleRow value onChange={() => {}} locked hint={WISHLIST_HINT} />
+      ) : (
+        <PrivateToggleRow value={isPrivate} onChange={setIsPrivate} />
+      )}
     </SheetContent>
   );
 }
@@ -125,6 +148,11 @@ export function PrivateToggleRow({
 }
 
 const useStyles = makeStyles((t) => ({
+  // Typvalet: vänsterställt, luft till namnfältet.
+  kind: {
+    alignSelf: 'flex-start',
+    marginBottom: spacing.xl,
+  },
   label: {
     ...typography.label,
     color: t.colors.textSecondary,

@@ -13,6 +13,15 @@ const LAST_OPENED_KEY = '@kroona/lastOpenedCollection';
 /** När den senast öppnades (ms), för ordningen i "Fortsätt där du var". Saknas för äldre data. */
 const LAST_OPENED_AT_KEY = '@kroona/lastOpenedCollectionAt';
 
+/**
+ * Lagrad data före brief 75 saknar `kind`: den blir Samling. Önskelistor är
+ * alltid privata, oavsett vad som ligger lagrat.
+ */
+function normalize(c: Omit<UserCollection, 'kind'> & { kind?: UserCollection['kind'] }): UserCollection {
+  const kind = c.kind ?? 'collection';
+  return { ...c, kind, visibility: kind === 'wishlist' ? 'private' : c.visibility };
+}
+
 /** Id för "Sparade produkter" i routes (`/collection/saved`, samma vy som samlingar). */
 export const ALL_SAVED_ID = 'saved';
 export const ALL_SAVED_NAME = 'Sparade produkter';
@@ -20,8 +29,12 @@ export const ALL_SAVED_NAME = 'Sparade produkter';
 type UserCollectionsContextValue = {
   userCollections: UserCollection[];
   getUserCollection: (id: string) => UserCollection | undefined;
-  /** Skapar en tom samling och returnerar dess id. */
-  createCollection: (name: string, visibility: UserCollection['visibility']) => string;
+  /** Skapar en tom samling eller önskelista (alltid privat) och returnerar dess id. */
+  createCollection: (
+    name: string,
+    visibility: UserCollection['visibility'],
+    kind?: UserCollection['kind'],
+  ) => string;
   /** Lägger till en produkt i en egen samling (oberoende av Sparade produkter).
    *  Används från "Lägg till i samling" (senare brief). */
   addProductToCollection: (collectionId: string, productId: string) => void;
@@ -54,7 +67,7 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
     (async () => {
       try {
         const raw = await AsyncStorage.getItem(STORAGE_KEY);
-        if (raw) setCollections(JSON.parse(raw));
+        if (raw) setCollections((JSON.parse(raw) as UserCollection[]).map(normalize));
         setLastOpenedId(await AsyncStorage.getItem(LAST_OPENED_KEY));
         setLastOpenedAt(Number(await AsyncStorage.getItem(LAST_OPENED_AT_KEY)) || 0);
       } catch (error) {
@@ -72,13 +85,17 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
     );
   }, [collections, isHydrated]);
 
-  const createCollection = (name: string, visibility: UserCollection['visibility']) => {
+  const createCollection = (
+    name: string,
+    visibility: UserCollection['visibility'],
+    kind: UserCollection['kind'] = 'collection',
+  ) => {
     // Avgränsare `_`, inte `:` (används i boundary-id:n, se ProductCard).
     // Tid + slumpdel, så att två samlingar skapade i samma millisekund inte krockar.
     const id = `uc_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
     setCollections((prev) => [
       ...prev,
-      { id, name: name.trim(), visibility, productIds: [], createdAt: new Date().toISOString() },
+      normalize({ id, kind, name: name.trim(), visibility, productIds: [], createdAt: new Date().toISOString() }),
     ]);
     return id;
   };
@@ -108,7 +125,9 @@ export function UserCollectionsProvider({ children }: { children: React.ReactNod
     const n = name?.trim();
     setCollections((prev) =>
       prev.map((c) =>
-        c.id === collectionId ? { ...c, ...(n ? { name: n } : null), ...(visibility ? { visibility } : null) } : c,
+        c.id === collectionId
+          ? normalize({ ...c, ...(n ? { name: n } : null), ...(visibility ? { visibility } : null) })
+          : c,
       ),
     );
   };

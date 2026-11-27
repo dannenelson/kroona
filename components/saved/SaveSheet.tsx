@@ -12,8 +12,8 @@
 // ("<produkt> lades till i <samling>" eller "… i N samlingar"); bara
 // borttagningar ger ingen snackbar.
 import { useRouter } from 'expo-router';
-import { View } from 'react-native';
-import { makeStyles, spacing, radius, control, listRow, iconSize } from '../../theme';
+import { Text, View } from 'react-native';
+import { makeStyles, spacing, radius, control, listRow, iconSize, typography } from '../../theme';
 import { useUserCollections } from '../../context/UserCollectionsContext';
 import { ALL_SAVED_ID, ALL_SAVED_NAME } from '../../context/UserCollectionsContext';
 import { useSavedProducts } from '../../context/SavedProductsContext';
@@ -126,13 +126,22 @@ export function useSaveActions(productId: string) {
   return { saved, inSavedProducts, quickSave, openSheet };
 }
 
-/** Listan i kortet: Sparade produkter överst, sedan egna samlingar. Skrollar med kortets gest. */
+/**
+ * Listan i kortet: Sparade produkter överst, sedan egna samlingar och
+ * önskelistor (brief 75; en liten etikett före varje grupp när båda finns,
+ * önskelistor med gåva). Skrollar med kortets gest.
+ */
 function SaveList({ productId, session }: { productId: string; session: Session }) {
   const styles = useStyles();
   const insets = useSheetInsets();
   const { savedProducts, isSaved, toggleSaved } = useSavedProducts();
   const { userCollections, addProductToCollection, removeProductFromCollection } = useUserCollections();
   const inSavedProducts = isSaved(productId);
+  const sorted = sortByName(userCollections, (c) => c.name);
+  const groups = [
+    { label: 'Samlingar', items: sorted.filter((c) => c.kind === 'collection') },
+    { label: 'Önskelistor', items: sorted.filter((c) => c.kind === 'wishlist') },
+  ].filter((g) => g.items.length > 0);
 
   const check = (on: boolean) => (
     <View style={[styles.check, on ? styles.checkOn : styles.checkOff]}>
@@ -166,40 +175,48 @@ function SaveList({ productId, session }: { productId: string; session: Session 
         accessibilityState={{ checked: inSavedProducts }}
         trailing={check(inSavedProducts)}
       />
-      {sortByName(userCollections, (c) => c.name).map((c) => {
-        const added = c.productIds.includes(productId);
-        const images = c.productIds
-          .map((id) => PRODUCTS.find((p) => p.id === id)?.imageUrl)
-          .filter((u): u is string => !!u)
-          .slice(0, 4);
-        return (
-          <ListRow
-            key={c.id}
-            compact
-            title={c.name}
-            subtitle={`${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${countLabel(knownProductIds(c.productIds).length)}`}
-            thumb={
-              <CollectionMosaic
-                images={images}
-                style={[styles.thumb, { width: listRow.compactThumb, height: listRow.compactThumb }]}
+      {groups.map((g) => (
+        <View key={g.label}>
+          {groups.length > 1 ? <Text style={styles.groupLabel}>{g.label}</Text> : null}
+          {g.items.map((c) => {
+            const added = c.productIds.includes(productId);
+            const images = c.productIds
+              .map((id) => PRODUCTS.find((p) => p.id === id)?.imageUrl)
+              .filter((u): u is string => !!u)
+              .slice(0, 4);
+            const n = countLabel(knownProductIds(c.productIds).length);
+            const wishlist = c.kind === 'wishlist';
+            return (
+              <ListRow
+                key={c.id}
+                compact
+                title={c.name}
+                subtitle={wishlist ? `Önskelista · ${n}` : `${c.visibility === 'public' ? 'Publik' : 'Privat'} · ${n}`}
+                subtitleIcon={wishlist ? 'gift' : undefined}
+                thumb={
+                  <CollectionMosaic
+                    images={images}
+                    style={[styles.thumb, { width: listRow.compactThumb, height: listRow.compactThumb }]}
+                  />
+                }
+                thumbRadius={radius.control}
+                onPress={() => {
+                  if (added) {
+                    removeProductFromCollection(c.id, productId);
+                    session.delete(c.id);
+                  } else {
+                    addProductToCollection(c.id, productId);
+                    session.set(c.id, c.name);
+                  }
+                }}
+                accessibilityLabel={`${c.name}, ${added ? 'tillagd' : 'inte tillagd'}`}
+                accessibilityState={{ checked: added }}
+                trailing={check(added)}
               />
-            }
-            thumbRadius={radius.control}
-            onPress={() => {
-              if (added) {
-                removeProductFromCollection(c.id, productId);
-                session.delete(c.id);
-              } else {
-                addProductToCollection(c.id, productId);
-                session.set(c.id, c.name);
-              }
-            }}
-            accessibilityLabel={`${c.name}, ${added ? 'tillagd' : 'inte tillagd'}`}
-            accessibilityState={{ checked: added }}
-            trailing={check(added)}
-          />
-        );
-      })}
+            );
+          })}
+        </View>
+      ))}
     </SheetScrollView>
   );
 }
@@ -219,6 +236,14 @@ const useStyles = makeStyles((t) => ({
   },
   savedIcon: {
     color: t.colors.textPrimary,
+  },
+  // Etikett före varje grupp när både samlingar och önskelistor finns (brief 75).
+  groupLabel: {
+    ...typography.label,
+    color: t.colors.textSecondary,
+    paddingHorizontal: spacing.screenMargin,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xs,
   },
   thumb: {
     borderRadius: radius.control,

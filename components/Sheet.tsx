@@ -96,6 +96,8 @@ type SheetApi = {
   /** Ett steg tillbaka; i första steget stängs lagret. */
   pop: () => void;
   close: () => void;
+  /** Byter rubrik på det aktuella steget (t.ex. Skapa samling → Skapa önskelista, brief 75). */
+  setTitle: (title: string) => void;
 };
 
 const SheetContext = createContext<SheetApi | null>(null);
@@ -289,7 +291,14 @@ export function SheetProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  const api = useMemo(() => ({ open, push, pop, close }), [open, push, pop, close]);
+  const setTitle = useCallback((title: string) => {
+    setSteps((prev) =>
+      prev.length === 0 || prev[prev.length - 1].title === title
+        ? prev
+        : [...prev.slice(0, -1), { ...prev[prev.length - 1], title }],
+    );
+  }, []);
+  const api = useMemo(() => ({ open, push, pop, close, setTitle }), [open, push, pop, close, setTitle]);
   const finishCardClose = useCallback(() => {
     setSteps([]);
     setCardClosing(false);

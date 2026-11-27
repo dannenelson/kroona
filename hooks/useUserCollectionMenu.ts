@@ -28,7 +28,7 @@ export function useUserCollectionMenu(): (c: UserCollection, options?: Options) 
   const { deleteCollection } = useUserCollections();
 
   const confirmDelete = (c: UserCollection, onDeleted?: () => void) =>
-    Alert.alert(`Ta bort ${c.name}?`, 'Samlingen tas bort. Produkterna finns kvar.', [
+    Alert.alert(`Ta bort ${c.name}?`, `${c.kind === 'wishlist' ? 'Önskelistan' : 'Samlingen'} tas bort. Produkterna finns kvar.`, [
       { text: 'Avbryt', style: 'cancel' },
       {
         text: 'Ta bort',
@@ -50,6 +50,10 @@ export function useUserCollectionMenu(): (c: UserCollection, options?: Options) 
         onEditContent ?? (() => router.push({ pathname: '/collection/[id]', params: { id: c.id, edit: '1' } })),
     },
     { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri }) },
-    { label: 'Ta bort samling', icon: 'trash', onPress: () => confirmDelete(c, onDeleted) },
+    {
+      label: c.kind === 'wishlist' ? 'Ta bort önskelista' : 'Ta bort samling',
+      icon: 'trash',
+      onPress: () => confirmDelete(c, onDeleted),
+    },
   ];
 }

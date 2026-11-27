@@ -41,6 +41,7 @@ import IconButton from '../../components/IconButton';
 import SectionTitle from '../../components/SectionTitle';
 import { COLLECTION_LOGOS } from '../../data/logos';
 import type { Product } from '../../types/product';
+import type { IconName } from '../../components/Icon';
 
 // Lokalt layoutmått: cover i samma proportion som Produktdetaljens hero (4:5).
 const ALL = 'Alla';
@@ -58,8 +59,8 @@ type CollectionView = {
   imageUrl?: string;
   /** Raden "vad av vem" i hero (brief 74), t.ex. "Kollektion av Filippa K". */
   byline: string;
-  /** Lås före raden för egna privata samlingar. */
-  private: boolean;
+  /** Ikon före raden: lås (egen privat samling) eller gåva (önskelista, brief 75). */
+  bylineIcon?: IconName;
   /** Kuratorns sida: Partnerdetalj (varumärke) eller profil (person). Raden är tryckbar bara då. */
   curatorHref?: { pathname: '/partner/[id]' | '/profile/[id]'; id: string };
   /** Bara kuraterade samlingar kan följas (egna har ingen Följ-knapp). */
@@ -121,7 +122,7 @@ export default function CollectionScreen() {
         name: ALL_SAVED_NAME,
         products: savedProducts,
         byline: 'Privat samling av dig',
-        private: true,
+        bylineIcon: 'lock',
         followable: false,
         followers: 0,
         byBrand: false,
@@ -136,13 +137,23 @@ export default function CollectionScreen() {
         products: userCollection.productIds
           .map((pid) => PRODUCTS.find((p) => p.id === pid))
           .filter((p): p is Product => !!p),
-        byline: userCollection.visibility === 'public' ? 'Publik samling av dig' : 'Privat samling av dig',
-        private: userCollection.visibility !== 'public',
+        // Önskelista (brief 75): alltid privat, gåva i stället för lås.
+        byline:
+          userCollection.kind === 'wishlist'
+            ? 'Önskelista av dig'
+            : userCollection.visibility === 'public'
+              ? 'Publik samling av dig'
+              : 'Privat samling av dig',
+        bylineIcon:
+          userCollection.kind === 'wishlist' ? 'gift' : userCollection.visibility === 'public' ? undefined : 'lock',
         followable: false,
         followers: 0,
         byBrand: false,
-        emptyTitle: 'Samlingen är tom',
-        emptyHint: 'Produkter du lägger här visas i den här samlingen.',
+        emptyTitle: userCollection.kind === 'wishlist' ? 'Önskelistan är tom' : 'Samlingen är tom',
+        emptyHint:
+          userCollection.kind === 'wishlist'
+            ? 'Produkter du lägger här visas i den här önskelistan.'
+            : 'Produkter du lägger här visas i den här samlingen.',
       };
     }
     const c = ALL_COLLECTIONS.find((x) => x.id === id);
@@ -160,7 +171,6 @@ export default function CollectionScreen() {
         : curator.personId
           ? `Samling av ${curator.name}`
           : 'Tema av Kroona',
-      private: false,
       curatorHref: curator.retailerId
         ? { pathname: '/partner/[id]', id: curator.retailerId }
         : curator.personId
@@ -277,7 +287,7 @@ export default function CollectionScreen() {
           title={collection.name}
           logo={COLLECTION_LOGOS[collection.id]}
           subtitle={collection.byline}
-          subtitleIcon={collection.private ? 'lock' : undefined}
+          subtitleIcon={collection.bylineIcon}
           onSubtitlePress={
             curatorHref
               ? () => router.push({ pathname: curatorHref.pathname, params: { id: curatorHref.id } })
