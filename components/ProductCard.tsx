@@ -9,6 +9,7 @@ import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import { useContextMenu, type ContextMenuItem } from './ProductContextMenu';
 import ProductCardText from './ProductCardText';
 import { useSaveActions } from './saved/SaveSheet';
+import { useSnackbar } from './Snackbar';
 import { useBrandFollowItem } from '../hooks/useBrandFollowItem';
 
 export type ProductCardSize = 'S' | 'M' | 'L';
@@ -80,6 +81,7 @@ export default function ProductCard({
   // den ligger där), "Spara i samling" = kortet "Spara i …". Fyllt bokmärke när
   // produkten ligger i Sparade produkter eller i någon samling.
   const save = useSaveActions(id);
+  const snackbar = useSnackbar();
   const cardRef = useRef<ComponentRef<typeof View>>(null);
   const contextMenu = useContextMenu();
   // Standard: öppna Produktdetalj, där kortets bild zoomar till heron (brief 13,
@@ -108,14 +110,15 @@ export default function ProductCard({
   const isLarge = size === 'L';
 
 
-  // Följ <märke> (brief 72) bara när märket har en profil. Dela och Visa
-  // liknande har ingen logik ännu, de stänger bara menyn.
+  // Följ <märke> (brief 72) bara när märket har en profil. Dela är en
+  // platshållare (samma snackbar som övriga Dela-val). Visa liknande har
+  // ingen logik ännu, det stänger bara menyn.
   const followItem = useBrandFollowItem(brand);
   const menuItems: ContextMenuItem[] = [
     { label: save.inSavedProducts ? 'Sparad' : 'Spara', icon: 'bookmark', filled: save.saved, onPress: save.quickSave },
     { label: 'Spara i samling', icon: 'folder-add', onPress: save.openSheet },
     ...(followItem ? [followItem] : []),
-    { label: 'Dela', icon: 'share' },
+    { label: 'Dela', icon: 'share', onPress: () => snackbar.show({ text: 'Delning kommer senare', thumbUri: imageUrl }) },
     { label: 'Visa liknande', icon: 'layers' },
   ];
 
